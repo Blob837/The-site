@@ -1460,54 +1460,141 @@ async function fetchTextWithFallback(url) {
   // Check cache first
   const cached = getCachedData(url);
   if (cached) return cached;
-  
+
   // Check if already fetching
   if (STATE.fetchQueue.has(url)) {
     return STATE.fetchQueue.get(url);
   }
-  
+
+  const supportsAbort = typeof AbortController !== 'undefined';
   const proxies = [
-    url => fetch(url, {
-      mode: 'cors', 
-      cache: 'no-cache',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; NewsBot/1.0)',
-        'Accept': 'application/rss+xml, application/xml, text/xml, */*'
-      }
-    }),
-    url => fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url)),
-    url => fetch('https://r.jina.ai/http/' + url.replace(/^https?:\/\//, ''))
-  ];
-  
-  const fetchPromise = (async () => {
-    for (let i = 0; i < proxies.length; i++) {
-      try { 
-        const response = await Promise.race([
-          proxies[i](url),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout')), i === 0 ? 5000 : 8000)
-          )
-        ]);
-        
-        if (response.ok) {
-          const text = await response.text();
-          if (text.length > 100) {
-            setCachedData(url, text);
-            STATE.fetchQueue.delete(url);
-            return text;
+    {
+      name: 'Direct',
+      delay: 0,
+      timeout: 4000,
+      request: (signal) => {
+        const options = {
+          mode: 'cors',
+          cache: 'no-cache',
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (compatible; NewsBot/1.0)',
+            'Accept': 'application/rss+xml, application/xml, text/xml, */*'
           }
-        }
-      } catch(e) { 
-        console.warn(`Proxy ${i+1} failed for ${url}:`, e.message);
-        continue; 
+        };
+        if (signal) options.signal = signal;
+        return fetch(url, options);
+      }
+    },
+    {
+      name: 'AllOrigins',
+      delay: 200,
+      timeout: 7000,
+      request: (signal) => {
+        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+        const options = { cache: 'no-store' };
+        if (signal) options.signal = signal;
+        return fetch(proxyUrl, options);
+      }
+    },
+    {
+      name: 'Jina',
+      delay: 400,
+      timeout: 7000,
+      request: (signal) => {
+        const proxyUrl = 'https://r.jina.ai/http/' + url.replace(/^https?:\/\//, '');
+        const options = { cache: 'no-store' };
+        if (signal) options.signal = signal;
+        return fetch(proxyUrl, options);
       }
     }
+  ];
+
+  const controllers = new Array(proxies.length).fill(null);
+  const timers = new Array(proxies.length).fill(null);
+  const startTimers = new Array(proxies.length).fill(null);
+  const errors = new Array(proxies.length).fill(null);
+  let resolved = false;
+
+  const cleanup = () => {
+    startTimers.forEach(timer => timer && clearTimeout(timer));
+    timers.forEach(timer => timer && clearTimeout(timer));
+    controllers.forEach(ctrl => ctrl && ctrl.abort());
+  };
+
+  const fetchPromiseInner = new Promise((resolve, reject) => {
+    proxies.forEach((proxy, index) => {
+      startTimers[index] = setTimeout(() => {
+        startTimers[index] = null;
+        if (resolved) return;
+
+        const controller = supportsAbort ? new AbortController() : null;
+        controllers[index] = controller;
+
+        if (proxy.timeout) {
+          timers[index] = setTimeout(() => {
+            if (controller) controller.abort();
+          }, proxy.timeout);
+        }
+
+        const recordFailure = (error) => {
+          if (resolved) return;
+          const failure = error || new Error('Unknown error');
+          errors[index] = failure;
+
+          if (failure.name !== 'AbortError') {
+            console.warn(`Proxy ${proxy.name} failed for ${url}:`, failure.message || failure);
+          }
+
+          if (errors.filter(Boolean).length === proxies.length) {
+            cleanup();
+            reject(new Error('All fetch methods failed for ' + url));
+          }
+        };
+
+        let requestPromise;
+        try {
+          requestPromise = proxy.request(controller ? controller.signal : undefined);
+        } catch (error) {
+          recordFailure(error);
+          return;
+        }
+
+        Promise.resolve(requestPromise)
+          .then(response => {
+            if (!response || !response.ok) {
+              throw new Error(`HTTP ${response ? response.status : 'no response'}`);
+            }
+            return response.text();
+          })
+          .then(text => {
+            if (!text || text.length < 100) {
+              throw new Error('Empty response');
+            }
+
+            if (resolved) return;
+            resolved = true;
+            cleanup();
+            setCachedData(url, text);
+            resolve(text);
+          })
+          .catch(recordFailure)
+          .finally(() => {
+            if (timers[index]) {
+              clearTimeout(timers[index]);
+              timers[index] = null;
+            }
+          });
+      }, proxy.delay || 0);
+    });
+  });
+
+  const sharedPromise = fetchPromiseInner.finally(() => {
+    cleanup();
     STATE.fetchQueue.delete(url);
-    throw new Error('All fetch methods failed for ' + url);
-  })();
-  
-  STATE.fetchQueue.set(url, fetchPromise);
-  return fetchPromise;
+  });
+
+  STATE.fetchQueue.set(url, sharedPromise);
+  return sharedPromise;
 }
 
 function parseRSS(xmlString, source) {
