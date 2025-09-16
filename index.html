@@ -15,12 +15,12 @@
     --ink:#e0e0e0;
     --muted:#8a8a8a;
     --accent:#ff4444;
-    --secondary:#44ff44;
+    --secondary:#666666;
     --warning:#ffaa44;
     --border:#333;
     --chip:#151515;
     --glow-red: rgba(255, 68, 68, 0.3);
-    --glow-green: rgba(68, 255, 68, 0.3);
+    --glow-grey: rgba(102, 102, 102, 0.3);
   }
   
   *{box-sizing:border-box}
@@ -102,14 +102,20 @@
   
   .btn:active{transform:translateY(1px)}
   
-  .btn.secondary{
-    border-color: var(--secondary); 
-    box-shadow: 0 0 10px rgba(68,255,68,0.1);
+  .btn.reset{
+    border-color: var(--warning); 
+    box-shadow: 0 0 10px rgba(255,170,68,0.1);
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 100;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
   }
   
-  .btn.secondary:hover{
-    background:var(--secondary); color:var(--bg);
-    box-shadow: 0 0 20px var(--glow-green);
+  .btn.reset:hover{
+    background:var(--warning); color:var(--bg);
+    box-shadow: 0 0 20px rgba(255,170,68,0.3);
   }
 
   /* Enhanced Filters */
@@ -139,7 +145,7 @@
   }
 
   /* Enhanced Main Content */
-  main{padding:1rem; max-width:900px; margin:0 auto; padding-bottom: 7rem;}
+  main{padding:1rem; max-width:900px; margin:0 auto; padding-bottom: 2rem;}
   
   .hint{
     font-size:0.75rem; color:var(--muted); margin:0.5rem 0;
@@ -162,13 +168,13 @@
   
   .src:hover{
     border-color: var(--secondary);
-    box-shadow: 0 0 8px rgba(68,255,68,0.2);
+    box-shadow: 0 0 8px var(--glow-grey);
     transform: translateY(-1px);
   }
   
   .src.on{
     color:var(--ink); background:var(--secondary); border-color:var(--secondary);
-    box-shadow:0 0 10px var(--glow-green);
+    box-shadow:0 0 10px var(--glow-grey);
   }
   
   .src.solo{
@@ -238,28 +244,9 @@
     display:block; animation:slideIn 0.3s ease-out;
   }
 
-  /* Enhanced Footer */
-  .footer{
-    position:fixed; bottom:0; left:0; right:0; z-index:90;
-    background: linear-gradient(180deg, rgba(10,10,10,0.95), var(--bg));
-    backdrop-filter: blur(15px);
-    padding:1rem calc(1rem + env(safe-area-inset-bottom));
-    border-top:2px solid var(--accent);
-    box-shadow: 0 0 20px rgba(255,68,68,0.2), 0 -8px 32px rgba(0,0,0,0.4);
-  }
-  
-  .footgrid{display:flex; gap:1rem; align-items:center;}
-  .footgrid .btn{flex:1}
-  
-  .count{
-    font-size:0.85rem; color:var(--muted); font-weight: 600;
-    background: var(--chip); padding: 0.5rem 0.8rem; border-radius: 6px;
-    border: 1px solid var(--border);
-  }
-
   /* Enhanced styling */
   a{color:var(--accent); text-decoration:none; font-weight: 600}
-  a:hover{color:var(--secondary); text-shadow: 0 0 5px var(--glow-green)}
+  a:hover{color:var(--secondary); text-shadow: 0 0 5px var(--glow-grey)}
   
   .empty{
     color:var(--muted); text-align:center; padding:3rem 1rem;
@@ -302,8 +289,12 @@
     .bar { padding: 0.8rem; }
     main { padding: 0.8rem; }
     .card-head { padding: 0.8rem; }
-    .footgrid { flex-direction: column; gap: 0.8rem; }
-    .footgrid .btn { flex: none; width: 100%; }
+    .btn.reset { 
+      bottom: 0.5rem; 
+      right: 0.5rem; 
+      padding: 0.5rem 0.6rem; 
+      font-size: 0.7rem; 
+    }
   }
 </style>
 </head>
@@ -337,13 +328,7 @@
   </div>
 </main>
 
-<div class="footer">
-  <div class="footgrid">
-    <div class="count" id="countInfo">0 articles loaded</div>
-    <button class="btn secondary" id="saveBtn">SAVE CONFIG</button>
-    <button class="btn" id="clearBtn">RESET ALL</button>
-  </div>
-</div>
+<button class="btn reset" id="resetBtn" title="Reset all sources and settings">RESET</button>
 
 <script>
 /* ================= ENHANCED CORE SYSTEM ================= */
@@ -384,11 +369,11 @@ function loadEnabled(){
 
 function saveEnabled(){
   localStorage.setItem('urnews.enabled', JSON.stringify([...STATE.enabled]));
-  toast('Configuration saved successfully', 'success');
+  toast('Configuration saved automatically', 'success');
 }
 
 function resetAll(){
-  if(confirm('Reset all settings and reload sources?')){
+  if(confirm('Reset all sources and settings? This will reload the page.')){
     localStorage.removeItem('urnews.enabled');
     STATE.enabled = new Set(SOURCES.map(s=>s.id));
     STATE.lastSolo = null;
@@ -405,7 +390,7 @@ function toast(msg, type = 'info'){
   const el = document.createElement('div');
   el.textContent = msg;
   el.style.cssText = `
-    position:fixed; bottom:120px; left:50%; transform:translateX(-50%);
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
     background:${type === 'success' ? 'var(--secondary)' : 'var(--accent)'};
     color:var(--bg); padding:0.8rem 1.2rem; border-radius:8px; z-index:999;
     font-weight:600; box-shadow:0 8px 25px rgba(0,0,0,0.4);
@@ -601,7 +586,7 @@ function card(item){
       <div>
         <div class="titleline">${escapeHTML(item.title)}${item.isBreaking ? ' 🔴' : ''}</div>
         <div class="tag">
-          ${escapeHTML(item.source)} • <span class="​​​​​​​​​​​​​​​​time">${escapeHTML(timeStr)}</span>
+          ${escapeHTML(item.source)} • <span class="time">${escapeHTML(timeStr)}</span>
           <span class="badge ${mood.cls}">${mood.tag}</span>
         </div>
       </div>
@@ -620,7 +605,9 @@ function card(item){
   head.addEventListener('click', ()=>{
     const open = el.classList.toggle('open');
     head.setAttribute('aria-expanded', open ? 'true' : 'false');
-    head.querySelector('.time').textContent = open ? '▼' : '▶';
+    
+    
+   head.querySelector('.time').textContent = open ? '▼' : '▶';
   });
   
   addLongPress(head, ()=> {
@@ -634,7 +621,6 @@ function card(item){
 function render(){
   const list = document.getElementById('feedList');
   const empty = document.getElementById('emptyMsg');
-  const countInfo = document.getElementById('countInfo');
   list.innerHTML = '';
 
   let items = STATE.items.filter(it=> STATE.enabled.has(it.id));
@@ -642,8 +628,6 @@ function render(){
   if (STATE.view === 'conservative') items = items.filter(i=> i.lane==='conservative');
   if (STATE.view === 'populist') items = items.filter(i=> i.lane==='populist');
   if (STATE.view === 'breaking') items = items.filter(i=> i.isBreaking);
-
-  countInfo.textContent = `${items.length} articles loaded`;
 
   if (!items.length){
     empty.style.display = 'block';
@@ -697,6 +681,7 @@ function buildSourceToggles(){
       }
       syncButtons();
       render();
+      saveEnabled(); // Auto-save when sources change
     });
 
     // Long-press = toggle include/exclude
@@ -713,6 +698,7 @@ function buildSourceToggles(){
       clearSolo();
       syncButtons();
       render();
+      saveEnabled(); // Auto-save when sources change
       toast(STATE.enabled.has(id) ? `Enabled ${src.name}` : `Disabled ${src.name}`, 'info');
     });
 
@@ -760,8 +746,7 @@ function init(){
   buildFilters();
   buildSourceToggles();
   document.getElementById('refreshBtn').addEventListener('click', loadFeeds);
-  document.getElementById('saveBtn').addEventListener('click', saveEnabled);
-  document.getElementById('clearBtn').addEventListener('click', resetAll);
+  document.getElementById('resetBtn').addEventListener('click', resetAll);
   loadFeeds();
 }
 
