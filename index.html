@@ -16,32 +16,22 @@
     --bg: #0a0a0a;
     --bg-secondary: #0f0f0f;
     --bg-tertiary: #151515;
-    --panel: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-    --panel-hover: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
     --line: #1a1a1a;
     --line-bright: #2a2a2a;
     --ink: #f0f0f0;
     --ink-secondary: #d0d0d0;
     --muted: #8a8a8a;
-    --muted-dark: #666666;
     --accent: #ff4444;
     --accent-hover: #ff6666;
     --accent-glow: #ff2222;
     --secondary: #666666;
-    --secondary-active: #888888;
     --warning: #ffaa44;
     --danger: #ff2244;
     --info: #44aaff;
     --success: #44ff88;
     --popular: #ff44ff;
     --border: #333333;
-    --border-hover: #444444;
     --chip: #151515;
-    --chip-active: #2a2a2a;
-    --glow-red: rgba(255, 68, 68, 0.4);
-    --glow-grey: rgba(136, 136, 136, 0.3);
-    --glow-blue: rgba(68, 170, 255, 0.4);
-    --glow-purple: rgba(255, 68, 255, 0.4);
     --shadow-heavy: 0 8px 32px rgba(0, 0, 0, 0.6);
     --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.4);
     --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -80,194 +70,145 @@
     position: relative;
   }
   
-  /* Ultra Enhanced Terminal Effects */
+  /* Hypnotic gradient mesh background */
   body::before {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 1000;
+    z-index: 1;
     background: 
-      repeating-linear-gradient(
-        90deg, 
-        transparent, 
-        rgba(255, 68, 68, 0.008) 1px, 
-        transparent 2px, 
-        transparent 4px
-      ),
-      repeating-linear-gradient(
-        0deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.005) 1px, 
-        transparent 2px, 
-        transparent 3px
-      );
-    animation: crtFlicker 0.15s infinite linear alternate;
-    mix-blend-mode: screen;
+      radial-gradient(ellipse 1200px 800px at 10% 20%, rgba(255, 68, 68, 0.12) 0%, transparent 35%),
+      radial-gradient(ellipse 1000px 600px at 90% 80%, rgba(68, 170, 255, 0.10) 0%, transparent 35%),
+      radial-gradient(ellipse 800px 800px at 50% 60%, rgba(255, 68, 255, 0.08) 0%, transparent 40%),
+      radial-gradient(circle 600px at 70% 40%, rgba(255, 170, 68, 0.06) 0%, transparent 35%),
+      radial-gradient(circle 500px at 30% 70%, rgba(68, 255, 136, 0.05) 0%, transparent 35%);
+    animation: meshFlow 25s ease-in-out infinite;
+    filter: blur(1px);
   }
-  
+
+  @keyframes meshFlow {
+    0%, 100% {
+      transform: translate(0, 0) rotate(0deg) scale(1);
+      filter: blur(1px) saturate(100%);
+    }
+    20% {
+      transform: translate(-20px, 10px) rotate(1deg) scale(1.02);
+      filter: blur(2px) saturate(120%);
+    }
+    40% {
+      transform: translate(10px, -20px) rotate(-1deg) scale(0.98);
+      filter: blur(1px) saturate(110%);
+    }
+    60% {
+      transform: translate(15px, 15px) rotate(0.5deg) scale(1.01);
+      filter: blur(1.5px) saturate(130%);
+    }
+    80% {
+      transform: translate(-10px, -10px) rotate(-0.5deg) scale(0.99);
+      filter: blur(1px) saturate(105%);
+    }
+  }
+
+  /* Scanlines overlay */
   body::after {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 999;
+    z-index: 2;
     background: 
-      radial-gradient(ellipse 800px 400px at 20% 30%, rgba(255, 68, 68, 0.15) 0%, transparent 40%),
-      radial-gradient(ellipse 800px 400px at 80% 70%, rgba(68, 170, 255, 0.15) 0%, transparent 40%),
-      radial-gradient(ellipse 600px 600px at 50% 50%, rgba(255, 68, 255, 0.1) 0%, transparent 50%),
-      radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
-    mix-blend-mode: color-dodge;
-    animation: gradientMorph 15s ease-in-out infinite;
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255, 255, 255, 0.008) 2px,
+        rgba(255, 255, 255, 0.008) 4px
+      );
+    animation: scanlines 8s linear infinite;
+    mix-blend-mode: overlay;
   }
 
-  @keyframes gradientMorph {
-    0%, 100% { 
-      background: 
-        radial-gradient(ellipse 800px 400px at 20% 30%, rgba(255, 68, 68, 0.15) 0%, transparent 40%),
-        radial-gradient(ellipse 800px 400px at 80% 70%, rgba(68, 170, 255, 0.15) 0%, transparent 40%),
-        radial-gradient(ellipse 600px 600px at 50% 50%, rgba(255, 68, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
-    }
-    25% { 
-      background: 
-        radial-gradient(ellipse 900px 500px at 70% 20%, rgba(255, 68, 68, 0.18) 0%, transparent 45%),
-        radial-gradient(ellipse 700px 700px at 30% 80%, rgba(68, 170, 255, 0.12) 0%, transparent 45%),
-        radial-gradient(ellipse 500px 800px at 60% 40%, rgba(255, 68, 255, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
-    }
-    50% { 
-      background: 
-        radial-gradient(ellipse 700px 700px at 80% 70%, rgba(255, 68, 68, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse 900px 400px at 20% 30%, rgba(68, 170, 255, 0.18) 0%, transparent 45%),
-        radial-gradient(ellipse 800px 500px at 40% 60%, rgba(255, 68, 255, 0.15) 0%, transparent 55%),
-        radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
-    }
-    75% { 
-      background: 
-        radial-gradient(ellipse 600px 800px at 30% 80%, rgba(255, 68, 68, 0.12) 0%, transparent 40%),
-        radial-gradient(ellipse 1000px 300px at 70% 20%, rgba(68, 170, 255, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse 700px 600px at 55% 55%, rgba(255, 68, 255, 0.08) 0%, transparent 45%),
-        radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
-    }
-  }
-
-  @keyframes crtFlicker {
-    0% { opacity: 1; }
-    100% { opacity: 0.985; }
+  @keyframes scanlines {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(10px); }
   }
 
   @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.8; transform: scale(0.98); }
-  }
-
-  @keyframes slideIn {
-    from {
-      transform: translateY(-30px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes slideUp {
-    from {
-      transform: translateY(30px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  @keyframes glow {
     0%, 100% { 
-      box-shadow: 0 0 5px var(--glow-red), 0 0 10px var(--glow-red), 0 0 15px var(--glow-red);
+      opacity: 1; 
       transform: scale(1);
     }
     50% { 
-      box-shadow: 0 0 10px var(--glow-red), 0 0 20px var(--glow-red), 0 0 30px var(--glow-red);
-      transform: scale(1.1);
+      opacity: 0.85; 
+      transform: scale(0.98);
     }
-  }
-
-  @keyframes dataStream {
-    0% { transform: translateX(-100%); opacity: 0; }
-    50% { opacity: 1; }
-    100% { transform: translateX(100%); opacity: 0; }
   }
 
   @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
   }
 
-  @keyframes cardPulse {
-    0%, 100% { 
-      background-size: 100% 100%;
-      filter: brightness(1);
-    }
-    50% { 
-      background-size: 105% 105%;
-      filter: brightness(1.05);
-    }
-  }
-
-  @keyframes popularGlow {
+  @keyframes neonGlow {
     0%, 100% {
-      box-shadow: 
-        0 0 20px rgba(255, 68, 255, 0.3),
-        0 0 40px rgba(255, 68, 255, 0.2),
-        inset 0 0 20px rgba(255, 68, 255, 0.1);
+      text-shadow: 
+        0 0 10px var(--accent),
+        0 0 20px var(--accent),
+        0 0 30px var(--accent),
+        0 0 40px var(--accent-glow);
     }
     50% {
-      box-shadow: 
-        0 0 30px rgba(255, 68, 255, 0.5),
-        0 0 60px rgba(255, 68, 255, 0.3),
-        inset 0 0 30px rgba(255, 68, 255, 0.2);
+      text-shadow: 
+        0 0 15px var(--accent),
+        0 0 30px var(--accent),
+        0 0 45px var(--accent),
+        0 0 60px var(--accent-glow);
     }
   }
 
-  /* Ultra Enhanced Header */
+  /* Header with liquid glass effect */
   header {
     position: sticky;
     top: 0;
     z-index: 100;
     background: 
       linear-gradient(180deg, 
-        rgba(10, 10, 10, 0.98) 0%, 
-        rgba(10, 10, 10, 0.95) 50%,
-        rgba(10, 10, 10, 0.9) 100%);
-    backdrop-filter: blur(24px) saturate(200%);
-    -webkit-backdrop-filter: blur(24px) saturate(200%);
-    border-bottom: 2px solid transparent;
-    background-clip: padding-box;
+        rgba(10, 10, 10, 0.97) 0%, 
+        rgba(10, 10, 10, 0.94) 50%,
+        rgba(10, 10, 10, 0.88) 100%);
+    backdrop-filter: blur(24px) saturate(180%) brightness(90%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%) brightness(90%);
+    border-bottom: 1px solid transparent;
     box-shadow: 
-      0 0 40px rgba(255, 68, 68, 0.25),
-      0 10px 40px rgba(0, 0, 0, 0.6),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05),
-      inset 0 -1px 0 rgba(255, 68, 68, 0.5);
+      0 0 50px rgba(255, 68, 68, 0.2),
+      0 15px 35px rgba(0, 0, 0, 0.7),
+      inset 0 1px 0 rgba(255, 255, 255, 0.03);
     position: relative;
+    overflow: hidden;
   }
 
   header::before {
     content: "";
     position: absolute;
-    bottom: -2px;
-    left: 0;
-    right: 0;
+    bottom: 0;
+    left: -100%;
+    width: 100%;
     height: 2px;
     background: linear-gradient(90deg, 
       transparent, 
       var(--accent) 20%, 
-      var(--info) 50%, 
-      var(--accent) 80%, 
+      var(--info) 35%,
+      var(--popular) 50%,
+      var(--warning) 65%,
+      var(--success) 80%,
       transparent);
-    animation: shimmer 3s ease-in-out infinite;
+    animation: slideStream 4s linear infinite;
+  }
+
+  @keyframes slideStream {
+    0% { left: -100%; }
+    100% { left: 100%; }
   }
   
   .bar {
@@ -275,24 +216,21 @@
     gap: 1rem;
     align-items: center;
     padding: 1rem 1.2rem;
-    background: linear-gradient(90deg, 
-      transparent, 
-      rgba(255, 68, 68, 0.02), 
-      rgba(68, 170, 255, 0.02),
-      transparent);
     position: relative;
   }
   
   .title {
     font-weight: 800;
-    letter-spacing: 2px;
+    letter-spacing: 2.5px;
     font-size: 1.4rem;
     flex: 1;
     background: linear-gradient(135deg, 
       var(--accent) 0%, 
-      var(--info) 50%, 
+      var(--info) 25%, 
+      var(--popular) 50%,
+      var(--warning) 75%,
       var(--accent) 100%);
-    background-size: 200% 200%;
+    background-size: 300% 300%;
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -301,58 +239,55 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 0.5rem;
-    animation: shimmer 4s ease-in-out infinite;
-    filter: drop-shadow(0 0 20px rgba(255, 68, 68, 0.5));
+    animation: shimmer 6s ease-in-out infinite, neonGlow 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 30px rgba(255, 68, 68, 0.6));
   }
   
   .title::after {
-    content: '█';
-    background: var(--accent);
-    background-clip: text;
-    -webkit-background-clip: text;
+    content: '▮';
+    color: var(--accent);
     animation: pulse 1s infinite;
     margin-left: 4px;
     font-size: 0.9em;
   }
   
   .blip {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     background: radial-gradient(circle at 30% 30%, 
-      rgba(255, 255, 255, 0.8), 
-      var(--accent) 40%, 
+      rgba(255, 255, 255, 0.9), 
+      var(--accent) 30%, 
       var(--accent-glow) 100%);
     margin-right: 0.8rem;
     box-shadow: 
-      0 0 20px var(--accent),
-      0 0 40px var(--accent),
-      inset 0 0 10px rgba(255, 255, 255, 0.5);
-    animation: glow 2s infinite ease-in-out;
+      0 0 30px var(--accent),
+      0 0 60px var(--accent),
+      inset 0 0 15px rgba(255, 255, 255, 0.6);
+    animation: heartbeat 1.5s infinite ease-in-out;
     position: relative;
     flex-shrink: 0;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    10% { transform: scale(1.2); }
+    20% { transform: scale(1); }
+    30% { transform: scale(1.15); }
+    40% { transform: scale(1); }
   }
   
   .meta {
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
     white-space: nowrap;
-    background: linear-gradient(90deg, 
-      var(--muted), 
-      var(--accent), 
-      var(--info), 
-      var(--popular),
-      var(--muted));
-    background-size: 300% 300%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shimmer 5s ease-in-out infinite;
+    color: var(--muted);
+    opacity: 0.8;
   }
   
-  /* Ultra Enhanced Filters */
+  /* Filter chips with liquid metal effect */
   .filters {
     display: flex;
     gap: 0.6rem;
@@ -365,27 +300,6 @@
     position: relative;
   }
 
-  .filters::before,
-  .filters::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 40px;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .filters::before {
-    left: 0;
-    background: linear-gradient(90deg, var(--bg) 0%, transparent 100%);
-  }
-
-  .filters::after {
-    right: 0;
-    background: linear-gradient(270deg, var(--bg) 0%, transparent 100%);
-  }
-  
   .filters::-webkit-scrollbar {
     display: none;
   }
@@ -393,238 +307,185 @@
   .chip {
     white-space: nowrap;
     padding: 0.5rem 1rem;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: linear-gradient(135deg, var(--chip) 0%, rgba(255, 255, 255, 0.02) 100%);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: 
+      linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.03) 0%, 
+        rgba(255, 255, 255, 0.01) 100%);
     color: var(--muted);
     font-size: 0.7rem;
     font-weight: 600;
     cursor: pointer;
     user-select: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     position: relative;
     overflow: hidden;
     flex-shrink: 0;
-    min-width: fit-content;
+    backdrop-filter: blur(10px);
   }
 
   .chip::before {
     content: "";
     position: absolute;
-    inset: -2px;
-    background: linear-gradient(45deg, 
-      transparent, 
-      rgba(255, 68, 68, 0.3), 
-      transparent);
-    transform: translateX(-100%);
-    transition: transform 0.5s ease;
-    opacity: 0;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+      rgba(255, 68, 68, 0.4), 
+      transparent 70%);
+    transform: translate(-50%, -50%);
+    transition: all 0.5s ease;
   }
 
   .chip:hover::before {
-    transform: translateX(100%);
-    opacity: 1;
+    width: 150%;
+    height: 150%;
   }
   
   .chip:hover {
+    transform: translateY(-2px) scale(1.05);
     border-color: var(--accent);
     color: var(--ink);
-    background: linear-gradient(135deg, 
-      rgba(255, 68, 68, 0.1) 0%, 
-      rgba(255, 68, 68, 0.05) 100%);
     box-shadow: 
-      0 0 20px rgba(255, 68, 68, 0.3),
-      var(--shadow-light);
-    transform: translateY(-2px) scale(1.05);
+      0 5px 20px rgba(255, 68, 68, 0.3),
+      0 0 30px rgba(255, 68, 68, 0.2),
+      inset 0 0 20px rgba(255, 68, 68, 0.05);
   }
   
   .chip.active {
     background: linear-gradient(135deg, 
       var(--accent) 0%, 
-      rgba(255, 68, 68, 0.8) 100%);
+      rgba(255, 68, 68, 0.7) 100%);
     color: var(--bg);
     border-color: var(--accent);
     box-shadow: 
-      0 0 30px var(--glow-red),
-      0 0 60px var(--glow-red),
-      inset 0 0 20px rgba(0, 0, 0, 0.3);
+      0 0 40px var(--accent),
+      0 0 80px rgba(255, 68, 68, 0.4),
+      inset 0 0 25px rgba(0, 0, 0, 0.4);
     font-weight: 700;
+    transform: scale(1.05);
     animation: pulse 2s infinite;
   }
 
   .chip[data-view="popular"] {
-    border-color: var(--popular);
+    border-color: rgba(255, 68, 255, 0.3);
   }
 
-  .chip[data-view="popular"]:hover {
-    background: linear-gradient(135deg, 
-      rgba(255, 68, 255, 0.1) 0%, 
-      rgba(255, 68, 255, 0.05) 100%);
-    box-shadow: 
-      0 0 20px rgba(255, 68, 255, 0.3),
-      var(--shadow-light);
+  .chip[data-view="popular"]:hover::before {
+    background: radial-gradient(circle, 
+      rgba(255, 68, 255, 0.4), 
+      transparent 70%);
   }
 
   .chip[data-view="popular"].active {
     background: linear-gradient(135deg, 
       var(--popular) 0%, 
-      rgba(255, 68, 255, 0.8) 100%);
+      rgba(255, 68, 255, 0.7) 100%);
     box-shadow: 
-      0 0 30px var(--glow-purple),
-      0 0 60px var(--glow-purple);
+      0 0 40px var(--popular),
+      0 0 80px rgba(255, 68, 255, 0.4),
+      inset 0 0 25px rgba(0, 0, 0, 0.4);
   }
   
-  /* Main Content */
+  /* Main content */
   main {
-    padding: 1.5rem 1.2rem;
+    padding: 1rem 1.2rem;
     max-width: 1000px;
     margin: 0 auto;
     padding-bottom: 4rem;
     position: relative;
   }
   
-  /* Stats Section */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-  }
-  
-  .stat {
-    text-align: center;
-    padding: 0.8rem;
-    background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.02) 0%, 
-      rgba(255, 255, 255, 0.01) 100%);
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-  }
-
-  .stat::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, 
-      transparent, 
-      rgba(255, 68, 68, 0.1), 
-      transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .stat:hover::before {
-    opacity: 1;
-  }
-
-  .stat:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent);
-    box-shadow: 
-      0 10px 30px rgba(255, 68, 68, 0.2),
-      var(--shadow-medium);
-  }
-  
-  .stat-value {
-    display: block;
-    font-size: 1.3rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--accent), var(--info));
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 10px var(--glow-red));
-  }
-  
-  .stat-label {
-    font-size: 0.65rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 0.2rem;
-  }
-  
-  /* Enhanced Cards */
+  /* Enhanced cards with liquid crystal display */
   .card {
-    background: linear-gradient(135deg, 
-      var(--bg-secondary) 0%, 
-      var(--bg-tertiary) 100%);
-    border: 1px solid var(--line);
+    background: 
+      linear-gradient(135deg, 
+        rgba(15, 15, 15, 0.9) 0%, 
+        rgba(25, 25, 25, 0.9) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: var(--shadow-medium);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+      0 10px 40px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     margin-bottom: 1.2rem;
     transform-origin: center;
+    backdrop-filter: blur(10px);
   }
 
   .card::before {
     content: "";
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
+    left: -100%;
+    width: 100%;
     height: 3px;
     background: linear-gradient(90deg, 
-      var(--accent), 
-      var(--info), 
-      var(--warning),
-      var(--accent));
-    background-size: 300% 100%;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    animation: shimmer 3s linear infinite;
+      transparent,
+      var(--accent) 10%,
+      var(--info) 30%,
+      var(--popular) 50%,
+      var(--warning) 70%,
+      var(--success) 90%,
+      transparent);
+    transition: left 0.6s ease;
   }
 
   .card:hover::before {
-    opacity: 1;
+    left: 100%;
   }
 
   .card:hover {
-    transform: translateY(-4px) scale(1.01);
+    transform: translateY(-6px) scale(1.02) rotateX(2deg);
     box-shadow:
-      var(--shadow-heavy),
-      0 0 40px rgba(255, 68, 68, 0.15);
-    border-color: rgba(255, 68, 68, 0.3);
-    background: linear-gradient(135deg, 
-      rgba(255, 68, 68, 0.05) 0%, 
-      var(--bg-tertiary) 100%);
+      0 20px 60px rgba(0, 0, 0, 0.7),
+      0 0 60px rgba(255, 68, 68, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 68, 68, 0.2);
+    background: 
+      linear-gradient(135deg, 
+        rgba(255, 68, 68, 0.05) 0%,
+        rgba(25, 25, 25, 0.95) 100%);
   }
 
   .card.open {
-    background: linear-gradient(135deg,
-      rgba(255, 68, 68, 0.08) 0%,
-      rgba(68, 170, 255, 0.05) 50%,
-      rgba(255, 170, 68, 0.08) 100%);
+    transform: translateY(-4px) scale(1.01);
+    background: 
+      linear-gradient(135deg,
+        rgba(255, 68, 68, 0.1) 0%,
+        rgba(68, 170, 255, 0.05) 50%,
+        rgba(255, 170, 68, 0.1) 100%);
     box-shadow:
-      var(--shadow-heavy),
-      0 0 50px rgba(255, 68, 68, 0.2),
-      inset 0 0 30px rgba(255, 68, 68, 0.05);
-    border-color: rgba(255, 68, 68, 0.5);
-    transform: translateY(-2px) scale(1.005);
-    animation: cardPulse 4s ease-in-out infinite;
-  }
-
-  .card.open::before {
-    opacity: 1;
+      0 25px 70px rgba(0, 0, 0, 0.8),
+      0 0 80px rgba(255, 68, 68, 0.15),
+      inset 0 0 40px rgba(255, 68, 68, 0.03);
+    border-color: rgba(255, 68, 68, 0.4);
   }
 
   .card.popular {
-    border-color: rgba(255, 68, 255, 0.3);
-    animation: popularGlow 3s ease-in-out infinite;
+    animation: popularPulse 4s ease-in-out infinite;
   }
 
-  .card.popular::before {
-    background: linear-gradient(90deg, 
-      var(--popular), 
-      var(--accent), 
-      var(--popular),
-      var(--info));
+  @keyframes popularPulse {
+    0%, 100% {
+      box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(255, 68, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    50% {
+      box-shadow:
+        0 15px 50px rgba(0, 0, 0, 0.6),
+        0 0 60px rgba(255, 68, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
   }
 
   .card-head {
@@ -635,7 +496,7 @@
     padding: 1.2rem;
     cursor: pointer;
     position: relative;
-    transition: background 0.2s ease;
+    transition: background 0.3s ease;
   }
   
   .card-head:hover {
@@ -648,22 +509,24 @@
     width: 20px;
     height: 20px;
     border-radius: 6px;
-    background: var(--chip);
+    background: rgba(255, 255, 255, 0.05);
     display: inline-block;
     background-size: cover;
     background-position: center;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-light);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
     flex-shrink: 0;
     margin-top: 2px;
     transition: all 0.3s ease;
   }
 
   .card:hover .favicon {
-    transform: rotate(5deg) scale(1.1);
+    transform: rotate(10deg) scale(1.1);
     box-shadow: 
-      0 0 20px rgba(255, 68, 68, 0.3),
-      var(--shadow-light);
+      0 4px 16px rgba(255, 68, 68, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
   
   .titleline {
@@ -672,15 +535,15 @@
     line-height: 1.3;
     color: var(--ink);
     margin-bottom: 0.5rem;
-    transition: color 0.2s ease;
+    transition: all 0.3s ease;
     word-wrap: break-word;
     overflow-wrap: break-word;
     hyphens: auto;
   }
   
-  .card-head:hover .titleline {
+  .card:hover .titleline {
     color: var(--accent);
-    text-shadow: 0 0 20px rgba(255, 68, 68, 0.3);
+    text-shadow: 0 0 30px rgba(255, 68, 68, 0.4);
   }
   
   .tag {
@@ -701,66 +564,32 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     color: var(--ink);
-    background: var(--chip);
+    background: rgba(255, 255, 255, 0.02);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
     flex-shrink: 0;
     transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
   }
   
-  .badge.alarm {
-    border-color: #ff4444;
-    color: #ff8888;
-    background: linear-gradient(135deg, #2a1010, #3a1515);
-    box-shadow: 0 0 15px rgba(255, 68, 68, 0.3);
-  }
-  
-  .badge.angry {
-    border-color: #ff6644;
-    color: #ffaa88;
-    background: linear-gradient(135deg, #2a1510, #3a2010);
-    box-shadow: 0 0 15px rgba(255, 102, 68, 0.3);
-  }
-  
-  .badge.grim {
-    border-color: #666;
-    color: #aaa;
-    background: linear-gradient(135deg, #1a1a1a, #252525);
-  }
-  
-  .badge.hope {
-    border-color: #44ff44;
-    color: #88ff88;
-    background: linear-gradient(135deg, #102a10, #153a15);
-    box-shadow: 0 0 15px rgba(68, 255, 68, 0.3);
-  }
-  
-  .badge.neutral {
-    border-color: #4488ff;
-    color: #88bbff;
-    background: linear-gradient(135deg, #101520, #151a30);
-    box-shadow: 0 0 15px rgba(68, 136, 255, 0.3);
-  }
-
-  .popularity-score {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    background: linear-gradient(135deg, var(--popular), rgba(255, 68, 255, 0.8));
-    color: white;
-    font-size: 0.55rem;
-    font-weight: 700;
-    padding: 0.15rem 0.4rem;
-    border-radius: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 0 15px rgba(255, 68, 255, 0.4);
+  .badge.trending {
+    border-color: var(--popular);
+    color: var(--popular);
+    background: linear-gradient(135deg, 
+      rgba(255, 68, 255, 0.1) 0%, 
+      rgba(255, 68, 255, 0.05) 100%);
+    box-shadow: 
+      0 0 20px rgba(255, 68, 255, 0.3),
+      inset 0 0 10px rgba(255, 68, 255, 0.1);
+    animation: pulse 2s infinite;
   }
 
   .breaking-indicator {
     display: inline-block;
-    background: linear-gradient(135deg, var(--danger), rgba(255, 34, 68, 0.8));
+    background: linear-gradient(135deg, 
+      var(--danger) 0%, 
+      rgba(255, 34, 68, 0.7) 100%);
     color: white;
     font-size: 0.55rem;
     font-weight: 700;
@@ -770,7 +599,9 @@
     letter-spacing: 0.5px;
     margin-left: 0.3rem;
     animation: pulse 1.5s infinite;
-    box-shadow: 0 0 15px rgba(255, 34, 68, 0.5);
+    box-shadow: 
+      0 0 20px rgba(255, 34, 68, 0.5),
+      inset 0 0 10px rgba(0, 0, 0, 0.3);
     flex-shrink: 0;
   }
   
@@ -803,12 +634,12 @@
     padding: 1.2rem;
     font-size: 0.85rem;
     color: var(--ink-secondary);
-    line-height: 1.5;
+    line-height: 1.6;
     display: none;
     background: linear-gradient(180deg, 
-      rgba(0, 0, 0, 0.3) 0%, 
-      rgba(0, 0, 0, 0.5) 100%);
-    border-top: 1px solid rgba(255, 68, 68, 0.2);
+      rgba(0, 0, 0, 0.4) 0%, 
+      rgba(0, 0, 0, 0.6) 100%);
+    border-top: 1px solid rgba(255, 68, 68, 0.1);
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
@@ -816,6 +647,17 @@
   .card.open .card-body {
     display: block;
     animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .card-actions {
@@ -827,47 +669,74 @@
   .article-link {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.4rem;
-    background: linear-gradient(135deg, var(--accent), rgba(255, 68, 68, 0.8));
+    background: linear-gradient(135deg, 
+      var(--accent) 0%, 
+      rgba(255, 68, 68, 0.7) 100%);
     color: var(--bg) !important;
     padding: 0.7rem 1rem;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-size: 0.75rem;
     transition: all 0.3s ease;
-    box-shadow: var(--shadow-light);
+    box-shadow: 
+      0 4px 20px rgba(255, 68, 68, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
     text-decoration: none;
     flex: 1;
-    justify-content: center;
     border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .article-link::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, 
+      rgba(255, 255, 255, 0.3), 
+      transparent 70%);
+    transform: translate(-50%, -50%);
+    transition: all 0.4s ease;
+  }
+
+  .article-link:hover::before {
+    width: 150%;
+    height: 150%;
   }
   
   .article-link:hover {
-    background: linear-gradient(135deg, var(--accent-hover), var(--accent));
+    transform: translateY(-2px) scale(1.02);
     box-shadow: 
-      0 0 30px rgba(255, 68, 68, 0.4),
-      var(--shadow-medium);
-    transform: translateY(-2px);
+      0 6px 30px rgba(255, 68, 68, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
 
   .read-btn {
-    background: linear-gradient(135deg, var(--info), rgba(68, 170, 255, 0.8));
+    background: linear-gradient(135deg, 
+      var(--info) 0%, 
+      rgba(68, 170, 255, 0.7) 100%);
   }
 
   .read-btn:hover {
-    background: linear-gradient(135deg, rgba(68, 170, 255, 1), var(--info));
     box-shadow: 
-      0 0 30px rgba(68, 170, 255, 0.4),
-      var(--shadow-medium);
+      0 6px 30px rgba(68, 170, 255, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
   
-  /* Article Reader Modal */
+  /* Article reader modal */
   .reader-modal {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.98);
+    background: linear-gradient(135deg, 
+      rgba(0, 0, 0, 0.98) 0%, 
+      rgba(10, 10, 10, 0.98) 100%);
     backdrop-filter: blur(20px);
     z-index: 2000;
     display: none;
@@ -880,8 +749,14 @@
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from { 
+      opacity: 0;
+      backdrop-filter: blur(0);
+    }
+    to { 
+      opacity: 1;
+      backdrop-filter: blur(20px);
+    }
   }
 
   .reader-header {
@@ -893,7 +768,7 @@
       rgba(10, 10, 10, 0.95) 0%, 
       rgba(10, 10, 10, 0.9) 100%);
     border-bottom: 2px solid var(--accent);
-    box-shadow: 0 0 30px rgba(255, 68, 68, 0.3);
+    box-shadow: 0 0 40px rgba(255, 68, 68, 0.3);
   }
 
   .reader-title {
@@ -911,7 +786,9 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: var(--accent);
+    background: linear-gradient(135deg, 
+      var(--accent) 0%, 
+      rgba(255, 68, 68, 0.7) 100%);
     color: var(--bg);
     border: none;
     font-size: 1.5rem;
@@ -921,12 +798,12 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    box-shadow: 0 0 20px rgba(255, 68, 68, 0.4);
+    box-shadow: 0 0 30px rgba(255, 68, 68, 0.4);
   }
 
   .reader-close:hover {
     transform: rotate(90deg) scale(1.1);
-    box-shadow: 0 0 30px rgba(255, 68, 68, 0.6);
+    box-shadow: 0 0 40px rgba(255, 68, 68, 0.6);
   }
 
   .reader-body {
@@ -942,6 +819,10 @@
     color: var(--ink-secondary);
     font-size: 0.95rem;
     line-height: 1.8;
+  }
+
+  .reader-content p {
+    margin-bottom: 1rem;
   }
 
   .reader-loading {
@@ -960,40 +841,51 @@
     padding: 2rem;
   }
 
-  /* Toast */
+  /* Toast notifications */
   .toast {
     position: fixed;
     bottom: 100px;
     left: 50%;
     transform: translateX(-50%);
-    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+    background: linear-gradient(135deg, 
+      rgba(15, 15, 15, 0.95) 0%, 
+      rgba(25, 25, 25, 0.95) 100%);
     color: var(--ink);
     padding: 0.8rem 1.2rem;
     border-radius: 12px;
     z-index: 3000;
     font-weight: 600;
-    box-shadow: var(--shadow-heavy);
-    border: 1px solid var(--border);
+    box-shadow: 
+      0 10px 40px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     animation: slideUp 0.3s ease-out;
     max-width: 85%;
     text-align: center;
     font-size: 0.8rem;
+    backdrop-filter: blur(10px);
   }
   
   .toast.success {
     border-color: var(--success);
-    box-shadow: 0 0 30px rgba(68, 255, 136, 0.3);
+    box-shadow: 
+      0 0 40px rgba(68, 255, 136, 0.3),
+      0 10px 40px rgba(0, 0, 0, 0.6);
   }
   
   .toast.error {
     border-color: var(--danger);
-    box-shadow: 0 0 30px rgba(255, 34, 68, 0.3);
+    box-shadow: 
+      0 0 40px rgba(255, 34, 68, 0.3),
+      0 10px 40px rgba(0, 0, 0, 0.6);
   }
 
-  /* Buttons */
+  /* Reset button */
   .btn.reset {
     border: 2px solid var(--warning);
-    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+    background: linear-gradient(135deg, 
+      rgba(15, 15, 15, 0.9) 0%, 
+      rgba(25, 25, 25, 0.9) 100%);
     color: var(--ink);
     padding: 0.6rem 0.9rem;
     border-radius: 12px;
@@ -1003,48 +895,75 @@
     letter-spacing: 1px;
     font-family: inherit;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: fixed;
     bottom: 1.2rem;
     right: 1.2rem;
     z-index: 100;
-    box-shadow: 0 0 20px rgba(255, 170, 68, 0.2);
-    overflow: hidden;
-  }
-  
-  .btn.reset::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(45deg, transparent, rgba(255, 170, 68, 0.2), transparent);
-    transform: translateX(-100%);
-    transition: transform 0.4s ease;
+    box-shadow: 
+      0 0 30px rgba(255, 170, 68, 0.2),
+      0 10px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
   }
   
   .btn.reset:hover {
-    background: linear-gradient(135deg, var(--warning), rgba(255, 170, 68, 0.8));
+    background: linear-gradient(135deg, 
+      var(--warning) 0%, 
+      rgba(255, 170, 68, 0.8) 100%);
     color: var(--bg);
     box-shadow: 
-      0 0 35px rgba(255, 170, 68, 0.4),
-      var(--shadow-heavy);
+      0 0 50px rgba(255, 170, 68, 0.4),
+      0 15px 40px rgba(0, 0, 0, 0.6);
     transform: translateY(-3px) scale(1.05);
   }
-  
-  .btn.reset:hover::before {
-    transform: translateX(100%);
+
+  /* Source toggles */
+  .src-grid {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 1rem 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
-  /* Loading skeleton */
-  .skeleton {
-    background: linear-gradient(90deg, 
-      var(--bg-secondary) 0%, 
-      var(--line) 50%, 
-      var(--bg-secondary) 100%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
+  .src-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .src {
+    padding: 0.5rem 0.8rem;
     border-radius: 8px;
-    height: 120px;
-    margin-bottom: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.65rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    backdrop-filter: blur(5px);
+  }
+
+  .src:hover {
+    transform: translateY(-2px);
+    border-color: var(--secondary);
+    color: var(--ink);
+    box-shadow: 0 5px 20px rgba(136, 136, 136, 0.3);
+  }
+
+  .src.on {
+    background: linear-gradient(135deg, 
+      var(--secondary) 0%, 
+      rgba(136, 136, 136, 0.7) 100%);
+    color: var(--bg);
+    border-color: var(--secondary);
+    box-shadow: 
+      0 0 30px rgba(136, 136, 136, 0.3),
+      inset 0 0 15px rgba(0, 0, 0, 0.3);
   }
 
   /* Empty state */
@@ -1052,10 +971,15 @@
     color: var(--muted);
     text-align: center;
     padding: 3rem 1.5rem;
-    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+    background: linear-gradient(135deg, 
+      rgba(15, 15, 15, 0.9) 0%, 
+      rgba(25, 25, 25, 0.9) 100%);
     border-radius: 16px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-light);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 
+      0 10px 40px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
   }
   
   .empty h3 {
@@ -1071,10 +995,6 @@
 
   /* Mobile optimizations */
   @media (max-width: 768px) {
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    
     .card-actions {
       flex-direction: column;
     }
@@ -1087,8 +1007,6 @@
   @media (max-width: 480px) {
     .bar {
       padding: 0.7rem 0.8rem;
-      gap: 0.6rem;
-      flex-wrap: wrap;
     }
     
     .title {
@@ -1104,17 +1022,10 @@
     .chip {
       padding: 0.35rem 0.7rem;
       font-size: 0.6rem;
-      border-radius: 16px;
     }
     
     main {
-      padding: 1rem 0.8rem;
-      padding-bottom: 3.5rem;
-    }
-    
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.6rem;
+      padding: 0.8rem;
     }
     
     .reader-body {
@@ -1128,12 +1039,12 @@
   <div class="bar">
     <div class="title">
       <span class="blip"></span>UR NEWS
-      <span class="meta" id="lastUpdated">• INITIALIZING FEEDS</span>
+      <span class="meta" id="lastUpdated">• INITIALIZING</span>
     </div>
   </div>
   <div class="filters" id="filters">
-    <div class="chip active" data-view="all">ALL SOURCES</div>
-    <div class="chip" data-view="popular">🔥 POPULAR</div>
+    <div class="chip active" data-view="all">ALL</div>
+    <div class="chip" data-view="popular">🔥 TRENDING</div>
     <div class="chip" data-view="by-source">BY SOURCE</div>
     <div class="chip" data-view="conservative">CONSERVATIVE</div>
     <div class="chip" data-view="populist">POPULIST</div>
@@ -1142,38 +1053,11 @@
 </header>
 
 <main>
-  <div class="toggle-section open" id="statsSection">
-    <div class="toggle-header">
-      <span class="toggle-title">Intelligence Overview</span>
-      <span class="toggle-arrow">▼</span>
-    </div>
-    <div class="toggle-content">
-      <div class="stats-grid" id="statsBar">
-        <div class="stat">
-          <span class="stat-value" id="totalArticles">0</span>
-          <span class="stat-label">Articles</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value" id="activeSources">0</span>
-          <span class="stat-label">Sources</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value" id="breakingCount">0</span>
-          <span class="stat-label">Breaking</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value" id="popularCount">0</span>
-          <span class="stat-label">Popular</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  
   <div class="src-grid" id="sourceToggles"></div>
   <div class="list" id="feedList"></div>
   <div class="empty" id="emptyMsg" style="display:none;">
     <h3>NO ACTIVE FEEDS</h3>
-    <p>Enable sources above or wait for auto-refresh cycle</p>
+    <p>Enable sources above or wait for refresh</p>
   </div>
 </main>
 
@@ -1187,183 +1071,128 @@
   </div>
 </div>
 
-<button class="btn reset" id="resetBtn" title="Reset all sources and settings">RESET</button>
+<button class="btn reset" id="resetBtn" title="Reset">RESET</button>
 
 <script>
-/* ================= OPTIMIZED PRODUCTION SYSTEM ================= */
+/* ================= FERRARI EDITION ================= */
 
 const SOURCES = [
-  { id:'breitbart',   name:'Breitbart',            url:'https://www.breitbart.com/feed/',                     lane:'populist' },
-  { id:'federalist',  name:'The Federalist',       url:'https://thefederalist.com/feed/',                     lane:'conservative' },
-  { id:'dailywire',   name:'Daily Wire',           url:'https://www.dailywire.com/feeds/rss.xml',             lane:'conservative' },
-  { id:'gateway',     name:'Gateway Pundit',       url:'https://www.thegatewaypundit.com/feed/',              lane:'populist' },
-  { id:'infowars',    name:'InfoWars',             url:'https://www.infowars.com/rss.xml',                    lane:'populist' },
-  { id:'revolver',    name:'Revolver News',        url:'https://www.revolver.news/feed/',                     lane:'populist' },
-  { id:'natfile',     name:'National File',        url:'https://nationalfile.com/feed/',                      lane:'populist' },
-  { id:'tplvoice',    name:"People's Voice",       url:'https://thepeoplesvoice.tv/feed/',                    lane:'populist' },
-  { id:'libertydaily',name:'Liberty Daily',        url:'https://thelibertydaily.com/rss.xml',                 lane:'populist' },
-  { id:'naturalnews', name:'Natural News',         url:'https://www.naturalnews.com/rss.xml',                 lane:'populist' },
-  { id:'dailycaller', name:'Daily Caller',         url:'https://dailycaller.com/feed/',                       lane:'conservative' },
-  { id:'redstate',    name:'RedState',             url:'https://redstate.com/feed/',                          lane:'conservative' },
-  { id:'amgreat',     name:'AmGreatness',          url:'https://amgreatness.com/feed/',                       lane:'conservative' },
-  { id:'pjm',         name:'PJ Media',             url:'https://pjmedia.com/feeds/latest',                    lane:'conservative' },
-  { id:'nypost',      name:'NY Post',              url:'https://nypost.com/feed/',                            lane:'populist' },
-  { id:'townhall',    name:'Townhall',             url:'https://townhall.com/rss',                            lane:'conservative' },
-  { id:'foxnews',     name:'Fox News',             url:'https://feeds.foxnews.com/foxnews/latest',            lane:'conservative' },
-  { id:'washexam',    name:'Washington Examiner',  url:'https://www.washingtonexaminer.com/feed',             lane:'conservative' },
-  { id:'theblaze',    name:'The Blaze',            url:'https://www.theblaze.com/feeds/latest.rss',           lane:'conservative' }
+  { id:'breitbart', name:'Breitbart', url:'https://www.breitbart.com/feed/', lane:'populist' },
+  { id:'federalist', name:'The Federalist', url:'https://thefederalist.com/feed/', lane:'conservative' },
+  { id:'dailywire', name:'Daily Wire', url:'https://www.dailywire.com/feeds/rss.xml', lane:'conservative' },
+  { id:'gateway', name:'Gateway Pundit', url:'https://www.thegatewaypundit.com/feed/', lane:'populist' },
+  { id:'infowars', name:'InfoWars', url:'https://www.infowars.com/rss.xml', lane:'populist' },
+  { id:'revolver', name:'Revolver News', url:'https://www.revolver.news/feed/', lane:'populist' },
+  { id:'natfile', name:'National File', url:'https://nationalfile.com/feed/', lane:'populist' },
+  { id:'tplvoice', name:"People's Voice", url:'https://thepeoplesvoice.tv/feed/', lane:'populist' },
+  { id:'libertydaily', name:'Liberty Daily', url:'https://thelibertydaily.com/rss.xml', lane:'populist' },
+  { id:'naturalnews', name:'Natural News', url:'https://www.naturalnews.com/rss.xml', lane:'populist' },
+  { id:'dailycaller', name:'Daily Caller', url:'https://dailycaller.com/feed/', lane:'conservative' },
+  { id:'redstate', name:'RedState', url:'https://redstate.com/feed/', lane:'conservative' },
+  { id:'amgreat', name:'AmGreatness', url:'https://amgreatness.com/feed/', lane:'conservative' },
+  { id:'pjm', name:'PJ Media', url:'https://pjmedia.com/feeds/latest', lane:'conservative' },
+  { id:'nypost', name:'NY Post', url:'https://nypost.com/feed/', lane:'populist' },
+  { id:'townhall', name:'Townhall', url:'https://townhall.com/rss', lane:'conservative' },
+  { id:'foxnews', name:'Fox News', url:'https://feeds.foxnews.com/foxnews/latest', lane:'conservative' },
+  { id:'washexam', name:'Washington Examiner', url:'https://www.washingtonexaminer.com/feed', lane:'conservative' },
+  { id:'theblaze', name:'The Blaze', url:'https://www.theblaze.com/feeds/latest.rss', lane:'conservative' }
 ];
 
 const STATE = {
   enabled: new Set(loadEnabled() || SOURCES.map(s=>s.id)),
   items: [],
   view: 'all',
-  lastSolo: null,
   loading: false,
   lastFetch: 0,
-  autoRefreshTimer: null,
   cache: new Map(),
   expandedCards: new Set(),
-  popularityScores: new Map(),
-  viewCounts: new Map()
+  trendingKeywords: new Map()
 };
 
-// Optimized caching with IndexedDB fallback
+// Memory cache only for speed
 const CACHE_TTL = 120000;
-const MAX_MEMORY_CACHE = 30;
 
-class SmartCache {
-  constructor() {
-    this.memory = new Map();
-    this.initDB();
+function getCached(url) {
+  const cached = STATE.cache.get(url);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
   }
-
-  async initDB() {
-    if (!window.indexedDB) return;
-    try {
-      const request = indexedDB.open('URNewsCache', 1);
-      request.onsuccess = (e) => { this.db = e.target.result; };
-      request.onupgradeneeded = (e) => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains('feeds')) {
-          db.createObjectStore('feeds', { keyPath: 'url' });
-        }
-      };
-    } catch(e) { console.warn('IndexedDB init failed:', e); }
-  }
-
-  async get(url) {
-    // Check memory first
-    const memCache = this.memory.get(url);
-    if (memCache && Date.now() - memCache.timestamp < CACHE_TTL) {
-      return memCache.data;
-    }
-
-    // Check IndexedDB
-    if (this.db) {
-      try {
-        return await new Promise((resolve, reject) => {
-          const trans = this.db.transaction(['feeds'], 'readonly');
-          const request = trans.objectStore('feeds').get(url);
-          request.onsuccess = () => {
-            const result = request.result;
-            if (result && Date.now() - result.timestamp < CACHE_TTL) {
-              this.memory.set(url, result);
-              resolve(result.data);
-            } else {
-              resolve(null);
-            }
-          };
-          request.onerror = () => resolve(null);
-        });
-      } catch(e) { return null; }
-    }
-    return null;
-  }
-
-  async set(url, data) {
-    const entry = { url, data, timestamp: Date.now() };
-    
-    // Memory cache with LRU
-    if (this.memory.size >= MAX_MEMORY_CACHE) {
-      const firstKey = this.memory.keys().next().value;
-      this.memory.delete(firstKey);
-    }
-    this.memory.set(url, entry);
-
-    // IndexedDB
-    if (this.db) {
-      try {
-        const trans = this.db.transaction(['feeds'], 'readwrite');
-        trans.objectStore('feeds').put(entry);
-      } catch(e) { console.warn('IndexedDB write failed:', e); }
-    }
-  }
+  return null;
 }
 
-const cache = new SmartCache();
-
-// Popularity tracking
-function updatePopularity(item) {
-  const key = item.link;
-  const current = STATE.popularityScores.get(key) || 0;
-  const views = STATE.viewCounts.get(key) || 0;
-  
-  // Decay old popularity scores
-  STATE.popularityScores.forEach((score, k) => {
-    if (k !== key) STATE.popularityScores.set(k, score * 0.95);
-  });
-  
-  // Boost current item
-  const timeFactor = Math.max(0, 1 - (Date.now() - new Date(item.pubDate)) / (24*60*60*1000));
-  const score = current + 1 + (timeFactor * 2) + (views * 0.1);
-  STATE.popularityScores.set(key, score);
-  
-  return score;
-}
-
-function trackView(item) {
-  const key = item.link;
-  const views = STATE.viewCounts.get(key) || 0;
-  STATE.viewCounts.set(key, views + 1);
-  updatePopularity(item);
+function setCached(url, data) {
+  STATE.cache.set(url, { data, timestamp: Date.now() });
 }
 
 // Ultra-fast parallel fetch
-async function fetchTextUltraFast(url) {
-  const cached = await cache.get(url);
-  if (cached) return cached;
+async function fetchFast(url) {
+  const cached = getCached(url);
+  if (cached) return Promise.resolve(cached);
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
+  const timeout = setTimeout(() => controller.abort(), 4000);
 
   try {
-    const proxies = [
-      fetch(url, { 
-        mode: 'cors', 
-        cache: 'no-cache',
-        signal: controller.signal 
+    // Fire all proxies simultaneously
+    const response = await Promise.race([
+      fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url), {
+        signal: controller.signal
       }),
-      fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url), { 
-        signal: controller.signal 
+      fetch('https://corsproxy.io/?' + encodeURIComponent(url), {
+        signal: controller.signal
       })
-    ];
+    ]);
 
-    const result = await Promise.race(proxies);
     clearTimeout(timeout);
+    if (!response.ok) throw new Error('Failed');
     
-    if (!result.ok) throw new Error(`HTTP ${result.status}`);
-    const text = await result.text();
-    
+    const text = await response.text();
     if (text && text.length > 100) {
-      await cache.set(url, text);
+      setCached(url, text);
       return text;
     }
-    throw new Error('Empty response');
+    throw new Error('Empty');
   } catch(e) {
     clearTimeout(timeout);
     throw e;
   }
+}
+
+// Calculate trending based on keyword frequency
+function calculateTrending(items) {
+  const keywords = new Map();
+  const now = Date.now();
+  
+  items.forEach(item => {
+    const age = (now - new Date(item.pubDate)) / (1000 * 60 * 60); // hours
+    if (age > 24) return; // Only last 24 hours
+    
+    const text = (item.title + ' ' + item.desc).toLowerCase();
+    const words = text.match(/\b[a-z]{4,}\b/g) || [];
+    
+    words.forEach(word => {
+      if (!/^(with|that|this|from|have|were|been|their|about|would|could|should)$/.test(word)) {
+        const current = keywords.get(word) || 0;
+        keywords.set(word, current + (1 / Math.max(1, age / 6))); // Weight by recency
+      }
+    });
+  });
+  
+  STATE.trendingKeywords = keywords;
+  
+  // Score items based on trending keywords
+  items.forEach(item => {
+    const text = (item.title + ' ' + item.desc).toLowerCase();
+    let score = 0;
+    
+    keywords.forEach((weight, word) => {
+      if (text.includes(word)) {
+        score += weight;
+      }
+    });
+    
+    item.trendingScore = score;
+  });
 }
 
 function parseRSS(xmlString, source) {
@@ -1371,13 +1200,13 @@ function parseRSS(xmlString, source) {
   if (doc.getElementsByTagName('parsererror')[0]) return [];
 
   return Array.from(doc.querySelectorAll('item, entry'))
-    .slice(0, 20)
+    .slice(0, 15) // Less items per source for speed
     .map(item => {
       const title = (item.querySelector('title')?.textContent || '').trim();
       const link = (item.querySelector('link')?.getAttribute('href') || 
                    item.querySelector('link')?.textContent || '').trim();
       const pubDate = (item.querySelector('pubDate, updated, published')?.textContent || '').trim();
-      const desc = (item.querySelector('description, summary, content\\:encoded')?.textContent || '').trim();
+      const desc = (item.querySelector('description, summary')?.textContent || '').trim();
       
       return {
         title,
@@ -1386,48 +1215,18 @@ function parseRSS(xmlString, source) {
         source: source.name,
         lane: source.lane,
         id: source.id,
-        desc: stripHTML(desc).slice(0, 300),
-        isBreaking: isBreakingNews(title, desc),
-        popularity: STATE.popularityScores.get(link) || 0
+        desc: stripHTML(desc).slice(0, 250),
+        isBreaking: /breaking|urgent|just in|developing|exclusive/i.test(title),
+        trendingScore: 0
       };
     })
-    .filter(x => x.title && x.link && !isLikelyAd(x));
-}
-
-function isLikelyAd(item) {
-  const text = (item.title + " " + item.desc).toLowerCase();
-  const adPatterns = /sponsored|advertisement|promo|deal:|shop|buy now|subscribe|newsletter|podcast:|video:|% off|save \$/i;
-  return adPatterns.test(text) || item.title.length < 15;
-}
-
-function isBreakingNews(title, desc) {
-  const text = (title + " " + desc).toLowerCase();
-  return /breaking|urgent|alert|just in|developing|happening now|exclusive|bombshell/i.test(text);
-}
-
-function sentimentAnalysis(title, desc) {
-  const text = (title + " " + desc).toLowerCase();
-  
-  const scores = {
-    positive: (text.match(/victory|triumph|success|wins?|boom|surge|rally|record high/gi) || []).length * 2,
-    alarm: (text.match(/emergency|crisis|catastrophe|shooting|attack|terror|dead|war/gi) || []).length * -4,
-    angry: (text.match(/fraud|rigged|corrupt|betrayal|scandal|arrest|impeach/gi) || []).length * -3,
-    grim: (text.match(/recession|inflation|shortage|decline|crime|layoffs/gi) || []).length * -2
-  };
-  
-  const total = Object.values(scores).reduce((a, b) => a + b, 0);
-  
-  if (total >= 3) return { tag: "POSITIVE", cls: "hope" };
-  if (total <= -4) return { tag: "CRITICAL", cls: "alarm" };
-  if (total <= -3) return { tag: "HOSTILE", cls: "angry" };
-  if (total <= -1) return { tag: "NEGATIVE", cls: "grim" };
-  return { tag: "NEUTRAL", cls: "neutral" };
+    .filter(x => x.title && x.link && x.title.length > 15);
 }
 
 function stripHTML(html) {
   const temp = document.createElement('div');
   temp.innerHTML = html;
-  return (temp.textContent || temp.innerText || '').replace(/\s+/g, ' ').trim();
+  return temp.textContent.replace(/\s+/g, ' ').trim();
 }
 
 function saveEnabled() {
@@ -1445,27 +1244,21 @@ function loadEnabled() {
   }
 }
 
-// Ultra-optimized feed loader
+// Blazing fast parallel loader
 async function loadFeeds() {
   if (STATE.loading) return;
   STATE.loading = true;
   STATE.lastFetch = Date.now();
   
-  const loadingToast = toast('Loading feeds...', 'info');
-  
   try {
     const enabledSources = SOURCES.filter(s => STATE.enabled.has(s.id));
     
-    // Parallel fetch all at once for speed
-    const promises = enabledSources.map(async source => {
-      try {
-        const text = await fetchTextUltraFast(source.url);
-        return parseRSS(text, source);
-      } catch (e) {
-        console.warn(`Failed: ${source.name}`);
-        return [];
-      }
-    });
+    // Fire ALL requests at once
+    const promises = enabledSources.map(source => 
+      fetchFast(source.url)
+        .then(text => parseRSS(text, source))
+        .catch(() => [])
+    );
     
     const results = await Promise.allSettled(promises);
     const allItems = results
@@ -1473,38 +1266,27 @@ async function loadFeeds() {
       .flatMap(r => r.value)
       .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
     
-    STATE.items = allItems.slice(0, 150);
+    STATE.items = allItems.slice(0, 100);
     
-    updateStats();
+    // Calculate trending
+    calculateTrending(STATE.items);
+    
     render();
     
     document.getElementById('lastUpdated').textContent = 
-      `• UPDATED ${new Date().toLocaleTimeString()}`;
+      `• ${new Date().toLocaleTimeString()}`;
     
-    if (loadingToast) loadingToast.remove();
-    toast(`Loaded ${STATE.items.length} articles`, 'success');
+    toast(`${STATE.items.length} articles loaded`, 'success');
     
   } catch (error) {
-    console.error('Feed failed:', error);
-    if (loadingToast) loadingToast.remove();
-    toast('Feed loading failed', 'error');
+    console.error('Failed:', error);
+    toast('Loading failed', 'error');
   } finally {
     STATE.loading = false;
   }
 }
 
-function updateStats() {
-  const filtered = STATE.items.filter(item => STATE.enabled.has(item.id));
-  const breaking = filtered.filter(item => item.isBreaking);
-  const popular = filtered.filter(item => (STATE.popularityScores.get(item.link) || 0) > 5);
-  
-  document.getElementById('totalArticles').textContent = filtered.length;
-  document.getElementById('activeSources').textContent = STATE.enabled.size;
-  document.getElementById('breakingCount').textContent = breaking.length;
-  document.getElementById('popularCount').textContent = popular.length;
-}
-
-// Article reader
+// Fixed article reader
 async function openReader(item) {
   const modal = document.getElementById('readerModal');
   const title = document.getElementById('readerTitle');
@@ -1514,52 +1296,85 @@ async function openReader(item) {
   title.textContent = item.title;
   content.innerHTML = '<div class="reader-loading">LOADING ARTICLE...</div>';
   
+  // Block NY Post and other problematic sources
+  const blockedDomains = ['nypost.com', 'wsj.com', 'ft.com'];
+  const domain = new URL(item.link).hostname;
+  
+  if (blockedDomains.some(blocked => domain.includes(blocked))) {
+    content.innerHTML = `
+      <div class="reader-error">
+        This source blocks external readers. 
+        Please visit the article directly.
+      </div>
+    `;
+    return;
+  }
+  
   try {
-    const response = await fetch('https://r.jina.ai/' + item.link);
-    const text = await response.text();
+    // Use 12ft.io for paywall bypass
+    const proxyUrl = 'https://12ft.io/' + item.link;
+    const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(proxyUrl));
+    const html = await response.text();
     
-    // Clean and format content
-    const cleanText = text
-      .replace(/^.*?\n\n/, '') // Remove headers
-      .replace(/\n{3,}/g, '\n\n') // Clean spacing
-      .split('\n')
-      .map(p => p.trim())
-      .filter(p => p && p.length > 20)
-      .map(p => `<p>${p}</p>`)
+    // Extract article content
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    // Remove scripts and styles
+    doc.querySelectorAll('script, style, nav, header, footer, aside').forEach(el => el.remove());
+    
+    // Find main content
+    const article = doc.querySelector('article, main, [role="main"], .content, .article-body') || doc.body;
+    
+    // Extract paragraphs
+    const paragraphs = Array.from(article.querySelectorAll('p'))
+      .map(p => p.textContent.trim())
+      .filter(text => text.length > 50)
+      .slice(0, 30)
+      .map(text => `<p>${text}</p>`)
       .join('');
     
-    content.innerHTML = `<div class="reader-content">${cleanText || 'Unable to load article content.'}</div>`;
+    content.innerHTML = `<div class="reader-content">${paragraphs || 'Unable to extract article content.'}</div>`;
+    
   } catch (e) {
-    content.innerHTML = `<div class="reader-error">Failed to load article. Please visit the source directly.</div>`;
+    // Fallback to showing description
+    content.innerHTML = `
+      <div class="reader-content">
+        <p><strong>Summary:</strong></p>
+        <p>${item.desc || 'No summary available.'}</p>
+        <p style="margin-top: 2rem;">
+          <a href="${item.link}" target="_blank" style="color: var(--accent);">
+            Click here to read the full article →
+          </a>
+        </p>
+      </div>
+    `;
   }
 }
 
 function createCard(item) {
-  const article = document.createElement('article');
   const cardId = btoa(item.link).slice(0, 16);
   const isExpanded = STATE.expandedCards.has(cardId);
-  const isPopular = (STATE.popularityScores.get(item.link) || 0) > 5;
+  const isTrending = item.trendingScore > 5;
   
-  article.className = `card ${isExpanded ? 'open' : ''} ${isPopular ? 'popular' : ''}`;
+  const article = document.createElement('article');
+  article.className = `card ${isExpanded ? 'open' : ''} ${isTrending ? 'popular' : ''}`;
   article.dataset.cardId = cardId;
   
   const hostname = new URL(item.link).hostname;
-  const sentiment = sentimentAnalysis(item.title, item.desc);
   const timeString = fmtTime(item.pubDate);
-  const popularityScore = Math.round(STATE.popularityScores.get(item.link) || 0);
   
   article.innerHTML = `
-    <div class="card-head" role="button" tabindex="0" aria-expanded="${isExpanded}">
-      <span class="favicon" style="background-image:url('https://www.google.com/s2/favicons?domain=${hostname}&sz=64');" aria-hidden="true"></span>
+    <div class="card-head">
+      <span class="favicon" style="background-image:url('https://www.google.com/s2/favicons?domain=${hostname}&sz=64');"></span>
       <div>
         <div class="titleline">
           ${escapeHTML(item.title)}
           ${item.isBreaking ? '<span class="breaking-indicator">BREAKING</span>' : ''}
-          ${isPopular ? `<span class="popularity-score">🔥 ${popularityScore}</span>` : ''}
         </div>
         <div class="tag">
-          ${escapeHTML(item.source)} • <span class="time">${escapeHTML(timeString)}</span>
-          <span class="badge ${sentiment.cls}">${sentiment.tag}</span>
+          ${escapeHTML(item.source)} • <span class="time">${timeString}</span>
+          ${isTrending ? '<span class="badge trending">TRENDING</span>' : ''}
         </div>
       </div>
       <div class="expand-btn">▶</div>
@@ -1567,11 +1382,11 @@ function createCard(item) {
     <div class="card-body">
       <div>${escapeHTML(item.desc || 'No summary available.')}</div>
       <div class="card-actions">
-        <a href="${escapeHTML(item.link)}" target="_blank" rel="noopener" class="article-link">
-          OPEN SOURCE ↗
+        <a href="${escapeHTML(item.link)}" target="_blank" class="article-link">
+          OPEN SOURCE
         </a>
-        <button class="article-link read-btn" data-link="${escapeHTML(item.link)}" data-title="${escapeHTML(item.title)}">
-          READ HERE 📖
+        <button class="article-link read-btn">
+          READ HERE
         </button>
       </div>
     </div>
@@ -1583,18 +1398,15 @@ function createCard(item) {
   
   const toggleCard = () => {
     const isOpen = article.classList.toggle('open');
-    header.setAttribute('aria-expanded', isOpen);
     expandBtn.textContent = isOpen ? '▼' : '▶';
     
     if (isOpen) {
       STATE.expandedCards.add(cardId);
-      trackView(item);
-      // Close other cards
+      // Close others
       document.querySelectorAll('.card.open').forEach(card => {
         if (card !== article) {
           card.classList.remove('open');
-          const otherBtn = card.querySelector('.expand-btn');
-          if (otherBtn) otherBtn.textContent = '▶';
+          card.querySelector('.expand-btn').textContent = '▶';
           STATE.expandedCards.delete(card.dataset.cardId);
         }
       });
@@ -1605,15 +1417,9 @@ function createCard(item) {
   };
 
   header.addEventListener('click', toggleCard);
-  
   readBtn.addEventListener('click', (e) => {
     e.preventDefault();
     openReader(item);
-  });
-  
-  addLongPress(header, () => {
-    window.open(item.link, '_blank', 'noopener');
-    toast('Opening in new tab...', 'info');
   });
   
   return article;
@@ -1623,39 +1429,28 @@ function render() {
   const feedList = document.getElementById('feedList');
   const emptyMsg = document.getElementById('emptyMsg');
   
-  // Show loading skeletons during fetch
-  if (STATE.loading && feedList.children.length === 0) {
-    feedList.innerHTML = Array(5).fill('<div class="skeleton"></div>').join('');
-    return;
-  }
-  
   feedList.innerHTML = '';
   
-  let filteredItems = STATE.items.filter(item => STATE.enabled.has(item.id));
+  let filtered = STATE.items.filter(item => STATE.enabled.has(item.id));
   
-  // Apply view filters
   switch (STATE.view) {
     case 'popular':
-      filteredItems = filteredItems
-        .map(item => ({
-          ...item,
-          popularity: STATE.popularityScores.get(item.link) || 0
-        }))
-        .sort((a, b) => b.popularity - a.popularity)
-        .slice(0, 50);
+      filtered = filtered
+        .sort((a, b) => b.trendingScore - a.trendingScore)
+        .slice(0, 30);
       break;
     case 'conservative':
-      filteredItems = filteredItems.filter(item => item.lane === 'conservative');
+      filtered = filtered.filter(item => item.lane === 'conservative');
       break;
     case 'populist':
-      filteredItems = filteredItems.filter(item => item.lane === 'populist');
+      filtered = filtered.filter(item => item.lane === 'populist');
       break;
     case 'breaking':
-      filteredItems = filteredItems.filter(item => item.isBreaking);
+      filtered = filtered.filter(item => item.isBreaking);
       break;
     case 'by-source':
       const grouped = {};
-      filteredItems.forEach(item => {
+      filtered.forEach(item => {
         if (!grouped[item.source]) grouped[item.source] = [];
         grouped[item.source].push(item);
       });
@@ -1663,179 +1458,72 @@ function render() {
       Object.keys(grouped).sort().forEach(sourceName => {
         const header = document.createElement('div');
         header.style.cssText = `
-          margin: 2rem 0 1.5rem;
-          font-size: 1.1rem;
+          margin: 2rem 0 1rem;
+          font-size: 1rem;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 1.5px;
-          border-bottom: 2px solid var(--line);
+          color: var(--accent);
           padding-bottom: 0.5rem;
-          background: linear-gradient(90deg, var(--accent), var(--info), var(--accent));
-          background-size: 200% 200%;
-          background-clip: text;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          animation: shimmer 3s ease-in-out infinite;
+          border-bottom: 1px solid var(--line);
         `;
-        header.textContent = `${sourceName} • ${grouped[sourceName].length} ARTICLES`;
+        header.textContent = `${sourceName} (${grouped[sourceName].length})`;
         feedList.appendChild(header);
         
-        grouped[sourceName].slice(0, 15).forEach(item => {
+        grouped[sourceName].slice(0, 10).forEach(item => {
           feedList.appendChild(createCard(item));
         });
       });
-      
-      updateStats();
       return;
   }
   
-  if (!filteredItems.length) {
+  if (!filtered.length) {
     emptyMsg.style.display = 'block';
-    return;
   } else {
     emptyMsg.style.display = 'none';
+    filtered.slice(0, 50).forEach(item => {
+      feedList.appendChild(createCard(item));
+    });
   }
-  
-  filteredItems.slice(0, 60).forEach(item => {
-    feedList.appendChild(createCard(item));
-  });
-  
-  updateStats();
 }
 
 function buildSourceToggles() {
   const container = document.getElementById('sourceToggles');
   container.innerHTML = '';
-  container.className = 'src-grid';
-  container.style.cssText = `
-    display: flex;
-    gap: 0.5rem;
-    overflow-x: auto;
-    padding: 1.2rem 0;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  `;
   
   SOURCES.forEach(source => {
     const button = document.createElement('button');
     button.className = 'src' + (STATE.enabled.has(source.id) ? ' on' : '');
     button.textContent = source.name;
     button.dataset.id = source.id;
-    button.style.cssText = `
-      padding: 0.5rem 0.8rem;
-      border-radius: 8px;
-      background: var(--chip);
-      border: 1px solid var(--border);
-      font-size: 0.7rem;
-      color: var(--muted);
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 600;
-      white-space: nowrap;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      flex-shrink: 0;
-    `;
 
     button.addEventListener('click', () => {
-      const sourceId = button.dataset.id;
-      const isAlreadySolo = (STATE.enabled.size === 1 && STATE.enabled.has(sourceId));
-      
-      if (!isAlreadySolo) {
-        STATE.lastSolo = new Set(STATE.enabled);
-        STATE.enabled = new Set([sourceId]);
-        updateSoloState(sourceId);
-        toast(`SOLO: ${source.name}`, 'info');
+      if (STATE.enabled.has(source.id)) {
+        STATE.enabled.delete(source.id);
       } else {
-        STATE.enabled = STATE.lastSolo || new Set(SOURCES.map(s => s.id));
-        clearSoloState();
-        toast('SOLO OFF', 'info');
-      }
-      
-      updateButtonStates();
-      render();
-      saveEnabled();
-    });
-
-    addLongPress(button, () => {
-      const sourceId = button.dataset.id;
-      
-      if (STATE.enabled.has(sourceId)) {
-        STATE.enabled.delete(sourceId);
-      } else {
-        STATE.enabled.add(sourceId);
+        STATE.enabled.add(source.id);
       }
       
       if (STATE.enabled.size === 0) {
-        STATE.enabled = new Set([sourceId]);
+        STATE.enabled = new Set([source.id]);
       }
       
-      clearSoloState();
-      updateButtonStates();
+      button.classList.toggle('on');
       render();
       saveEnabled();
-      toast(`${STATE.enabled.has(sourceId) ? 'Enabled' : 'Disabled'} ${source.name}`, 'info');
     });
 
     container.appendChild(button);
-  });
-
-  function updateButtonStates() {
-    document.querySelectorAll('.src').forEach(btn => {
-      const isEnabled = STATE.enabled.has(btn.dataset.id);
-      btn.className = 'src' + (isEnabled ? ' on' : '');
-      if (isEnabled) {
-        btn.style.background = 'var(--secondary)';
-        btn.style.color = 'var(--bg)';
-        btn.style.borderColor = 'var(--secondary)';
-      } else {
-        btn.style.background = 'var(--chip)';
-        btn.style.color = 'var(--muted)';
-        btn.style.borderColor = 'var(--border)';
-      }
-    });
-  }
-  
-  function updateSoloState(soloId) {
-    document.querySelectorAll('.src').forEach(btn => {
-      if (btn.dataset.id === soloId) {
-        btn.style.outline = '2px dashed var(--warning)';
-        btn.style.outlineOffset = '2px';
-      }
-    });
-  }
-  
-  function clearSoloState() {
-    document.querySelectorAll('.src').forEach(btn => {
-      btn.style.outline = 'none';
-    });
-  }
-
-  updateButtonStates();
-}
-
-function buildFilters() {
-  document.getElementById('filters').addEventListener('click', (e) => {
-    const chip = e.target.closest('.chip');
-    if (!chip) return;
-    
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    STATE.view = chip.dataset.view;
-    render();
   });
 }
 
 function fmtTime(ts) {
   const d = new Date(ts);
-  if (isNaN(d)) return 'UNKNOWN';
-  
   const diff = (Date.now() - d) / 1000;
-  if (diff < 60) return 'LIVE';
+  if (diff < 60) return 'NOW';
   if (diff < 3600) return Math.floor(diff / 60) + 'm';
   if (diff < 86400) return Math.floor(diff / 3600) + 'h';
-  if (diff < 604800) return Math.floor(diff / 86400) + 'd';
-  return d.toLocaleDateString();
+  return Math.floor(diff / 86400) + 'd';
 }
 
 function toast(msg, type = 'info') {
@@ -1843,27 +1531,8 @@ function toast(msg, type = 'info') {
   el.className = `toast ${type}`;
   el.textContent = msg;
   document.body.appendChild(el);
-  
-  setTimeout(() => { 
-    el.style.opacity = '0'; 
-    el.style.transform = 'translateX(-50%) translateY(-10px)';
-    setTimeout(() => el.remove(), 300);
-  }, 2500);
-  
+  setTimeout(() => el.remove(), 2500);
   return el;
-}
-
-function addLongPress(target, fn) {
-  let timer;
-  const start = () => timer = setTimeout(fn, 500);
-  const end = () => clearTimeout(timer);
-  
-  target.addEventListener('touchstart', start, {passive: true});
-  target.addEventListener('touchend', end, {passive: true});
-  target.addEventListener('touchcancel', end, {passive: true});
-  target.addEventListener('mousedown', start);
-  target.addEventListener('mouseup', end);
-  target.addEventListener('mouseleave', end);
 }
 
 function escapeHTML(str = '') {
@@ -1871,64 +1540,38 @@ function escapeHTML(str = '') {
   return str.replace(/[&<>"']/g, c => map[c]);
 }
 
-function resetAll() {
-  if(confirm('Reset all settings?')) {
-    localStorage.clear();
-    STATE.enabled = new Set(SOURCES.map(s=>s.id));
-    STATE.expandedCards.clear();
-    STATE.popularityScores.clear();
-    STATE.viewCounts.clear();
-    buildSourceToggles();
-    loadFeeds();
-    toast('System reset', 'success');
-  }
-}
-
 // Initialize
-function initialize() {
-  buildFilters();
+document.addEventListener('DOMContentLoaded', () => {
   buildSourceToggles();
   
-  // Toggle sections
-  document.querySelectorAll('.toggle-section').forEach(section => {
-    const header = section.querySelector('.toggle-header');
-    const arrow = section.querySelector('.toggle-arrow');
-    header.addEventListener('click', () => {
-      const isOpen = section.classList.toggle('open');
-      arrow.textContent = isOpen ? '▼' : '▶';
-    });
+  document.getElementById('filters').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    STATE.view = chip.dataset.view;
+    render();
   });
   
-  // Reader modal
   document.getElementById('readerClose').addEventListener('click', () => {
     document.getElementById('readerModal').classList.remove('active');
   });
   
-  document.getElementById('resetBtn').addEventListener('click', resetAll);
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if(confirm('Reset?')) {
+      localStorage.clear();
+      location.reload();
+    }
+  });
   
   // Auto-refresh
   setInterval(() => {
-    if (!STATE.loading && document.visibilityState === 'visible') {
-      loadFeeds();
-    }
+    if (!STATE.loading) loadFeeds();
   }, 120000);
   
   // Initial load
-  setTimeout(loadFeeds, 100);
-  
-  // Visibility handling
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && Date.now() - STATE.lastFetch > 180000) {
-      loadFeeds();
-    }
-  });
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initialize);
-} else {
-  initialize();
-}
+  loadFeeds();
+});
 </script>
 </body>
 </html>
