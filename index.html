@@ -63,7 +63,7 @@ CHANGELOG:
     line-height: 1.4;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
     overflow-x: hidden;
   }
 
@@ -186,18 +186,14 @@ CHANGELOG:
   /* Filter chips */
   .filters {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
-    overflow-x: auto;
-    padding: 0.75rem 1rem 1rem;
-    background: linear-gradient(180deg, rgba(5, 7, 13, 0.97), rgba(5, 7, 13, 0.92));
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 10px 30px rgba(5, 7, 13, 0.55);
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
   }
-
-  .filters::-webkit-scrollbar { display: none; }
   
   .chip {
     white-space: nowrap;
@@ -677,52 +673,6 @@ CHANGELOG:
     color: var(--err);
   }
 
-  /* Source toggles */
-  .src-grid {
-    display: flex;
-    gap: 0.4rem;
-    overflow-x: auto;
-    padding: 1rem 0;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .src-grid::-webkit-scrollbar { display: none; }
-
-  .src {
-    padding: 0.4rem 0.7rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    font-size: 0.68rem;
-    color: var(--muted);
-    cursor: pointer;
-    font-weight: 600;
-    white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    flex-shrink: 0;
-    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .src:hover {
-    border-color: rgba(64, 217, 255, 0.6);
-    color: var(--text);
-    background: rgba(64, 217, 255, 0.08);
-  }
-
-  .src:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-
-  .src.on {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
-    color: #020305;
-    border-color: transparent;
-    box-shadow: 0 14px 26px rgba(64, 217, 255, 0.25);
-  }
-
   /* Empty state */
   .empty {
     color: var(--muted);
@@ -775,7 +725,7 @@ CHANGELOG:
     }
 
     main {
-      padding: 0.8rem 0.8rem calc(7.5rem + var(--tab-bar-dynamic-offset));
+      padding: 0.8rem 0.8rem calc(3rem + var(--tab-bar-height) + var(--tab-bar-dynamic-offset));
     }
   }
 
@@ -835,11 +785,12 @@ CHANGELOG:
     --tab-bg: rgba(8, 12, 20, 0.82);
     --tab-stroke: rgba(255, 255, 255, 0.08);
     --tab-shadow: 0 22px 48px rgba(8, 12, 20, 0.65);
+    --tab-bar-height: 84px;
     --sheet-bg: rgba(10, 14, 22, 0.88);
     --sheet-backdrop: rgba(3, 5, 8, 0.55);
     --sheet-border: rgba(255, 255, 255, 0.12);
     --ios-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-    --tab-bar-base-gap: 0.75rem;
+    --tab-bar-base-gap: 0;
     --tab-bar-dynamic-offset: 0px;
   }
 
@@ -867,7 +818,7 @@ CHANGELOG:
   main {
     width: min(960px, 100% - 2.5rem);
     margin: 0 auto;
-    padding: 2.6rem 1.25rem calc(9.5rem + var(--tab-bar-dynamic-offset));
+    padding: 2.6rem 1.25rem calc(4.5rem + var(--tab-bar-height) + var(--tab-bar-dynamic-offset));
     display: flex;
     flex-direction: column;
     gap: 2.75rem;
@@ -894,36 +845,14 @@ CHANGELOG:
   }
 
   .filters {
-    position: sticky;
-    top: calc(env(safe-area-inset-top) + 3.25rem);
+    position: static;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: flex-start;
-    padding: 0.85rem 1.5rem;
-    gap: 0.75rem;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    overflow-x: auto;
-    overflow-y: hidden;
-    flex-wrap: nowrap;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .filters::before {
-    content: '';
-    position: absolute;
-    inset: 0.35rem 1.25rem;
-    border-radius: 20px;
-    background: var(--glass);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 18px 44px rgba(6, 10, 18, 0.6);
-    pointer-events: none;
-  }
-
-  .filters::-webkit-scrollbar {
-    display: none;
+    gap: 0.65rem;
+    padding: 0;
+    overflow: visible;
   }
 
   .chip {
@@ -1139,16 +1068,59 @@ CHANGELOG:
     gap: 1.6rem;
   }
 
-  .intel-grid {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: minmax(0, 1.75fr) minmax(0, 1.05fr);
+  .card-insights {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1rem 1.2rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  @media (min-width: 720px) {
+    .card-insights {
+      flex-direction: row;
+    }
+
+    .card-insights > * {
+      flex: 1;
+    }
   }
 
   .card-summary {
     font-size: 0.92rem;
     letter-spacing: 0.01em;
     color: rgba(244, 246, 255, 0.9);
+    line-height: 1.6;
+  }
+
+  .card-credibility {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .card-credibility__label {
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .card-credibility__value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+  }
+
+  .card-credibility__note {
+    margin: 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.62);
   }
 
   .card-actions {
@@ -1172,77 +1144,6 @@ CHANGELOG:
 
   .bias-indicator {
     transition: left 0.45s var(--ios-ease);
-  }
-
-
-  .sentiment-panel {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 1rem;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 1rem 1.2rem;
-  }
-
-  .sentiment-summary {
-    display: grid;
-    gap: 0.4rem;
-  }
-
-  .sentiment-summary__label {
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.55);
-  }
-
-  .sentiment-summary__value {
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .sentiment-summary__value--very-positive {
-    color: var(--tone-high);
-  }
-
-  .sentiment-summary__value--positive {
-    color: var(--tone-mid);
-  }
-
-  .sentiment-summary__value--neutral {
-    color: var(--tone-neutral);
-  }
-
-  .sentiment-summary__value--negative {
-    color: var(--tone-low);
-  }
-
-  .sentiment-summary__value--very-negative {
-    color: var(--tone-critical);
-  }
-
-  .sentiment-summary__score {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.65);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .credibility-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  .credibility-row strong {
-    color: var(--accent);
   }
 
   .reading-progress {
@@ -1310,19 +1211,19 @@ CHANGELOG:
   .tab-bar {
     position: fixed;
     left: 50%;
-    bottom: calc(env(safe-area-inset-bottom) + var(--tab-bar-base-gap) + var(--tab-bar-dynamic-offset));
+    bottom: calc(var(--tab-bar-dynamic-offset));
     transform: translateX(-50%);
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0.4rem;
     background: var(--tab-bg);
     border-radius: 26px;
-    padding: 0.35rem;
+    padding: 0.35rem 0.6rem calc(0.35rem + env(safe-area-inset-bottom));
     border: 1px solid var(--tab-stroke);
     box-shadow: var(--tab-shadow);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    width: min(440px, calc(100% - 3rem));
+    width: min(480px, calc(100% - 1.5rem));
     z-index: 120;
   }
 
@@ -1434,6 +1335,264 @@ CHANGELOG:
     color: var(--err);
   }
 
+  .sheet {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: flex-end center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    z-index: 260;
+  }
+
+  .sheet.is-visible {
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  .sheet__overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--sheet-backdrop);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .sheet__panel {
+    position: relative;
+    width: min(520px, 100%);
+    margin: 0 auto;
+    background: var(--sheet-bg);
+    border: 1px solid var(--sheet-border);
+    border-radius: 28px 28px 0 0;
+    box-shadow: 0 40px 80px rgba(6, 10, 18, 0.72);
+    transform: translateY(48px);
+    transition: transform 0.4s var(--ios-ease);
+    overflow: hidden;
+  }
+
+  .sheet.is-visible .sheet__panel {
+    transform: translateY(0);
+  }
+
+  .filter-sheet__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
+  }
+
+  .filter-sheet__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1.2rem 1.5rem 0.75rem;
+  }
+
+  .filter-sheet__title {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+  }
+
+  .filter-sheet__close {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .filter-sheet__section {
+    padding: 1rem 1.5rem 1.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .filter-sheet__section + .filter-sheet__section {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .filter-sheet__section-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.58);
+  }
+
+  .filter-sheet__source-btn {
+    width: 100%;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.9rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    color: var(--text);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    cursor: pointer;
+    transition: border-color 0.3s ease, background 0.3s ease;
+  }
+
+  .filter-sheet__source-btn:hover,
+  .filter-sheet__source-btn:focus-visible {
+    border-color: rgba(64, 217, 255, 0.55);
+    background: rgba(64, 217, 255, 0.08);
+    outline: none;
+  }
+
+  .filter-sheet__source-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .filter-sheet__source-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  .filter-sheet__source-hint {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .source-sheet__panel {
+    display: flex;
+    flex-direction: column;
+    max-height: min(80vh, 640px);
+    padding: 1.2rem 1.5rem calc(env(safe-area-inset-bottom) + 1rem);
+    gap: 0.75rem;
+  }
+
+  .source-sheet__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .source-sheet__title {
+    font-size: 0.82rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .source-sheet__close,
+  .source-sheet__clear {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .source-sheet__clear:disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .source-sheet__list {
+    display: grid;
+    gap: 0.65rem;
+    overflow-y: auto;
+    padding: 0.25rem 0.25rem 0.25rem 0;
+  }
+
+  .source-option {
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    color: var(--text);
+    font-size: 0.88rem;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    cursor: pointer;
+    transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
+  }
+
+  .source-option:hover {
+    border-color: rgba(64, 217, 255, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .source-option[aria-selected='true'] {
+    border-color: rgba(64, 217, 255, 0.65);
+    background: linear-gradient(135deg, rgba(64, 217, 255, 0.22), rgba(122, 91, 255, 0.18));
+  }
+
+  .source-option__name {
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  .source-option__meta {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .source-option__bias {
+    font-weight: 600;
+    letter-spacing: 0.12em;
+  }
+
+  .source-option__check {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .source-option[aria-selected='true'] .source-option__check {
+    opacity: 1;
+  }
+
+  @media (max-width: 520px) {
+    .sheet__panel {
+      width: calc(100% - 1.25rem);
+    }
+
+    .filter-sheet__header,
+    .filter-sheet__section,
+    .source-sheet__panel {
+      padding-left: 1.1rem;
+      padding-right: 1.1rem;
+    }
+  }
+
   .spring-stagger .card {
     animation-duration: 0.55s;
   }
@@ -1452,15 +1611,11 @@ CHANGELOG:
   @media (max-width: 720px) {
     main {
       width: calc(100% - 1.5rem);
-      padding: 2.2rem 0.75rem calc(8.5rem + var(--tab-bar-dynamic-offset));
+      padding: 2.2rem 0.75rem calc(3.5rem + var(--tab-bar-height) + var(--tab-bar-dynamic-offset));
     }
 
     .bar {
       padding: 1rem 1.1rem;
-    }
-
-    .filters::before {
-      inset: 0.25rem 0.5rem;
     }
 
     .card-head {
@@ -1472,19 +1627,11 @@ CHANGELOG:
     .card-body {
       padding: 0 1.3rem 1.4rem;
     }
-
-    .intel-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .sentiment-panel {
-      order: 2;
-    }
   }
 
   @media (max-width: 520px) {
     .tab-bar {
-      width: calc(100% - 2rem);
+      width: calc(100% - 1.5rem);
     }
 
     .chip {
@@ -1536,19 +1683,10 @@ CHANGELOG:
       <span class="meta mood neutral" id="overallMood">• MOOD: CALM</span>
     </div>
   </div>
-  <div class="filters" id="filters" role="tablist" aria-label="Content filters">
-    <button class="chip active smooth" data-view="all" role="tab" aria-selected="true" tabindex="0">ALL</button>
-    <button class="chip smooth" data-view="popular" role="tab" aria-selected="false" tabindex="-1">🔥 TRENDING</button>
-    <button class="chip smooth" data-view="by-source" role="tab" aria-selected="false" tabindex="-1">BY SOURCE</button>
-    <button class="chip smooth" data-view="conservative" role="tab" aria-selected="false" tabindex="-1">CONSERVATIVE</button>
-    <button class="chip smooth" data-view="populist" role="tab" aria-selected="false" tabindex="-1">POPULIST</button>
-    <button class="chip smooth" data-view="breaking" role="tab" aria-selected="false" tabindex="-1">BREAKING</button>
-  </div>
 </header>
 
 <main>
   <div class="pull-indicator" id="pullIndicator" role="status" aria-live="polite">Pull to refresh</div>
-  <div class="src-grid" id="sourceToggles" role="group" aria-label="News sources"></div>
   <div class="list" id="feedList" role="main" aria-live="polite"></div>
   <div class="empty" id="emptyMsg" style="display:none;">
     <h3>NO STORIES AVAILABLE</h3>
@@ -1572,6 +1710,19 @@ CHANGELOG:
   <button
     type="button"
     class="tab-bar__btn"
+    id="filterTrigger"
+    data-filter-trigger
+    role="tab"
+    aria-selected="false"
+    aria-haspopup="dialog"
+    aria-expanded="false"
+  >
+    <span class="tab-bar__icon">⚙︎</span>
+    <span class="tab-bar__label">Filters</span>
+  </button>
+  <button
+    type="button"
+    class="tab-bar__btn"
     id="moreActionsTrigger"
     data-sheet-trigger="true"
     role="tab"
@@ -1583,6 +1734,53 @@ CHANGELOG:
     <span class="tab-bar__label">More</span>
   </button>
 </nav>
+
+<div class="sheet filter-sheet" id="filterSheet" role="dialog" aria-modal="true" hidden>
+  <div class="sheet__overlay" data-filter-close></div>
+  <div class="sheet__panel filter-sheet__panel" role="document">
+    <div class="filter-sheet__header">
+      <h2 class="filter-sheet__title">Feed Controls</h2>
+      <button type="button" class="filter-sheet__close" data-filter-close>Done</button>
+    </div>
+    <section class="filter-sheet__section">
+      <h3 class="filter-sheet__section-title">View</h3>
+      <div class="filters" id="filters" role="tablist" aria-label="Content filters">
+        <button class="chip active smooth" data-view="all" role="tab" aria-selected="true" tabindex="0">ALL</button>
+        <button class="chip smooth" data-view="popular" role="tab" aria-selected="false" tabindex="-1">🔥 TRENDING</button>
+        <button class="chip smooth" data-view="by-source" role="tab" aria-selected="false" tabindex="-1">BY SOURCE</button>
+        <button class="chip smooth" data-view="conservative" role="tab" aria-selected="false" tabindex="-1">CONSERVATIVE</button>
+        <button class="chip smooth" data-view="populist" role="tab" aria-selected="false" tabindex="-1">POPULIST</button>
+        <button class="chip smooth" data-view="breaking" role="tab" aria-selected="false" tabindex="-1">BREAKING</button>
+      </div>
+    </section>
+    <section class="filter-sheet__section">
+      <h3 class="filter-sheet__section-title">Source</h3>
+      <button
+        type="button"
+        class="filter-sheet__source-btn smooth"
+        id="sourceFilterButton"
+        aria-haspopup="dialog"
+        aria-expanded="false"
+      >
+        <span class="filter-sheet__source-label">Current Source</span>
+        <span class="filter-sheet__source-value" id="sourceFilterValue">All Sources</span>
+        <span class="filter-sheet__source-hint">Tap to focus on a single outlet</span>
+      </button>
+    </section>
+  </div>
+</div>
+
+<div class="sheet source-sheet" id="sourceSheet" role="dialog" aria-modal="true" hidden>
+  <div class="sheet__overlay" data-source-close></div>
+  <div class="sheet__panel source-sheet__panel" role="document">
+    <div class="source-sheet__header">
+      <button type="button" class="source-sheet__close" data-source-close>Cancel</button>
+      <span class="source-sheet__title">Select Source</span>
+      <button type="button" class="source-sheet__clear" id="clearSourceFilter">Show All</button>
+    </div>
+    <div class="source-sheet__list" id="sourceToggles" role="listbox" aria-label="News sources"></div>
+  </div>
+</div>
 
 <div class="action-sheet" id="actionSheet" role="dialog" aria-modal="true" hidden>
   <div class="action-sheet__overlay" data-sheet-close></div>
@@ -1822,8 +2020,8 @@ function syncActiveNav() {
     tabBar.querySelectorAll('.tab-bar__btn').forEach(button => {
       const view = button.dataset.viewTarget;
       const active = Boolean(view && view === currentView);
-      button.classList.toggle('active', active);
       if (view) {
+        button.classList.toggle('active', active);
         button.setAttribute('aria-selected', String(active));
       }
     });
@@ -1907,6 +2105,17 @@ function setupTabBar() {
       return;
     }
 
+    if (button.hasAttribute('data-filter-trigger')) {
+      const sheet = document.getElementById('filterSheet');
+      if (sheet?.classList.contains('is-visible')) {
+        closeFilterSheet();
+      } else {
+        closeActionSheet();
+        openFilterSheet(button);
+      }
+      return;
+    }
+
     const view = button.dataset.viewTarget;
     if (view) {
       changeView(view);
@@ -1950,6 +2159,10 @@ function setupTabBar() {
 
 let actionSheetHideTimer = null;
 let actionSheetTriggerEl = null;
+let filterSheetHideTimer = null;
+let filterSheetTriggerEl = null;
+let sourceSheetHideTimer = null;
+let sourceSheetTriggerEl = null;
 
 function openActionSheet(trigger) {
   const sheet = document.getElementById('actionSheet');
@@ -2082,6 +2295,185 @@ function setupActionSheet() {
   });
 }
 
+function openFilterSheet(trigger) {
+  const sheet = document.getElementById('filterSheet');
+  if (!sheet) {
+    return;
+  }
+
+  if (filterSheetHideTimer) {
+    clearTimeout(filterSheetHideTimer);
+    filterSheetHideTimer = null;
+  }
+
+  filterSheetTriggerEl = trigger || filterSheetTriggerEl || document.getElementById('filterTrigger');
+
+  sheet.hidden = false;
+  sheet.classList.add('is-visible');
+  sheet.setAttribute('aria-hidden', 'false');
+
+  if (filterSheetTriggerEl) {
+    filterSheetTriggerEl.setAttribute('aria-expanded', 'true');
+    filterSheetTriggerEl.setAttribute('aria-selected', 'true');
+  }
+
+  const firstChip = sheet.querySelector('.filters .chip');
+  requestAnimationFrame(() => {
+    firstChip?.focus({ preventScroll: true });
+  });
+
+  triggerHaptic('action');
+}
+
+function closeFilterSheet() {
+  const sheet = document.getElementById('filterSheet');
+  if (!sheet || sheet.hidden) {
+    return;
+  }
+
+  closeSourceSheet({ skipFocus: true });
+
+  sheet.classList.remove('is-visible');
+  sheet.setAttribute('aria-hidden', 'true');
+
+  if (filterSheetTriggerEl) {
+    filterSheetTriggerEl.setAttribute('aria-expanded', 'false');
+    filterSheetTriggerEl.setAttribute('aria-selected', 'false');
+    filterSheetTriggerEl.focus({ preventScroll: true });
+  }
+
+  if (filterSheetHideTimer) {
+    clearTimeout(filterSheetHideTimer);
+  }
+
+  filterSheetHideTimer = setTimeout(() => {
+    sheet.hidden = true;
+  }, 320);
+}
+
+function setupFilterSheet() {
+  const sheet = document.getElementById('filterSheet');
+  if (!sheet) {
+    return;
+  }
+
+  sheet.addEventListener('click', event => {
+    if (event.target.closest('[data-filter-close]')) {
+      closeFilterSheet();
+    }
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !sheet.hidden) {
+      const sourceSheet = document.getElementById('sourceSheet');
+      if (sourceSheet && !sourceSheet.hidden) {
+        return;
+      }
+      closeFilterSheet();
+    }
+  });
+
+  const sourceButton = document.getElementById('sourceFilterButton');
+  if (sourceButton) {
+    sourceButton.addEventListener('click', () => {
+      openSourceSheet(sourceButton);
+    });
+  }
+}
+
+function openSourceSheet(trigger) {
+  const sheet = document.getElementById('sourceSheet');
+  if (!sheet) {
+    return;
+  }
+
+  if (sourceSheetHideTimer) {
+    clearTimeout(sourceSheetHideTimer);
+    sourceSheetHideTimer = null;
+  }
+
+  sourceSheetTriggerEl = trigger || sourceSheetTriggerEl || document.getElementById('sourceFilterButton');
+
+  sheet.hidden = false;
+  sheet.classList.add('is-visible');
+  sheet.setAttribute('aria-hidden', 'false');
+
+  if (sourceSheetTriggerEl) {
+    sourceSheetTriggerEl.setAttribute('aria-expanded', 'true');
+  }
+
+  const selected = sheet.querySelector('.source-option[aria-selected="true"]');
+  const fallback = sheet.querySelector('.source-option');
+  requestAnimationFrame(() => {
+    (selected || fallback)?.focus({ preventScroll: true });
+  });
+
+  triggerHaptic('action');
+}
+
+function closeSourceSheet(options = {}) {
+  const sheet = document.getElementById('sourceSheet');
+  if (!sheet || sheet.hidden) {
+    return;
+  }
+
+  const skipFocus = typeof options === 'object' && options.skipFocus === true;
+
+  sheet.classList.remove('is-visible');
+  sheet.setAttribute('aria-hidden', 'true');
+
+  if (sourceSheetTriggerEl) {
+    sourceSheetTriggerEl.setAttribute('aria-expanded', 'false');
+    if (!skipFocus) {
+      sourceSheetTriggerEl.focus({ preventScroll: true });
+    }
+  }
+
+  if (sourceSheetHideTimer) {
+    clearTimeout(sourceSheetHideTimer);
+  }
+
+  sourceSheetHideTimer = setTimeout(() => {
+    sheet.hidden = true;
+  }, 320);
+}
+
+function setupSourceSheet() {
+  const sheet = document.getElementById('sourceSheet');
+  if (!sheet) {
+    return;
+  }
+
+  sheet.addEventListener('click', event => {
+    if (event.target.closest('[data-source-close]')) {
+      closeSourceSheet();
+    }
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !sheet.hidden) {
+      closeSourceSheet();
+    }
+  });
+
+  const clearButton = document.getElementById('clearSourceFilter');
+  if (clearButton) {
+    clearButton.addEventListener('click', () => {
+      if (!STATE.sourceFilter) {
+        closeSourceSheet();
+        return;
+      }
+      STATE.sourceFilter = null;
+      persistState();
+      buildSourceToggles();
+      updateSourceSummary();
+      render();
+      triggerHaptic('tab');
+      closeSourceSheet();
+    });
+  }
+}
+
 function setupPullToRefresh() {
   const indicator = document.getElementById('pullIndicator');
   if (!indicator) {
@@ -2091,12 +2483,15 @@ function setupPullToRefresh() {
   let startY = 0;
   let pulling = false;
   let ready = false;
+  let pullActive = false;
 
   const resetPull = () => {
     document.body.style.setProperty('--pull-distance', '0px');
     pulling = false;
     ready = false;
+    pullActive = false;
     indicator.dataset.state = 'idle';
+    indicator.style.opacity = 0;
   };
 
   window.addEventListener(
@@ -2108,8 +2503,10 @@ function setupPullToRefresh() {
       startY = event.touches[0].clientY;
       pulling = true;
       ready = false;
+      pullActive = false;
       indicator.dataset.state = 'idle';
       indicator.textContent = 'Pull to refresh';
+      indicator.style.opacity = 0;
     },
     { passive: true }
   );
@@ -2131,13 +2528,21 @@ function setupPullToRefresh() {
         return;
       }
 
-      event.preventDefault();
-      const limited = Math.min(160, delta);
-      const eased = Math.pow(limited / 160, 0.85) * 160;
-      document.body.style.setProperty('--pull-distance', `${eased}px`);
-      indicator.style.opacity = Math.min(1, eased / 90);
+      if (!pullActive && delta < 32) {
+        return;
+      }
 
-      if (eased > 90) {
+      if (!pullActive) {
+        pullActive = true;
+      }
+
+      event.preventDefault();
+      const limited = Math.min(220, delta);
+      const eased = Math.pow(limited / 220, 0.85) * 220;
+      document.body.style.setProperty('--pull-distance', `${eased}px`);
+      indicator.style.opacity = Math.min(1, eased / 120);
+
+      if (eased > 140) {
         indicator.dataset.state = 'ready';
         indicator.textContent = 'Release to refresh';
         if (!ready) {
@@ -2161,7 +2566,7 @@ function setupPullToRefresh() {
     document.body.style.setProperty('--pull-distance', '0px');
     indicator.style.opacity = 0;
 
-    if (ready && !STATE.loading) {
+    if (ready && pullActive && !STATE.loading) {
       indicator.dataset.state = 'loading';
       indicator.textContent = 'Updating…';
       triggerHaptic('refresh');
@@ -2172,6 +2577,7 @@ function setupPullToRefresh() {
 
     pulling = false;
     ready = false;
+    pullActive = false;
   };
 
   window.addEventListener('touchend', endPull);
@@ -3007,9 +3413,7 @@ function createCard(item, index = 0, total = 1) {
   const sentimentTone = ['very-positive', 'positive', 'neutral', 'negative', 'very-negative'].includes(item.sentimentTone)
     ? item.sentimentTone
     : 'neutral';
-  const sentimentSummaryClass = ` sentiment-summary__value--${sentimentTone}`;
   const sentimentScoreFormatted = formatSentimentScore(item.sentimentScore);
-  const sentimentLabelText = escapeHTML(item.sentimentLabel || 'STEADY');
   const progressValue = getReadProgress(cardId);
 
   const article = document.createElement('article');
@@ -3044,7 +3448,7 @@ function createCard(item, index = 0, total = 1) {
 
   const timeString = fmtTime(item.pubDate);
   const sentimentBadge = item.sentimentLabel
-    ? `<span class="badge sentiment ${item.sentimentTone}" title="Sentiment score ${sentimentScoreFormatted}">${escapeHTML(item.sentimentLabel)} • ${sentimentScoreFormatted}</span>`
+    ? `<span class="badge sentiment ${sentimentTone}" title="Sentiment score ${sentimentScoreFormatted}">${escapeHTML(item.sentimentLabel)} • ${sentimentScoreFormatted}</span>`
     : '';
   const biasLabel = item.biasLabel || 'Center';
   const biasClass = item.biasClass || 'center';
@@ -3083,7 +3487,7 @@ function createCard(item, index = 0, total = 1) {
       <div class="expand-btn" aria-hidden="true">${isExpanded ? '▼' : '▶'}</div>
     </div>
     <div class="card-body" id="body-${cardId}" role="region">
-      <div class="intel-grid">
+      <div class="card-insights">
         <div class="bias-section" aria-label="${biasAria}">
           <div class="bias-header">
             <span class="bias-title">Political Lean</span>
@@ -3101,16 +3505,10 @@ function createCard(item, index = 0, total = 1) {
             <span>RIGHT</span>
           </div>
         </div>
-        <div class="sentiment-panel" aria-label="Sentiment and credibility insights">
-          <div class="sentiment-summary">
-            <span class="sentiment-summary__label">Sentiment</span>
-            <span class="sentiment-summary__value${sentimentSummaryClass}">${sentimentLabelText}</span>
-            <span class="sentiment-summary__score">Score ${sentimentScoreFormatted}</span>
-          </div>
-          <div class="credibility-row">
-            <strong>${escapeHTML(credibility.detail)}</strong>
-            <span>${escapeHTML(credibility.description)}</span>
-          </div>
+        <div class="card-credibility" aria-label="Credibility insight ${escapeHTML(credibility.detail)}">
+          <span class="card-credibility__label">Credibility</span>
+          <span class="card-credibility__value">${escapeHTML(credibility.detail)}</span>
+          <p class="card-credibility__note">${escapeHTML(credibility.description)}</p>
         </div>
       </div>
       <div class="card-summary">${escapeHTML(item.desc || 'No summary available.')}</div>
@@ -3218,6 +3616,7 @@ function updateMoodIndicator(items) {
 function render() {
   const feedList = document.getElementById('feedList');
   const emptyMsg = document.getElementById('emptyMsg');
+  updateSourceSummary();
 
   batchDOM(() => {
     feedList.innerHTML = '';
@@ -3301,34 +3700,93 @@ function render() {
   syncActiveNav();
 }
 
+function updateSourceSummary() {
+  const valueEl = document.getElementById('sourceFilterValue');
+  const trigger = document.getElementById('sourceFilterButton');
+  const navTrigger = document.getElementById('filterTrigger');
+  const clearButton = document.getElementById('clearSourceFilter');
+  const selection = SOURCES.find(source => source.id === STATE.sourceFilter);
+
+  if (valueEl) {
+    valueEl.textContent = selection ? selection.name : 'All Sources';
+  }
+
+  if (trigger) {
+    trigger.setAttribute('aria-label', selection ? `Current source ${selection.name}` : 'Current source All Sources');
+    trigger.dataset.selectedSource = selection ? selection.id : '';
+  }
+
+  if (navTrigger) {
+    navTrigger.classList.toggle('active', Boolean(selection));
+  }
+
+  if (clearButton) {
+    clearButton.disabled = !selection;
+  }
+}
+
 function buildSourceToggles() {
   const container = document.getElementById('sourceToggles');
+  if (!container) {
+    return;
+  }
+
   container.innerHTML = '';
   const fragment = document.createDocumentFragment();
 
-  SOURCES.forEach(source => {
-    const isActive = STATE.sourceFilter === source.id;
+  const appendOption = (label, metaSegments, sourceId, isActive, onSelect) => {
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = `src smooth${isActive ? ' on' : ''}`;
-    button.dataset.sourceId = source.id;
-    button.textContent = source.name;
-    button.setAttribute('aria-pressed', String(isActive));
-
+    button.className = 'source-option smooth';
+    button.dataset.sourceId = sourceId || '';
+    button.setAttribute('role', 'option');
+    button.tabIndex = 0;
+    button.setAttribute('aria-selected', String(isActive));
+    const metaHTML = metaSegments.map(part => `<span>${escapeHTML(part)}</span>`).join('');
+    button.innerHTML = `
+      <span class="source-option__name">${escapeHTML(label)}</span>
+      <span class="source-option__meta">${metaHTML}</span>
+      <span class="source-option__check" aria-hidden="true">✓</span>
+    `;
     button.addEventListener('click', () => {
-      STATE.sourceFilter = STATE.sourceFilter === source.id ? null : source.id;
-      persistState();
-
-      container.querySelectorAll('.src').forEach(control => {
-        const active = STATE.sourceFilter === control.dataset.sourceId;
-        control.classList.toggle('on', active);
-        control.setAttribute('aria-pressed', String(active));
-      });
-
+      onSelect();
+      buildSourceToggles();
+      updateSourceSummary();
       render();
+      triggerHaptic('tab');
+      closeSourceSheet();
     });
-
     fragment.appendChild(button);
+  };
+
+  appendOption(
+    'All Sources',
+    ['All outlets'],
+    '',
+    !STATE.sourceFilter,
+    () => {
+      STATE.sourceFilter = null;
+      persistState();
+    }
+  );
+
+  SOURCES.forEach(source => {
+    const isActive = STATE.sourceFilter === source.id;
+    const laneLabel = source.lane ? source.lane.replace(/\b\w/g, char => char.toUpperCase()) : 'General';
+    const biasLabel = Number.isFinite(source.bias)
+      ? `Bias ${source.bias >= 0 ? '+' : ''}${source.bias.toFixed(1)}`
+      : 'Bias N/A';
+
+    appendOption(
+      source.name,
+      [laneLabel, biasLabel],
+      source.id,
+      isActive,
+      () => {
+        STATE.sourceFilter = source.id;
+        persistState();
+      }
+    );
   });
 
   container.appendChild(fragment);
@@ -3399,9 +3857,12 @@ function escapeHTML(str = '') {
 
 document.addEventListener('DOMContentLoaded', () => {
   buildSourceToggles();
+  updateSourceSummary();
   initFilterNavigation();
   setupTabBar();
   setupActionSheet();
+  setupFilterSheet();
+  setupSourceSheet();
   setupPullToRefresh();
   syncActiveNav();
 
@@ -3412,6 +3873,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
     changeView(chip.dataset.view);
+    closeFilterSheet();
   });
 
   setInterval(() => {
