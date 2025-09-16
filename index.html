@@ -21,18 +21,27 @@ CHANGELOG:
 <meta name="description" content="Real-time intelligence terminal for breaking news and political analysis">
 <style>
   :root {
-    --bg: #0b0f14;
-    --panel: #10161b;
-    --muted: #93a1a1;
-    --text: #e6edf3;
-    --accent: #4cc2ff;
-    --ok: #3bd671;
-    --warn: #f5c451;
-    --err: #ff6b6b;
-    --border: #1f2a33;
-    --hover: #161e24;
-    --focus: #2d3748;
-    --skeleton: #1a2027;
+    --bg: #000000;
+    --panel: #05070d;
+    --muted: #7c8cab;
+    --text: #f4f6ff;
+    --accent: #40d9ff;
+    --accent-soft: #7a5bff;
+    --ok: #4ef4c2;
+    --warn: #ff8f66;
+    --err: #ff5e8a;
+    --border: #10131d;
+    --hover: #0b0f1a;
+    --focus: #162032;
+    --skeleton: #0f1322;
+    --tone-high: #55f6d2;
+    --tone-mid: #3cc3ff;
+    --tone-neutral: #7d8ca3;
+    --tone-low: #ff7f9e;
+    --tone-critical: #ff4d7e;
+    --aurora-1: #40d9ff;
+    --aurora-2: #7a5bff;
+    --aurora-3: #4ef4c2;
   }
   
   * {
@@ -85,16 +94,18 @@ CHANGELOG:
     position: sticky;
     top: 0;
     z-index: 100;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(64, 217, 255, 0.12), rgba(0, 0, 0, 0));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 16px 32px rgba(64, 217, 255, 0.12);
   }
-  
+
   .bar {
     display: flex;
     gap: 1rem;
     align-items: center;
     padding: 1rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: none;
+    background: rgba(5, 7, 13, 0.9);
   }
   
   .title {
@@ -126,6 +137,12 @@ CHANGELOG:
     0%, 100% { opacity: 1; }
     50% { opacity: 0.3; }
   }
+
+  @keyframes aurora {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
   
   .meta {
     font-size: 0.75rem;
@@ -133,6 +150,32 @@ CHANGELOG:
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--muted);
+  }
+
+  .meta.mood {
+    margin-left: 0.75rem;
+    color: var(--tone-neutral);
+    transition: color 0.2s ease;
+  }
+
+  .meta.mood.very-positive {
+    color: var(--tone-high);
+  }
+
+  .meta.mood.positive {
+    color: var(--tone-mid);
+  }
+
+  .meta.mood.neutral {
+    color: var(--tone-neutral);
+  }
+
+  .meta.mood.negative {
+    color: var(--tone-low);
+  }
+
+  .meta.mood.very-negative {
+    color: var(--tone-critical);
   }
   
   /* Filter chips */
@@ -149,10 +192,10 @@ CHANGELOG:
   
   .chip {
     white-space: nowrap;
-    padding: 0.5rem 0.8rem;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    background: var(--panel);
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
     color: var(--muted);
     font-size: 0.75rem;
     font-weight: 600;
@@ -161,28 +204,31 @@ CHANGELOG:
     text-transform: uppercase;
     letter-spacing: 0.3px;
     flex-shrink: 0;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
   }
 
   .chip:hover {
-    border-color: var(--accent);
+    border-color: rgba(64, 217, 255, 0.7);
     color: var(--text);
-    background: var(--hover);
+    background: rgba(64, 217, 255, 0.08);
+    box-shadow: 0 12px 24px rgba(64, 217, 255, 0.16);
   }
 
   .chip:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
-  
+
   .chip.active {
-    background: var(--accent);
-    color: var(--bg);
-    border-color: var(--accent);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+    color: #020305;
+    border-color: transparent;
+    box-shadow: 0 16px 30px rgba(64, 217, 255, 0.28);
   }
 
   .chip[data-view="popular"].active {
-    background: var(--warn);
-    border-color: var(--warn);
+    background: linear-gradient(135deg, var(--warn) 0%, var(--accent-soft) 100%);
+    color: #0a0604;
   }
   
   /* Main content */
@@ -197,28 +243,57 @@ CHANGELOG:
   .card {
     background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
     margin-bottom: 1rem;
     position: relative;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--aurora-1), var(--aurora-2), var(--aurora-3));
+    background-size: 200% 200%;
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
   }
 
   .card:hover {
     border-color: var(--accent);
+    box-shadow: 0 18px 38px rgba(64, 217, 255, 0.14);
   }
 
   .card.open {
     border-color: var(--accent);
+    box-shadow: 0 20px 46px rgba(64, 217, 255, 0.2);
   }
 
-  .card.popular::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--warn);
+  .card.open::before {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .card.open::before {
+      animation: aurora 6s linear infinite;
+    }
+  }
+
+  .card.popular {
+    border-color: rgba(64, 217, 255, 0.35);
+    box-shadow: 0 0 0 1px rgba(64, 217, 255, 0.28), 0 20px 45px rgba(122, 91, 255, 0.16);
+  }
+
+  .card.open.popular {
+    box-shadow: 0 0 0 1px rgba(64, 217, 255, 0.35), 0 24px 52px rgba(122, 91, 255, 0.22);
   }
 
   .card-head {
@@ -277,42 +352,52 @@ CHANGELOG:
   .badge {
     font-size: 0.65rem;
     font-weight: 700;
-    padding: 0.2rem 0.4rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
     color: var(--text);
-    background: var(--hover);
+    background: rgba(255, 255, 255, 0.03);
     text-transform: uppercase;
     letter-spacing: 0.3px;
     white-space: nowrap;
     flex-shrink: 0;
   }
-  
+
   .badge.trending {
-    border-color: var(--warn);
-    color: var(--warn);
-    background: var(--bg);
+    border-color: rgba(64, 217, 255, 0.6);
+    color: var(--accent);
+    background: rgba(64, 217, 255, 0.08);
   }
 
   .badge.sentiment {
-    background: var(--bg);
-    border-color: var(--border);
-    color: var(--muted);
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.06);
+    color: var(--tone-neutral);
+  }
+
+  .badge.sentiment.very-positive {
+    border-color: var(--tone-high);
+    color: var(--tone-high);
   }
 
   .badge.sentiment.positive {
-    border-color: var(--ok);
-    color: var(--ok);
-  }
-
-  .badge.sentiment.negative {
-    border-color: var(--err);
-    color: var(--err);
+    border-color: var(--tone-mid);
+    color: var(--tone-mid);
   }
 
   .badge.sentiment.neutral {
-    border-color: var(--muted);
-    color: var(--muted);
+    border-color: var(--tone-neutral);
+    color: var(--tone-neutral);
+  }
+
+  .badge.sentiment.negative {
+    border-color: var(--tone-low);
+    color: var(--tone-low);
+  }
+
+  .badge.sentiment.very-negative {
+    border-color: var(--tone-critical);
+    color: var(--tone-critical);
   }
 
   .breaking-indicator {
@@ -363,10 +448,10 @@ CHANGELOG:
   .card-body {
     padding: 1rem;
     font-size: 0.85rem;
-    color: var(--muted);
+    color: #a9b7d1;
     line-height: 1.5;
     display: none;
-    background: var(--bg);
+    background: rgba(255, 255, 255, 0.02);
     border-top: 1px solid var(--border);
     word-wrap: break-word;
   }
@@ -379,6 +464,7 @@ CHANGELOG:
     display: flex;
     gap: 0.5rem;
     margin-top: 1rem;
+    flex-wrap: wrap;
   }
 
   .source-header {
@@ -397,163 +483,59 @@ CHANGELOG:
     align-items: center;
     justify-content: center;
     gap: 0.3rem;
-    background: var(--accent);
-    color: var(--bg);
-    padding: 0.6rem 0.8rem;
-    border-radius: 6px;
-    font-weight: 600;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+    color: #020305;
+    padding: 0.6rem 1.2rem;
+    border-radius: 999px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.3px;
     font-size: 0.75rem;
     text-decoration: none;
-    flex: 1;
+    flex: 0;
     border: none;
     cursor: pointer;
     font-family: inherit;
+    box-shadow: 0 14px 28px rgba(64, 217, 255, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .article-link:hover {
-    background: var(--focus);
-    color: var(--accent);
-    border: 1px solid var(--accent);
+    box-shadow: 0 18px 34px rgba(122, 91, 255, 0.28);
+    transform: translateY(-1px);
   }
 
   .article-link:focus-visible {
     outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-
-  .read-btn {
-    background: var(--panel);
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-
-  .read-btn:hover {
-    background: var(--hover);
-    border-color: var(--accent);
+    outline-offset: 4px;
   }
   
-  /* Article reader modal */
-  .reader-modal {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    z-index: 2000;
-    display: none;
-  }
-
-  .reader-modal.active {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .reader-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem;
-    background: var(--panel);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .reader-title {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text);
-    flex: 1;
-    margin-right: 1rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .reader-close {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    background: var(--err);
-    color: var(--bg);
-    border: none;
-    font-size: 1.2rem;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: inherit;
-  }
-
-  .reader-close:hover {
-    background: var(--focus);
-    color: var(--err);
-    border: 1px solid var(--err);
-  }
-
-  .reader-close:focus-visible {
-    outline: 2px solid var(--err);
-    outline-offset: 2px;
-  }
-
-  .reader-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1.5rem;
-    max-width: 800px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .reader-content {
-    color: var(--text);
-    font-size: 0.9rem;
-    line-height: 1.6;
-  }
-
-  .reader-content p {
-    margin-bottom: 1rem;
-  }
-
-  .reader-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 300px;
-    color: var(--muted);
-    font-size: 0.85rem;
-  }
-
-  .reader-error {
-    color: var(--err);
-    text-align: center;
-    padding: 2rem;
-  }
-
   /* Toast notifications */
   .toast {
     position: fixed;
     bottom: 100px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--panel);
+    background: rgba(5, 7, 13, 0.95);
     color: var(--text);
-    padding: 0.8rem 1rem;
-    border-radius: 6px;
+    padding: 0.9rem 1.1rem;
+    border-radius: 12px;
     z-index: 3000;
     font-weight: 500;
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     max-width: 85%;
     text-align: center;
     font-size: 0.8rem;
+    box-shadow: 0 14px 32px rgba(64, 217, 255, 0.18);
   }
-  
+
   .toast.success {
-    border-color: var(--ok);
+    border-color: rgba(78, 244, 194, 0.6);
     color: var(--ok);
   }
-  
+
   .toast.error {
-    border-color: var(--err);
+    border-color: rgba(255, 94, 138, 0.6);
     color: var(--err);
   }
 
@@ -599,24 +581,25 @@ CHANGELOG:
   .src-grid::-webkit-scrollbar { display: none; }
 
   .src {
-    padding: 0.4rem 0.6rem;
-    border-radius: 6px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    font-size: 0.7rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.68rem;
     color: var(--muted);
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 600;
     white-space: nowrap;
     text-transform: uppercase;
     letter-spacing: 0.3px;
     flex-shrink: 0;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
   }
 
   .src:hover {
-    border-color: var(--accent);
+    border-color: rgba(64, 217, 255, 0.6);
     color: var(--text);
-    background: var(--hover);
+    background: rgba(64, 217, 255, 0.08);
   }
 
   .src:focus-visible {
@@ -625,9 +608,10 @@ CHANGELOG:
   }
 
   .src.on {
-    background: var(--accent);
-    color: var(--bg);
-    border-color: var(--accent);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
+    color: #020305;
+    border-color: transparent;
+    box-shadow: 0 14px 26px rgba(64, 217, 255, 0.25);
   }
 
   /* Empty state */
@@ -700,10 +684,6 @@ CHANGELOG:
       padding: 0.4rem 0.6rem;
       font-size: 0.7rem;
     }
-    
-    .reader-body {
-      padding: 1rem;
-    }
   }
 
   /* Focus management */
@@ -730,6 +710,7 @@ CHANGELOG:
     <div class="title">
       <span class="blip" aria-label="Live status"></span>UR NEWS
       <span class="meta" id="lastUpdated">• INITIALIZING</span>
+      <span class="meta mood neutral" id="overallMood">• MOOD: CALM</span>
     </div>
   </div>
   <div class="filters" id="filters" role="tablist" aria-label="Content filters">
@@ -746,20 +727,10 @@ CHANGELOG:
   <div class="src-grid" id="sourceToggles" role="group" aria-label="News sources"></div>
   <div class="list" id="feedList" role="main" aria-live="polite"></div>
   <div class="empty" id="emptyMsg" style="display:none;">
-    <h3>NO ACTIVE FEEDS</h3>
-    <p>Enable sources above or wait for refresh</p>
+    <h3>NO STORIES AVAILABLE</h3>
+    <p>Adjust filters or check back shortly.</p>
   </div>
 </main>
-
-<div class="reader-modal" id="readerModal" role="dialog" aria-modal="true" aria-labelledby="readerTitle">
-  <div class="reader-header">
-    <div class="reader-title" id="readerTitle"></div>
-    <button class="reader-close smooth" id="readerClose" aria-label="Close reader">×</button>
-  </div>
-  <div class="reader-body">
-    <div id="readerContent"></div>
-  </div>
-</div>
 
 <button class="btn reset smooth" id="resetBtn" title="Reset application">RESET</button>
 
@@ -791,31 +762,226 @@ const SOURCES = [
 const persistedState = loadPersistedState();
 
 const STATE = {
-  enabled: new Set(persistedState.enabled || SOURCES.map(source => source.id)),
   items: [],
   view: 'all',
   loading: false,
   lastFetch: 0,
   cache: new Map(),
   expandedCards: new Set(persistedState.expanded || []),
-  trendingKeywords: new Map()
+  trendingKeywords: new Map(),
+  sourceFilter: persistedState.sourceFilter || null
 };
+
+if (STATE.sourceFilter && !SOURCES.some(source => source.id === STATE.sourceFilter)) {
+  STATE.sourceFilter = null;
+}
 
 const CACHE_TTL = 120000;
 const FETCH_TIMEOUT = 4000;
 
+const SENTIMENT_LEXICON = new Map([
+  ['victory', 4.5],
+  ['victories', 4.5],
+  ['landslide', 5],
+  ['triumph', 4],
+  ['triumphant', 4],
+  ['win', 3.5],
+  ['wins', 3.5],
+  ['won', 3.5],
+  ['winning', 3.2],
+  ['record', 3],
+  ['records', 3],
+  ['breakthrough', 4],
+  ['surge', 2.6],
+  ['surging', 2.6],
+  ['surged', 2.6],
+  ['boom', 3.1],
+  ['booming', 3.4],
+  ['boon', 2.5],
+  ['resilient', 2.2],
+  ['resilience', 2.2],
+  ['relief', 2.4],
+  ['stability', 2.1],
+  ['stabilize', 2.1],
+  ['stabilized', 2.1],
+  ['improves', 2.2],
+  ['improved', 2.2],
+  ['improving', 2.2],
+  ['progress', 2.5],
+  ['peace', 2.6],
+  ['peaceful', 2.6],
+  ['secure', 2.1],
+  ['secured', 2.1],
+  ['support', 2],
+  ['supports', 2],
+  ['praise', 2.5],
+  ['praised', 2.5],
+  ['optimism', 2.5],
+  ['optimistic', 2.5],
+  ['growth', 2.3],
+  ['grows', 2.3],
+  ['growing', 2.3],
+  ['rebound', 2.6],
+  ['rebounds', 2.6],
+  ['rebounded', 2.6],
+  ['strength', 2.4],
+  ['strengthen', 2.4],
+  ['strengthens', 2.4],
+  ['strengthened', 2.4],
+  ['crisis', -3.5],
+  ['crises', -3.5],
+  ['catastrophe', -5.5],
+  ['disaster', -5],
+  ['collapse', -4.5],
+  ['collapsed', -4.5],
+  ['collapsing', -4.5],
+  ['chaos', -3.5],
+  ['chaotic', -3],
+  ['shooting', -5],
+  ['shootings', -5],
+  ['attack', -3.5],
+  ['attacks', -3.5],
+  ['assault', -3],
+  ['massacre', -6],
+  ['tragedy', -5],
+  ['fatal', -4],
+  ['deadly', -4.5],
+  ['murder', -5],
+  ['murdered', -5],
+  ['violence', -4],
+  ['violent', -4],
+  ['threat', -3],
+  ['threats', -3],
+  ['warning', -2.5],
+  ['warnings', -2.5],
+  ['fear', -2.5],
+  ['fears', -2.5],
+  ['panic', -4],
+  ['emergency', -3.5],
+  ['fraud', -3],
+  ['scandal', -3.5],
+  ['scandals', -3.5],
+  ['corruption', -3.5],
+  ['corrupt', -3],
+  ['indicted', -4],
+  ['indictment', -4],
+  ['charged', -3],
+  ['charges', -3],
+  ['arrested', -3.5],
+  ['arrests', -3.5],
+  ['lawsuit', -2.5],
+  ['lawsuits', -2.5],
+  ['investigation', -2.2],
+  ['investigations', -2.2],
+  ['probe', -2.2],
+  ['probes', -2.2],
+  ['meltdown', -5],
+  ['shortage', -2.5],
+  ['shortages', -2.5],
+  ['decline', -2.5],
+  ['declines', -2.5],
+  ['plunge', -3.5],
+  ['plunges', -3.5],
+  ['slump', -3],
+  ['slumps', -3],
+  ['sanction', -2.5],
+  ['sanctions', -2.5],
+  ['ban', -2.5],
+  ['banned', -2.5],
+  ['outage', -2],
+  ['outages', -2],
+  ['breach', -3],
+  ['breaches', -3]
+]);
+
 const POSITIVE_WORDS = new Set([
-  'win', 'wins', 'won', 'victory', 'success', 'secure', 'secured', 'boost', 'rise', 'surge',
-  'growth', 'growing', 'strong', 'support', 'praise', 'gain', 'gains', 'positive', 'good', 'safe',
-  'peace', 'upbeat', 'improve', 'improves', 'improved', 'progress', 'benefit', 'benefits'
+  'good', 'great', 'positive', 'upbeat', 'hope', 'hopes', 'hopeful', 'advance', 'advances',
+  'advancing', 'strong', 'stronger', 'sturdy', 'rescue', 'rescued', 'rescues', 'ally', 'allies',
+  'agreement', 'agreements', 'calm', 'steady', 'supportive', 'boost', 'boosts', 'benefit',
+  'benefits', 'recover', 'recovery', 'recovered', 'healing', 'relief', 'relieved', 'progressive',
+  'peaceful', 'stable', 'stability', 'balanced', 'constructive', 'diplomatic', 'unity', 'unite',
+  'unites', 'secured', 'security', 'resilient', 'cooperate', 'cooperation', 'truce', 'win-win'
 ]);
 
 const NEGATIVE_WORDS = new Set([
-  'loss', 'losses', 'lost', 'defeat', 'crisis', 'risk', 'risks', 'fear', 'fears', 'concern',
-  'concerns', 'drop', 'drops', 'decline', 'declines', 'fall', 'falls', 'negative', 'bad', 'threat',
-  'threats', 'fraud', 'attack', 'attacks', 'scandal', 'crash', 'collapse', 'danger', 'lawsuit',
-  'lawsuits', 'probe', 'probes', 'charge', 'charges', 'investigation', 'chaos'
+  'loss', 'losses', 'lost', 'defeat', 'defeated', 'risk', 'risks', 'concern', 'concerns', 'doubt',
+  'doubts', 'fear', 'fears', 'worry', 'worries', 'worried', 'drop', 'drops', 'fall', 'falls',
+  'fallen', 'negative', 'bad', 'threat', 'threaten', 'threatened', 'danger', 'dangerous', 'fraud',
+  'crash', 'crashes', 'collapsed', 'collapse', 'lawsuit', 'lawsuits', 'probe', 'probes', 'charge',
+  'charges', 'investigation', 'chaos', 'violent', 'violence', 'crime', 'crimes', 'criminal',
+  'riot', 'riots', 'riotous', 'storm', 'storms', 'hurricane', 'earthquake', 'wildfire', 'fire',
+  'fires', 'shooting', 'shootings', 'attack', 'attacks', 'murder', 'murdered', 'extremist',
+  'extremism', 'terror', 'terrorism', 'terrorist', 'scandal', 'panic', 'shortage', 'shortages',
+  'decline', 'declines', 'slump', 'slumps', 'collapse', 'opposition', 'backlash', 'controversy'
 ]);
+
+const BOOSTER_WORDS = new Set(['very', 'extremely', 'highly', 'truly', 'deeply', 'major', 'massive', 'hugely', 'seriously', 'significantly']);
+const DAMPENER_WORDS = new Set(['slightly', 'barely', 'somewhat', 'mildly', 'modestly', 'partially']);
+const NEGATION_WORDS = new Set(['no', 'not', 'never', 'without', 'hardly', 'rarely', 'scarcely', 'neither']);
+
+const CLICKBAIT_PATTERNS = [
+  /you won't believe/i,
+  /you will not believe/i,
+  /jaw[-\s]?dropping/i,
+  /what happens next/i,
+  /this is why/i,
+  /must see/i,
+  /can't miss/i,
+  /goes viral/i,
+  /internet reacts/i,
+  /breaks the internet/i,
+  /things get/i,
+  /shocking/i,
+  /insane/i,
+  /crazy/i,
+  /epic/i,
+  /unbelievable/i,
+  /life[-\s]?changing/i,
+  /top \d+ (things|reasons|ways|tricks|hacks)/i
+];
+
+const NON_NEWS_PATTERNS = [
+  /^watch:/i,
+  /^listen:/i,
+  /^video:/i,
+  /\bopinion\b/i,
+  /\bcommentary\b/i,
+  /\bcolumn\b/i,
+  /\beditorial\b/i,
+  /\bpodcast\b/i,
+  /\bnewsletter\b/i,
+  /\brecap\b/i,
+  /\bhow to\b/i,
+  /\bhow-to\b/i,
+  /\bexplainer\b/i,
+  /\breview\b/i,
+  /\bsponsored\b/i,
+  /\badvertis/i,
+  /\bdeal\b/i,
+  /\bdeals\b/i,
+  /\bdiscount\b/i,
+  /\bsale\b/i,
+  /\bmerch\b/i,
+  /\bshop\b/i,
+  /\bcelebrity\b/i,
+  /\bsubscribe\b/i,
+  /click here/i
+];
+
+const NON_NEWS_PATH_FRAGMENTS = [
+  '/video',
+  '/videos',
+  '/podcast',
+  '/opinion',
+  '/commentary',
+  '/column',
+  '/blog',
+  '/sponsored',
+  '/commerce',
+  '/shopping',
+  '/lifestyle',
+  '/entertainment'
+];
 
 const ESCAPE_MAP = {
   '&': '&amp;',
@@ -829,21 +995,25 @@ let domUpdates = [];
 
 function loadPersistedState() {
   try {
-    const enabled = JSON.parse(localStorage.getItem('urnews.enabled'));
     const expanded = JSON.parse(localStorage.getItem('urnews.expanded'));
+    const storedSource = localStorage.getItem('urnews.sourceFilter');
     return {
-      enabled: Array.isArray(enabled) && enabled.length ? enabled : null,
-      expanded: Array.isArray(expanded) ? expanded : null
+      expanded: Array.isArray(expanded) ? expanded : null,
+      sourceFilter: storedSource || null
     };
   } catch (error) {
-    return { enabled: null, expanded: null };
+    return { expanded: null, sourceFilter: null };
   }
 }
 
 function persistState() {
   try {
-    localStorage.setItem('urnews.enabled', JSON.stringify([...STATE.enabled]));
     localStorage.setItem('urnews.expanded', JSON.stringify([...STATE.expandedCards]));
+    if (STATE.sourceFilter) {
+      localStorage.setItem('urnews.sourceFilter', STATE.sourceFilter);
+    } else {
+      localStorage.removeItem('urnews.sourceFilter');
+    }
   } catch (error) {
     console.warn('Storage failed:', error);
   }
@@ -978,21 +1148,81 @@ function calculateTrending(items) {
   });
 }
 
-function analyzeSentiment(item) {
-  const text = `${item.title} ${item.desc}`.toLowerCase();
-  const tokens = text.match(/\b[a-z]+\b/g) || [];
-  let score = 0;
+function scoreTokens(tokens, scale = 1) {
+  let total = 0;
 
-  tokens.forEach(word => {
-    if (POSITIVE_WORDS.has(word)) {
-      score += 1;
+  for (let i = 0; i < tokens.length; i += 1) {
+    const word = tokens[i];
+    let weight = 0;
+
+    if (SENTIMENT_LEXICON.has(word)) {
+      weight = SENTIMENT_LEXICON.get(word);
+    } else if (POSITIVE_WORDS.has(word)) {
+      weight = 1;
     } else if (NEGATIVE_WORDS.has(word)) {
-      score -= 1;
+      weight = -1;
     }
-  });
 
-  const label = score > 0 ? 'POSITIVE' : score < 0 ? 'NEGATIVE' : 'NEUTRAL';
-  return { label, tone: label.toLowerCase(), score };
+    if (weight !== 0) {
+      const previous = tokens[i - 1];
+      if (previous && NEGATION_WORDS.has(previous)) {
+        weight *= -1;
+      }
+      if (previous && BOOSTER_WORDS.has(previous)) {
+        weight *= 1.4;
+      } else if (previous && DAMPENER_WORDS.has(previous)) {
+        weight *= 0.5;
+      }
+
+      total += weight * scale;
+    }
+  }
+
+  return total;
+}
+
+function describeSentiment(score) {
+  if (score >= 6) {
+    return { label: 'ELECTRIC', tone: 'very-positive' };
+  }
+  if (score >= 3) {
+    return { label: 'OPTIMISTIC', tone: 'positive' };
+  }
+  if (score > -2) {
+    return { label: 'STEADY', tone: 'neutral' };
+  }
+  if (score > -5) {
+    return { label: 'WARY', tone: 'negative' };
+  }
+  return { label: 'ALARMED', tone: 'very-negative' };
+}
+
+function formatSentimentScore(score = 0) {
+  if (typeof score !== 'number' || Number.isNaN(score)) {
+    return '0.0';
+  }
+  const rounded = Math.round(score * 10) / 10;
+  return `${rounded > 0 ? '+' : ''}${rounded.toFixed(1)}`;
+}
+
+function analyzeSentiment(item) {
+  const titleTokens = (item.title || '').toLowerCase().match(/\b[a-z'-]+\b/g) || [];
+  const descTokens = (item.desc || '').toLowerCase().match(/\b[a-z'-]+\b/g) || [];
+
+  let score = 0;
+  score += scoreTokens(titleTokens, 1.4);
+  score += scoreTokens(descTokens, 0.8);
+
+  const exclamations = (item.title.match(/!/g) || []).length;
+  if (exclamations > 1) {
+    score -= (exclamations - 1) * 0.6;
+  }
+
+  score = Math.max(-12, Math.min(12, score));
+
+  const descriptor = describeSentiment(score);
+
+  return { label: descriptor.label, tone: descriptor.tone, score };
 }
 
 function createCardId(link) {
@@ -1039,6 +1269,44 @@ function stripHTML(html) {
   return temp.textContent.replace(/\s+/g, ' ').trim();
 }
 
+function isLikelyNews(item) {
+  const title = (item.title || '').trim();
+  if (!title) {
+    return false;
+  }
+
+  const description = (item.desc || '').trim();
+  const combined = `${title} ${description}`.toLowerCase();
+
+  if (CLICKBAIT_PATTERNS.some(pattern => pattern.test(combined))) {
+    return false;
+  }
+
+  if (NON_NEWS_PATTERNS.some(pattern => pattern.test(title)) || NON_NEWS_PATTERNS.some(pattern => pattern.test(description))) {
+    return false;
+  }
+
+  try {
+    const url = new URL(item.link);
+    const path = `${url.pathname}${url.search}`.toLowerCase();
+    if (NON_NEWS_PATH_FRAGMENTS.some(fragment => path.includes(fragment))) {
+      return false;
+    }
+  } catch (error) {
+    const fallback = (item.link || '').toLowerCase();
+    if (NON_NEWS_PATH_FRAGMENTS.some(fragment => fallback.includes(fragment))) {
+      return false;
+    }
+  }
+
+  const exclamationCount = (title.match(/!/g) || []).length;
+  if (exclamationCount > 2) {
+    return false;
+  }
+
+  return true;
+}
+
 function showLoading() {
   const feedList = document.getElementById('feedList');
   feedList.innerHTML = '';
@@ -1062,20 +1330,12 @@ async function loadFeeds() {
     return;
   }
 
-  const enabledSources = SOURCES.filter(source => STATE.enabled.has(source.id));
-  if (enabledSources.length === 0) {
-    STATE.items = [];
-    render();
-    document.getElementById('lastUpdated').textContent = '• NO SOURCES';
-    return;
-  }
-
   STATE.loading = true;
   STATE.lastFetch = Date.now();
   showLoading();
 
   try {
-    const fetches = enabledSources.map(source =>
+    const fetches = SOURCES.map(source =>
       fetchFast(source.url)
         .then(text => parseRSS(text, source))
         .catch(error => {
@@ -1099,87 +1359,28 @@ async function loadFeeds() {
         }
       });
 
-    STATE.items = deduped.slice(0, 100);
+    const curated = deduped.filter(isLikelyNews);
+    STATE.items = curated.slice(0, 100);
     calculateTrending(STATE.items);
     STATE.items.forEach(item => {
       const sentiment = analyzeSentiment(item);
-      item.sentimentScore = sentiment.score;
+      item.sentimentScore = Number(sentiment.score.toFixed(2));
       item.sentimentLabel = sentiment.label;
       item.sentimentTone = sentiment.tone;
     });
 
     render();
-    document.getElementById('lastUpdated').textContent = `• ${new Date().toLocaleTimeString()}`;
-    toast(`${STATE.items.length} articles loaded`, 'success');
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('lastUpdated').textContent = `• ${timestamp}`;
+    const reportMessage = STATE.items.length ? `${STATE.items.length} reports ready` : 'Feed refreshed';
+    toast(reportMessage, 'success');
   } catch (error) {
     console.error('Failed:', error);
     document.getElementById('lastUpdated').textContent = '• RETRY';
+    updateMoodIndicator([]);
     toast('Loading failed', 'error');
   } finally {
     STATE.loading = false;
-  }
-}
-
-async function openReader(item) {
-  const modal = document.getElementById('readerModal');
-  const title = document.getElementById('readerTitle');
-  const content = document.getElementById('readerContent');
-  modal.classList.add('active');
-  title.textContent = item.title;
-  content.innerHTML = '<div class="reader-loading">LOADING ARTICLE...</div>';
-  document.getElementById('readerClose').focus();
-
-  let hostname = '';
-  try {
-    hostname = new URL(item.link).hostname;
-  } catch (error) {
-    hostname = '';
-  }
-
-  const blockedDomains = ['nypost.com', 'wsj.com', 'ft.com'];
-  if (blockedDomains.some(domain => hostname.includes(domain))) {
-    content.innerHTML = `
-      <div class="reader-error">
-        This source blocks external readers. Please visit the article directly.
-      </div>
-    `;
-    return;
-  }
-
-  try {
-    const proxyUrl = `https://12ft.io/${item.link}`;
-    const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(proxyUrl));
-    const html = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    doc.querySelectorAll('script, style, nav, header, footer, aside').forEach(el => el.remove());
-
-    const article = doc.querySelector('article, main, [role="main"], .content, .article-body') || doc.body;
-    const paragraphs = Array.from(article.querySelectorAll('p'))
-      .map(p => p.textContent.trim())
-      .filter(text => text.length > 50)
-      .slice(0, 30)
-      .map(text => `<p>${escapeHTML(text)}</p>`)
-      .join('');
-
-    content.innerHTML = `
-      <div class="reader-content">
-        ${paragraphs || 'Unable to extract article content.'}
-      </div>
-    `;
-  } catch (error) {
-    content.innerHTML = `
-      <div class="reader-content">
-        <p><strong>Summary:</strong></p>
-        <p>${escapeHTML(item.desc || 'No summary available.')}</p>
-        <p style="margin-top: 2rem;">
-          <a href="${escapeHTML(item.link)}" target="_blank" rel="noopener" style="color: var(--accent);">
-            Click here to read the full article →
-          </a>
-        </p>
-      </div>
-    `;
   }
 }
 
@@ -1200,7 +1401,7 @@ function createCard(item) {
 
   const timeString = fmtTime(item.pubDate);
   const sentimentBadge = item.sentimentLabel
-    ? `<span class="badge sentiment ${item.sentimentTone}">${item.sentimentLabel}</span>`
+    ? `<span class="badge sentiment ${item.sentimentTone}" title="Sentiment score ${formatSentimentScore(item.sentimentScore)}">${escapeHTML(item.sentimentLabel)} • ${formatSentimentScore(item.sentimentScore)}</span>`
     : '';
 
   article.innerHTML = `
@@ -1223,16 +1424,14 @@ function createCard(item) {
       <div>${escapeHTML(item.desc || 'No summary available.')}</div>
       <div class="card-actions">
         <a href="${escapeHTML(item.link)}" target="_blank" rel="noopener" class="article-link smooth">
-          OPEN SOURCE
+          OPEN ARTICLE
         </a>
-        <button class="article-link read-btn smooth">READ HERE</button>
       </div>
     </div>
   `;
 
   const header = article.querySelector('.card-head');
   const expandBtn = article.querySelector('.expand-btn');
-  const readBtn = article.querySelector('.read-btn');
 
   const toggleCard = () => {
     const isOpen = article.classList.toggle('open');
@@ -1270,12 +1469,27 @@ function createCard(item) {
     }
   });
 
-  readBtn.addEventListener('click', event => {
-    event.preventDefault();
-    openReader(item);
-  });
-
   return article;
+}
+
+function updateMoodIndicator(items) {
+  const moodEl = document.getElementById('overallMood');
+  if (!moodEl) {
+    return;
+  }
+
+  if (!Array.isArray(items) || items.length === 0) {
+    moodEl.textContent = '• MOOD: QUIET';
+    moodEl.className = 'meta mood neutral';
+    return;
+  }
+
+  const total = items.reduce((sum, item) => sum + (item.sentimentScore || 0), 0);
+  const average = total / items.length;
+  const descriptor = describeSentiment(average);
+
+  moodEl.textContent = `• MOOD: ${descriptor.label}`;
+  moodEl.className = `meta mood ${descriptor.tone}`;
 }
 
 function render() {
@@ -1284,17 +1498,49 @@ function render() {
 
   batchDOM(() => {
     feedList.innerHTML = '';
-    let filtered = STATE.items.filter(item => STATE.enabled.has(item.id));
+    let filtered = STATE.items.slice();
+
+    if (STATE.sourceFilter) {
+      filtered = filtered.filter(item => item.id === STATE.sourceFilter);
+    }
+
+    let viewItems;
+
+    switch (STATE.view) {
+      case 'popular':
+        viewItems = filtered
+          .slice()
+          .sort((a, b) => b.trendingScore - a.trendingScore)
+          .slice(0, 30);
+        break;
+      case 'conservative':
+        viewItems = filtered.filter(item => item.lane === 'conservative');
+        break;
+      case 'populist':
+        viewItems = filtered.filter(item => item.lane === 'populist');
+        break;
+      case 'breaking':
+        viewItems = filtered.filter(item => item.isBreaking);
+        break;
+      case 'by-source':
+        viewItems = filtered.slice();
+        break;
+      default:
+        viewItems = filtered.slice(0, 60);
+    }
+
+    updateMoodIndicator(viewItems);
+
+    if (viewItems.length === 0) {
+      emptyMsg.style.display = 'block';
+      return;
+    }
+
+    emptyMsg.style.display = 'none';
 
     if (STATE.view === 'by-source') {
-      if (filtered.length === 0) {
-        emptyMsg.style.display = 'block';
-        return;
-      }
-
-      emptyMsg.style.display = 'none';
       const grouped = new Map();
-      filtered.forEach(item => {
+      viewItems.forEach(item => {
         if (!grouped.has(item.source)) {
           grouped.set(item.source, []);
         }
@@ -1316,33 +1562,8 @@ function render() {
       return;
     }
 
-    switch (STATE.view) {
-      case 'popular':
-        filtered = filtered
-          .sort((a, b) => b.trendingScore - a.trendingScore)
-          .slice(0, 30);
-        break;
-      case 'conservative':
-        filtered = filtered.filter(item => item.lane === 'conservative');
-        break;
-      case 'populist':
-        filtered = filtered.filter(item => item.lane === 'populist');
-        break;
-      case 'breaking':
-        filtered = filtered.filter(item => item.isBreaking);
-        break;
-      default:
-        filtered = filtered.slice(0, 60);
-    }
-
-    if (filtered.length === 0) {
-      emptyMsg.style.display = 'block';
-      return;
-    }
-
-    emptyMsg.style.display = 'none';
     const fragment = document.createDocumentFragment();
-    filtered.forEach(item => {
+    viewItems.forEach(item => {
       fragment.appendChild(createCard(item));
     });
     feedList.appendChild(fragment);
@@ -1355,33 +1576,25 @@ function buildSourceToggles() {
   const fragment = document.createDocumentFragment();
 
   SOURCES.forEach(source => {
-    const isEnabled = STATE.enabled.has(source.id);
+    const isActive = STATE.sourceFilter === source.id;
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = `src smooth${isEnabled ? ' on' : ''}`;
+    button.className = `src smooth${isActive ? ' on' : ''}`;
     button.dataset.sourceId = source.id;
     button.textContent = source.name;
-    button.setAttribute('aria-pressed', String(isEnabled));
+    button.setAttribute('aria-pressed', String(isActive));
 
     button.addEventListener('click', () => {
-      const wasEnabled = STATE.enabled.has(source.id);
-      if (wasEnabled) {
-        STATE.enabled.delete(source.id);
-      } else {
-        STATE.enabled.add(source.id);
-      }
-
-      if (STATE.enabled.size === 0) {
-        STATE.enabled.add(source.id);
-      }
-
-      button.classList.toggle('on', !wasEnabled || STATE.enabled.has(source.id));
-      button.setAttribute('aria-pressed', String(STATE.enabled.has(source.id)));
+      STATE.sourceFilter = STATE.sourceFilter === source.id ? null : source.id;
       persistState();
+
+      container.querySelectorAll('.src').forEach(control => {
+        const active = STATE.sourceFilter === control.dataset.sourceId;
+        control.classList.toggle('on', active);
+        control.setAttribute('aria-pressed', String(active));
+      });
+
       render();
-      if (!wasEnabled) {
-        loadFeeds();
-      }
     });
 
     fragment.appendChild(button);
@@ -1476,18 +1689,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     STATE.view = chip.dataset.view;
     render();
-  });
-
-  const modal = document.getElementById('readerModal');
-  const closeBtn = document.getElementById('readerClose');
-  closeBtn.addEventListener('click', () => {
-    modal.classList.remove('active');
-  });
-
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && modal.classList.contains('active')) {
-      modal.classList.remove('active');
-    }
   });
 
   document.getElementById('resetBtn').addEventListener('click', () => {
