@@ -775,7 +775,7 @@ CHANGELOG:
     }
 
     main {
-      padding: 0.8rem;
+      padding: 0.8rem 0.8rem calc(7.5rem + var(--tab-bar-dynamic-offset));
     }
   }
 
@@ -839,6 +839,8 @@ CHANGELOG:
     --sheet-backdrop: rgba(3, 5, 8, 0.55);
     --sheet-border: rgba(255, 255, 255, 0.12);
     --ios-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --tab-bar-base-gap: 0.75rem;
+    --tab-bar-dynamic-offset: 0px;
   }
 
   body {
@@ -865,7 +867,7 @@ CHANGELOG:
   main {
     width: min(960px, 100% - 2.5rem);
     margin: 0 auto;
-    padding: 2.6rem 1.25rem 9.5rem;
+    padding: 2.6rem 1.25rem calc(9.5rem + var(--tab-bar-dynamic-offset));
     display: flex;
     flex-direction: column;
     gap: 2.75rem;
@@ -1308,7 +1310,7 @@ CHANGELOG:
   .tab-bar {
     position: fixed;
     left: 50%;
-    bottom: calc(env(safe-area-inset-bottom) + 1.2rem);
+    bottom: calc(env(safe-area-inset-bottom) + var(--tab-bar-base-gap) + var(--tab-bar-dynamic-offset));
     transform: translateX(-50%);
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1450,7 +1452,7 @@ CHANGELOG:
   @media (max-width: 720px) {
     main {
       width: calc(100% - 1.5rem);
-      padding: 2.2rem 0.75rem 8.5rem;
+      padding: 2.2rem 0.75rem calc(8.5rem + var(--tab-bar-dynamic-offset));
     }
 
     .bar {
@@ -1855,6 +1857,39 @@ function setupTabBar() {
   if (!tabBar) {
     return;
   }
+
+  const root = document.documentElement;
+  const updateViewportOffset = () => {
+    if (!root) {
+      return;
+    }
+
+    const viewport = window.visualViewport;
+    let offset = 0;
+
+    if (viewport) {
+      const diff = window.innerHeight - viewport.height - viewport.offsetTop;
+      if (Number.isFinite(diff)) {
+        offset = Math.max(0, diff);
+      }
+    }
+
+    if (offset < 1) {
+      root.style.setProperty('--tab-bar-dynamic-offset', '0px');
+      return;
+    }
+
+    root.style.setProperty('--tab-bar-dynamic-offset', `${Math.round(offset)}px`);
+  };
+
+  updateViewportOffset();
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateViewportOffset);
+    window.visualViewport.addEventListener('scroll', updateViewportOffset);
+  }
+
+  window.addEventListener('resize', updateViewportOffset);
 
   tabBar.addEventListener('click', event => {
     const button = event.target.closest('.tab-bar__btn');
