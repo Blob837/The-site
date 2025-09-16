@@ -200,7 +200,13 @@
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
-  
+
+  @keyframes cardGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
   /* Enhanced Header */
   header {
     position: sticky;
@@ -616,8 +622,9 @@
     border-radius: 12px;
     overflow: hidden;
     box-shadow: var(--shadow-medium);
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.6s ease;
     position: relative;
+    background-size: 120% 120%;
   }
   
   .card::before {
@@ -634,16 +641,34 @@
   
   .card:hover {
     transform: translateY(-4px);
-    box-shadow: 
+    box-shadow:
       var(--shadow-heavy),
       0 0 30px rgba(255, 68, 68, 0.15);
     border-color: var(--line-bright);
   }
-  
+
   .card:hover::before {
     opacity: 1;
   }
-  
+
+  .card.open {
+    background: linear-gradient(135deg,
+                rgba(255, 68, 68, 0.12),
+                rgba(68, 170, 255, 0.08),
+                rgba(255, 170, 68, 0.12));
+    background-size: 200% 200%;
+    animation: cardGradient 12s ease-in-out infinite;
+    box-shadow:
+      var(--shadow-heavy),
+      0 0 35px rgba(255, 68, 68, 0.18);
+    border-color: var(--line-bright);
+    transform: translateY(-2px);
+  }
+
+  .card.open::before {
+    opacity: 1;
+  }
+
   .card-head {
     display: grid;
     grid-template-columns: auto 1fr auto;
@@ -785,8 +810,12 @@
     user-select: none;
     flex-shrink: 0;
   }
-  
+
   .card:hover .expand-btn {
+    color: var(--accent);
+  }
+
+  .card.open .expand-btn {
     color: var(--accent);
   }
   
@@ -805,6 +834,7 @@
   .card.open .card-body {
     display: block;
     animation: slideUp 0.3s ease-out;
+    background: rgba(0, 0, 0, 0.45);
   }
   
   /* Enhanced Links */
@@ -1724,10 +1754,33 @@ function createCard(item) {
   const header = article.querySelector('.card-head');
   const expandBtn = article.querySelector('.expand-btn');
   
-  header.addEventListener('click', () => {
-    const isOpen = article.classList.toggle('open');
-    header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-    expandBtn.textContent = isOpen ? '▼' : '▶';
+  const toggleCard = () => {
+    const isCurrentlyOpen = article.classList.contains('open');
+
+    document.querySelectorAll('.card.open').forEach(openCard => {
+      if (openCard === article) return;
+      openCard.classList.remove('open');
+      const openHeader = openCard.querySelector('.card-head');
+      const openBtn = openCard.querySelector('.expand-btn');
+      if (openHeader) {
+        openHeader.setAttribute('aria-expanded', 'false');
+      }
+      if (openBtn) {
+        openBtn.textContent = '▶';
+      }
+    });
+
+    article.classList.toggle('open', !isCurrentlyOpen);
+    header.setAttribute('aria-expanded', !isCurrentlyOpen ? 'true' : 'false');
+    expandBtn.textContent = !isCurrentlyOpen ? '▼' : '▶';
+  };
+
+  header.addEventListener('click', toggleCard);
+  header.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleCard();
+    }
   });
   
   addLongPress(header, () => {
