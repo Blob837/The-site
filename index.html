@@ -474,7 +474,7 @@ CHANGELOG:
   .bias-section {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
   }
 
   .bias-header {
@@ -520,40 +520,69 @@ CHANGELOG:
 
   .bias-meter {
     position: relative;
-    height: 32px;
+    height: 14px;
     border-radius: 999px;
-    overflow: hidden;
+    overflow: visible;
     border: 1px solid rgba(255, 255, 255, 0.12);
-    background: linear-gradient(90deg, rgba(47, 107, 255, 0.85) 0%, rgba(47, 107, 255, 0.65) 20%, rgba(155, 169, 200, 0.8) 50%, rgba(255, 95, 95, 0.65) 80%, rgba(255, 95, 95, 0.85) 100%);
-    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.45);
+    background: linear-gradient(
+      90deg,
+      rgba(47, 107, 255, 0.4) 0%,
+      rgba(47, 107, 255, 0.28) 20%,
+      rgba(155, 169, 200, 0.38) 50%,
+      rgba(255, 95, 95, 0.28) 80%,
+      rgba(255, 95, 95, 0.4) 100%
+    );
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
   }
 
   .bias-indicator {
     position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    bottom: 0;
+    transform: translateX(-50%);
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.2rem;
+    align-items: flex-end;
+    justify-content: center;
     pointer-events: none;
   }
 
-  .bias-symbol {
-    font-size: 1rem;
-    color: #ffffff;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+  .bias-score {
+    position: absolute;
+    bottom: calc(100% + 0.35rem);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(5, 7, 13, 0.92);
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    letter-spacing: 0.35px;
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+    white-space: nowrap;
   }
 
-  .bias-score {
-    font-size: 0.65rem;
-    font-weight: 700;
-    background: rgba(2, 3, 5, 0.78);
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-    letter-spacing: 0.4px;
-    color: var(--text);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35);
+  .bias-marker {
+    position: relative;
+    width: 3px;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--text);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+  }
+
+  .bias-marker::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--text);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
   }
 
   .bias-scale-labels {
@@ -564,6 +593,7 @@ CHANGELOG:
     letter-spacing: 0.3px;
     color: var(--muted);
     text-transform: uppercase;
+    margin-top: 0.75rem;
   }
 
   .card-actions {
@@ -792,11 +822,17 @@ CHANGELOG:
     }
 
     .bias-meter {
-      height: 26px;
+      height: 12px;
     }
 
     .bias-score {
-      font-size: 0.58rem;
+      font-size: 0.64rem;
+      padding: 0.16rem 0.45rem;
+    }
+
+    .bias-marker::after {
+      width: 8px;
+      height: 8px;
     }
   }
 
@@ -1035,12 +1071,6 @@ const NEGATIVE_WORDS = new Set([
 const BOOSTER_WORDS = new Set(['very', 'extremely', 'highly', 'truly', 'deeply', 'major', 'massive', 'hugely', 'seriously', 'significantly']);
 const DAMPENER_WORDS = new Set(['slightly', 'barely', 'somewhat', 'mildly', 'modestly', 'partially']);
 const NEGATION_WORDS = new Set(['no', 'not', 'never', 'without', 'hardly', 'rarely', 'scarcely', 'neither']);
-
-const BIAS_SOURCE_BASE = {
-  conservative: 2,
-  populist: 3,
-  mainstream: 0
-};
 
 const BIAS_RANGE = 10;
 
@@ -1479,7 +1509,7 @@ function biasScoreToPercent(score = 0) {
 
 function analyzeBias(item) {
   const text = `${item.title || ''} ${item.desc || ''}`.toLowerCase();
-  let score = BIAS_SOURCE_BASE[item.lane] || 0;
+  let score = 0;
 
   BIAS_PHRASES.forEach(({ pattern, weight }) => {
     if (pattern.test(text)) {
@@ -1741,8 +1771,8 @@ function createCard(item) {
         </div>
         <div class="bias-meter" role="img" aria-label="${biasAria}">
           <div class="bias-indicator" style="left:${biasPosition}%;">
-            <span class="bias-symbol" aria-hidden="true">◆</span>
             <span class="bias-score" aria-hidden="true">${biasScoreFormatted}</span>
+            <span class="bias-marker" aria-hidden="true"></span>
           </div>
           <span class="sr-only">${biasAria}</span>
         </div>
