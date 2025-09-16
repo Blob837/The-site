@@ -3,298 +3,880 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"/>
-<title>UR NEWS</title>
+<title>UR NEWS - Terminal Intelligence</title>
 <meta name="theme-color" content="#0a0a0a" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Real-time intelligence terminal for breaking news and political analysis">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0a0a;
-    --panel:#0f0f0f;
-    --line:#1a1a1a;
-    --ink:#e0e0e0;
-    --muted:#8a8a8a;
-    --accent:#ff4444;
-    --secondary:#666666;
-    --warning:#ffaa44;
-    --border:#333;
-    --chip:#151515;
-    --glow-red: rgba(255, 68, 68, 0.3);
-    --glow-grey: rgba(102, 102, 102, 0.3);
+    --bg: #0a0a0a;
+    --bg-secondary: #0f0f0f;
+    --bg-tertiary: #151515;
+    --panel: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+    --panel-hover: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+    --line: #1a1a1a;
+    --line-bright: #2a2a2a;
+    --ink: #f0f0f0;
+    --ink-secondary: #d0d0d0;
+    --muted: #8a8a8a;
+    --muted-dark: #666666;
+    --accent: #ff4444;
+    --accent-hover: #ff6666;
+    --secondary: #00ff88;
+    --warning: #ffaa44;
+    --danger: #ff2244;
+    --info: #44aaff;
+    --success: #44ff88;
+    --border: #333333;
+    --border-hover: #444444;
+    --chip: #151515;
+    --chip-active: #2a2a2a;
+    --glow-red: rgba(255, 68, 68, 0.4);
+    --glow-green: rgba(0, 255, 136, 0.4);
+    --glow-blue: rgba(68, 170, 255, 0.4);
+    --shadow-heavy: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
   
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  html{background-color:var(--bg)}
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
   
-  body{
-    margin:0; background-color:var(--bg); color:var(--ink);
-    font-family: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
-    -webkit-font-smoothing:antialiased; text-rendering:optimizeSpeed;
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  html {
+    background-color: var(--bg);
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    font-weight: 400;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     padding-top: env(safe-area-inset-top);
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
     padding-bottom: env(safe-area-inset-bottom);
     overflow-x: hidden;
-  }
-  
-  /* Enhanced CRT effect with flicker animation */
-  body::before{
-    content:""; position:fixed; inset:0; pointer-events:none; z-index:1000;
-    background: 
-      repeating-linear-gradient(90deg, rgba(255,68,68,.02), rgba(255,68,68,.02) 1px, transparent 1px, transparent 3px),
-      repeating-linear-gradient(180deg, rgba(255,255,255,.015), rgba(255,255,255,.015) 1px, transparent 1px, transparent 2px);
-    animation: flicker 0.15s infinite linear alternate;
-  }
-  
-  @keyframes flicker { 0%{opacity:1} 100%{opacity:0.96} }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
-  @keyframes slideIn { from{transform:translateY(-10px);opacity:0} to{transform:translateY(0);opacity:1} }
-  @keyframes glow { 0%,100%{box-shadow:0 0 5px var(--glow-red)} 50%{box-shadow:0 0 15px var(--glow-red)} }
-
-  /* Enhanced Header */
-  header{
-    position:sticky; top:0; z-index:100;
-    background: linear-gradient(180deg, var(--bg), rgba(10,10,10,0.95));
-    backdrop-filter: blur(10px);
-    border-bottom:2px solid var(--accent);
-    box-shadow:0 0 20px rgba(255,68,68,0.2), 0 8px 32px rgba(0,0,0,0.4);
-  }
-  
-  .bar{ 
-    display:flex; gap:1rem; align-items:center; padding:1rem; 
-    background: linear-gradient(90deg, transparent, rgba(255,68,68,0.05), transparent);
-  }
-  
-  .title{ 
-    font-weight:900; letter-spacing:2px; font-size:1.5rem; flex:1; 
-    color:var(--accent); text-shadow: 0 0 10px var(--glow-red);
     position: relative;
   }
   
-  .title::after{
-    content: '█'; color: var(--accent); animation: pulse 1s infinite;
-    margin-left: 4px;
-  }
-  
-  .blip{
-    width:12px; height:12px; border-radius:50%; 
-    background:var(--accent); margin-right:0.8rem;
-    box-shadow:0 0 15px var(--accent), inset 0 0 8px rgba(255,255,255,0.3);
-    animation: glow 2s infinite;
-  }
-  
-  .meta{font-size:0.85rem; color:var(--muted); font-weight:500}
-  
-  .btn{
-    appearance:none; border:2px solid var(--accent); background:var(--panel); color:var(--ink);
-    padding:0.7rem 1rem; border-radius:8px; font-weight:800; font-size:0.9rem;
-    text-transform: uppercase; letter-spacing: 1px;
-    transition: all 0.2s ease; cursor: pointer;
-    box-shadow: 0 0 10px rgba(255,68,68,0.1);
-  }
-  
-  .btn:hover{
-    background:var(--accent); color:var(--bg);
-    box-shadow: 0 0 20px var(--glow-red);
-    transform: translateY(-1px);
-  }
-  
-  .btn:active{transform:translateY(1px)}
-  
-  .btn.reset{
-    border-color: var(--warning); 
-    box-shadow: 0 0 10px rgba(255,170,68,0.1);
+  /* Enhanced terminal effects */
+  body::before {
+    content: "";
     position: fixed;
-    bottom: 1rem;
-    right: 1rem;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1000;
+    background: 
+      repeating-linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 68, 68, 0.015) 1px, 
+        transparent 2px, 
+        transparent 4px
+      ),
+      repeating-linear-gradient(
+        0deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.01) 1px, 
+        transparent 2px, 
+        transparent 3px
+      );
+    animation: crtFlicker 0.15s infinite linear alternate;
+  }
+  
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+    mix-blend-mode: multiply;
+  }
+  
+  @keyframes crtFlicker {
+    0% { opacity: 1; }
+    100% { opacity: 0.98; }
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 5px var(--glow-red), 0 0 10px var(--glow-red), 0 0 15px var(--glow-red); }
+    50% { box-shadow: 0 0 10px var(--glow-red), 0 0 20px var(--glow-red), 0 0 30px var(--glow-red); }
+  }
+  
+  @keyframes dataStream {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  /* Enhanced Header */
+  header {
+    position: sticky;
+    top: 0;
     z-index: 100;
-    padding: 0.6rem 0.8rem;
-    font-size: 0.8rem;
+    background: 
+      linear-gradient(180deg, var(--bg) 0%, rgba(10, 10, 10, 0.98) 70%, rgba(10, 10, 10, 0.95) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 2px solid var(--accent);
+    box-shadow: 
+      0 0 30px rgba(255, 68, 68, 0.3),
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
   
-  .btn.reset:hover{
-    background:var(--warning); color:var(--bg);
-    box-shadow: 0 0 20px rgba(255,170,68,0.3);
-  }
-
-  /* Enhanced Filters */
-  .filters{ 
-    display:flex; gap:0.8rem; overflow:auto; padding:0 1rem 1rem; 
-    scrollbar-width: none;
-  }
-  .filters::-webkit-scrollbar{display:none}
-  
-  .chip{
-    white-space:nowrap; padding:0.5rem 1rem; border-radius:20px; 
-    border:1px solid var(--border); background:var(--chip); color:var(--muted); 
-    font-size:0.8rem; cursor:pointer; user-select:none;
-    transition: all 0.3s ease; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.5px;
+  .bar {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    background: linear-gradient(90deg, transparent, rgba(255, 68, 68, 0.03), transparent);
+    position: relative;
   }
   
-  .chip:hover{
-    border-color: var(--accent); 
-    box-shadow: 0 0 10px rgba(255,68,68,0.2);
+  .bar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.6;
+  }
+  
+  .title {
+    font-weight: 800;
+    letter-spacing: 3px;
+    font-size: 1.6rem;
+    flex: 1;
+    color: var(--accent);
+    text-shadow: 
+      0 0 10px var(--glow-red),
+      0 0 20px var(--glow-red),
+      0 0 30px var(--glow-red);
+    position: relative;
+    text-transform: uppercase;
+  }
+  
+  .title::after {
+    content: '█';
+    color: var(--accent);
+    animation: pulse 1s infinite;
+    margin-left: 8px;
+    font-size: 0.9em;
+  }
+  
+  .blip {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-right: 1rem;
+    box-shadow: 
+      0 0 15px var(--accent),
+      0 0 30px var(--accent),
+      inset 0 0 8px rgba(255, 255, 255, 0.4);
+    animation: glow 2s infinite ease-in-out;
+    position: relative;
+  }
+  
+  .blip::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.3;
+    animation: pulse 2s infinite;
+  }
+  
+  .meta {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .btn {
+    appearance: none;
+    border: 2px solid var(--accent);
+    background: var(--panel);
+    color: var(--ink);
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+      0 0 15px rgba(255, 68, 68, 0.2),
+      var(--shadow-medium);
+  }
+  
+  .btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 68, 68, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+    box-shadow: 
+      0 0 25px var(--glow-red),
+      0 0 50px var(--glow-red),
+      var(--shadow-heavy);
     transform: translateY(-2px);
   }
   
-  .chip.active{
-    background:var(--accent); color:var(--bg); border-color:var(--accent);
-    box-shadow:0 0 15px var(--glow-red);
-  }
-
-  /* Enhanced Main Content */
-  main{padding:1rem; max-width:900px; margin:0 auto; padding-bottom: 2rem;}
-  
-  .hint{
-    font-size:0.75rem; color:var(--muted); margin:0.5rem 0;
-    background: var(--panel); padding: 0.8rem; border-radius: 8px;
-    border-left: 4px solid var(--accent);
+  .btn:hover::before {
+    transform: translateX(100%);
   }
   
-  .src-grid{
-    display:flex; gap:0.6rem; overflow:auto; padding:0.5rem 0 1rem;
+  .btn:active {
+    transform: translateY(0);
+  }
+  
+  .btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+  
+  .btn.reset {
+    border-color: var(--warning);
+    box-shadow: 0 0 15px rgba(255, 170, 68, 0.2);
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 100;
+    padding: 0.7rem 1rem;
+    font-size: 0.75rem;
+    border-radius: 12px;
+  }
+  
+  .btn.reset:hover {
+    background: var(--warning);
+    color: var(--bg);
+    box-shadow: 
+      0 0 25px rgba(255, 170, 68, 0.4),
+      var(--shadow-heavy);
+  }
+  
+  /* Enhanced Filters */
+  .filters {
+    display: flex;
+    gap: 1rem;
+    overflow: auto;
+    padding: 0 1.5rem 1.2rem;
     scrollbar-width: none;
-  }
-  .src-grid::-webkit-scrollbar{display:none}
-  
-  .src{
-    padding:0.5rem 0.8rem; border-radius:8px; background:var(--chip); 
-    border:1px solid var(--border); font-size:0.8rem; color:var(--muted); 
-    cursor:pointer; user-select:none; transition: all 0.2s ease;
-    font-weight: 600; white-space: nowrap;
+    -ms-overflow-style: none;
   }
   
-  .src:hover{
-    border-color: var(--secondary);
-    box-shadow: 0 0 8px var(--glow-grey);
-    transform: translateY(-1px);
+  .filters::-webkit-scrollbar {
+    display: none;
   }
   
-  .src.on{
-    color:var(--ink); background:var(--secondary); border-color:var(--secondary);
-    box-shadow:0 0 10px var(--glow-grey);
-  }
-  
-  .src.solo{
-    outline:2px dashed var(--warning);
-    animation: pulse 1.5s infinite;
-  }
-
-  /* Enhanced Cards */
-  .list{display:grid; gap:1rem; margin-top:1rem}
-  
-  .card{
-    background:linear-gradient(145deg, var(--panel), var(--chip));
-    border:1px solid var(--line); border-radius:12px; overflow:hidden;
-    box-shadow:0 8px 25px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
-    transition: all 0.3s ease; position: relative;
-  }
-  
-  .card:hover{
-    transform: translateY(-4px);
-    box-shadow:0 12px 35px rgba(0,0,0,0.5), 0 0 20px rgba(255,68,68,0.1);
-    border-color: var(--accent);
-  }
-  
-  .card-head{
-    display:grid; grid-template-columns:auto 1fr auto; gap:0.8rem; 
-    align-items:start; padding:1rem; cursor:pointer; position: relative;
-  }
-  
-  .card-head::before{
-    content:''; position:absolute; top:0; left:0; right:0; height:2px;
-    background: linear-gradient(90deg, var(--accent), var(--secondary), var(--accent));
-    opacity: 0; transition: opacity 0.3s ease;
-  }
-  
-  .card:hover .card-head::before{ opacity: 1; }
-  
-  .tag{font-size:0.75rem; color:var(--muted); font-weight: 500}
-  
-  .badge{
-    font-size:0.7rem; font-weight:900; padding:0.2rem 0.5rem; 
-    border:1px solid var(--border); border-radius:12px; 
-    color:var(--ink); background:var(--chip); margin-left:0.5rem;
-    text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  
-  .badge.alarm{border-color:#ff4444; color:#ff8888; background:#2a1010}
-  .badge.angry{border-color:#ff6644; color:#ffaa88; background:#2a1510}
-  .badge.grim{border-color:#666; color:#aaa; background:#1a1a1a}
-  .badge.hope{border-color:#44ff44; color:#88ff88; background:#102a10}
-  .badge.neutral{border-color:#4488ff; color:#88bbff; background:#101520}
-  
-  .hline{height:1px; background:linear-gradient(90deg, transparent, var(--line), transparent)}
-  
-  .titleline{
-    font-size:1rem; font-weight:800; line-height:1.3; color:var(--ink);
-    margin-bottom: 0.5rem;
-  }
-  
-  .time{font-size:0.75rem; color:var(--muted); font-weight: 500}
-  
-  .card-body{
-    padding:1rem; font-size:0.9rem; color:#c8c8c8; display:none;
-    background: rgba(0,0,0,0.2); border-top: 1px solid var(--line);
-  }
-  
-  .card.open .card-body{
-    display:block; animation:slideIn 0.3s ease-out;
-  }
-
-  /* Enhanced styling */
-  a{color:var(--accent); text-decoration:none; font-weight: 600}
-  a:hover{color:var(--secondary); text-shadow: 0 0 5px var(--glow-grey)}
-  
-  .empty{
-    color:var(--muted); text-align:center; padding:3rem 1rem;
-    background: var(--panel); border-radius: 12px; border: 1px solid var(--border);
-  }
-  
-  .favicon{
-    width:20px; height:20px; border-radius:4px; 
-    background:var(--chip); display:inline-block; 
-    background-size:cover; background-position:center;
+  .chip {
+    white-space: nowrap;
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
     border: 1px solid var(--border);
-    box-shadow: 0 0 5px rgba(0,0,0,0.3);
-  }
-
-  /* Loading States */
-  .loading {
+    background: var(--chip);
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     position: relative;
     overflow: hidden;
   }
   
-  .loading::after {
-    content: '';
+  .chip::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 68, 68, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--ink-secondary);
+    box-shadow: 
+      0 0 15px rgba(255, 68, 68, 0.3),
+      var(--shadow-light);
+    transform: translateY(-3px);
+  }
+  
+  .chip:hover::before {
+    transform: translateX(100%);
+  }
+  
+  .chip.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+    box-shadow: 
+      0 0 20px var(--glow-red),
+      0 0 40px var(--glow-red);
+    font-weight: 700;
+  }
+  
+  /* Enhanced Main Content */
+  main {
+    padding: 2rem 1.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-bottom: 3rem;
+  }
+  
+  .stats-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow-medium);
+  }
+  
+  .stat {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: 0 0 10px var(--glow-red);
+  }
+  
+  .stat-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0.2rem;
+  }
+  
+  .hint {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: 0 0 1.5rem 0;
+    background: var(--panel);
+    padding: 1.2rem;
+    border-radius: 12px;
+    border-left: 4px solid var(--accent);
+    box-shadow: var(--shadow-light);
+    position: relative;
+  }
+  
+  .hint::before {
+    content: "💡";
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.2rem;
+    opacity: 0.7;
+  }
+  
+  .src-grid {
+    display: flex;
+    gap: 0.8rem;
+    overflow: auto;
+    padding: 0 0 1.5rem 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .src-grid::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .src {
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    background: var(--chip);
+    border: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .src::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .src:hover {
+    border-color: var(--secondary);
+    color: var(--ink-secondary);
+    box-shadow: 
+      0 0 15px var(--glow-green),
+      var(--shadow-light);
+    transform: translateY(-2px);
+  }
+  
+  .src:hover::before {
+    transform: translateX(100%);
+  }
+  
+  .src.on {
+    color: var(--bg);
+    background: var(--secondary);
+    border-color: var(--secondary);
+    box-shadow: 
+      0 0 15px var(--glow-green),
+      0 0 30px var(--glow-green);
+    font-weight: 700;
+  }
+  
+  .src.solo {
+    outline: 2px dashed var(--warning);
+    outline-offset: 2px;
+    animation: pulse 2s infinite;
+    box-shadow: 
+      0 0 20px rgba(255, 170, 68, 0.4),
+      var(--shadow-medium);
+  }
+  
+  /* Enhanced Cards */
+  .list {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-medium);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--secondary), var(--info));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 
+      var(--shadow-heavy),
+      0 0 30px rgba(255, 68, 68, 0.15);
+    border-color: var(--line-bright);
+  }
+  
+  .card:hover::before {
+    opacity: 1;
+  }
+  
+  .card-head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1.5rem;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s ease;
+  }
+  
+  .card-head:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  
+  .favicon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: var(--chip);
+    display: inline-block;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-light);
+    flex-shrink: 0;
+  }
+  
+  .tag {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    color: var(--ink);
+    background: var(--chip);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  
+  .badge.alarm {
+    border-color: #ff4444;
+    color: #ff8888;
+    background: #2a1010;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+  }
+  
+  .badge.angry {
+    border-color: #ff6644;
+    color: #ffaa88;
+    background: #2a1510;
+    box-shadow: 0 0 10px rgba(255, 102, 68, 0.3);
+  }
+  
+  .badge.grim {
+    border-color: #666;
+    color: #aaa;
+    background: #1a1a1a;
+  }
+  
+  .badge.hope {
+    border-color: #44ff44;
+    color: #88ff88;
+    background: #102a10;
+    box-shadow: 0 0 10px rgba(68, 255, 68, 0.3);
+  }
+  
+  .badge.neutral {
+    border-color: #4488ff;
+    color: #88bbff;
+    background: #101520;
+    box-shadow: 0 0 10px rgba(68, 136, 255, 0.3);
+  }
+  
+  .breaking-indicator {
+    display: inline-block;
+    background: var(--danger);
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 0.5rem;
+    animation: pulse 1.5s infinite;
+    box-shadow: 0 0 10px rgba(255, 34, 68, 0.5);
+  }
+  
+  .hline {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line), transparent);
+  }
+  
+  .titleline {
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--ink);
+    margin-bottom: 0.8rem;
+    transition: color 0.2s ease;
+  }
+  
+  .card-head:hover .titleline {
+    color: var(--accent);
+  }
+  
+  .time {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  
+  .expand-btn {
+    color: var(--muted);
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  
+  .card:hover .expand-btn {
+    color: var(--accent);
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--ink-secondary);
+    line-height: 1.6;
+    display: none;
+    background: rgba(0, 0, 0, 0.3);
+    border-top: 1px solid var(--line);
+  }
+  
+  .card.open .card-body {
+    display: block;
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  /* Enhanced Links */
+  a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  
+  a:hover {
+    color: var(--accent-hover);
+    text-shadow: 0 0 8px var(--glow-red);
+  }
+  
+  a::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+  
+  a:hover::after {
+    width: 100%;
+  }
+  
+  .article-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--accent);
+    color: var(--bg) !important;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-light);
+    margin-top: 1rem;
+  }
+  
+  .article-link:hover {
+    background: var(--accent-hover);
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-2px);
+  }
+  
+  .article-link::after {
+    display: none;
+  }
+  
+  .empty {
+    color: var(--muted);
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--panel);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-light);
+  }
+  
+  .empty h3 {
+    color: var(--accent);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  
+  /* Loading States */
+  .loading-overlay {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .loading-overlay::after {
+    content: "";
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,68,68,0.1), transparent);
-    animation: loading 1.5s infinite;
+    background: linear-gradient(90deg, transparent, rgba(255, 68, 68, 0.2), transparent);
+    animation: dataStream 2s infinite;
   }
   
-  @keyframes loading {
-    0% { left: -100%; }
-    100% { left: 100%; }
-  }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    .title { font-size: 1.2rem; }
-    .bar { padding: 0.8rem; }
-    main { padding: 0.8rem; }
-    .card-head { padding: 0.8rem; }
-    .btn.reset { 
-      bottom: 0.5rem; 
-      right: 0.5rem; 
-      padding: 0.5rem 0.6rem; 
-      font-size: 0.7rem; 
+  /* Enhanced Responsive */
+  @media (max-width: 768px) {
+    .title {
+      font-size: 1.3rem;
+      letter-spacing: 2px;
     }
+    
+    .bar {
+      padding: 1rem;
+      gap: 1rem;
+    }
+    
+    main {
+      padding: 1.5rem 1rem;
+    }
+    
+    .card-head {
+      padding: 1.2rem;
+    }
+    
+    .card-body {
+      padding: 1.2rem;
+    }
+    
+    .btn.reset {
+      bottom: 1rem;
+      right: 1rem;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.7rem;
+    }
+    
+    .stats-bar {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .stat {
+      text-align: left;
+    }
+    
+    .stat-value {
+      font-size: 1.2rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .filters {
+      padding: 0 1rem 1rem;
+    }
+    
+    .titleline {
+      font-size: 1rem;
+    }
+  }
+  
+  /* Toast Notifications */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel);
+    color: var(--ink);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    z-index: 999;
+    font-weight: 600;
+    box-shadow: var(--shadow-heavy);
+    border: 1px solid var(--border);
+    animation: slideUp 0.3s ease-out;
+    max-width: 90%;
+    text-align: center;
+  }
+  
+  .toast.success {
+    border-color: var(--success);
+    box-shadow: 0 0 20px rgba(68, 255, 136, 0.3);
+  }
+  
+  .toast.error {
+    border-color: var(--danger);
+    box-shadow: 0 0 20px rgba(255, 34, 68, 0.3);
   }
 </style>
 </head>
@@ -305,7 +887,9 @@
       <span class="blip"></span>UR NEWS
       <span class="meta" id="lastUpdated"></span>
     </div>
-    <button class="btn" id="refreshBtn" aria-label="Refresh">REFRESH</button>
+    <button class="btn" id="refreshBtn" aria-label="Refresh feeds">
+      <span>REFRESH</span>
+    </button>
   </div>
   <div class="filters" id="filters">
     <div class="chip active" data-view="all">ALL SOURCES</div>
@@ -317,10 +901,25 @@
 </header>
 
 <main>
-  <div class="hint">
-    <strong>OPERATIONAL GUIDE:</strong> Tap source to SOLO | Long-press to toggle | Tap headline to expand | Long-press headline to open in new tab
+  <div class="stats-bar" id="statsBar">
+    <div class="stat">
+      <span class="stat-value" id="totalArticles">0</span>
+      <span class="stat-label">Articles</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value" id="activeSources">0</span>
+      <span class="stat-label">Sources</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value" id="breakingCount">0</span>
+      <span class="stat-label">Breaking</span>
+    </div>
   </div>
-  <div class="src-grid" id="sourceToggles"></div>
+
+  <div class="hint">
+    <strong>TERMINAL INTERFACE:</strong> Tap source to SOLO | Long-press to toggle | Tap headline to expand | Long-press headline to open in new tab
+  </div>
+   <div class="src-grid" id="sourceToggles"></div>
   <div class="list" id="feedList"></div>
   <div class="empty" id="emptyMsg" style="display:none;">
     <h3>NO ACTIVE FEEDS</h3>
@@ -331,7 +930,7 @@
 <button class="btn reset" id="resetBtn" title="Reset all sources and settings">RESET</button>
 
 <script>
-/* ================= ENHANCED CORE SYSTEM ================= */
+/* ================= ENHANCED PRODUCTION SYSTEM ================= */
 
 const SOURCES = [
   { id:'breitbart',   name:'Breitbart',            url:'https://www.breitbart.com/feed/',                     lane:'populist' },
@@ -360,397 +959,632 @@ const STATE = {
   items: [],
   view: 'all',
   lastSolo: null,
-  loading: false
+  loading: false,
+  lastFetch: 0
 };
 
-function loadEnabled(){
-  try { return JSON.parse(localStorage.getItem('urnews.enabled')) } catch(e){ return null }
+// Enhanced ad filtering - this is where we separate wheat from chaff
+function isLikelyAd(item) {
+  const title = (item.title || '').toLowerCase();
+  const desc = (item.desc || '').toLowerCase();
+  const url = (item.link || '').toLowerCase();
+  
+  // Expanded ad detection patterns - tighter than a new wellhead
+  const adPatterns = {
+    title: [
+      /sponsored|advertisement|advert|promo|deal:|deals?:|shop|store|buy now|subscribe|newsletter/i,
+      /podcast:|video:|watch:|listen:|download|get yours|limited time|act now|don't miss/i,
+      /free shipping|best price|discount|coupon|sale|offer|special|exclusive deal/i,
+      /click here|learn more|find out|discover|unlock|revealed|secret|amazing/i,
+      /% off|save \$|starting at|from \$|only \$|just \$|\$\d+/i
+    ],
+    desc: [
+      /sponsored content|paid promotion|affiliate|referral|commission/i,
+      /subscribe|newsletter|mailing list|email list|follow us|like us|share/i,
+      /buy|purchase|order|shop|store|checkout|cart|payment|credit card/i,
+      /trial|demo|sample|preview|teaser|trailer/i
+    ],
+    url: [
+      /sponsor|advert|ads?|marketing|promo|deals?|shop|store|buy|purchase/i,
+      /subscribe|newsletter|signup|register|join|member/i,
+      /affiliate|referral|partner|tracking|utm_|fbclid|gclid/i,
+      /privacy|terms|legal|disclaimer|cookie/i
+    ]
+  };
+  
+  // Check title patterns
+  for (const pattern of adPatterns.title) {
+    if (pattern.test(title)) return true;
+  }
+  
+  // Check description patterns  
+  for (const pattern of adPatterns.desc) {
+    if (pattern.test(desc)) return true;
+  }
+  
+  // Check URL patterns
+  for (const pattern of adPatterns.url) {
+    if (pattern.test(url)) return true;
+  }
+  
+  // Additional heuristics
+  if (title.length < 10 || title.split(' ').length < 3) return true;
+  if (title.includes('...') && title.length < 30) return true;
+  if (/^\d+\s+(ways?|tips?|secrets?|tricks?)/i.test(title)) return true;
+  if (/you won't believe|shocking|incredible|unbelievable/i.test(title)) return true;
+  
+  return false;
 }
 
-function saveEnabled(){
+function loadEnabled() {
+  try { 
+    return JSON.parse(localStorage.getItem('urnews.enabled'));
+  } catch(e) { 
+    return null;
+  }
+}
+
+function saveEnabled() {
   localStorage.setItem('urnews.enabled', JSON.stringify([...STATE.enabled]));
-  toast('Configuration saved automatically', 'success');
+  toast('Configuration saved', 'success');
 }
 
-function resetAll(){
-  if(confirm('Reset all sources and settings? This will reload the page.')){
+function resetAll() {
+  if(confirm('Reset all sources and settings? This will reload the page.')) {
     localStorage.removeItem('urnews.enabled');
     STATE.enabled = new Set(SOURCES.map(s=>s.id));
     STATE.lastSolo = null;
     STATE.view = 'all';
-    document.querySelector('.chip.active').classList.remove('active');
-    document.querySelector('[data-view="all"]').classList.add('active');
+    document.querySelector('.chip.active')?.classList.remove('active');
+    document.querySelector('[data-view="all"]')?.classList.add('active');
     buildSourceToggles();
     loadFeeds();
     toast('System reset complete', 'success');
   }
 }
 
-function toast(msg, type = 'info'){
+function toast(msg, type = 'info') {
   const el = document.createElement('div');
+  el.className = `toast ${type}`;
   el.textContent = msg;
-  el.style.cssText = `
-    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
-    background:${type === 'success' ? 'var(--secondary)' : 'var(--accent)'};
-    color:var(--bg); padding:0.8rem 1.2rem; border-radius:8px; z-index:999;
-    font-weight:600; box-shadow:0 8px 25px rgba(0,0,0,0.4);
-    animation:slideIn 0.3s ease-out;
-  `;
   document.body.appendChild(el);
-  setTimeout(()=>{ 
-    el.style.transition='all 0.3s ease'; 
-    el.style.opacity='0'; 
-    el.style.transform='translateX(-50%) translateY(-10px)';
-    setTimeout(()=>el.remove(),300)
-  }, 2000);
+  
+  setTimeout(() => { 
+    el.style.transition = 'all 0.3s ease'; 
+    el.style.opacity = '0'; 
+    el.style.transform = 'translateX(-50%) translateY(-10px)';
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
 }
 
-function addLongPress(target, fn){
-  let t; 
-  const start = ()=> t=setTimeout(fn, 500);
-  const end = ()=> { clearTimeout(t); t=null; }
-  target.addEventListener('touchstart', start, {passive:true});
-  target.addEventListener('touchend', end, {passive:true});
-  target.addEventListener('touchcancel', end, {passive:true});
+function addLongPress(target, fn) {
+  let timer; 
+  const start = () => timer = setTimeout(fn, 500);
+  const end = () => { clearTimeout(timer); timer = null; };
+  
+  target.addEventListener('touchstart', start, {passive: true});
+  target.addEventListener('touchend', end, {passive: true});
+  target.addEventListener('touchcancel', end, {passive: true});
   target.addEventListener('mousedown', start);
   target.addEventListener('mouseup', end);
   target.addEventListener('mouseleave', end);
 }
 
-function fmtTime(ts){
+function fmtTime(ts) {
   const d = new Date(ts);
-  if (isNaN(d)) return '';
+  if (isNaN(d)) return 'UNKNOWN';
+  
   const now = new Date();
-  const diff = (now - d)/1000;
+  const diff = (now - d) / 1000;
+  
   if (diff < 60) return 'LIVE';
-  if (diff < 3600) return Math.floor(diff/60)+'m';
-  if (diff < 86400) return Math.floor(diff/3600)+'h';
-  if (diff < 86400*7) return Math.floor(diff/86400)+'d';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h';
+  if (diff < 86400 * 7) return Math.floor(diff / 86400) + 'd';
+  
   return d.toLocaleDateString();
 }
 
-function isLikelyAd(item){
-  const t = (item.title||'').toLowerCase();
-  const d = (item.desc||'').toLowerCase();
-  const u = (item.link||'').toLowerCase();
-  const badTitle = /(sponsored|advert|advertisement|promo|deal:|shop|store|buy now|subscribe|newsletter|podcast)/i;
-  const badPath  = /(sponsor|advert|ads?|subscribe|newsletter|shop|store|deals?|promo|coupons?|terms|privacy)/i;
-  const badDesc  = /(sponsored|advertisement|promo|shop now|limited time|subscribe)/i;
-  return badTitle.test(t) || badDesc.test(d) || badPath.test(u);
-}
-
-async function fetchTextWithFallback(url){
+async function fetchTextWithFallback(url) {
   const proxies = [
-    url => fetch(url, {mode:'cors'}),
+    url => fetch(url, {mode: 'cors', cache: 'no-cache'}),
     url => fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url)),
-    url => fetch('https://r.jina.ai/http/' + url.replace(/^https?:\/\//,''))
+    url => fetch('https://r.jina.ai/http/' + url.replace(/^https?:\/\//, ''))
   ];
   
-  for(const proxy of proxies){
-    try{ 
-      const r = await proxy(url); 
-      if (r.ok) return await r.text(); 
-    }catch(e){ continue; }
+  for (const proxy of proxies) {
+    try { 
+      const response = await proxy(url);
+      if (response.ok) {
+        const text = await response.text();
+        if (text.length > 100) return text; // Basic content validation
+      }
+    } catch(e) { 
+      continue; 
+    }
   }
   throw new Error('All fetch methods failed for ' + url);
 }
 
-function parseRSS(xmlString, source){
+function parseRSS(xmlString, source) {
+  // Handle markdown-style content
   if (!xmlString.trim().startsWith('<')) {
-    const lines = xmlString.split('\n').map(l=>l.trim()).filter(Boolean);
-    const picks = [];
-    for (let i=0;i<lines.length;i++){
-      const l = lines[i];
-      if (/^#|^##/.test(l)) {
-        const title = l.replace(/^#+\s*/,'').trim();
+    const lines = xmlString.split('\n').map(l => l.trim()).filter(Boolean);
+    const items = [];
+    
+    for (let i = 0; i < lines.length && items.length < 12; i++) {
+      const line = lines[i];
+      if (/^#+/.test(line)) {
+        const title = line.replace(/^#+\s*/, '').trim();
         let link = '';
-        for (let j=i+1;j<i+6 && j<lines.length;j++){
-          const m = lines[j].match(/https?:\/\/\S+/);
-          if (m){ link = m[0].replace(/[)\]]+$/,''); break; }
+        
+        // Look for URL in next few lines
+        for (let j = i + 1; j < i + 6 && j < lines.length; j++) {
+          const match = lines[j].match(/https?:\/\/\S+/);
+          if (match) {
+            link = match[0].replace(/[)\]]+$/, '');
+            break;
+          }
         }
+        
         if (title && link) {
-          const it = {title, link, pubDate: new Date().toISOString(), source: source.name, lane: source.lane, id: source.id, desc:''};
-          if (!isLikelyAd(it)) picks.push(it);
+          const item = {
+            title,
+            link,
+            pubDate: new Date().toISOString(),
+            source: source.name,
+            lane: source.lane,
+            id: source.id,
+            desc: '',
+            isBreaking: isBreakingNews(title, '')
+          };
+          
+          if (!isLikelyAd(item)) {
+            items.push(item);
+          }
         }
       }
-      if (picks.length >= 8) break;
     }
-    return picks;
+    return items;
   }
 
+  // Parse XML/RSS content
   const doc = new DOMParser().parseFromString(xmlString, 'text/xml');
   if (doc.getElementsByTagName('parsererror')[0]) return [];
 
-  const items = Array.from(doc.querySelectorAll('item, entry')).slice(0, 40).map(it=>{
-    const title = (it.querySelector('title')?.textContent||'').trim();
-    const link = (it.querySelector('link')?.getAttribute('href') || it.querySelector('link')?.textContent || '').trim();
-    const pub = (it.querySelector('pubDate, updated, published')?.textContent||'').trim();
-    const desc = (it.querySelector('description, summary, content\\:encoded')?.textContent||'').trim();
-    return { 
-      title, link, 
-      pubDate: pub || new Date().toISOString(), 
-      source: source.name, 
-      lane: source.lane, 
-      id: source.id, 
-      desc: strip(desc),
-      isBreaking: isBreakingNews(title, desc)
-    };
-  }).filter(x=>x.title && x.link && !isLikelyAd(x));
+  const items = Array.from(doc.querySelectorAll('item, entry'))
+    .slice(0, 50)
+    .map(item => {
+      const title = (item.querySelector('title')?.textContent || '').trim();
+      const link = (item.querySelector('link')?.getAttribute('href') || 
+                   item.querySelector('link')?.textContent || '').trim();
+      const pubDate = (item.querySelector('pubDate, updated, published')?.textContent || '').trim();
+      const desc = (item.querySelector('description, summary, content\\:encoded')?.textContent || '').trim();
+      
+      return {
+        title,
+        link,
+        pubDate: pubDate || new Date().toISOString(),
+        source: source.name,
+        lane: source.lane,
+        id: source.id,
+        desc: stripHTML(desc),
+        isBreaking: isBreakingNews(title, desc)
+      };
+    })
+    .filter(x => x.title && x.link && !isLikelyAd(x));
 
   return items;
 }
 
-function isBreakingNews(title, desc){
-  const text = (title + " " + (desc||"")).toLowerCase();
-  const breaking = /breaking|urgent|alert|just in|developing|live|update:|now:|confirmed|exclusive|bombshell/i;
-  return breaking.test(text);
+function isBreakingNews(title, desc) {
+  const text = (title + " " + (desc || "")).toLowerCase();
+  const breakingPatterns = [
+    /breaking|urgent|alert|just in|developing|live update|now:|confirmed/i,
+    /exclusive|bombshell|major|critical|emergency/i,
+    /happening now|this just in|reports|sources say/i
+  ];
+  
+  return breakingPatterns.some(pattern => pattern.test(text));
 }
 
-function sentimentWord(title, desc){
-  const text = (title + " " + (desc||"")).toLowerCase();
-
-  const pos = ["win","wins","victory","triumph","surge for","boom","celebrate","acquit","cleared","record high","optimism","upbeat","rally","success","achieve"];
-  const neg_alarm = ["emergency","catastrophe","collapse","panic","terror","lockdown","martial law","shooting","assassination","bomb","attack","threat","fatal","dead","crash","war","missile","riot","explosion","nuclear","apocalypse","crisis"];
-  const neg_angry = ["fraud","rigged","corrupt","betray","sellout","traitor","censorship","witch hunt","backlash","outrage","cover-up","lies","scandal","indicted","indictment","arrest","impeach","ban","boycott","sanction","exposed"];
-  const neg_grim  = ["recession","inflation","border crisis","fentanyl","crime wave","illegal immigration","shortage","decline","drop","cut","loss","collapse","debt","deficit","surge in crime","overdose","bankrupt","layoffs"];
-
-  let score = 0, tag = "NEUTRAL", cls = "neutral";
-
-  for (const w of pos){ if (text.includes(w)) score += 2; }
-  for (const w of neg_alarm){ if (text.includes(w)) score -= 3; }
-  for (const w of neg_angry){ if (text.includes(w)) score -= 2; }
-  for (const w of neg_grim){ if (text.includes(w)) score -= 1; }
-
-  if (score >= 2) { tag = "POSITIVE"; cls="hope"; }
-  else if (score <= -3) { tag = "CRITICAL"; cls="alarm"; }
-  else if (score == -2) { tag = "HOSTILE"; cls="angry"; }
-  else if (score == -1) { tag = "NEGATIVE"; cls="grim"; }
-  return {tag, cls};
+function sentimentAnalysis(title, desc) {
+  const text = (title + " " + (desc || "")).toLowerCase();
+  
+  const patterns = {
+    positive: [
+      "victory", "triumph", "success", "win", "wins", "boom", "surge", "rally",
+      "cleared", "acquit", "record high", "optimism", "celebrate", "achievement"
+    ],
+    alarm: [
+      "emergency", "crisis", "catastrophe", "collapse", "panic", "terror",
+      "shooting", "assassination", "bomb", "attack", "threat", "fatal", "dead",
+      "war", "missile", "riot", "explosion", "nuclear", "lockdown"
+    ],
+    angry: [
+      "fraud", "rigged", "corrupt", "betrayal", "sellout", "traitor",
+      "censorship", "witch hunt", "scandal", "indicted", "arrest", "impeach",
+      "ban", "boycott", "exposed", "cover-up", "lies"
+    ],
+    grim: [
+      "recession", "inflation", "crisis", "shortage", "decline", "loss",
+      "debt", "deficit", "crime", "illegal", "overdose", "bankrupt", "layoffs"
+    ]
+  };
+  
+  let score = 0;
+  let sentiment = "NEUTRAL";
+  let className = "neutral";
+  
+  // Score the content
+  for (const word of patterns.positive) {
+    if (text.includes(word)) score += 2;
+  }
+  for (const word of patterns.alarm) {
+    if (text.includes(word)) score -= 4;
+  }
+  for (const word of patterns.angry) {
+    if (text.includes(word)) score -= 3;
+  }
+  for (const word of patterns.grim) {
+    if (text.includes(word)) score -= 2;
+  }
+  
+  // Determine sentiment
+  if (score >= 3) {
+    sentiment = "POSITIVE";
+    className = "hope";
+  } else if (score <= -4) {
+    sentiment = "CRITICAL";
+    className = "alarm";
+  } else if (score <= -3) {
+    sentiment = "HOSTILE";
+    className = "angry";
+  } else if (score <= -1) {
+    sentiment = "NEGATIVE";
+    className = "grim";
+  }
+  
+  return { tag: sentiment, cls: className };
 }
 
-function strip(html){
+function stripHTML(html) {
   if (!html) return '';
-  const tmp = document.createElement('div'); 
-  tmp.innerHTML = html;
-  return (tmp.textContent || tmp.innerText || '').slice(0, 200);
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  return (temp.textContent || temp.innerText || '').slice(0, 250);
 }
 
-async function loadFeeds(){
-  if(STATE.loading) return;
+async function loadFeeds() {
+  if (STATE.loading) return;
+  
+  // Rate limiting - don't hammer feeds
+  const now = Date.now();
+  if (now - STATE.lastFetch < 30000) {
+    toast('Please wait before refreshing again', 'info');
+    return;
+  }
+  
   STATE.loading = true;
+  STATE.lastFetch = now;
   
   const refreshBtn = document.getElementById('refreshBtn');
-  refreshBtn.classList.add('loading');
-  refreshBtn.textContent = 'LOADING...';
+  refreshBtn.classList.add('loading-overlay');
+  refreshBtn.querySelector('span').textContent = 'LOADING...';
   
   try {
-    const enabledList = SOURCES.filter(s=>STATE.enabled.has(s.id));
-    const tasks = enabledList.map(async src=>{
-      try{
-        const txt = await fetchTextWithFallback(src.url);
-        return parseRSS(txt, src);
-      }catch(e){
-        console.warn('Failed', src.name, e);
+    const enabledSources = SOURCES.filter(s => STATE.enabled.has(s.id));
+    
+    const tasks = enabledSources.map(async source => {
+      try {
+        const text = await fetchTextWithFallback(source.url);
+        return parseRSS(text, source);
+      } catch (error) {
+        console.warn(`Failed to load ${source.name}:`, error);
         return [];
       }
     });
     
-    const results = (await Promise.allSettled(tasks)).flatMap(r=> r.status==='fulfilled' ? r.value : []);
-    results.sort((a,b)=> new Date(b.pubDate) - new Date(a.pubDate));
-    STATE.items = results.slice(0, 200);
+    const results = await Promise.allSettled(tasks);
+    const allItems = results
+      .filter(r => r.status === 'fulfilled')
+      .flatMap(r => r.value)
+      .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+    
+    STATE.items = allItems.slice(0, 250); // Increased limit
+    
+    updateStats();
+    render();
     
     const now = new Date();
-    document.getElementById('lastUpdated').textContent = `• UPDATED ${now.toLocaleTimeString()}`;
+    document.getElementById('lastUpdated').textContent = 
+      `• UPDATED ${now.toLocaleTimeString()}`;
     
-    render();
-    toast(`Loaded ${STATE.items.length} articles from ${enabledList.length} sources`, 'success');
-  } catch(e) {
+    toast(`Loaded ${STATE.items.length} articles from ${enabledSources.length} sources`, 'success');
+    
+  } catch (error) {
+    console.error('Feed loading failed:', error);
     toast('Feed loading failed - check connection', 'error');
   } finally {
     STATE.loading = false;
-    refreshBtn.classList.remove('loading');
-    refreshBtn.textContent = 'REFRESH';
+    refreshBtn.classList.remove('loading-overlay');
+    refreshBtn.querySelector('span').textContent = 'REFRESH';
   }
 }
 
-function card(item){
-  const el = document.createElement('article');
-  el.className = 'card';
-  const host = safeHost(item.link);
-  const mood = sentimentWord(item.title||'', item.desc||'');
-  const timeStr = fmtTime(item.pubDate);
+function updateStats() {
+  const filtered = STATE.items.filter(item => STATE.enabled.has(item.id));
+  const breaking = filtered.filter(item => item.isBreaking);
   
-  el.innerHTML = `
+  document.getElementById('totalArticles').textContent = filtered.length;
+  document.getElementById('activeSources').textContent = STATE.enabled.size;
+  document.getElementById('breakingCount').textContent = breaking.length;
+}
+
+function createCard(item) {
+  const article = document.createElement('article');
+  article.className = 'card';
+  article.setAttribute('role', 'article');
+  
+  const hostname = getHostname(item.link);
+  const sentiment = sentimentAnalysis(item.title || '', item.desc || '');
+  const timeString = fmtTime(item.pubDate);
+  
+  article.innerHTML = `
     <div class="card-head" role="button" tabindex="0" aria-expanded="false">
-      <span class="favicon" style="background-image:url('https://www.google.com/s2/favicons?domain=${host}&sz=64');"></span>
+      <span class="favicon" style="background-image:url('https://www.google.com/s2/favicons?domain=${hostname}&sz=64');" aria-hidden="true"></span>
       <div>
-        <div class="titleline">${escapeHTML(item.title)}${item.isBreaking ? ' 🔴' : ''}</div>
+        <div class="titleline">
+          ${escapeHTML(item.title)}
+          ${item.isBreaking ? '<span class="breaking-indicator">BREAKING</span>' : ''}
+        </div>
         <div class="tag">
-          ${escapeHTML(item.source)} • <span class="time">${escapeHTML(timeStr)}</span>
-          <span class="badge ${mood.cls}">${mood.tag}</span>
+          ${escapeHTML(item.source)} • <span class="time">${escapeHTML(timeString)}</span>
+          <span class="badge ${sentiment.cls}">${sentiment.tag}</span>
         </div>
       </div>
-      <div class="time">▶</div>
+      <div class="expand-btn">▶</div>
     </div>
     <div class="hline"></div>
     <div class="card-body">
       <div>${escapeHTML(item.desc || 'No summary available.')}</div>
-      <div style="margin-top:1rem;">
-        <a href="${item.link}" target="_blank" rel="noopener">OPEN ARTICLE ↗</a>
-      </div>
+      <a href="${escapeHTML(item.link)}" target="_blank" rel="noopener" class="article-link">
+        OPEN ARTICLE ↗
+      </a>
     </div>
   `;
   
-  const head = el.querySelector('.card-head');
-  head.addEventListener('click', ()=>{
-    const open = el.classList.toggle('open');
-    head.setAttribute('aria-expanded', open ? 'true' : 'false');
-    
-    
-   head.querySelector('.time').textContent = open ? '▼' : '▶';
+  const header = article.querySelector('.card-head');
+  const expandBtn = article.querySelector('.expand-btn');
+  
+  header.addEventListener('click', () => {
+    const isOpen = article.classList.toggle('open');
+    header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    expandBtn.textContent = isOpen ? '▼' : '▶';
   });
   
-  addLongPress(head, ()=> {
-    window.open(item.link, '_blank');
+  addLongPress(header, () => {
+    window.open(item.link, '_blank', 'noopener');
     toast('Opening in new tab...', 'info');
   });
   
-  return el;
+  return article;
 }
 
-function render(){
-  const list = document.getElementById('feedList');
-  const empty = document.getElementById('emptyMsg');
-  list.innerHTML = '';
-
-  let items = STATE.items.filter(it=> STATE.enabled.has(it.id));
+function render() {
+  const feedList = document.getElementById('feedList');
+  const emptyMsg = document.getElementById('emptyMsg');
   
-  if (STATE.view === 'conservative') items = items.filter(i=> i.lane==='conservative');
-  if (STATE.view === 'populist') items = items.filter(i=> i.lane==='populist');
-  if (STATE.view === 'breaking') items = items.filter(i=> i.isBreaking);
-
-  if (!items.length){
-    empty.style.display = 'block';
+  feedList.innerHTML = '';
+  
+  let filteredItems = STATE.items.filter(item => STATE.enabled.has(item.id));
+  
+  // Apply view filters
+  switch (STATE.view) {
+    case 'conservative':
+      filteredItems = filteredItems.filter(item => item.lane === 'conservative');
+      break;
+    case 'populist':
+      filteredItems = filteredItems.filter(item => item.lane === 'populist');
+      break;
+    case 'breaking':
+      filteredItems = filteredItems.filter(item => item.isBreaking);
+      break;
+  }
+  
+  if (!filteredItems.length) {
+    emptyMsg.style.display = 'block';
     return;
   } else {
-    empty.style.display = 'none';
+    emptyMsg.style.display = 'none';
   }
-
-  if (STATE.view === 'by-source'){
-    const by = {};
-    for (const it of items) { (by[it.source] ||= []).push(it); }
-    Object.keys(by).sort().forEach(src=>{
-      const hdr = document.createElement('div');
-      hdr.className = 'tag'; 
-      hdr.style.cssText = 'margin:1.5rem 0 1rem; font-size:1rem; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:1px;';
-      hdr.textContent = `${src} • ${by[src].length} ARTICLES`;
-      list.appendChild(hdr);
-      by[src].slice(0,30).forEach(it=> list.appendChild(card(it)));
+  
+  if (STATE.view === 'by-source') {
+    const grouped = {};
+    for (const item of filteredItems) {
+      if (!grouped[item.source]) grouped[item.source] = [];
+      grouped[item.source].push(item);
+    }
+    
+    Object.keys(grouped).sort().forEach(sourceName => {
+      const header = document.createElement('div');
+      header.style.cssText = `
+        margin: 2rem 0 1.5rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        border-bottom: 2px solid var(--line);
+        padding-bottom: 0.5rem;
+      `;
+      header.textContent = `${sourceName} • ${grouped[sourceName].length} ARTICLES`;
+      feedList.appendChild(header);
+      
+      grouped[sourceName].slice(0, 25).forEach(item => {
+        feedList.appendChild(createCard(item));
+      });
     });
   } else {
-    items.slice(0,150).forEach(it=> list.appendChild(card(it)));
+    filteredItems.slice(0, 100).forEach(item => {
+      feedList.appendChild(createCard(item));
+    });
   }
+  
+  updateStats();
 }
 
-function buildSourceToggles(){
-  const host = document.getElementById('sourceToggles');
-  host.innerHTML = '';
+function buildSourceToggles() {
+  const container = document.getElementById('sourceToggles');
+  container.innerHTML = '';
   
-  SOURCES.forEach(src=>{
-    const b = document.createElement('button');
-    b.className = 'src' + (STATE.enabled.has(src.id) ? ' on' : '');
-    b.textContent = src.name;
-    b.dataset.id = src.id;
-    b.setAttribute('aria-pressed', STATE.enabled.has(src.id) ? 'true' : 'false');
+  SOURCES.forEach(source => {
+    const button = document.createElement('button');
+    button.className = 'src' + (STATE.enabled.has(source.id) ? ' on' : '');
+    button.textContent = source.name;
+    button.dataset.id = source.id;
+    button.setAttribute('aria-pressed', STATE.enabled.has(source.id) ? 'true' : 'false');
 
-    // Short tap = SOLO this source
-    b.addEventListener('click', ()=>{
-      const id = b.dataset.id;
-      const onlyThis = new Set([id]);
-      const alreadySolo = (STATE.enabled.size === 1 && STATE.enabled.has(id));
+    // Click = SOLO mode
+    button.addEventListener('click', () => {
+      const sourceId = button.dataset.id;
+      const isAlreadySolo = (STATE.enabled.size === 1 && STATE.enabled.has(sourceId));
       
-      if (!alreadySolo){
+      if (!isAlreadySolo) {
         STATE.lastSolo = new Set(STATE.enabled);
-        STATE.enabled = onlyThis;
-        markSolo(id);
-        toast(`SOLO MODE: ${src.name}`, 'info');
+        STATE.enabled = new Set([sourceId]);
+        updateSoloState(sourceId);
+        toast(`SOLO MODE: ${source.name}`, 'info');
       } else {
-        STATE.enabled = STATE.lastSolo && STATE.lastSolo.size ? new Set(STATE.lastSolo) : new Set(SOURCES.map(s=>s.id));
-        clearSolo();
+        STATE.enabled = STATE.lastSolo && STATE.lastSolo.size ? 
+          new Set(STATE.lastSolo) : 
+          new Set(SOURCES.map(s => s.id));
+        clearSoloState();
         toast('SOLO MODE DISABLED', 'info');
       }
-      syncButtons();
+      
+      updateButtonStates();
       render();
-      saveEnabled(); // Auto-save when sources change
+      saveEnabled();
     });
 
-    // Long-press = toggle include/exclude
-    addLongPress(b, ()=>{
-      const id = b.dataset.id;
-      if (STATE.enabled.has(id)) {
-        STATE.enabled.delete(id);
+    // Long press = toggle
+    addLongPress(button, () => {
+      const sourceId = button.dataset.id;
+      
+      if (STATE.enabled.has(sourceId)) {
+        STATE.enabled.delete(sourceId);
       } else {
-        STATE.enabled.add(id);
+        STATE.enabled.add(sourceId);
       }
       
-      if (STATE.enabled.size === 0) STATE.enabled = new Set([id]); // never zero
+      if (STATE.enabled.size === 0) {
+        STATE.enabled = new Set([sourceId]);
+      }
+      
       STATE.lastSolo = null;
-      clearSolo();
-      syncButtons();
+      clearSoloState();
+      updateButtonStates();
       render();
-      saveEnabled(); // Auto-save when sources change
-      toast(STATE.enabled.has(id) ? `Enabled ${src.name}` : `Disabled ${src.name}`, 'info');
+      saveEnabled();
+      
+      const action = STATE.enabled.has(sourceId) ? 'Enabled' : 'Disabled';
+      toast(`${action} ${source.name}`, 'info');
     });
 
-    host.appendChild(b);
+    container.appendChild(button);
   });
 
-  function syncButtons(){
-    document.querySelectorAll('.src').forEach(btn=>{
-      const on = STATE.enabled.has(btn.dataset.id);
-      btn.classList.toggle('on', on);
-      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  function updateButtonStates() {
+    document.querySelectorAll('.src').forEach(btn => {
+      const isEnabled = STATE.enabled.has(btn.dataset.id);
+      btn.classList.toggle('on', isEnabled);
+      btn.setAttribute('aria-pressed', isEnabled ? 'true' : 'false');
     });
   }
-  function markSolo(id){
-    document.querySelectorAll('.src').forEach(btn=>{
-      btn.classList.toggle('solo', btn.dataset.id === id);
+  
+  function updateSoloState(soloId) {
+    document.querySelectorAll('.src').forEach(btn => {
+      btn.classList.toggle('solo', btn.dataset.id === soloId);
     });
   }
-  function clearSolo(){
-    document.querySelectorAll('.src').forEach(btn=> btn.classList.remove('solo'));
+  
+  function clearSoloState() {
+    document.querySelectorAll('.src').forEach(btn => {
+      btn.classList.remove('solo');
+    });
   }
 }
 
-function buildFilters(){
-  const filters = document.getElementById('filters');
-  filters.addEventListener('click', (e)=>{
-    const chip = e.target.closest('.chip');
+function buildFilters() {
+  const filtersContainer = document.getElementById('filters');
+  
+  filtersContainer.addEventListener('click', (event) => {
+    const chip = event.target.closest('.chip');
     if (!chip) return;
-    filters.querySelectorAll('.chip').forEach(c=> c.classList.remove('active'));
+    
+    filtersContainer.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     STATE.view = chip.dataset.view;
     render();
   });
 }
 
-function escapeHTML(str=''){ 
-  return str.replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); 
+function escapeHTML(str = '') {
+  const escapeMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return str.replace(/[&<>"']/g, char => escapeMap[char]);
 }
 
-function safeHost(url){ 
-  try { return new URL(url).hostname; } catch(e){ return '' } 
+function getHostname(url) {
+  try {
+    return new URL(url).hostname;
+  } catch (e) {
+    return 'unknown';
+  }
 }
 
-function init(){
+function initialize() {
   buildFilters();
   buildSourceToggles();
+  
   document.getElementById('refreshBtn').addEventListener('click', loadFeeds);
   document.getElementById('resetBtn').addEventListener('click', resetAll);
+  
+  // Auto-refresh every 5 minutes
+  setInterval(() => {
+    if (!STATE.loading && document.visibilityState === 'visible') {
+      loadFeeds();
+    }
+  }, 300000);
+  
+  // Initial load
   loadFeeds();
+  
+  // Handle visibility changes
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && 
+        Date.now() - STATE.lastFetch > 120000) {
+      loadFeeds();
+    }
+  });
 }
 
-document.addEventListener('DOMContentLoaded', init);
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initialize);
+} else {
+  initialize();
+}
 </script>
 </body>
 </html>
+
+  
+  
+  
