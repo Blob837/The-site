@@ -2,670 +2,1212 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"/>
 <title>UR NEWS - Terminal Intelligence</title>
-<meta name="theme-color" content="#0d1117" />
+<meta name="theme-color" content="#0a0a0a" />
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="description" content="Real-time political intelligence terminal">
-<link rel="preconnect" href="https://api.allorigins.win">
-<link rel="preconnect" href="https://r.jina.ai">
-<link rel="dns-prefetch" href="//www.google.com">
+<meta name="description" content="Real-time intelligence terminal for breaking news and political analysis">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg-primary: #0d1117;
-    --bg-secondary: #161b22;
-    --bg-tertiary: #21262d;
-    --surface: #30363d;
-    --surface-hover: #484f58;
-    --border: #21262d;
-    --text-primary: #f0f6fc;
-    --text-secondary: #8b949e;
-    --text-muted: #6e7681;
-    --accent-green: #238636;
-    --accent-amber: #d29922;
-    --accent-cyan: #56d4dd;
-    --accent-red: #da3633;
-    --accent-purple: #8957e5;
-    --gradient-primary: conic-gradient(from 0deg, transparent, rgba(35, 134, 54, 0.05), transparent);
-    --gradient-secondary: linear-gradient(45deg, rgba(86, 212, 221, 0.03), rgba(137, 87, 229, 0.03));
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  :root{
+    --bg: #0a0a0a;
+    --bg-secondary: #0f0f0f;
+    --bg-tertiary: #151515;
+    --panel: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+    --panel-hover: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+    --line: #1a1a1a;
+    --line-bright: #2a2a2a;
+    --ink: #f0f0f0;
+    --ink-secondary: #d0d0d0;
+    --muted: #8a8a8a;
+    --muted-dark: #666666;
+    --accent: #ff4444;
+    --accent-hover: #ff6666;
+    --secondary: #666666;
+    --secondary-active: #888888;
+    --warning: #ffaa44;
+    --danger: #ff2244;
+    --info: #44aaff;
+    --success: #44ff88;
+    --border: #333333;
+    --border-hover: #444444;
+    --chip: #151515;
+    --chip-active: #2a2a2a;
+    --glow-red: rgba(255, 68, 68, 0.4);
+    --glow-grey: rgba(136, 136, 136, 0.3);
+    --glow-blue: rgba(68, 170, 255, 0.4);
+    --shadow-heavy: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    :root {
-      --gradient-primary: var(--bg-secondary);
-      --gradient-secondary: var(--bg-secondary);
-    }
-    
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-  }
-
+  
   * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
   }
-
+  
   html, body {
+    height: 100%;
     margin: 0;
     padding: 0;
-    height: 100%;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+  }
+  
+  html {
+    background-color: var(--bg);
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
     font-weight: 400;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-  }
-
-  /* Safe area handling */
-  body {
     padding-top: env(safe-area-inset-top);
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
     padding-bottom: env(safe-area-inset-bottom);
     overflow-x: hidden;
+    position: relative;
   }
-
-  /* Animated gradients */
-  @keyframes gradient-shift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+  
+  /* Enhanced terminal effects with animated gradients */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1000;
+    background: 
+      repeating-linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 68, 68, 0.015) 1px, 
+        transparent 2px, 
+        transparent 4px
+      ),
+      repeating-linear-gradient(
+        0deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.01) 1px, 
+        transparent 2px, 
+        transparent 3px
+      );
+    animation: crtFlicker 0.15s infinite linear alternate;
   }
-
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+  
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    background: 
+      radial-gradient(circle at 20% 50%, rgba(255, 68, 68, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 50%, rgba(68, 170, 255, 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+    mix-blend-mode: multiply;
+    animation: gradientShift 8s ease-in-out infinite;
   }
-
-  @keyframes pulse-green {
-    0%, 100% { box-shadow: 0 0 5px rgba(35, 134, 54, 0.3); }
-    50% { box-shadow: 0 0 15px rgba(35, 134, 54, 0.6); }
+  
+  @keyframes crtFlicker {
+    0% { opacity: 1; }
+    100% { opacity: 0.98; }
   }
-
-  /* App Shell */
-  .app-shell {
-    min-height: 100vh;
-    background: var(--bg-primary);
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Header */
-  .header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: var(--gradient-primary);
-    backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid var(--border);
-    box-shadow: var(--shadow-md);
-  }
-
-  @supports not (backdrop-filter: blur(20px)) {
-    .header {
-      background: var(--bg-secondary);
+  
+  @keyframes gradientShift {
+    0%, 100% { 
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 68, 68, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(68, 170, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+    }
+    25% { 
+      background: 
+        radial-gradient(circle at 70% 20%, rgba(255, 68, 68, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 30% 80%, rgba(68, 170, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+    }
+    50% { 
+      background: 
+        radial-gradient(circle at 80% 70%, rgba(255, 68, 68, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 20% 30%, rgba(68, 170, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+    }
+    75% { 
+      background: 
+        radial-gradient(circle at 30% 80%, rgba(255, 68, 68, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 70% 20%, rgba(68, 170, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
     }
   }
-
-  .header::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--gradient-secondary);
-    background-size: 400% 400%;
-    animation: gradient-shift 25s ease-in-out infinite;
-    opacity: 0.8;
-  }
-
-  .header-content {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    min-height: 60px;
-  }
-
-  .status-indicator {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--accent-green);
-    flex-shrink: 0;
-    animation: pulse-green 2s infinite;
-  }
-
-  .title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    flex: 1;
-  }
-
-  .header-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    padding: 0.5rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    font-family: inherit;
-    white-space: nowrap;
-  }
-
-  .btn:hover, .btn:focus {
-    background: var(--surface-hover);
-    border-color: var(--text-muted);
-    outline: none;
-  }
-
-  .btn:active {
-    transform: translateY(1px);
-  }
-
-  .btn.active {
-    background: var(--accent-green);
-    border-color: var(--accent-green);
-    color: var(--bg-primary);
-  }
-
-  /* Filters */
-  .filters {
-    padding: 0 1rem 1rem;
-    display: flex;
-    gap: 0.5rem;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .filters::-webkit-scrollbar {
-    display: none;
-  }
-
-  .filter-chip {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-muted);
-    padding: 0.375rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  .filter-chip:hover {
-    background: var(--surface-hover);
-    color: var(--text-secondary);
-  }
-
-  .filter-chip.active {
-    background: var(--accent-cyan);
-    border-color: var(--accent-cyan);
-    color: var(--bg-primary);
-  }
-
-  /* Main Content */
-  .main {
-    flex: 1;
-    padding: 1rem;
-    max-width: 800px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  /* Stats Bar */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .stat {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.75rem;
-    text-align: center;
-  }
-
-  .stat-value {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--accent-green);
-    line-height: 1;
-  }
-
-  .stat-label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-    margin-top: 0.25rem;
-  }
-
-  /* Article List */
-  .article-list {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .article-skeleton {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1rem;
-    position: relative;
-    overflow: hidden;
-    height: 120px;
-  }
-
-  .article-skeleton::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.02), transparent);
-    transform: translateX(-100%);
-    animation: shimmer 2s infinite;
-  }
-
-  .skeleton-line {
-    background: var(--bg-tertiary);
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-  }
-
-  .skeleton-line:nth-child(1) { width: 80%; height: 18px; }
-  .skeleton-line:nth-child(2) { width: 60%; height: 14px; }
-  .skeleton-line:nth-child(3) { width: 100%; height: 12px; }
-  .skeleton-line:nth-child(4) { width: 90%; height: 12px; }
-
-  .article {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    transition: all 0.15s ease;
-    position: relative;
-    opacity: 0;
-    animation: fadeIn 0.3s ease forwards;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .article:hover {
-    border-color: var(--surface-hover);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .article-header {
-    display: grid;
-    grid-template-columns: 20px 1fr 24px;
-    gap: 0.75rem;
-    align-items: flex-start;
-    padding: 1rem;
-    cursor: pointer;
-  }
-
-  .article-icon {
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-    background: var(--bg-tertiary);
-    background-size: cover;
-    background-position: center;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
-  .article-content {
-    min-width: 0; /* Allow flex items to shrink */
-  }
-
-  .article-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    line-height: 1.3;
-    margin-bottom: 0.5rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .article-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    flex-wrap: wrap;
-  }
-
-  .article-source {
-    font-weight: 500;
-    color: var(--text-secondary);
-  }
-
-  .article-time {
-    opacity: 0.8;
-  }
-
-  .sentiment-badge {
-    padding: 0.125rem 0.375rem;
-    border-radius: 12px;
-    font-size: 0.625rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-  }
-
-  .sentiment-positive { background: rgba(35, 134, 54, 0.2); color: var(--accent-green); }
-  .sentiment-negative { background: rgba(218, 54, 51, 0.2); color: var(--accent-red); }
-  .sentiment-neutral { background: rgba(139, 148, 158, 0.2); color: var(--text-muted); }
-
-  .breaking-badge {
-    background: var(--accent-red);
-    color: white;
-    padding: 0.125rem 0.375rem;
-    border-radius: 12px;
-    font-size: 0.625rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-    animation: pulse 2s infinite;
-  }
-
+  
   @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.7; }
   }
-
-  .action-btn {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 1.25rem;
-    cursor: pointer;
-    padding: 0;
-    transition: all 0.15s ease;
-    width: 24px;
-    height: 24px;
+  
+  @keyframes slideIn {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideDown {
+    from {
+      max-height: 0;
+      opacity: 0;
+    }
+    to {
+      max-height: 200px;
+      opacity: 1;
+    }
+  }
+  
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 5px var(--glow-red), 0 0 10px var(--glow-red), 0 0 15px var(--glow-red); }
+    50% { box-shadow: 0 0 10px var(--glow-red), 0 0 20px var(--glow-red), 0 0 30px var(--glow-red); }
+  }
+  
+  @keyframes dataStream {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  /* Enhanced Header */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: 
+      linear-gradient(180deg, var(--bg) 0%, rgba(10, 10, 10, 0.98) 70%, rgba(10, 10, 10, 0.95) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 2px solid var(--accent);
+    box-shadow: 
+      0 0 30px rgba(255, 68, 68, 0.3),
+      0 8px 32px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  .bar {
     display: flex;
+    gap: 1rem;
     align-items: center;
-    justify-content: center;
+    padding: 1rem 1.2rem;
+    background: linear-gradient(90deg, transparent, rgba(255, 68, 68, 0.03), transparent);
+    position: relative;
   }
-
-  .action-btn:hover {
-    color: var(--text-secondary);
-  }
-
-  /* Action Sheet */
-  .action-sheet {
-    position: fixed;
-    bottom: 0;
+  
+  .bar::before {
+    content: "";
+    position: absolute;
+    top: 0;
     left: 0;
     right: 0;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    border-radius: 12px 12px 0 0;
-    padding: 1rem;
-    transform: translateY(100%);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.6;
+  }
+  
+  .title {
+    font-weight: 800;
+    letter-spacing: 2px;
+    font-size: 1.4rem;
+    flex: 1;
+    color: var(--accent);
+    text-shadow: 
+      0 0 10px var(--glow-red),
+      0 0 20px var(--glow-red),
+      0 0 30px var(--glow-red);
+    position: relative;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .title::after {
+    content: '█';
+    color: var(--accent);
+    animation: pulse 1s infinite;
+    margin-left: 4px;
+    font-size: 0.9em;
+  }
+  
+  .blip {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-right: 0.8rem;
+    box-shadow: 
+      0 0 15px var(--accent),
+      0 0 30px var(--accent),
+      inset 0 0 8px rgba(255, 255, 255, 0.4);
+    animation: glow 2s infinite ease-in-out;
+    position: relative;
+    flex-shrink: 0;
+  }
+  
+  .blip::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.3;
+    animation: pulse 2s infinite;
+  }
+  
+  .meta {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    background: linear-gradient(45deg, var(--muted), var(--accent), var(--info), var(--muted));
+    background-size: 200% 200%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  
+  .btn.reset {
+    border: 2px solid var(--warning);
+    background: var(--panel);
+    color: var(--ink);
+    padding: 0.6rem 0.9rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: fixed;
+    bottom: 1.2rem;
+    right: 1.2rem;
+    z-index: 100;
+    box-shadow: 0 0 15px rgba(255, 170, 68, 0.2);
+    overflow: hidden;
+  }
+  
+  .btn.reset::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 170, 68, 0.1), transparent);
+    transform: translateX(-100%);
     transition: transform 0.3s ease;
-    z-index: 200;
-    box-shadow: var(--shadow-lg);
   }
-
-  .action-sheet.show {
-    transform: translateY(0);
+  
+  .btn.reset:hover {
+    background: var(--warning);
+    color: var(--bg);
+    box-shadow: 
+      0 0 25px rgba(255, 170, 68, 0.4),
+      var(--shadow-heavy);
+    transform: translateY(-2px);
   }
-
-  .action-sheet-header {
+  
+  .btn.reset:hover::before {
+    transform: translateX(100%);
+  }
+  
+  /* Enhanced Filters */
+  .filters {
+    display: flex;
+    gap: 0.6rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 1.2rem 1rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .filters::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .chip {
+    white-space: nowrap;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--chip);
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    min-width: fit-content;
+  }
+  
+  .chip::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 68, 68, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--ink-secondary);
+    box-shadow: 
+      0 0 15px rgba(255, 68, 68, 0.3),
+      var(--shadow-light);
+    transform: translateY(-2px);
+  }
+  
+  .chip:hover::before {
+    transform: translateX(100%);
+  }
+  
+  .chip.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+    box-shadow: 
+      0 0 20px var(--glow-red),
+      0 0 40px var(--glow-red);
+    font-weight: 700;
+  }
+  
+  /* Enhanced Main Content */
+  main {
+    padding: 1.5rem 1.2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-bottom: 4rem;
+  }
+  
+  .toggle-section {
+    position: relative;
+    margin-bottom: 1.5rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow-medium);
+    overflow: hidden;
+  }
+  
+  .toggle-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    user-select: none;
+    background: linear-gradient(90deg, transparent, rgba(255, 68, 68, 0.02), transparent);
   }
-
-  .action-sheet-title {
-    font-weight: 600;
-    color: var(--text-primary);
+  
+  .toggle-header:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  
+  .toggle-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .toggle-arrow {
     font-size: 0.9rem;
+    color: var(--muted);
+    transition: transform 0.3s ease;
   }
-
-  .action-sheet-close {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0;
+  
+  .toggle-section.open .toggle-arrow {
+    transform: rotate(180deg);
   }
-
-  .action-sheet-actions {
+  
+  .toggle-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    opacity: 0;
+  }
+  
+  .toggle-section.open .toggle-content {
+    max-height: 500px;
+    opacity: 1;
+    padding: 0 1.2rem 1.2rem;
+  }
+  
+  .stats-grid {
     display: grid;
-    gap: 0.5rem;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
   }
-
-  .action-sheet-btn {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .action-sheet-btn:hover {
-    background: var(--surface-hover);
-  }
-
-  /* Overlay */
-  .overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 150;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-  }
-
-  .overlay.show {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  /* Toast */
-  .toast {
-    position: fixed;
-    top: calc(env(safe-area-inset-top) + 80px);
-    left: 1rem;
-    right: 1rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    box-shadow: var(--shadow-md);
-    transform: translateY(-100px);
-    opacity: 0;
-    transition: all 0.3s ease;
-    z-index: 300;
-  }
-
-  .toast.show {
-    transform: translateY(0);
-    opacity: 1;
-  }
-
-  .toast.success { border-left: 4px solid var(--accent-green); }
-  .toast.error { border-left: 4px solid var(--accent-red); }
-  .toast.info { border-left: 4px solid var(--accent-cyan); }
-
-  /* Empty State */
-  .empty-state {
+  
+  .stat {
     text-align: center;
-    padding: 3rem 1rem;
-    color: var(--text-muted);
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    border: 1px solid var(--border);
   }
-
-  .empty-state h3 {
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-    font-size: 1.125rem;
+  
+  .stat-value {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: 0 0 10px var(--glow-red);
   }
-
-  /* Pull to Refresh */
-  .pull-refresh {
-    height: 60px;
+  
+  .stat-label {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0.2rem;
+  }
+  
+  .hint-content {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.4;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent);
+    position: relative;
+  }
+  
+  .hint-content::before {
+    content: "💡";
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.1rem;
+    opacity: 0.7;
+  }
+  
+  .src-grid {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-    font-size: 0.875rem;
-    margin-top: -60px;
-    transition: margin-top 0.3s ease;
+    gap: 0.5rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 0 1.2rem 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
   }
-
-  .pull-refresh.active {
-    margin-top: 0;
+  
+  .src-grid::-webkit-scrollbar {
+    display: none;
   }
-
-  .spinner {
+  
+  .src {
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    background: var(--chip);
+    border: 1px solid var(--border);
+    font-size: 0.7rem;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    min-width: fit-content;
+  }
+  
+  .src::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent, rgba(136, 136, 136, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .src:hover {
+    border-color: var(--secondary);
+    color: var(--ink-secondary);
+    box-shadow: 
+      0 0 15px var(--glow-grey),
+      var(--shadow-light);
+    transform: translateY(-1px);
+  }
+  
+  .src:hover::before {
+    transform: translateX(100%);
+  }
+  
+  .src.on {
+    color: var(--bg);
+    background: var(--secondary);
+    border-color: var(--secondary);
+    box-shadow: 
+      0 0 15px var(--glow-grey),
+      0 0 30px var(--glow-grey);
+    font-weight: 700;
+  }
+  
+  .src.solo {
+    outline: 2px dashed var(--warning);
+    outline-offset: 2px;
+    animation: pulse 2s infinite;
+    box-shadow: 
+      0 0 20px rgba(255, 170, 68, 0.4),
+      var(--shadow-medium);
+  }
+  
+  /* Enhanced Cards */
+  .list {
+    display: grid;
+    gap: 1.2rem;
+    margin-top: 1.5rem;
+  }
+  
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-medium);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--info), var(--warning));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      var(--shadow-heavy),
+      0 0 30px rgba(255, 68, 68, 0.15);
+    border-color: var(--line-bright);
+  }
+  
+  .card:hover::before {
+    opacity: 1;
+  }
+  
+  .card-head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.8rem;
+    align-items: flex-start;
+    padding: 1.2rem;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s ease;
+  }
+  
+  .card-head:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  
+  .favicon {
     width: 20px;
     height: 20px;
-    border: 2px solid var(--border);
-    border-top: 2px solid var(--accent-green);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-right: 0.5rem;
+    border-radius: 4px;
+    background: var(--chip);
+    display: inline-block;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-light);
+    flex-shrink: 0;
+    margin-top: 2px;
   }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
+  
+  .tag {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.3rem;
   }
-
-  /* Responsive */
-  @media (max-width: 640px) {
-    .header-content {
-      padding: 0.75rem;
-      gap: 0.75rem;
+  
+  .badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--ink);
+    background: var(--chip);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  
+  .badge.alarm {
+    border-color: #ff4444;
+    color: #ff8888;
+    background: #2a1010;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+  }
+  
+  .badge.angry {
+    border-color: #ff6644;
+    color: #ffaa88;
+    background: #2a1510;
+    box-shadow: 0 0 10px rgba(255, 102, 68, 0.3);
+  }
+  
+  .badge.grim {
+    border-color: #666;
+    color: #aaa;
+    background: #1a1a1a;
+  }
+  
+  .badge.hope {
+    border-color: #44ff44;
+    color: #88ff88;
+    background: #102a10;
+    box-shadow: 0 0 10px rgba(68, 255, 68, 0.3);
+  }
+  
+  .badge.neutral {
+    border-color: #4488ff;
+    color: #88bbff;
+    background: #101520;
+    box-shadow: 0 0 10px rgba(68, 136, 255, 0.3);
+  }
+  
+  .breaking-indicator {
+    display: inline-block;
+    background: var(--danger);
+    color: white;
+    font-size: 0.55rem;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 0.3rem;
+    animation: pulse 1.5s infinite;
+    box-shadow: 0 0 10px rgba(255, 34, 68, 0.5);
+    flex-shrink: 0;
+  }
+  
+  .hline {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line), transparent);
+  }
+  
+  .titleline {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    transition: color 0.2s ease;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+  }
+  
+  .card-head:hover .titleline {
+    color: var(--accent);
+  }
+  
+  .time {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  
+  .expand-btn {
+    color: var(--muted);
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+    user-select: none;
+    flex-shrink: 0;
+  }
+  
+  .card:hover .expand-btn {
+    color: var(--accent);
+  }
+  
+  .card-body {
+    padding: 1.2rem;
+    font-size: 0.85rem;
+    color: var(--ink-secondary);
+    line-height: 1.5;
+    display: none;
+    background: rgba(0, 0, 0, 0.3);
+    border-top: 1px solid var(--line);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .card.open .card-body {
+    display: block;
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  /* Enhanced Links */
+  a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  
+  a:hover {
+    color: var(--accent-hover);
+    text-shadow: 0 0 8px var(--glow-red);
+  }
+  
+  a::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+  
+  a:hover::after {
+    width: 100%;
+  }
+  
+  .article-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--accent);
+    color: var(--bg) !important;
+    padding: 0.7rem 1rem;
+    border-radius: 6px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-light);
+    margin-top: 0.8rem;
+    text-decoration: none;
+  }
+  
+  .article-link:hover {
+    background: var(--accent-hover);
+   box-shadow: var(--shadow-medium);
+    transform: translateY(-1px);
+    text-shadow: none;
+  }
+  
+  .article-link::after {
+    display: none;
+  }
+  
+  .empty {
+    color: var(--muted);
+    text-align: center;
+    padding: 3rem 1.5rem;
+    background: var(--panel);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-light);
+  }
+  
+  .empty h3 {
+    color: var(--accent);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  
+  /* Loading States */
+  .loading-overlay {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .loading-overlay::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 68, 68, 0.2), transparent);
+    animation: dataStream 2s infinite;
+  }
+  
+  /* Toast Notifications */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel);
+    color: var(--ink);
+    padding: 0.8rem 1.2rem;
+    border-radius: 10px;
+    z-index: 999;
+    font-weight: 600;
+    box-shadow: var(--shadow-heavy);
+    border: 1px solid var(--border);
+    animation: slideUp 0.3s ease-out;
+    max-width: 85%;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  
+  .toast.success {
+    border-color: var(--success);
+    box-shadow: 0 0 20px rgba(68, 255, 136, 0.3);
+  }
+  
+  .toast.error {
+    border-color: var(--danger);
+    box-shadow: 0 0 20px rgba(255, 34, 68, 0.3);
+  }
+  
+  /* Enhanced Mobile Responsive */
+  @media (max-width: 768px) {
+    .bar {
+      padding: 0.8rem 1rem;
+      gap: 0.8rem;
     }
-
+    
     .title {
-      font-size: 1.125rem;
+      font-size: 1.2rem;
+      letter-spacing: 1.5px;
     }
-
-    .main {
-      padding: 0.75rem;
+    
+    .meta {
+      font-size: 0.7rem;
     }
-
-    .stats {
-      gap: 0.75rem;
-    }
-
-    .stat {
-      padding: 0.5rem;
-    }
-
-    .stat-value {
-      font-size: 1.25rem;
-    }
-
-    .article-header {
-      padding: 0.75rem;
+    
+    .filters {
+      padding: 0 1rem 0.8rem;
       gap: 0.5rem;
     }
-
-    .article-title {
-      font-size: 0.875rem;
+    
+    .chip {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.65rem;
+    }
+    
+    main {
+      padding: 1.2rem 1rem;
+    }
+    
+    .toggle-header {
+      padding: 0.8rem 1rem;
+    }
+    
+    .toggle-section.open .toggle-content {
+      padding: 0 1rem 1rem;
+    }
+    
+    .stats-grid {
+      gap: 0.8rem;
+    }
+    
+    .stat-value {
+      font-size: 1.1rem;
+    }
+    
+    .stat-label {
+      font-size: 0.6rem;
+    }
+    
+    .card-head {
+      padding: 1rem;
+      gap: 0.6rem;
+    }
+    
+    .card-body {
+      padding: 1rem;
+      font-size: 0.8rem;
+    }
+    
+    .titleline {
+      font-size: 0.9rem;
+      line-height: 1.25;
+    }
+    
+    .btn.reset {
+      bottom: 0.8rem;
+      right: 0.8rem;
+      padding: 0.5rem 0.7rem;
+      font-size: 0.65rem;
     }
   }
-
-  /* High contrast support */
-  @media (prefers-contrast: high) {
-    :root {
-      --border: #484f58;
-      --surface: #21262d;
-      --text-muted: #8b949e;
+  
+  @media (max-width: 480px) {
+    .bar {
+      padding: 0.7rem 0.8rem;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    
+    .title {
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+    
+    .blip {
+      width: 10px;
+      height: 10px;
+      margin-right: 0.5rem;
+    }
+    
+    .meta {
+      font-size: 0.65rem;
+      order: 3;
+      width: 100%;
+      margin-top: 0.3rem;
+    }
+    
+    .filters {
+      padding: 0 0.8rem 0.8rem;
+      gap: 0.4rem;
+    }
+    
+    .chip {
+      padding: 0.35rem 0.7rem;
+      font-size: 0.6rem;
+      border-radius: 16px;
+    }
+    
+    main {
+      padding: 1rem 0.8rem;
+      padding-bottom: 3.5rem;
+    }
+    
+    .toggle-header {
+      padding: 0.7rem 0.9rem;
+    }
+    
+    .toggle-title {
+      font-size: 0.75rem;
+    }
+    
+    .toggle-section.open .toggle-content {
+      padding: 0 0.9rem 0.9rem;
+      max-height: 400px;
+    }
+    
+    .stats-grid {
+      gap: 0.6rem;
+    }
+    
+    .stat {
+      padding: 0.6rem;
+    }
+    
+    .stat-value {
+      font-size: 1rem;
+    }
+    
+    .stat-label {
+      font-size: 0.55rem;
+    }
+    
+    .hint-content {
+      font-size: 0.7rem;
+      padding: 0.8rem;
+      line-height: 1.3;
+    }
+    
+    .hint-content::before {
+      top: 0.8rem;
+      right: 0.8rem;
+      font-size: 1rem;
+    }
+    
+    .src-grid {
+      gap: 0.4rem;
+      padding-bottom: 1rem;
+    }
+    
+    .src {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.6rem;
+      border-radius: 6px;
+    }
+    
+    .list {
+      gap: 1rem;
+      margin-top: 1.2rem;
+    }
+    
+    .card {
+      border-radius: 10px;
+    }
+    
+    .card-head {
+      padding: 0.9rem;
+      gap: 0.5rem;
+    }
+    
+    .card-body {
+      padding: 0.9rem;
+      font-size: 0.75rem;
+      line-height: 1.4;
+    }
+    
+    .favicon {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .titleline {
+      font-size: 0.85rem;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+    
+    .tag {
+      font-size: 0.65rem;
+      gap: 0.3rem;
+      margin-top: 0.2rem;
+    }
+    
+    .badge {
+      font-size: 0.55rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 10px;
+    }
+    
+    .breaking-indicator {
+      font-size: 0.5rem;
+      padding: 0.1rem 0.3rem;
+      border-radius: 6px;
+      margin-left: 0.2rem;
+    }
+    
+    .time {
+      font-size: 0.65rem;
+    }
+    
+    .expand-btn {
+      font-size: 1rem;
+    }
+    
+    .article-link {
+      padding: 0.6rem 0.8rem;
+      font-size: 0.7rem;
+      gap: 0.3rem;
+      margin-top: 0.6rem;
+    }
+    
+    .btn.reset {
+      bottom: 0.6rem;
+      right: 0.6rem;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.6rem;
+    }
+    
+    .toast {
+      bottom: 80px;
+      font-size: 0.75rem;
+      padding: 0.7rem 1rem;
+      max-width: 90%;
     }
   }
 </style>
 </head>
 <body>
-  <div class="app-shell">
-    <header class="header">
-      <div class="header-content">
-        <div class="status-indicator"></div>
-        <h1 class="title">UR NEWS</h1>
-        <div class="header-actions">
-          <button class="btn" id="refreshBtn">Refresh</button>
-          <button class="btn active" id="politicsBtn">Politics Only</button>
-        </div>
-      </div>
-      <div class="filters" id="filters">
-        <div class="filter-chip active" data-view="all">All</div>
-        <div class="filter-chip" data-view="conservative">Conservative</div>
-        <div class="filter-chip" data-view="populist">Populist</div>
-        <div class="filter-chip" data-view="breaking">Breaking</div>
-      </div>
-    </header>
+<header>
+  <div class="bar">
+    <div class="title">
+      <span class="blip"></span>UR NEWS
+      <span class="meta" id="lastUpdated">• INITIALIZING FEEDS</span>
+    </div>
+  </div>
+  <div class="filters" id="filters">
+    <div class="chip active" data-view="all">ALL SOURCES</div>
+    <div class="chip" data-view="by-source">BY SOURCE</div>
+    <div class="chip" data-view="conservative">CONSERVATIVE</div>
+    <div class="chip" data-view="populist">POPULIST</div>
+    <div class="chip" data-view="breaking">BREAKING</div>
+  </div>
+</header>
 
-    <main class="main">
-      <div class="pull-refresh" id="pullRefresh">
-        <div class="spinner"></div>
-        <span>Pull to refresh...</span>
-      </div>
-
-      <div class="stats" id="stats">
+<main>
+  <div class="toggle-section open" id="statsSection">
+    <div class="toggle-header">
+      <span class="toggle-title">Intelligence Overview</span>
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="toggle-content">
+      <div class="stats-grid" id="statsBar">
         <div class="stat">
-          <span class="stat-value" id="totalCount">0</span>
+          <span class="stat-value" id="totalArticles">0</span>
           <span class="stat-label">Articles</span>
         </div>
         <div class="stat">
-          <span class="stat-value" id="sourceCount">0</span>
+          <span class="stat-value" id="activeSources">0</span>
           <span class="stat-label">Sources</span>
         </div>
         <div class="stat">
@@ -673,842 +1215,820 @@
           <span class="stat-label">Breaking</span>
         </div>
       </div>
-
-      <div class="article-list" id="articleList">
-        <!-- Articles will be rendered here -->
-      </div>
-
-      <div class="empty-state" id="emptyState" style="display: none;">
-        <h3>No Articles Found</h3>
-        <p>Check your filters or try refreshing</p>
-      </div>
-    </main>
-  </div>
-
-  <!-- Action Sheet -->
-  <div class="overlay" id="overlay"></div>
-  <div class="action-sheet" id="actionSheet">
-    <div class="action-sheet-header">
-      <div class="action-sheet-title">Article Actions</div>
-      <button class="action-sheet-close" id="closeActionSheet">&times;</button>
-    </div>
-    <div class="action-sheet-actions">
-      <button class="action-sheet-btn" id="openArticle">
-        <span>🔗</span> Open Article
-      </button>
-      <button class="action-sheet-btn" id="saveArticle">
-        <span>💾</span> Save for Later
-      </button>
-      <button class="action-sheet-btn" id="hideArticle">
-        <span>👁️</span> Hide Article
-      </button>
-      <button class="action-sheet-btn" id="shareArticle">
-        <span>📤</span> Share
-      </button>
     </div>
   </div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
+  <div class="toggle-section" id="hintsSection">
+    <div class="toggle-header">
+      <span class="toggle-title">Terminal Interface Guide</span>
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="toggle-content">
+      <div class="hint-content">
+        <strong>COMMAND INTERFACE:</strong> Tap source to SOLO | Long-press to toggle | Tap headline to expand | Long-press headline to open in new tab | Auto-refresh every 2 minutes
+      </div>
+    </div>
+  </div>
+  
+  <div class="src-grid" id="sourceToggles"></div>
+  <div class="list" id="feedList"></div>
+  <div class="empty" id="emptyMsg" style="display:none;">
+    <h3>NO ACTIVE FEEDS</h3>
+    <p>Enable sources above or wait for auto-refresh cycle</p>
+  </div>
+</main>
 
-  <script>
-(function() {
-  'use strict';
+<button class="btn reset" id="resetBtn" title="Reset all sources and settings">RESET</button>
 
-  // News sources - politics-focused only
-  const SOURCES = [
-    { id: 'breitbart', name: 'Breitbart', url: 'https://www.breitbart.com/feed/', lane: 'populist' },
-    { id: 'federalist', name: 'The Federalist', url: 'https://thefederalist.com/feed/', lane: 'conservative' },
-    { id: 'dailywire', name: 'Daily Wire', url: 'https://www.dailywire.com/feeds/rss.xml', lane: 'conservative' },
-    { id: 'gateway', name: 'Gateway Pundit', url: 'https://www.thegatewaypundit.com/feed/', lane: 'populist' },
-    { id: 'revolver', name: 'Revolver News', url: 'https://www.revolver.news/feed/', lane: 'populist' },
-    { id: 'dailycaller', name: 'Daily Caller', url: 'https://dailycaller.com/feed/', lane: 'conservative' },
-    { id: 'redstate', name: 'RedState', url: 'https://redstate.com/feed/', lane: 'conservative' },
-    { id: 'townhall', name: 'Townhall', url: 'https://townhall.com/rss', lane: 'conservative' },
-    { id: 'foxnews', name: 'Fox News', url: 'https://feeds.foxnews.com/foxnews/latest', lane: 'conservative' },
-    { id: 'washexam', name: 'Washington Examiner', url: 'https://www.washingtonexaminer.com/feed', lane: 'conservative' },
-    { id: 'theblaze', name: 'The Blaze', url: 'https://www.theblaze.com/feeds/latest.rss', lane: 'conservative' },
-    { id: 'nypost', name: 'NY Post', url: 'https://nypost.com/feed/', lane: 'populist' }
-  ];
+<script>
+/* ================= ENHANCED PRODUCTION SYSTEM ================= */
 
-  // Gossip/celebrity filter patterns
-  const GOSSIP_SOURCES = [
-    'page six', 'tmz', 'us weekly', 'e!', 'radar online', 'people magazine',
-    'daily mail showbiz', 'ok!', 'perez hilton', 'huffpost entertainment',
-    'buzzfeed celeb', 'vanity fair hollywood', 'the sun showbiz'
-  ];
+const SOURCES = [
+  { id:'breitbart',   name:'Breitbart',            url:'https://www.breitbart.com/feed/',                     lane:'populist' },
+  { id:'federalist',  name:'The Federalist',       url:'https://thefederalist.com/feed/',                     lane:'conservative' },
+  { id:'dailywire',   name:'Daily Wire',           url:'https://www.dailywire.com/feeds/rss.xml',             lane:'conservative' },
+  { id:'gateway',     name:'Gateway Pundit',       url:'https://www.thegatewaypundit.com/feed/',              lane:'populist' },
+  { id:'infowars',    name:'InfoWars',             url:'https://www.infowars.com/rss.xml',                    lane:'populist' },
+  { id:'revolver',    name:'Revolver News',        url:'https://www.revolver.news/feed/',                     lane:'populist' },
+  { id:'natfile',     name:'National File',        url:'https://nationalfile.com/feed/',                      lane:'populist' },
+  { id:'tplvoice',    name:"People's Voice",       url:'https://thepeoplesvoice.tv/feed/',                    lane:'populist' },
+  { id:'libertydaily',name:'Liberty Daily',        url:'https://thelibertydaily.com/rss.xml',                 lane:'populist' },
+  { id:'naturalnews', name:'Natural News',         url:'https://www.naturalnews.com/rss.xml',                 lane:'populist' },
+  { id:'dailycaller', name:'Daily Caller',         url:'https://dailycaller.com/feed/',                       lane:'conservative' },
+  { id:'redstate',    name:'RedState',             url:'https://redstate.com/feed/',                          lane:'conservative' },
+  { id:'amgreat',     name:'AmGreatness',          url:'https://amgreatness.com/feed/',                       lane:'conservative' },
+  { id:'pjm',         name:'PJ Media',             url:'https://pjmedia.com/feeds/latest',                    lane:'conservative' },
+  { id:'nypost',      name:'NY Post',              url:'https://nypost.com/feed/',                            lane:'populist' },
+  { id:'townhall',    name:'Townhall',             url:'https://townhall.com/rss',                            lane:'conservative' },
+  { id:'foxnews',     name:'Fox News',             url:'https://feeds.foxnews.com/foxnews/latest',            lane:'conservative' },
+  { id:'washexam',    name:'Washington Examiner',  url:'https://www.washingtonexaminer.com/feed',             lane:'conservative' },
+  { id:'theblaze',    name:'The Blaze',            url:'https://www.theblaze.com/feeds/latest.rss',           lane:'conservative' }
+];
 
-  const GOSSIP_KEYWORDS = [
-    'celebrity', 'hollywood', 'kardashian', 'jenner', 'swift', 'bieber',
-    'hadid', 'megan fox', 'machine gun kelly', 'travis kelce', 'royal family',
-    'royals', 'prince william', 'princess kate', 'affair', 'breakup',
-    'baby bump', 'red carpet', 'outfit', 'paparazzi', 'fashion', 'style',
-    'dating', 'relationship', 'wedding', 'divorce', 'custody'
-  ];
+const STATE = {
+  enabled: new Set(loadEnabled() || SOURCES.map(s=>s.id)),
+  items: [],
+  view: 'all',
+  lastSolo: null,
+  loading: false,
+  lastFetch: 0,
+  autoRefreshTimer: null,
+  fetchQueue: new Map(),
+  cache: new Map()
+};
 
-  const POLITICS_KEYWORDS = [
-    'election', 'congress', 'senate', 'house', 'governor', 'policy',
-    'bill', 'act', 'supreme court', 'white house', 'administration',
-    'campaign', 'debate', 'ballot', 'legislation', 'geopolitics',
-    'treaty', 'sanction', 'nato', 'minister', 'parliament', 'president',
-    'politics', 'political', 'government', 'federal', 'state', 'democrat',
-    'republican', 'conservative', 'liberal', 'vote', 'voter', 'constitution',
-    'amendment', 'court', 'judge', 'justice', 'law', 'legal', 'regulation'
-  ];
+// Optimized caching system
+const CACHE_TTL = 120000; // 2 minutes
+const MAX_CACHE_SIZE = 50;
 
-  // Application state
-  const state = {
-    articles: [],
-    filteredArticles: [],
-    currentView: 'all',
-    politicsOnly: true,
-    loading: false,
-    lastRefresh: 0,
-    currentArticle: null,
-    cache: new Map(),
-    abortController: null
+function getCacheKey(url) {
+  return btoa(url).slice(0, 20);
+}
+
+function getCachedData(url) {
+  const key = getCacheKey(url);
+  const cached = STATE.cache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+  return null;
+}
+
+function setCachedData(url, data) {
+  const key = getCacheKey(url);
+  
+  // Clean old cache entries
+  if (STATE.cache.size >= MAX_CACHE_SIZE) {
+    const oldestKey = STATE.cache.keys().next().value;
+    STATE.cache.delete(oldestKey);
+  }
+  
+  STATE.cache.set(key, {
+    data: data,
+    timestamp: Date.now()
+  });
+}
+
+// Enhanced ad filtering
+function isLikelyAd(item) {
+  const title = (item.title || '').toLowerCase();
+  const desc = (item.desc || '').toLowerCase();
+  const url = (item.link || '').toLowerCase();
+  
+  const adPatterns = {
+    title: [
+      /sponsored|advertisement|advert|promo|deal:|deals?:|shop|store|buy now|subscribe|newsletter/i,
+      /podcast:|video:|watch:|listen:|download|get yours|limited time|act now|don't miss/i,
+      /free shipping|best price|discount|coupon|sale|offer|special|exclusive deal/i,
+      /click here|learn more|find out|discover|unlock|revealed|secret|amazing/i,
+      /% off|save \$|starting at|from \$|only \$|just \$|\$\d+/i,
+      /must see|you won't believe|shocking|incredible|unbelievable/i
+    ],
+    desc: [
+      /sponsored content|paid promotion|affiliate|referral|commission/i,
+      /subscribe|newsletter|mailing list|email list|follow us|like us|share/i,
+      /buy|purchase|order|shop|store|checkout|cart|payment|credit card/i,
+      /trial|demo|sample|preview|teaser|trailer/i
+    ],
+    url: [
+      /sponsor|advert|ads?|marketing|promo|deals?|shop|store|buy|purchase/i,
+      /subscribe|newsletter|signup|register|join|member/i,
+      /affiliate|referral|partner|tracking|utm_|fbclid|gclid/i,
+      /privacy|terms|legal|disclaimer|cookie/i
+    ]
   };
-
-  // DOM elements
-  const elements = {
-    articleList: document.getElementById('articleList'),
-    emptyState: document.getElementById('emptyState'),
-    totalCount: document.getElementById('totalCount'),
-    sourceCount: document.getElementById('sourceCount'),
-    breakingCount: document.getElementById('breakingCount'),
-    refreshBtn: document.getElementById('refreshBtn'),
-    politicsBtn: document.getElementById('politicsBtn'),
-    filters: document.getElementById('filters'),
-    pullRefresh: document.getElementById('pullRefresh'),
-    actionSheet: document.getElementById('actionSheet'),
-    overlay: document.getElementById('overlay'),
-    toast: document.getElementById('toast')
-  };
-
-  // Utility functions
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+  
+  for (const pattern of adPatterns.title) {
+    if (pattern.test(title)) return true;
   }
-
-  function stripHtml(html) {
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    return div.textContent || div.innerText || '';
+  for (const pattern of adPatterns.desc) {
+    if (pattern.test(desc)) return true;
   }
-
-  function formatTime(dateString) {
-    try {
-      const date = new Date(dateString);
-      const now = new Date();
-      const diffMs = now - date;
-      const diffMins = Math.floor(diffMs / 60000);
-      
-      if (diffMins < 1) return 'now';
-      if (diffMins < 60) return `${diffMins}m`;
-      if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h`;
-      return `${Math.floor(diffMins / 1440)}d`;
-    } catch (e) {
-      return 'unknown';
-    }
+  for (const pattern of adPatterns.url) {
+    if (pattern.test(url)) return true;
   }
+  
+  if (title.length < 10 || title.split(' ').length < 3) return true;
+  if (title.includes('...') && title.length < 30) return true;
+  if (/^\d+\s+(ways?|tips?|secrets?|tricks?)/i.test(title)) return true;
+  
+  return false;
+}
 
-  function getHostname(url) {
-    try {
-      return new URL(url).hostname;
-    } catch (e) {
-      return 'unknown';
-    }
+function loadEnabled() {
+  try { 
+    return JSON.parse(localStorage.getItem('urnews.enabled'));
+  } catch(e) { 
+    return null;
   }
+}
 
-  function showToast(message, type = 'info') {
-    const toast = elements.toast;
-    toast.textContent = message;
-    toast.className = `toast ${type} show`;
-    
-    setTimeout(() => {
-      toast.classList.remove('show');
-    }, 3000);
+function saveEnabled() {
+  localStorage.setItem('urnews.enabled', JSON.stringify([...STATE.enabled]));
+  toast('Configuration saved', 'success');
+}
+
+function resetAll() {
+  if(confirm('Reset all sources and settings? This will reload the page.')) {
+    localStorage.removeItem('urnews.enabled');
+    STATE.enabled = new Set(SOURCES.map(s=>s.id));
+    STATE.lastSolo = null;
+    STATE.view = 'all';
+    STATE.cache.clear();
+    document.querySelector('.chip.active')?.classList.remove('active');
+    document.querySelector('[data-view="all"]')?.classList.add('active');
+    buildSourceToggles();
+    loadFeeds();
+    toast('System reset complete', 'success');
   }
+}
 
-  function normalizeTitle(title) {
-    return title
-      .toLowerCase()
-      .replace(/[^\w\s]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
+function toast(msg, type = 'info') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  
+  setTimeout(() => { 
+    el.style.transition = 'all 0.3s ease'; 
+    el.style.opacity = '0'; 
+    el.style.transform = 'translateX(-50%) translateY(-10px)';
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
+}
+
+function addLongPress(target, fn) {
+  let timer; 
+  const start = () => timer = setTimeout(fn, 500);
+  const end = () => { clearTimeout(timer); timer = null; };
+  
+  target.addEventListener('touchstart', start, {passive: true});
+  target.addEventListener('touchend', end, {passive: true});
+  target.addEventListener('touchcancel', end, {passive: true});
+  target.addEventListener('mousedown', start);
+  target.addEventListener('mouseup', end);
+  target.addEventListener('mouseleave', end);
+}
+
+function fmtTime(ts) {
+  const d = new Date(ts);
+  if (isNaN(d)) return 'UNKNOWN';
+  
+  const now = new Date();
+  const diff = (now - d) / 1000;
+  
+  if (diff < 60) return 'LIVE';
+  if (diff < 3600) return Math.floor(diff / 60) + 'm';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h';
+  if (diff < 86400 * 7) return Math.floor(diff / 86400) + 'd';
+  
+  return d.toLocaleDateString();
+}
+
+// Optimized fetch with better error handling
+async function fetchTextWithFallback(url) {
+  // Check cache first
+  const cached = getCachedData(url);
+  if (cached) return cached;
+  
+  // Check if already fetching
+  if (STATE.fetchQueue.has(url)) {
+    return STATE.fetchQueue.get(url);
   }
-
-  function calculateSimilarity(title1, title2) {
-    const words1 = normalizeTitle(title1).split(' ');
-    const words2 = normalizeTitle(title2).split(' ');
-    
-    const set1 = new Set(words1);
-    const set2 = new Set(words2);
-    
-    const intersection = new Set([...set1].filter(x => set2.has(x)));
-    const union = new Set([...set1, ...set2]);
-    
-    return intersection.size / union.size;
-  }
-
-  // Politics/gossip filtering
-  function isPolitical(article) {
-    if (!state.politicsOnly) return true;
-    
-    const text = `${article.title} ${article.description || ''}`.toLowerCase();
-    
-    // Check for gossip source patterns
-    for (const pattern of GOSSIP_SOURCES) {
-      if (article.source.toLowerCase().includes(pattern)) {
-        return false;
+  
+  const proxies = [
+    url => fetch(url, {
+      mode: 'cors', 
+      cache: 'no-cache',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; NewsBot/1.0)',
+        'Accept': 'application/rss+xml, application/xml, text/xml, */*'
       }
-    }
-    
-    // Check for gossip keywords
-    for (const keyword of GOSSIP_KEYWORDS) {
-      if (text.includes(keyword)) {
-        return false;
-      }
-    }
-    
-    // Check for political keywords (bonus points)
-    let politicalScore = 0;
-    for (const keyword of POLITICS_KEYWORDS) {
-      if (text.includes(keyword)) {
-        politicalScore++;
-      }
-    }
-    
-    // If we have political indicators, it's likely political
-    if (politicalScore >= 2) return true;
-    
-    // Default to keeping if uncertain (better than filtering out
-// valid political content)
-    return true;
-  }
-
-  function isBreaking(article) {
-    const text = `${article.title} ${article.description || ''}`.toLowerCase();
-    const breakingPatterns = [
-      'breaking', 'urgent', 'alert', 'just in', 'developing', 'live',
-      'happening now', 'this just in', 'confirmed', 'exclusive'
-    ];
-    
-    return breakingPatterns.some(pattern => text.includes(pattern));
-  }
-
-  function getSentiment(article) {
-    const text = `${article.title} ${article.description || ''}`.toLowerCase();
-    
-    const positive = ['victory', 'win', 'success', 'triumph', 'boom', 'surge'];
-    const negative = ['crisis', 'collapse', 'scandal', 'fraud', 'attack', 'threat'];
-    
-    let score = 0;
-    positive.forEach(word => { if (text.includes(word)) score += 1; });
-    negative.forEach(word => { if (text.includes(word)) score -= 1; });
-    
-    if (score > 0) return 'positive';
-    if (score < 0) return 'negative';
-    return 'neutral';
-  }
-
-  // Fetch with timeout and error handling
-  async function fetchWithTimeout(url, timeout = 12000) {
-    if (state.abortController) {
-      state.abortController.abort();
-    }
-    
-    state.abortController = new AbortController();
-    
-    const proxies = [
-      url => fetch(url, { 
-        signal: state.abortController.signal,
-        headers: { 'User-Agent': 'NewsBot/1.0' }
-      }),
-      url => fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, {
-        signal: state.abortController.signal
-      }),
-      url => fetch(`https://r.jina.ai/${url}`, {
-        signal: state.abortController.signal
-      })
-    ];
-
+    }),
+    url => fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url)),
+    url => fetch('https://r.jina.ai/http/' + url.replace(/^https?:\/\//, ''))
+  ];
+  
+  const fetchPromise = (async () => {
     for (let i = 0; i < proxies.length; i++) {
-      try {
+      try { 
         const response = await Promise.race([
           proxies[i](url),
           new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Timeout')), timeout)
+            setTimeout(() => reject(new Error('Timeout')), i === 0 ? 5000 : 8000)
           )
         ]);
         
         if (response.ok) {
           const text = await response.text();
-          if (text && text.length > 100) {
+          if (text.length > 100) {
+            setCachedData(url, text);
+            STATE.fetchQueue.delete(url);
             return text;
           }
         }
-      } catch (error) {
-        if (error.name === 'AbortError') throw error;
-        console.warn(`Proxy ${i + 1} failed:`, error.message);
-        continue;
+      } catch(e) { 
+        console.warn(`Proxy ${i+1} failed for ${url}:`, e.message);
+        continue; 
       }
     }
-    
-    throw new Error('All proxies failed');
-  }
+    STATE.fetchQueue.delete(url);
+    throw new Error('All fetch methods failed for ' + url);
+  })();
+  
+  STATE.fetchQueue.set(url, fetchPromise);
+  return fetchPromise;
+}
 
-  // RSS parsing
-  function parseRSS(xmlText, source) {
-    try {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(xmlText, 'text/xml');
-      
-      if (doc.querySelector('parsererror')) {
-        throw new Error('Invalid XML');
-      }
-      
-      const items = Array.from(doc.querySelectorAll('item, entry'));
-      
-      return items.slice(0, 20).map(item => {
-        const title = item.querySelector('title')?.textContent?.trim() || '';
-        const link = item.querySelector('link')?.getAttribute('href') || 
-                    item.querySelector('link')?.textContent?.trim() || '';
-        const description = stripHtml(
-          item.querySelector('description, summary, content\\:encoded')?.textContent || ''
-        ).slice(0, 200);
-        const pubDate = item.querySelector('pubDate, updated, published')?.textContent || '';
+function parseRSS(xmlString, source) {
+  if (!xmlString.trim().startsWith('<')) {
+    const lines = xmlString.split('\n').map(l => l.trim()).filter(Boolean);
+    const items = [];
+    
+    for (let i = 0; i < lines.length && items.length < 12; i++) {
+      const line = lines[i];
+      if (/^#+/.test(line)) {
+        const title = line.replace(/^#+\s*/, '').trim();
+        let link = '';
         
-        return {
-          id: `${source.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          title,
-          link,
-          description,
-          pubDate,
-          source: source.name,
-          sourceId: source.id,
-          lane: source.lane,
-          isBreaking: isBreaking({ title, description }),
-          sentiment: getSentiment({ title, description })
-        };
-      }).filter(article => 
-        article.title && 
-        article.link && 
-        article.title.length > 10 &&
-        isPolitical(article)
-      );
-    } catch (error) {
-      console.error('RSS parse error:', error);
-      return [];
-    }
-  }
-
-  // Deduplication
-  function deduplicateArticles(articles) {
-    const seen = new Map();
-    const deduplicated = [];
-    
-    for (const article of articles) {
-      const normalizedTitle = normalizeTitle(article.title);
-      let isDuplicate = false;
-      
-      // Check against existing articles
-      for (const [existingTitle, existingArticle] of seen) {
-        if (calculateSimilarity(normalizedTitle, existingTitle) > 0.85) {
-          isDuplicate = true;
-          // Keep the one with better description or more recent
-          if (article.description.length > existingArticle.description.length) {
-            const index = deduplicated.indexOf(existingArticle);
-            if (index !== -1) {
-              deduplicated[index] = article;
-              seen.set(normalizedTitle, article);
-            }
+        for (let j = i + 1; j < i + 6 && j < lines.length; j++) {
+          const match = lines[j].match(/https?:\/\/\S+/);
+          if (match) {
+            link = match[0].replace(/[)\]]+$/, '');
+            break;
           }
-          break;
         }
-      }
-      
-      if (!isDuplicate) {
-        seen.set(normalizedTitle, article);
-        deduplicated.push(article);
-      }
-    }
-    
-    return deduplicated;
-  }
-
-  // Article rendering
-  function createSkeletonCard() {
-    const article = document.createElement('article');
-    article.className = 'article-skeleton';
-    article.innerHTML = `
-      <div class="skeleton-line"></div>
-      <div class="skeleton-line"></div>
-      <div class="skeleton-line"></div>
-      <div class="skeleton-line"></div>
-    `;
-    return article;
-  }
-
-  function createArticleCard(article, index) {
-    const articleEl = document.createElement('article');
-    articleEl.className = 'article';
-    articleEl.style.animationDelay = `${index * 50}ms`;
-    
-    const hostname = getHostname(article.link);
-    const timeString = formatTime(article.pubDate);
-    
-    articleEl.innerHTML = `
-      <div class="article-header">
-        <img class="article-icon" 
-             src="https://www.google.com/s2/favicons?domain=${escapeHtml(hostname)}&sz=64" 
-             alt="" 
-             loading="lazy">
-        <div class="article-content">
-          <h3 class="article-title">${escapeHtml(article.title)}</h3>
-          <div class="article-meta">
-            <span class="article-source">${escapeHtml(article.source)}</span>
-            <span>•</span>
-            <span class="article-time">${escapeHtml(timeString)}</span>
-            ${article.isBreaking ? '<span class="breaking-badge">Breaking</span>' : ''}
-            <span class="sentiment-badge sentiment-${article.sentiment}">${article.sentiment}</span>
-          </div>
-        </div>
-        <button class="action-btn" aria-label="Article actions">⋮</button>
-      </div>
-    `;
-    
-    // Add click handlers
-    const header = articleEl.querySelector('.article-header');
-    const actionBtn = articleEl.querySelector('.action-btn');
-    
-    header.addEventListener('click', (e) => {
-      if (e.target === actionBtn) return;
-      window.open(article.link, '_blank', 'noopener,noreferrer');
-    });
-    
-    actionBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      showActionSheet(article);
-    });
-    
-    return articleEl;
-  }
-
-  // Action sheet
-  function showActionSheet(article) {
-    state.currentArticle = article;
-    elements.overlay.classList.add('show');
-    elements.actionSheet.classList.add('show');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function hideActionSheet() {
-    elements.overlay.classList.remove('show');
-    elements.actionSheet.classList.remove('show');
-    document.body.style.overflow = '';
-    state.currentArticle = null;
-  }
-
-  // Batch rendering for performance
-  function renderArticles() {
-    elements.articleList.innerHTML = '';
-    
-    if (state.filteredArticles.length === 0) {
-      elements.emptyState.style.display = 'block';
-      return;
-    }
-    
-    elements.emptyState.style.display = 'none';
-    
-    // Create document fragment for batch DOM updates
-    const fragment = document.createDocumentFragment();
-    
-    // Render in batches of 20 to avoid blocking
-    const batchSize = 20;
-    let currentBatch = 0;
-    
-    function renderBatch() {
-      const start = currentBatch * batchSize;
-      const end = Math.min(start + batchSize, state.filteredArticles.length);
-      
-      for (let i = start; i < end; i++) {
-        const article = state.filteredArticles[i];
-        const card = createArticleCard(article, i);
-        fragment.appendChild(card);
-      }
-      
-      elements.articleList.appendChild(fragment);
-      currentBatch++;
-      
-      if (end < state.filteredArticles.length) {
-        requestAnimationFrame(renderBatch);
-      }
-    }
-    
-    // Start first batch
-    requestAnimationFrame(renderBatch);
-  }
-
-  // Filtering
-  function applyFilters() {
-    let filtered = state.articles;
-    
-    // Apply view filter
-    if (state.currentView !== 'all') {
-      switch (state.currentView) {
-        case 'conservative':
-          filtered = filtered.filter(a => a.lane === 'conservative');
-          break;
-        case 'populist':
-          filtered = filtered.filter(a => a.lane === 'populist');
-          break;
-        case 'breaking':
-          filtered = filtered.filter(a => a.isBreaking);
-          break;
-      }
-    }
-    
-    state.filteredArticles = filtered;
-    updateStats();
-    renderArticles();
-  }
-
-  // Stats update
-  function updateStats() {
-    elements.totalCount.textContent = state.filteredArticles.length;
-    elements.sourceCount.textContent = new Set(state.articles.map(a => a.sourceId)).size;
-    elements.breakingCount.textContent = state.filteredArticles.filter(a => a.isBreaking).length;
-  }
-
-  // Loading articles with staggered fetch
-  async function loadArticles() {
-    if (state.loading) return;
-    
-    const now = Date.now();
-    if (now - state.lastRefresh < 30000) { // 30 second rate limit
-      showToast('Please wait before refreshing again', 'info');
-      return;
-    }
-    
-    state.loading = true;
-    state.lastRefresh = now;
-    elements.refreshBtn.textContent = 'Loading...';
-    elements.refreshBtn.disabled = true;
-    
-    // Show skeleton loaders
-    elements.articleList.innerHTML = '';
-    for (let i = 0; i < 8; i++) {
-      elements.articleList.appendChild(createSkeletonCard());
-    }
-    
-    try {
-      const results = [];
-      
-      // Stagger requests to avoid overwhelming servers
-      for (let i = 0; i < SOURCES.length; i += 3) {
-        const batch = SOURCES.slice(i, i + 3);
-        const batchPromises = batch.map(async source => {
-          try {
-            // Check cache first (5 minute TTL)
-            const cacheKey = `${source.id}-${Math.floor(now / 300000)}`;
-            if (state.cache.has(cacheKey)) {
-              return state.cache.get(cacheKey);
-            }
-            
-            const xmlText = await fetchWithTimeout(source.url);
-            const articles = parseRSS(xmlText, source);
-            
-            // Cache the result
-            state.cache.set(cacheKey, articles);
-            
-            return articles;
-          } catch (error) {
-            console.warn(`Failed to load ${source.name}:`, error.message);
-            return [];
+        
+        if (title && link) {
+          const item = {
+            title,
+            link,
+            pubDate: new Date().toISOString(),
+            source: source.name,
+            lane: source.lane,
+            id: source.id,
+            desc: '',
+            isBreaking: isBreakingNews(title, '')
+          };
+          
+          if (!isLikelyAd(item)) {
+            items.push(item);
           }
-        });
-        
-        const batchResults = await Promise.allSettled(batchPromises);
-        results.push(...batchResults
-          .filter(r => r.status === 'fulfilled')
-          .map(r => r.value)
-        );
-        
-        // Small delay between batches
-        if (i + 3 < SOURCES.length) {
-          await new Promise(resolve => setTimeout(resolve, 500));
         }
       }
-      
-      // Flatten, deduplicate, and sort
-      const allArticles = results.flat();
-      const deduplicated = deduplicateArticles(allArticles);
-      
-      state.articles = deduplicated
-        .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
-        .slice(0, 200); // Limit total articles
-      
-      applyFilters();
-      
-      showToast(`Loaded ${state.articles.length} articles`, 'success');
-      
-      // Clean old cache entries
-      if (state.cache.size > 50) {
-        const oldKeys = Array.from(state.cache.keys()).slice(0, 20);
-        oldKeys.forEach(key => state.cache.delete(key));
-      }
-      
-    } catch (error) {
-      console.error('Load failed:', error);
-      showToast('Failed to load articles', 'error');
-      
-      // Try to load from cache as fallback
-      try {
-        const cached = JSON.parse(localStorage.getItem('ur-news-cache') || '[]');
-        if (cached.length > 0) {
-          state.articles = cached;
-          applyFilters();
-          showToast('Loaded cached articles', 'info');
-        }
-      } catch (e) {
-        elements.emptyState.style.display = 'block';
-      }
-    } finally {
-      state.loading = false;
-      elements.refreshBtn.textContent = 'Refresh';
-      elements.refreshBtn.disabled = false;
     }
+    return items;
   }
 
-  // Pull to refresh
-  let pullStartY = 0;
-  let pullCurrentY = 0;
-  let pullDiff = 0;
-  let isPulling = false;
+  const doc = new DOMParser().parseFromString(xmlString, 'text/xml');
+  if (doc.getElementsByTagName('parsererror')[0]) return [];
 
-  function handleTouchStart(e) {
-    if (window.scrollY > 0) return;
-    pullStartY = e.touches[0].clientY;
+  const items = Array.from(doc.querySelectorAll('item, entry'))
+    .slice(0, 25)
+    .map(item => {
+      const title = (item.querySelector('title')?.textContent || '').trim();
+      const link = (item.querySelector('link')?.getAttribute('href') || 
+                   item.querySelector('link')?.textContent || '').trim();
+      const pubDate = (item.querySelector('pubDate, updated, published')?.textContent || '').trim();
+      const desc = (item.querySelector('description, summary, content\\:encoded')?.textContent || '').trim();
+      
+      return {
+        title,
+        link,
+        pubDate: pubDate || new Date().toISOString(),
+        source: source.name,
+        lane: source.lane,
+        id: source.id,
+        desc: stripHTML(desc),
+        isBreaking: isBreakingNews(title, desc)
+      };
+    })
+    .filter(x => x.title && x.link && !isLikelyAd(x));
+
+  return items;
+}
+
+function isBreakingNews(title, desc) {
+  const text = (title + " " + (desc || "")).toLowerCase();
+  const breakingPatterns = [
+    /breaking|urgent|alert|just in|developing|live update|now:|confirmed/i,
+    /exclusive|bombshell|major|critical|emergency/i,
+    /happening now|this just in|reports|sources say/i
+  ];
+  
+  return breakingPatterns.some(pattern => pattern.test(text));
+}
+
+function sentimentAnalysis(title, desc) {
+  const text = (title + " " + (desc || "")).toLowerCase();
+  
+  const patterns = {
+    positive: [
+      "victory", "triumph", "success", "win", "wins", "boom", "surge", "rally",
+      "cleared", "acquit", "record high", "optimism", "celebrate", "achievement"
+    ],
+    alarm: [
+      "emergency", "crisis", "catastrophe", "collapse", "panic", "terror",
+      "shooting", "assassination", "bomb", "attack", "threat", "fatal", "dead",
+      "war", "missile", "riot", "explosion", "nuclear", "lockdown"
+    ],
+    angry: [
+      "fraud", "rigged", "corrupt", "betrayal", "sellout", "traitor",
+      "censorship", "witch hunt", "scandal", "indicted", "arrest", "impeach",
+      "ban", "boycott", "exposed", "cover-up", "lies"
+    ],
+    grim: [
+      "recession", "inflation", "crisis", "shortage", "decline", "loss",
+      "debt", "deficit", "crime", "illegal", "overdose", "bankrupt", "layoffs"
+    ]
+  };
+  
+  let score = 0;
+  
+  for (const word of patterns.positive) {
+    if (text.includes(word)) score += 2;
   }
-
-  function handleTouchMove(e) {
-    if (window.scrollY > 0 || state.loading) return;
-    
-    pullCurrentY = e.touches[0].clientY;
-    pullDiff = pullCurrentY - pullStartY;
-    
-    if (pullDiff > 0) {
-      isPulling = true;
-      e.preventDefault();
-      
-      const pullDistance = Math.min(pullDiff * 0.5, 60);
-      elements.pullRefresh.style.marginTop = `${pullDistance - 60}px`;
-      
-      if (pullDistance >= 50) {
-        elements.pullRefresh.classList.add('active');
-      }
-    }
+  for (const word of patterns.alarm) {
+    if (text.includes(word)) score -= 4;
   }
-
-  function handleTouchEnd() {
-    if (!isPulling) return;
-    
-    isPulling = false;
-    elements.pullRefresh.style.marginTop = '-60px';
-    
-    if (elements.pullRefresh.classList.contains('active')) {
-      elements.pullRefresh.classList.remove('active');
-      loadArticles();
-    }
+  for (const word of patterns.angry) {
+    if (text.includes(word)) score -= 3;
   }
-
-  // Service Worker for caching
-  function registerServiceWorker() {
-    if (!('serviceWorker' in navigator)) return;
-    
-    const swCode = `
-      const CACHE_NAME = 'ur-news-v1';
-      const urlsToCache = ['/'];
-      
-      self.addEventListener('install', event => {
-        event.waitUntil(
-          caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(urlsToCache))
-        );
-      });
-      
-      self.addEventListener('fetch', event => {
-        if (event.request.url.includes('/feed') || event.request.url.includes('rss')) {
-          event.respondWith(
-            caches.open(CACHE_NAME).then(cache => {
-              return fetch(event.request).then(response => {
-                cache.put(event.request, response.clone());
-                return response;
-              }).catch(() => {
-                return cache.match(event.request);
-              });
-            })
-          );
-        }
-      });
-    `;
-    
-    const blob = new Blob([swCode], { type: 'application/javascript' });
-    const swUrl = URL.createObjectURL(blob);
-    
-    navigator.serviceWorker.register(swUrl).catch(console.warn);
+  for (const word of patterns.grim) {
+    if (text.includes(word)) score -= 2;
   }
+  
+  if (score >= 3) return { tag: "POSITIVE", cls: "hope" };
+  if (score <= -4) return { tag: "CRITICAL", cls: "alarm" };
+  if (score <= -3) return { tag: "HOSTILE", cls: "angry" };
+  if (score <= -1) return { tag: "NEGATIVE", cls: "grim" };
+  
+  return { tag: "NEUTRAL", cls: "neutral" };
+}
 
-  // Event listeners
-  function setupEventListeners() {
-    // Refresh button
-    elements.refreshBtn.addEventListener('click', loadArticles);
+function stripHTML(html) {
+  if (!html) return '';
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  return (temp.textContent || temp.innerText || '').slice(0, 250);
+}
+
+// Optimized feed loading with parallel processing
+async function loadFeeds() {
+  if (STATE.loading) return;
+  
+  const now = Date.now();
+  if (now - STATE.lastFetch < 15000) {
+    toast('Rate limited - wait 15 seconds', 'info');
+    return;
+  }
+  
+  STATE.loading = true;
+  STATE.lastFetch = now;
+  
+  try {
+    const enabledSources = SOURCES.filter(s => STATE.enabled.has(s.id));
     
-    // Politics filter toggle
-    elements.politicsBtn.addEventListener('click', () => {
-      state.politicsOnly = !state.politicsOnly;
-      elements.politicsBtn.classList.toggle('active', state.politicsOnly);
-      elements.politicsBtn.textContent = state.politicsOnly ? 'Politics Only' : 'All Topics';
-      applyFilters();
-    });
+    // Parallel fetch with controlled concurrency
+    const BATCH_SIZE = 6;
+    const results = [];
     
-    // View filters
-    elements.filters.addEventListener('click', (e) => {
-      if (!e.target.classList.contains('filter-chip')) return;
-      
-      elements.filters.querySelectorAll('.filter-chip').forEach(chip => {
-        chip.classList.remove('active');
-      });
-      
-      e.target.classList.add('active');
-      state.currentView = e.target.dataset.view;
-      applyFilters();
-    });
-    
-    // Action sheet
-    elements.overlay.addEventListener('click', hideActionSheet);
-    elements.closeActionSheet.addEventListener('click', hideActionSheet);
-    
-    document.getElementById('openArticle').addEventListener('click', () => {
-      if (state.currentArticle) {
-        window.open(state.currentArticle.link, '_blank', 'noopener,noreferrer');
-        hideActionSheet();
-      }
-    });
-    
-    document.getElementById('saveArticle').addEventListener('click', () => {
-      if (state.currentArticle) {
-        const saved = JSON.parse(localStorage.getItem('ur-news-saved') || '[]');
-        saved.unshift(state.currentArticle);
-        localStorage.setItem('ur-news-saved', JSON.stringify(saved.slice(0, 100)));
-        showToast('Article saved', 'success');
-        hideActionSheet();
-      }
-    });
-    
-    document.getElementById('shareArticle').addEventListener('click', async () => {
-      if (state.currentArticle && navigator.share) {
+    for (let i = 0; i < enabledSources.length; i += BATCH_SIZE) {
+      const batch = enabledSources.slice(i, i + BATCH_SIZE);
+      const batchTasks = batch.map(async source => {
         try {
-          await navigator.share({
-            title: state.currentArticle.title,
-            url: state.currentArticle.link
-          });
-          hideActionSheet();
-        } catch (e) {
-          // Fallback to clipboard
-          navigator.clipboard?.writeText(state.currentArticle.link);
-          showToast('Link copied to clipboard', 'success');
-          hideActionSheet();
+          const text = await fetchTextWithFallback(source.url);
+          return parseRSS(text, source);
+        } catch (error) {
+          console.warn(`Failed to load ${source.name}:`, error.message);
+          return [];
         }
+      });
+      
+      const batchResults = await Promise.allSettled(batchTasks);
+      results.push(...batchResults);
+      
+      // Small delay between batches to prevent overwhelming
+      if (i + BATCH_SIZE < enabledSources.length) {
+        await new Promise(resolve => setTimeout(resolve, 200));
       }
+    }
+    
+    const allItems = results
+      .filter(r => r.status === 'fulfilled')
+      .flatMap(r => r.value)
+      .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+    
+    STATE.items = allItems.slice(0, 200);
+    
+    updateStats();
+    render();
+    
+    const updateTime = new Date();
+    document.getElementById('lastUpdated').textContent = 
+      `• UPDATED ${updateTime.toLocaleTimeString()}`;
+    
+    toast(`Loaded ${STATE.items.length} articles from ${enabledSources.length} sources`, 'success');
+    
+  } catch (error) {
+    console.error('Feed loading failed:', error);
+    toast('Feed loading failed - check connection', 'error');
+  } finally {
+    STATE.loading = false;
+  }
+}
+
+function updateStats() {
+  const filtered = STATE.items.filter(item => STATE.enabled.has(item.id));
+  const breaking = filtered.filter(item => item.isBreaking);
+  
+  document.getElementById('totalArticles').textContent = filtered.length;
+  document.getElementById('activeSources').textContent = STATE.enabled.size;
+  document.getElementById('breakingCount').textContent = breaking.length;
+}
+
+function createCard(item) {
+  const article = document.createElement('article');
+  article.className = 'card';
+  article.setAttribute('role', 'article');
+  
+  const hostname = getHostname(item.link);
+  const sentiment = sentimentAnalysis(item.title || '', item.desc || '');
+  const timeString = fmtTime(item.pubDate);
+  
+  article.innerHTML = `
+
+  <div class="card-head" role="button" tabindex="0" aria-expanded="false">
+      <span class="favicon" style="background-image:url('https://www.google.com/s2/favicons?domain=${hostname}&sz=64');" aria-hidden="true"></span>
+      <div>
+        <div class="titleline">
+          ${escapeHTML(item.title)}
+          ${item.isBreaking ? '<span class="breaking-indicator">BREAKING</span>' : ''}
+        </div>
+        <div class="tag">
+          ${escapeHTML(item.source)} • <span class="time">${escapeHTML(timeString)}</span>
+          <span class="badge ${sentiment.cls}">${sentiment.tag}</span>
+        </div>
+      </div>
+      <div class="expand-btn">▶</div>
+    </div>
+    <div class="hline"></div>
+    <div class="card-body">
+      <div>${escapeHTML(item.desc || 'No summary available.')}</div>
+      <a href="${escapeHTML(item.link)}" target="_blank" rel="noopener" class="article-link">
+        OPEN ARTICLE ↗
+      </a>
+    </div>
+  `;
+  
+  const header = article.querySelector('.card-head');
+  const expandBtn = article.querySelector('.expand-btn');
+  
+  header.addEventListener('click', () => {
+    const isOpen = article.classList.toggle('open');
+    header.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    expandBtn.textContent = isOpen ? '▼' : '▶';
+  });
+  
+  addLongPress(header, () => {
+    window.open(item.link, '_blank', 'noopener');
+    toast('Opening in new tab...', 'info');
+  });
+  
+  return article;
+}
+
+function render() {
+  const feedList = document.getElementById('feedList');
+  const emptyMsg = document.getElementById('emptyMsg');
+  
+  feedList.innerHTML = '';
+  
+  let filteredItems = STATE.items.filter(item => STATE.enabled.has(item.id));
+  
+  // Apply view filters
+  switch (STATE.view) {
+    case 'conservative':
+      filteredItems = filteredItems.filter(item => item.lane === 'conservative');
+      break;
+    case 'populist':
+      filteredItems = filteredItems.filter(item => item.lane === 'populist');
+      break;
+    case 'breaking':
+      filteredItems = filteredItems.filter(item => item.isBreaking);
+      break;
+  }
+  
+  if (!filteredItems.length) {
+    emptyMsg.style.display = 'block';
+    return;
+  } else {
+    emptyMsg.style.display = 'none';
+  }
+  
+  if (STATE.view === 'by-source') {
+    const grouped = {};
+    for (const item of filteredItems) {
+      if (!grouped[item.source]) grouped[item.source] = [];
+      grouped[item.source].push(item);
+    }
+    
+    Object.keys(grouped).sort().forEach(sourceName => {
+      const header = document.createElement('div');
+      header.style.cssText = `
+        margin: 2rem 0 1.5rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        border-bottom: 2px solid var(--line);
+        padding-bottom: 0.5rem;
+        background: linear-gradient(90deg, var(--accent), var(--info), var(--accent));
+        background-size: 200% 200%;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shimmer 3s ease-in-out infinite;
+      `;
+      header.textContent = `${sourceName} • ${grouped[sourceName].length} ARTICLES`;
+      feedList.appendChild(header);
+      
+      grouped[sourceName].slice(0, 20).forEach(item => {
+        feedList.appendChild(createCard(item));
+      });
     });
-    
-    // Pull to refresh
-    document.addEventListener('touchstart', handleTouchStart, { passive: false });
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd);
-    
-    // Visibility change handling
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        // Auto-refresh if data is stale (10+ minutes)
-        if (Date.now() - state.lastRefresh > 600000) {
-          loadArticles();
-        }
-      }
+  } else {
+    filteredItems.slice(0, 80).forEach(item => {
+      feedList.appendChild(createCard(item));
     });
-    
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'r' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        loadArticles();
+  }
+  
+  updateStats();
+}
+
+function buildSourceToggles() {
+  const container = document.getElementById('sourceToggles');
+  container.innerHTML = '';
+  
+  SOURCES.forEach(source => {
+    const button = document.createElement('button');
+    button.className = 'src' + (STATE.enabled.has(source.id) ? ' on' : '');
+    button.textContent = source.name;
+    button.dataset.id = source.id;
+    button.setAttribute('aria-pressed', STATE.enabled.has(source.id) ? 'true' : 'false');
+
+    button.addEventListener('click', () => {
+      const sourceId = button.dataset.id;
+      const isAlreadySolo = (STATE.enabled.size === 1 && STATE.enabled.has(sourceId));
+      
+      if (!isAlreadySolo) {
+        STATE.lastSolo = new Set(STATE.enabled);
+        STATE.enabled = new Set([sourceId]);
+        updateSoloState(sourceId);
+        toast(`SOLO MODE: ${source.name}`, 'info');
+      } else {
+        STATE.enabled = STATE.lastSolo && STATE.lastSolo.size ? 
+          new Set(STATE.lastSolo) : 
+          new Set(SOURCES.map(s => s.id));
+        clearSoloState();
+        toast('SOLO MODE DISABLED', 'info');
       }
       
-      if (e.key === 'Escape') {
-        hideActionSheet();
+      updateButtonStates();
+      render();
+      saveEnabled();
+    });
+
+    addLongPress(button, () => {
+      const sourceId = button.dataset.id;
+      
+      if (STATE.enabled.has(sourceId)) {
+        STATE.enabled.delete(sourceId);
+      } else {
+        STATE.enabled.add(sourceId);
       }
+      
+      if (STATE.enabled.size === 0) {
+        STATE.enabled = new Set([sourceId]);
+      }
+      
+      STATE.lastSolo = null;
+      clearSoloState();
+      updateButtonStates();
+      render();
+      saveEnabled();
+      
+      const action = STATE.enabled.has(sourceId) ? 'Enabled' : 'Disabled';
+      toast(`${action} ${source.name}`, 'info');
+    });
+
+    container.appendChild(button);
+  });
+
+  function updateButtonStates() {
+    document.querySelectorAll('.src').forEach(btn => {
+      const isEnabled = STATE.enabled.has(btn.dataset.id);
+      btn.classList.toggle('on', isEnabled);
+      btn.setAttribute('aria-pressed', isEnabled ? 'true' : 'false');
     });
   }
-
-  // Persistence
-  function saveState() {
-    try {
-      localStorage.setItem('ur-news-cache', JSON.stringify(state.articles.slice(0, 50)));
-    } catch (e) {
-      // Storage full or disabled
-    }
+  
+  function updateSoloState(soloId) {
+    document.querySelectorAll('.src').forEach(btn => {
+      btn.classList.toggle('solo', btn.dataset.id === soloId);
+    });
   }
-
-  function loadState() {
-    try {
-      const cached = localStorage.getItem('ur-news-cache');
-      if (cached) {
-        const articles = JSON.parse(cached);
-        if (Array.isArray(articles) && articles.length > 0) {
-          state.articles = articles;
-          applyFilters();
-        }
-      }
-    } catch (e) {
-      // Invalid cache
-    }
+  
+  function clearSoloState() {
+    document.querySelectorAll('.src').forEach(btn => {
+      btn.classList.remove('solo');
+    });
   }
+}
 
-  // Auto-save state periodically
-  setInterval(saveState, 60000);
-  window.addEventListener('beforeunload', saveState);
-
-  // Initialize
-  function init() {
-    setupEventListeners();
-    registerServiceWorker();
-    loadState();
+function buildFilters() {
+  const filtersContainer = document.getElementById('filters');
+  
+  filtersContainer.addEventListener('click', (event) => {
+    const chip = event.target.closest('.chip');
+    if (!chip) return;
     
-    // Initial load with small delay for better perceived performance
-    setTimeout(loadArticles, 100);
+    filtersContainer.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    STATE.view = chip.dataset.view;
+    render();
+  });
+}
+
+function buildToggleSections() {
+  const sections = document.querySelectorAll('.toggle-section');
+  
+  sections.forEach(section => {
+    const header = section.querySelector('.toggle-header');
+    const content = section.querySelector('.toggle-content');
+    const arrow = section.querySelector('.toggle-arrow');
     
-    // Auto-refresh every 10 minutes
-    setInterval(() => {
-      if (!state.loading && document.visibilityState === 'visible') {
-        loadArticles();
+    header.addEventListener('click', () => {
+      const isOpen = section.classList.toggle('open');
+      arrow.textContent = isOpen ? '▼' : '▶';
+    });
+  });
+}
+
+function startAutoRefresh() {
+  // Clear any existing timer
+  if (STATE.autoRefreshTimer) {
+    clearInterval(STATE.autoRefreshTimer);
+  }
+  
+  // Auto-refresh every 2 minutes
+  STATE.autoRefreshTimer = setInterval(() => {
+    if (!STATE.loading && document.visibilityState === 'visible') {
+      loadFeeds();
+    }
+  }, 120000);
+}
+
+function escapeHTML(str = '') {
+  const escapeMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return str.replace(/[&<>"']/g, char => escapeMap[char]);
+}
+
+function getHostname(url) {
+  try {
+    return new URL(url).hostname;
+  } catch (e) {
+    return 'unknown';
+  }
+}
+
+function initialize() {
+  buildFilters();
+  buildSourceToggles();
+  buildToggleSections();
+  
+  document.getElementById('resetBtn').addEventListener('click', resetAll);
+  
+  // Start auto-refresh cycle
+  startAutoRefresh();
+  
+  // Initial load - faster startup
+  setTimeout(loadFeeds, 100);
+  
+  // Handle visibility changes for better performance
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      if (Date.now() - STATE.lastFetch > 180000) { // 3 minutes
+        loadFeeds();
       }
-    }, 600000);
+      startAutoRefresh();
+    } else {
+      if (STATE.autoRefreshTimer) {
+        clearInterval(STATE.autoRefreshTimer);
+      }
+    }
+  });
+  
+  // Performance optimization - preload critical favicons
+  const preloadDomains = ['breitbart.com', 'foxnews.com', 'dailywire.com', 'thegatewaypundit.com'];
+  preloadDomains.forEach(domain => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+    document.head.appendChild(link);
+  });
+  
+  // Performance monitoring
+  const observer = new PerformanceObserver((list) => {
+    for (const entry of list.getEntries()) {
+      if (entry.duration > 100) {
+        console.warn(`Slow operation detected: ${entry.name} took ${entry.duration}ms`);
+      }
+    }
+  });
+  
+  try {
+    observer.observe({ entryTypes: ['measure', 'navigation'] });
+  } catch (e) {
+    // Silently fail on browsers that don't support PerformanceObserver
   }
+}
 
-  // Start the app
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initialize);
+} else {
+  initialize();
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+  if (STATE.autoRefreshTimer) {
+    clearInterval(STATE.autoRefreshTimer);
   }
+  STATE.fetchQueue.clear();
+});
 
-})();
-  </script>
+// Service worker registration for better caching
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('SW registered: ', registration);
+      })
+      .catch(registrationError => {
+        console.log('SW registration failed: ', registrationError);
+      });
+  });
+}
+</script>
 </body>
 </html>
-
-  
