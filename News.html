@@ -1,0 +1,471 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"/>
+<title>ALT NEWS TTY</title>
+<!-- Make iPhone notch/status area match the page background -->
+<meta name="theme-color" content="#0a0f0a" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  /* ===== TERMINAL TTY SKIN (solid background, CRT vibe) ===== */
+  :root{
+    --bg:#0a0f0a;       /* page & safe-area background */
+    --panel:#0c130c;
+    --line:#0f190f;
+    --ink:#d3ffd3;
+    --muted:#82b782;
+    --accent:#6bff9f;
+    --border:#183118;
+    --chip:#0c150c;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  html{background-color:var(--bg)}
+  body{
+    margin:0;
+    background-color:var(--bg); /* SOLID to cover notch/safe area */
+    color:var(--ink);
+    font-family: ui-monospace, Menlo, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    -webkit-font-smoothing:none; text-rendering:optimizeSpeed;
+    padding-top: env(safe-area-inset-top);   /* ensure content isn’t obscured */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  /* faint scanlines only (no gradients that could mismatch status bar) */
+  body::before{
+    content:"";
+    position:fixed; inset:0; pointer-events:none;
+    background: repeating-linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.02) 1px, transparent 1px, transparent 3px);
+    mix-blend-mode:soft-light;
+  }
+
+  header{
+    position:sticky; top:0; z-index:50;
+    background: var(--bg);
+    border-bottom:1px solid var(--border);
+    box-shadow:0 12px 30px rgba(0,0,0,.35);
+  }
+  .bar{ display:flex; gap:.75rem; align-items:center; padding:.7rem .9rem; }
+  .title{ font-weight:800; letter-spacing:.6px; font-size:1rem; flex:1; color:var(--accent); }
+  .blip{width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent); margin-right:.5rem}
+  .meta{font-size:.78rem; color:var(--muted)}
+  .btn{
+    appearance:none; border:1px solid var(--border); background:var(--chip); color:var(--ink);
+    padding:.45rem .7rem; border-radius:6px; font-weight:800; font-size:.85rem;
+  }
+  .btn:active{transform:translateY(1px)}
+  .filters{ display:flex; gap:.5rem; overflow:auto; padding:0 .9rem .6rem .9rem; }
+  .chip{
+    white-space:nowrap; padding:.32rem .55rem; border-radius:999px; border:1px solid var(--border);
+    background:var(--chip); color:var(--muted); font-size:.76rem; cursor:pointer; user-select:none;
+  }
+  .chip.active{background:#0f1e0f; color:var(--ink); border-color:#1c3c1c; box-shadow:0 0 0 1px #1c3c1c inset}
+  main{padding:.7rem .9rem 5.5rem; max-width:840px; margin:0 auto;}
+  .hint{font-size:.72rem; color:var(--muted); margin:.2rem 0 .1rem}
+  .src-grid{display:flex; gap:.45rem; overflow:auto; padding:.2rem 0 .5rem}
+  .src{
+    padding:.34rem .55rem; border-radius:6px; background:var(--chip); border:1px solid var(--border);
+    font-size:.78rem; color:var(--muted); cursor:pointer; user-select:none;
+  }
+  .src.on{color:var(--ink); background:#0f1e0f; border-color:#1c3c1c; box-shadow:0 0 0 1px #1c3c1c inset}
+  .src.solo{outline:1px dashed var(--accent)}
+  .list{display:grid; gap:.55rem; margin-top:.5rem}
+  .card{
+    background:linear-gradient(180deg, rgba(12,21,12,.92), rgba(10,16,10,.98));
+    border:1px solid var(--line); border-radius:8px; overflow:clip;
+    box-shadow:0 10px 24px rgba(0,0,0,.35);
+  }
+  .card-head{
+    display:grid; grid-template-columns:auto 1fr auto; gap:.6rem; align-items:start;
+    padding:.7rem .8rem; cursor:pointer;
+  }
+  .tag{font-size:.7rem; color:var(--muted)}
+  .badge{
+    font-size:.65rem; font-weight:900; padding:.15rem .4rem; border:1px solid var(--border);
+    border-radius:999px; color:var(--ink); background:#0f1e0f; margin-left:.35rem;
+  }
+  .badge.alarm{border-color:#3e5a00; color:#eaff9c}
+  .badge.angry{border-color:#4d1c1c; color:#ffb3b3}
+  .badge.grim{border-color:#3a3a3a; color:#d0d0d0}
+  .badge.hope{border-color:#1c4d2e; color:#b4ffd5}
+  .badge.neutral{border-color:#2a3a2a; color:#bfe6bf}
+  .hline{height:1px; background:var(--line)}
+  .titleline{font-size:.94rem; font-weight:900; line-height:1.2; color:var(--ink)}
+  .time{font-size:.72rem; color:var(--muted)}
+  .card-body{padding:.75rem .8rem; font-size:.9rem; color:#c8f3c8; display:none}
+  .card.open .card-body{display:block; animation:fade .15s ease-out}
+  @keyframes fade{from{opacity:0; transform:translateY(-2px)} to{opacity:1; transform:translateY(0)}}
+  .footer{
+    position:fixed; bottom:0; left:0; right:0; z-index:40;
+    background: var(--bg);
+    padding:.55rem .9rem calc(.85rem + env(safe-area-inset-bottom));
+    border-top:1px solid var(--border);
+  }
+  .footgrid{display:flex; gap:.6rem; align-items:center;}
+  .footgrid .btn{flex:1}
+  .count{font-size:.8rem; color:var(--muted)}
+  a{color:var(--accent); text-decoration:none}
+  .empty{color:var(--muted); text-align:center; padding:1.6rem .5rem}
+  .favicon{
+    width:16px; height:16px; border-radius:3px; transform: translateY(2px);
+    background:#0f1e0f; display:inline-block; background-size:cover; background-position:center;
+    filter:grayscale(100%) brightness(1.2);
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="title"><span class="blip"></span>ALT NEWS TTY <span class="meta" id="lastUpdated"></span></div>
+    <button class="btn" id="refreshBtn" aria-label="Refresh">REFRESH</button>
+  </div>
+  <div class="filters" id="filters">
+    <div class="chip active" data-view="all">ALL</div>
+    <div class="chip" data-view="by-source">BY SOURCE</div>
+    <div class="chip" data-view="conservative">CONSERVATIVE</div>
+    <div class="chip" data-view="populist">POPULIST</div>
+  </div>
+</header>
+
+<main>
+  <div class="hint">Tap a source to <strong>solo</strong> it. Long-press to toggle on/off. Tap a headline to expand; long-press a headline to open.</div>
+  <div class="src-grid" id="sourceToggles"></div>
+  <div class="list" id="feedList"></div>
+  <div class="empty" id="emptyMsg" style="display:none;">No headlines — hit REFRESH.</div>
+</main>
+
+<div class="footer">
+  <div class="footgrid">
+    <div class="count" id="countInfo">0 items</div>
+    <button class="btn" id="saveBtn">SAVE SOURCES</button>
+  </div>
+</div>
+
+<script>
+/* ================= CORE ================= */
+/* Updated sources: removed Blaze, ZeroHedge, Wash. Examiner; added spicier alt feeds */
+const SOURCES = [
+  { id:'breitbart',   name:'Breitbart',            url:'https://www.breitbart.com/feed/',                     lane:'populist' },
+  { id:'federalist',  name:'The Federalist',       url:'https://thefederalist.com/feed/',                     lane:'conservative' },
+  { id:'dailywire',   name:'Daily Wire',           url:'https://www.dailywire.com/feeds/rss.xml',             lane:'conservative' },
+  { id:'gateway',     name:'Gateway Pundit',       url:'https://www.thegatewaypundit.com/feed/',              lane:'populist' },
+  { id:'infowars',    name:'InfoWars',             url:'https://www.infowars.com/rss.xml',                    lane:'populist' },
+  { id:'revolver',    name:'Revolver News',        url:'https://www.revolver.news/feed/',                     lane:'populist' },
+  { id:'natfile',     name:'National File',        url:'https://nationalfile.com/feed/',                      lane:'populist' },
+  { id:'tplvoice',    name:"People's Voice",       url:'https://thepeoplesvoice.tv/feed/',                    lane:'populist' },
+  { id:'libertydaily',name:'Liberty Daily',        url:'https://thelibertydaily.com/rss.xml',                 lane:'populist' },
+  { id:'naturalnews', name:'Natural News',         url:'https://www.naturalnews.com/rss.xml',                 lane:'populist' },
+  { id:'dailycaller', name:'Daily Caller',         url:'https://dailycaller.com/feed/',                       lane:'conservative' },
+  { id:'redstate',    name:'RedState',             url:'https://redstate.com/feed/',                          lane:'conservative' },
+  { id:'amgreat',     name:'AmGreatness',          url:'https://amgreatness.com/feed/',                       lane:'conservative' },
+  { id:'pjm',         name:'PJ Media',             url:'https://pjmedia.com/feeds/latest',                    lane:'conservative' },
+  { id:'nypost',      name:'NY Post',              url:'https://nypost.com/feed/',                            lane:'populist' },
+  { id:'townhall',    name:'Townhall',             url:'https://townhall.com/rss',                            lane:'conservative' }
+];
+
+const STATE = {
+  enabled: new Set(loadEnabled() || SOURCES.map(s=>s.id)),
+  items: [],
+  view: 'all',
+  lastSolo: null
+};
+
+function loadEnabled(){
+  try { return JSON.parse(localStorage.getItem('altnews.enabled')) } catch(e){ return null }
+}
+function saveEnabled(){
+  localStorage.setItem('altnews.enabled', JSON.stringify([...STATE.enabled]));
+  toast('Saved.');
+}
+function toast(msg){
+  const el = document.createElement('div');
+  el.textContent = msg;
+  el.style.position='fixed'; el.style.bottom='72px'; el.style.left='50%'; el.style.transform='translateX(-50%)';
+  el.style.background='#0f1e0f'; el.style.border='1px solid #1c3c1c'; el.style.padding='.45rem .6rem';
+  el.style.borderRadius='6px'; el.style.color='var(--ink)'; el.style.zIndex=99; el.style.boxShadow='0 6px 16px rgba(0,0,0,.35)';
+  document.body.appendChild(el); setTimeout(()=>{ el.style.transition='opacity .25s'; el.style.opacity='0'; setTimeout(()=>el.remove(),250)}, 1000);
+}
+
+/* Long-press helper */
+function addLongPress(target, fn){
+  let t; const start = ()=> t=setTimeout(fn, 450);
+  const end = ()=> { clearTimeout(t); t=null; }
+  target.addEventListener('touchstart', start, {passive:true});
+  target.addEventListener('touchend', end, {passive:true});
+  target.addEventListener('touchcancel', end, {passive:true});
+}
+
+/* Time formatting */
+function fmtTime(ts){
+  const d = new Date(ts);
+  if (isNaN(d)) return '';
+  const now = new Date();
+  const diff = (now - d)/1000;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60)+'m ago';
+  if (diff < 86400) return Math.floor(diff/3600)+'h ago';
+  return d.toLocaleString();
+}
+
+/* Naive ad/promotional filter heuristics */
+function isLikelyAd(item){
+  const t = (item.title||'').toLowerCase();
+  const d = (item.desc||'').toLowerCase();
+  const u = (item.link||'').toLowerCase();
+  const badTitle = /(sponsored|advert|advertisement|promo|deal:|shop|store|buy now|subscribe|newsletter)/;
+  const badPath  = /(sponsor|advert|ads?|subscribe|newsletter|shop|store|deals?|promo|coupons?|terms|privacy)/;
+  const badDesc  = /(sponsored|advertisement|promo|shop now|limited time|subscribe)/;
+  return badTitle.test(t) || badDesc.test(d) || badPath.test(u);
+}
+
+/* CORS-tolerant fetch */
+async function fetchTextWithFallback(url){
+  try{ const r = await fetch(url, {mode:'cors'}); if (r.ok) return await r.text(); }catch(e){}
+  try{ const r = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url)); if (r.ok) return await r.text(); }catch(e){}
+  try{ const r = await fetch('https://r.jina.ai/http/' + url.replace(/^https?:\/\//,'')); if (r.ok) return await r.text(); }catch(e){}
+  throw new Error('Fetch failed for ' + url);
+}
+
+/* Parse RSS/Atom, or scrape from jina fallback */
+function parseRSS(xmlString, source){
+  if (!xmlString.trim().startsWith('<')) {
+    const lines = xmlString.split('\n').map(l=>l.trim()).filter(Boolean);
+    const picks = [];
+    for (let i=0;i<lines.length;i++){
+      const l = lines[i];
+      if (/^#|^##/.test(l)) {
+        const title = l.replace(/^#+\s*/,'').trim();
+        let link = '';
+        for (let j=i+1;j<i+6 && j<lines.length;j++){
+          const m = lines[j].match(/https?:\/\/\S+/);
+          if (m){ link = m[0].replace(/[)\]]+$/,''); break; }
+        }
+        if (title && link) {
+          const it = {title, link, pubDate: new Date().toISOString(), source: source.name, lane: source.lane, id: source.id, desc:''};
+          if (!isLikelyAd(it)) picks.push(it);
+        }
+      }
+      if (picks.length >= 6) break;
+    }
+    return picks;
+  }
+
+  const doc = new DOMParser().parseFromString(xmlString, 'text/xml');
+  if (doc.getElementsByTagName('parsererror')[0]) return [];
+
+  const items = Array.from(doc.querySelectorAll('item, entry')).slice(0, 30).map(it=>{
+    const title = (it.querySelector('title')?.textContent||'').trim();
+    const link = (it.querySelector('link')?.getAttribute('href') || it.querySelector('link')?.textContent || '').trim();
+    const pub = (it.querySelector('pubDate, updated, published')?.textContent||'').trim();
+    const desc = (it.querySelector('description, summary, content\\:encoded')?.textContent||'').trim();
+    return { title, link, pubDate: pub || new Date().toISOString(), source: source.name, lane: source.lane, id: source.id, desc: strip(desc) };
+  }).filter(x=>x.title && x.link && !isLikelyAd(x));
+
+  return items;
+}
+
+/* Simple sentiment scoring for a one-word mood */
+function sentimentWord(title, desc){
+  const text = (title + " " + (desc||"")).toLowerCase();
+
+  const pos = ["win","wins","victory","triumph","surge for","boom","celebrate","acquit","cleared","record high","optimism","upbeat","rally"];
+  const neg_alarm = ["emergency","catastrophe","collapse","panic","terror","lockdown","martial law","shooting","assassination","bomb","attack","threat","fatal","dead","crash","war","missile","riot","explosion","nuclear","apocalypse"];
+  const neg_angry = ["fraud","rigged","corrupt","betray","sellout","traitor","censorship","witch hunt","backlash","outrage","cover-up","lies","scandal","indicted","indictment","arrest","impeach","ban","boycott","sanction"];
+  const neg_grim  = ["recession","inflation","border crisis","fentanyl","crime wave","illegal immigration","shortage","decline","drop","cut","loss","collapse","debt","deficit","surge in crime","overdose","bankrupt"];
+
+  let score = 0, tag = "NEUTRAL", cls = "neutral";
+
+  for (const w of pos){ if (text.includes(w)) score += 2; }
+  for (const w of neg_alarm){ if (text.includes(w)) score -= 3; }
+  for (const w of neg_angry){ if (text.includes(w)) score -= 2; }
+  for (const w of neg_grim){ if (text.includes(w)) score -= 1; }
+
+  if (score >= 2) { tag = "HOPEFUL"; cls="hope"; }
+  else if (score <= -3) { tag = "ALARM"; cls="alarm"; }
+  else if (score == -2) { tag = "ANGRY"; cls="angry"; }
+  else if (score == -1) { tag = "GRIM"; cls="grim"; }
+  return {tag, cls};
+}
+
+function strip(html){
+  if (!html) return '';
+  const tmp = document.createElement('div'); tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+}
+
+async function loadFeeds(){
+  const enabledList = SOURCES.filter(s=>STATE.enabled.has(s.id));
+  const tasks = enabledList.map(async src=>{
+    try{
+      const txt = await fetchTextWithFallback(src.url);
+      return parseRSS(txt, src);
+    }catch(e){
+      console.warn('Failed', src.name, e);
+      return [];
+    }
+  });
+  const results = (await Promise.allSettled(tasks)).flatMap(r=> r.status==='fulfilled' ? r.value : []);
+  results.sort((a,b)=> new Date(b.pubDate) - new Date(a.pubDate));
+  STATE.items = results.slice(0, 160);
+  document.getElementById('lastUpdated').textContent = '· ' + new Date().toLocaleTimeString();
+  render();
+}
+
+/* Cards */
+function card(item){
+  const el = document.createElement('article');
+  el.className = 'card';
+  const host = safeHost(item.link);
+  const mood = sentimentWord(item.title||'', item.desc||'');
+  el.innerHTML = `
+    <div class="card-head" role="button" tabindex="0" aria-expanded="false">
+      <span class="favicon" style="background-image:url('https://www.google.com/s2/favicons?domain=${host}&sz=64');"></span>
+      <div>
+        <div class="titleline">${escapeHTML(item.title)}</div>
+        <div class="tag">
+          ${escapeHTML(item.source)} · <span class="time">${escapeHTML(fmtTime(item.pubDate))}</span>
+          <span class="badge ${mood.cls}">${mood.tag}</span>
+        </div>
+      </div>
+      <div class="time">▶</div>
+    </div>
+    <div class="hline"></div>
+    <div class="card-body">
+      <div>${escapeHTML(item.desc || 'No summary available.')}</div>
+      <div style="margin-top:.6rem;"><a href="${item.link}" target="_blank" rel="noopener">OPEN ↗</a></div>
+    </div>
+  `;
+  const head = el.querySelector('.card-head');
+  head.addEventListener('click', ()=>{
+    const open = el.classList.toggle('open');
+    head.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  addLongPress(head, ()=> window.open(item.link, '_blank'));
+  return el;
+}
+
+/* Render list with filters */
+function render(){
+  const list = document.getElementById('feedList');
+  const empty = document.getElementById('emptyMsg');
+  const countInfo = document.getElementById('countInfo');
+  list.innerHTML = '';
+
+  let items = STATE.items.filter(it=> STATE.enabled.has(it.id));
+  if (STATE.view === 'conservative') items = items.filter(i=> i.lane==='conservative');
+  if (STATE.view === 'populist') items = items.filter(i=> i.lane==='populist');
+
+  countInfo.textContent = items.length + ' items';
+
+  if (!items.length){
+    empty.style.display = 'block';
+    return;
+  } else empty.style.display = 'none';
+
+  if (STATE.view === 'by-source'){
+    const by = {};
+    for (const it of items) { (by[it.source] ||= []).push(it); }
+    Object.keys(by).sort().forEach(src=>{
+      const hdr = document.createElement('div');
+      hdr.className = 'tag'; hdr.style.margin='10px 2px 6px'; hdr.textContent = src + ' • ' + by[src].length;
+      list.appendChild(hdr);
+      by[src].slice(0,24).forEach(it=> list.appendChild(card(it)));
+    });
+  } else {
+    items.slice(0,120).forEach(it=> list.appendChild(card(it)));
+  }
+}
+
+/* Source toggles with SOLO behavior */
+function buildSourceToggles(){
+  const host = document.getElementById('sourceToggles');
+  host.innerHTML = '';
+  SOURCES.forEach(src=>{
+    const b = document.createElement('button');
+    b.className = 'src' + (STATE.enabled.has(src.id) ? ' on' : '');
+    b.textContent = src.name;
+    b.dataset.id = src.id;
+    b.setAttribute('aria-pressed', STATE.enabled.has(src.id) ? 'true' : 'false');
+
+    // Short tap = SOLO this source, tap again to revert
+    b.addEventListener('click', ()=>{
+      const id = b.dataset.id;
+      const onlyThis = new Set([id]);
+      const alreadySolo = (STATE.enabled.size === 1 && STATE.enabled.has(id));
+      if (!alreadySolo){
+        STATE.lastSolo = new Set(STATE.enabled);
+        STATE.enabled = onlyThis;
+        markSolo(id);
+      } else {
+        STATE.enabled = STATE.lastSolo && STATE.lastSolo.size ? new Set(STATE.lastSolo) : new Set(SOURCES.map(s=>s.id));
+        clearSolo();
+      }
+      syncButtons();
+      render();
+    });
+
+    // Long-press = toggle include/exclude
+    addLongPress(b, ()=>{
+      const id = b.dataset.id;
+      if (STATE.enabled.has(id)) STATE.enabled.delete(id); else STATE.enabled.add(id);
+      if (STATE.enabled.size === 0) STATE.enabled = new Set([id]); // never zero
+      STATE.lastSolo = null;
+      clearSolo();
+      syncButtons();
+      render();
+      toast(STATE.enabled.has(id) ? `Enabled ${src.name}` : `Disabled ${src.name}`);
+    });
+
+    host.appendChild(b);
+  });
+
+  function syncButtons(){
+    document.querySelectorAll('.src').forEach(btn=>{
+      const on = STATE.enabled.has(btn.dataset.id);
+      btn.classList.toggle('on', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+  function markSolo(id){
+    document.querySelectorAll('.src').forEach(btn=>{
+      btn.classList.toggle('solo', btn.dataset.id === id);
+    });
+  }
+  function clearSolo(){
+    document.querySelectorAll('.src').forEach(btn=> btn.classList.remove('solo'));
+  }
+}
+
+/* Filter chips */
+function buildFilters(){
+  const filters = document.getElementById('filters');
+  filters.addEventListener('click', (e)=>{
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    filters.querySelectorAll('.chip').forEach(c=> c.classList.remove('active'));
+    chip.classList.add('active');
+    STATE.view = chip.dataset.view;
+    render();
+  });
+}
+
+/* Utils */
+function escapeHTML(str=''){ return str.replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
+function safeHost(url){ try { return new URL(url).hostname; } catch(e){ return '' } }
+
+/* Init */
+function init(){
+  buildFilters();
+  buildSourceToggles();
+  document.getElementById('refreshBtn').addEventListener('click', loadFeeds);
+  document.getElementById('saveBtn').addEventListener('click', saveEnabled);
+  loadFeeds();
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
