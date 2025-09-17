@@ -44,8 +44,6 @@ CHANGELOG:
     --shadow-strong: 0 50px 80px rgba(5, 8, 28, 0.7);
     --card-radius: 22px;
     --tab-bar-height: 78px;
-    --tab-bar-dynamic-offset: 0px;
-    --tab-bar-translate: 0px;
     --gutter: clamp(1rem, 1vw + 1rem, 2.5rem);
     --pull-distance: 0px;
   }
@@ -268,7 +266,9 @@ CHANGELOG:
     flex: 1;
     width: min(1080px, calc(100% - var(--gutter) * 2));
     margin: 0 auto;
-    padding: clamp(1.5rem, 2vw + 1.2rem, 2.75rem) 0 calc(4.5rem + var(--tab-bar-height) + var(--tab-bar-dynamic-offset));
+    padding: clamp(1.5rem, 2vw + 1.2rem, 2.75rem)
+      0
+      calc(4.5rem + var(--tab-bar-height) + env(safe-area-inset-bottom, 0px));
     display: flex;
     flex-direction: column;
     gap: 1.8rem;
@@ -317,6 +317,67 @@ CHANGELOG:
     max-width: 520px;
     color: rgba(238, 240, 255, 0.75);
     font-size: 0.95rem;
+  }
+
+  .intro__signal {
+    margin-top: 1.4rem;
+    padding: 1rem 1.2rem;
+    border-radius: 20px;
+    background: rgba(8, 12, 28, 0.68);
+    border: 1px solid rgba(124, 92, 255, 0.32);
+    box-shadow: 0 28px 80px rgba(6, 10, 32, 0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .intro__signal::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 85% 15%, rgba(124, 92, 255, 0.25), transparent 65%);
+    opacity: 0.65;
+    pointer-events: none;
+  }
+
+  .intro__summary {
+    position: relative;
+    margin: 0;
+    max-width: 640px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: rgba(241, 244, 255, 0.85);
+    letter-spacing: 0.04em;
+    font-weight: 500;
+    z-index: 1;
+  }
+
+  .intro__topics {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    z-index: 1;
+  }
+
+  .intro__topic {
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid rgba(124, 92, 255, 0.4);
+    background: linear-gradient(135deg, rgba(124, 92, 255, 0.28), rgba(74, 209, 255, 0.18));
+    color: rgba(247, 249, 255, 0.88);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    box-shadow: 0 18px 40px rgba(6, 10, 32, 0.45);
   }
 
   .pull-indicator {
@@ -597,6 +658,9 @@ CHANGELOG:
   }
 
   .expand-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-family: 'Space Grotesk', 'Inter', sans-serif;
     font-size: 0.85rem;
     color: var(--muted);
@@ -604,6 +668,8 @@ CHANGELOG:
     border-radius: 999px;
     padding: 0.35rem 0.5rem;
     background: rgba(255, 255, 255, 0.03);
+    min-width: 72px;
+    white-space: nowrap;
     transition: background 0.3s ease, color 0.3s ease;
   }
 
@@ -613,11 +679,11 @@ CHANGELOG:
   }
 
   .card-body {
-    padding: 0 1.6rem 1.6rem;
+    padding: 1.25rem 1.85rem 1.85rem;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     flex-direction: column;
-    gap: 1.1rem;
+    gap: 1.25rem;
   }
 
   .card-body[hidden] {
@@ -728,7 +794,7 @@ CHANGELOG:
 
   .toast {
     position: fixed;
-    bottom: calc(var(--tab-bar-height) + 1.5rem);
+    bottom: calc(var(--tab-bar-height) + env(safe-area-inset-bottom, 0px) + 1.5rem);
     left: 50%;
     transform: translateX(-50%);
     background: rgba(8, 12, 28, 0.9);
@@ -756,8 +822,8 @@ CHANGELOG:
   .tab-bar {
     position: fixed;
     left: 50%;
-    bottom: calc(1.5rem + var(--tab-bar-dynamic-offset));
-    transform: translate(-50%, calc(var(--tab-bar-translate, 0px)));
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 1.25rem);
+    transform: translateX(-50%);
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0.3rem;
@@ -1213,7 +1279,7 @@ CHANGELOG:
   @media (max-width: 680px) {
     main {
       width: calc(100% - 1.4rem);
-      padding-bottom: calc(5rem + var(--tab-bar-height) + var(--tab-bar-dynamic-offset));
+      padding-bottom: calc(5rem + var(--tab-bar-height) + env(safe-area-inset-bottom, 0px));
     }
 
     .intro {
@@ -1222,6 +1288,21 @@ CHANGELOG:
 
     .intro__headline {
       font-size: clamp(1.2rem, 5vw, 1.8rem);
+    }
+
+    .intro__signal {
+      padding: 0.85rem 0.95rem;
+      border-radius: 18px;
+      gap: 0.6rem;
+    }
+
+    .intro__summary {
+      font-size: 0.82rem;
+    }
+
+    .intro__topic {
+      font-size: 0.64rem;
+      letter-spacing: 0.2em;
     }
 
     .pull-indicator {
@@ -1300,6 +1381,10 @@ CHANGELOG:
     <span class="intro__label">Signal report</span>
     <h1 class="intro__headline">Nightly intelligence on the national conversation</h1>
     <p class="intro__copy">Follow decisive stories as they emerge across trusted publishers. Pull to refresh, tap to expand, and filter to focus the perspective you need.</p>
+    <div class="intro__signal" aria-live="polite">
+      <p class="intro__summary" id="signalSummary">Scanning for live signals…</p>
+      <ul class="intro__topics" id="signalTopics" aria-label="Trending topics"></ul>
+    </div>
   </section>
   <div class="pull-indicator" id="pullIndicator" role="status" aria-live="polite">Pull to refresh</div>
   <div class="list" id="feedList" role="main" aria-live="polite"></div>
@@ -1481,6 +1566,18 @@ const HAPTIC_PATTERNS = {
   'pull-ready': [30],
   mark: [12, 4, 12]
 };
+
+const TRENDING_SUMMARY_STOPWORDS = new Set([
+  'analysis',
+  'latest',
+  'report',
+  'story',
+  'today',
+  'tonight',
+  'update',
+  'video',
+  'watch'
+]);
 
 function triggerHaptic(type) {
   if (!('vibrate' in navigator)) {
@@ -1667,7 +1764,6 @@ function changeView(view) {
 
 const rootElement = document.documentElement;
 let viewportMetricsFrame = null;
-let lastViewportOffset = null;
 let lastViewportHeight = null;
 let viewportMetricsListenersBound = false;
 
@@ -1702,26 +1798,6 @@ function applyViewportMetrics() {
     }
   }
 
-  let offset = 0;
-  if (viewport && Number.isFinite(layoutHeight) && layoutHeight > 0) {
-    const visualBottom = viewport.height + viewport.offsetTop;
-    if (Number.isFinite(visualBottom)) {
-      const diff = layoutHeight - visualBottom;
-      if (Number.isFinite(diff)) {
-        offset = Math.max(0, diff);
-        if (offset < 4) {
-          offset = 0;
-        }
-      }
-    }
-  }
-
-  const roundedOffset = Math.round(offset);
-  if (lastViewportOffset !== roundedOffset) {
-    rootElement.style.setProperty('--tab-bar-dynamic-offset', `${roundedOffset}px`);
-    rootElement.style.setProperty('--tab-bar-translate', `${-roundedOffset}px`);
-    lastViewportOffset = roundedOffset;
-  }
 }
 
 function scheduleViewportMetricsUpdate() {
@@ -3160,7 +3236,7 @@ function createCard(item, index = 0, total = 1) {
       <div class="reading-progress" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(progressValue)}">
         <span class="reading-progress__meter" style="--progress:${progressFraction.toFixed(2)};"></span>
       </div>
-      <div class="expand-btn" aria-hidden="true">${isExpanded ? '▼' : '▶'}</div>
+      <div class="expand-btn" aria-hidden="true">${isExpanded ? 'Hide' : 'Open'}</div>
     </div>
     <div class="card-body" id="body-${cardId}" role="region">
       <div class="card-summary">${escapeHTML(item.desc || 'No summary available.')}</div>
@@ -3201,7 +3277,7 @@ function createCard(item, index = 0, total = 1) {
 
   const toggleCard = () => {
     const isOpen = article.classList.toggle('open');
-    expandBtn.textContent = isOpen ? '▼' : '▶';
+    expandBtn.textContent = isOpen ? 'Hide' : 'Open';
     header.setAttribute('aria-expanded', String(isOpen));
     if (cardBody) {
       cardBody.hidden = !isOpen;
@@ -3219,7 +3295,7 @@ function createCard(item, index = 0, total = 1) {
           const otherHeader = card.querySelector('.card-head');
           const otherBody = card.querySelector('.card-body');
           if (otherBtn) {
-            otherBtn.textContent = '▶';
+            otherBtn.textContent = 'Open';
           }
           if (otherHeader) {
             otherHeader.setAttribute('aria-expanded', 'false');
@@ -3259,6 +3335,129 @@ function createCard(item, index = 0, total = 1) {
   return article;
 }
 
+
+function toTitleCase(text = '') {
+  return text
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(part => {
+      if (/^[A-Z0-9]+$/.test(part)) {
+        return part;
+      }
+      if (part.length <= 3) {
+        return part.toUpperCase();
+      }
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join(' ');
+}
+
+function deriveTopicFromTitle(title = '') {
+  if (typeof title !== 'string') {
+    return '';
+  }
+
+  let clean = title.trim();
+  if (!clean) {
+    return '';
+  }
+
+  [' - ', ' — ', ' – ', ' | '].forEach(separator => {
+    const index = clean.indexOf(separator);
+    if (index > 0) {
+      clean = clean.slice(0, index);
+    }
+  });
+
+  const colonIndex = clean.indexOf(':');
+  if (colonIndex > 0 && colonIndex < 90) {
+    clean = clean.slice(0, colonIndex);
+  }
+
+  const words = clean.split(/\s+/).filter(Boolean).slice(0, 5);
+  if (!words.length) {
+    return '';
+  }
+
+  return toTitleCase(words.join(' '));
+}
+
+function formatTopicList(topics = []) {
+  if (!topics.length) {
+    return '';
+  }
+  if (topics.length === 1) {
+    return topics[0];
+  }
+  if (topics.length === 2) {
+    return `${topics[0]} and ${topics[1]}`;
+  }
+  return `${topics.slice(0, -1).join(', ')}, and ${topics[topics.length - 1]}`;
+}
+
+function updateTrendingSummary(items = STATE.items) {
+  const summaryEl = document.getElementById('signalSummary');
+  const topicsEl = document.getElementById('signalTopics');
+
+  if (!summaryEl || !topicsEl) {
+    return;
+  }
+
+  if (!Array.isArray(items) || items.length === 0) {
+    summaryEl.textContent = 'Scanning for live signals…';
+    topicsEl.innerHTML = '';
+    return;
+  }
+
+  const keywordEntries =
+    STATE.trendingKeywords instanceof Map ? Array.from(STATE.trendingKeywords.entries()) : [];
+  const searchPool = items.map(item => `${item.title || ''} ${item.desc || ''}`.toLowerCase());
+
+  let topics = keywordEntries
+    .filter(([word, weight]) => {
+      if (!word || typeof word !== 'string') {
+        return false;
+      }
+      if (!Number.isFinite(weight) || weight <= 0.6) {
+        return false;
+      }
+      if (TRENDING_SUMMARY_STOPWORDS.has(word)) {
+        return false;
+      }
+      if (searchPool.length && !searchPool.some(text => text.includes(word))) {
+        return false;
+      }
+      return true;
+    })
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(([word]) => toTitleCase(word));
+
+  if (!topics.length) {
+    topics = items
+      .slice()
+      .sort((a, b) => (Number(b.trendingScore) || 0) - (Number(a.trendingScore) || 0))
+      .slice(0, 3)
+      .map(item => deriveTopicFromTitle(item.title))
+      .filter(Boolean);
+  }
+
+  topics = topics.filter((topic, index, arr) => arr.indexOf(topic) === index);
+
+  const chips = topics.slice(0, 4);
+  topicsEl.innerHTML = chips
+    .map(topic => `<li class="intro__topic">${escapeHTML(topic)}</li>`)
+    .join('');
+
+  const summaryTopics = topics.slice(0, 3);
+  if (summaryTopics.length) {
+    const listText = formatTopicList(summaryTopics);
+    const verb = summaryTopics.length === 1 ? 'is' : 'are';
+    summaryEl.textContent = `Top signals: ${listText} ${verb} shaping tonight's conversation.`;
+  } else {
+    summaryEl.textContent = 'Top signals: A mix of developing national and political storylines are shaping the cycle.';
+  }
+}
 
 function updateMoodIndicator(items) {
   const moodEl = document.getElementById('overallMood');
@@ -3318,6 +3517,7 @@ function render() {
         viewItems = filtered.slice(0, 60);
     }
 
+    updateTrendingSummary(viewItems);
     updateMoodIndicator(viewItems);
     const totalItems = viewItems.length;
 
@@ -3525,6 +3725,7 @@ function escapeHTML(str = '') {
 document.addEventListener('DOMContentLoaded', () => {
   buildSourceToggles();
   updateSourceSummary();
+  updateTrendingSummary();
   initFilterNavigation();
   setupTabBar();
   setupActionSheet();
