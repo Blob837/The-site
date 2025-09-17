@@ -45,6 +45,7 @@ CHANGELOG:
     --bias-left: #2f6bff;
     --bias-center: #9ba9c8;
     --bias-right: #ff5f5f;
+    --app-height: 100vh;
   }
   
   * {
@@ -514,36 +515,6 @@ CHANGELOG:
     margin-top: 1rem;
   }
 
-  .bias-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    align-items: flex-start;
-  }
-
-  .bias-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    width: 100%;
-  }
-
-  .bias-title {
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.58);
-  }
-
-  .bias-description {
-    margin: 0;
-    font-size: 0.74rem;
-    letter-spacing: 0.06em;
-    color: rgba(255, 255, 255, 0.55);
-  }
-
   .card-actions {
     display: flex;
     gap: 0.5rem;
@@ -694,16 +665,6 @@ CHANGELOG:
       font-size: 0.7rem;
     }
 
-    .bias-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
-    }
-
-    .badge.bias {
-      width: 100%;
-      justify-content: space-between;
-    }
   }
 
   /* Focus management */
@@ -748,7 +709,7 @@ CHANGELOG:
     letter-spacing: 0.01em;
     display: flex;
     flex-direction: column;
-    min-height: 100%;
+    min-height: var(--app-height, 100%);
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     background: radial-gradient(circle at top, rgba(64, 217, 255, 0.12), transparent 45%) fixed,
@@ -769,8 +730,10 @@ CHANGELOG:
     display: flex;
     flex-direction: column;
     gap: 2.75rem;
+    flex: 1;
+    min-height: 0;
     transform: translateY(calc(var(--pull-distance, 0px) * 0.48));
-    transition: transform 0.45s var(--ios-ease);
+    transition: transform 0.45s var(--ios-ease), padding-bottom 0.45s var(--ios-ease);
   }
 
   .bar {
@@ -1127,36 +1090,6 @@ CHANGELOG:
     letter-spacing: 0.18em;
   }
 
-  .bias-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-    align-items: flex-start;
-  }
-
-  .bias-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.4rem;
-    width: 100%;
-  }
-
-  .bias-title {
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.6);
-  }
-
-  .bias-description {
-    margin: 0;
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    color: rgba(255, 255, 255, 0.55);
-  }
-
   .reading-progress {
     width: 38px;
     height: 38px;
@@ -1235,6 +1168,8 @@ CHANGELOG:
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     width: min(480px, calc(100% - 1.5rem));
+    transition: bottom 0.45s var(--ios-ease), transform 0.45s var(--ios-ease);
+    will-change: bottom, transform;
     z-index: 120;
   }
 
@@ -2061,44 +1996,88 @@ function changeView(view) {
   triggerHaptic('tab');
 }
 
+const rootElement = document.documentElement;
+let viewportMetricsFrame = null;
+let lastViewportOffset = null;
+let lastViewportHeight = null;
+let viewportMetricsListenersBound = false;
+
+function applyViewportMetrics() {
+  if (!rootElement) {
+    return;
+  }
+
+  const viewport = window.visualViewport;
+  const viewportHeight = viewport ? viewport.height : window.innerHeight || rootElement.clientHeight;
+  if (Number.isFinite(viewportHeight)) {
+    const roundedHeight = Math.round(viewportHeight);
+    if (lastViewportHeight !== roundedHeight) {
+      rootElement.style.setProperty('--app-height', `${roundedHeight}px`);
+      lastViewportHeight = roundedHeight;
+    }
+  }
+
+  let offset = 0;
+  if (viewport) {
+    const diff = window.innerHeight - viewport.height - viewport.offsetTop;
+    if (Number.isFinite(diff)) {
+      offset = Math.max(0, diff);
+      if (offset < 4) {
+        offset = 0;
+      }
+    }
+  }
+
+  const roundedOffset = Math.round(offset);
+  if (lastViewportOffset !== roundedOffset) {
+    rootElement.style.setProperty('--tab-bar-dynamic-offset', `${roundedOffset}px`);
+    lastViewportOffset = roundedOffset;
+  }
+}
+
+function scheduleViewportMetricsUpdate() {
+  if (viewportMetricsFrame) {
+    return;
+  }
+  viewportMetricsFrame = requestAnimationFrame(() => {
+    viewportMetricsFrame = null;
+    applyViewportMetrics();
+  });
+}
+
+function bindViewportMetricListeners() {
+  if (viewportMetricsListenersBound) {
+    return;
+  }
+  viewportMetricsListenersBound = true;
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', scheduleViewportMetricsUpdate);
+    window.visualViewport.addEventListener('scroll', scheduleViewportMetricsUpdate);
+  }
+
+  window.addEventListener('resize', scheduleViewportMetricsUpdate);
+  window.addEventListener('orientationchange', scheduleViewportMetricsUpdate);
+  try {
+    window.addEventListener('scroll', scheduleViewportMetricsUpdate, { passive: true });
+  } catch (error) {
+    window.addEventListener('scroll', scheduleViewportMetricsUpdate);
+  }
+  window.addEventListener('focus', scheduleViewportMetricsUpdate);
+  window.addEventListener('pageshow', scheduleViewportMetricsUpdate);
+  window.addEventListener('load', scheduleViewportMetricsUpdate);
+}
+
 function setupTabBar() {
   const tabBar = document.getElementById('tabBar');
   if (!tabBar) {
     return;
   }
 
-  const root = document.documentElement;
-  const updateViewportOffset = () => {
-    if (!root) {
-      return;
-    }
-
-    const viewport = window.visualViewport;
-    let offset = 0;
-
-    if (viewport) {
-      const diff = window.innerHeight - viewport.height - viewport.offsetTop;
-      if (Number.isFinite(diff)) {
-        offset = Math.max(0, diff);
-      }
-    }
-
-    if (offset < 1) {
-      root.style.setProperty('--tab-bar-dynamic-offset', '0px');
-      return;
-    }
-
-    root.style.setProperty('--tab-bar-dynamic-offset', `${Math.round(offset)}px`);
-  };
-
-  updateViewportOffset();
-
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', updateViewportOffset);
-    window.visualViewport.addEventListener('scroll', updateViewportOffset);
-  }
-
-  window.addEventListener('resize', updateViewportOffset);
+  bindViewportMetricListeners();
+  applyViewportMetrics();
+  scheduleViewportMetricsUpdate();
+  setTimeout(scheduleViewportMetricsUpdate, 350);
 
   tabBar.addEventListener('click', event => {
     const button = event.target.closest('.tab-bar__btn');
@@ -3459,7 +3438,7 @@ function createCard(item, index = 0, total = 1) {
   const biasScoreFormatted = formatBiasScore(biasScore);
   const biasScoreSafe = escapeHTML(biasScoreFormatted);
   const biasLabelSafe = escapeHTML(biasLabel);
-  const biasAriaText = `Political lean ${biasLabel} with score ${biasScoreFormatted}`;
+  const biasAriaText = `Political lean ${biasLabel} with score ${biasScoreFormatted} on a -10 (Left) to +10 (Right) scale`;
   const biasAria = escapeHTML(biasAriaText);
   const biasBadge = `<span class="badge bias ${biasClass}" aria-label="${biasAria}" title="${biasAria}"><span class="badge-bias__label" aria-hidden="true">${biasLabelSafe}</span><span class="badge-bias__value" aria-hidden="true">${biasScoreSafe}</span><span class="sr-only">${biasAria}</span></span>`;
 
@@ -3479,6 +3458,7 @@ function createCard(item, index = 0, total = 1) {
         <div class="tag">
           ${escapeHTML(item.source)} • <span class="time${isFresh ? ' time--fresh' : ''}">${timeString}</span>
           ${credibilityBadge}
+          ${biasBadge}
           ${freshBadge}
           ${isTrending ? '<span class="badge trending">TRENDING</span>' : ''}
           ${sentimentBadge}
@@ -3491,13 +3471,6 @@ function createCard(item, index = 0, total = 1) {
     </div>
     <div class="card-body" id="body-${cardId}" role="region">
       <div class="card-insights">
-        <div class="bias-section" aria-label="${biasAria}">
-          <div class="bias-header">
-            <span class="bias-title">Political Lean</span>
-            ${biasBadge}
-          </div>
-          <p class="bias-description">Normalized on a -10 (Left) to +10 (Right) scale.</p>
-        </div>
         <div class="card-credibility" aria-label="Credibility insight ${escapeHTML(credibility.detail)}">
           <span class="card-credibility__label">Credibility</span>
           <span class="card-credibility__value">${escapeHTML(credibility.detail)}</span>
