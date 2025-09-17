@@ -279,7 +279,7 @@ CHANGELOG:
   .intro {
     width: 100%;
     margin: 0;
-    padding: clamp(1.25rem, 1.5vw + 0.75rem, 2rem);
+    padding: clamp(1rem, 1.4vw + 0.6rem, 1.6rem);
     border-radius: calc(var(--card-radius) + 6px);
     background: linear-gradient(135deg, rgba(124, 92, 255, 0.14), rgba(74, 209, 255, 0.08));
     border: 1px solid rgba(124, 92, 255, 0.25);
@@ -297,31 +297,9 @@ CHANGELOG:
     pointer-events: none;
   }
 
-  .intro__label {
-    font-size: 0.7rem;
-    letter-spacing: 0.42em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.5);
-    margin-bottom: 0.65rem;
-  }
-
-  .intro__headline {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
-    margin: 0 0 0.75rem;
-    font-size: clamp(1.35rem, 2vw + 1rem, 2.4rem);
-    letter-spacing: 0.04em;
-  }
-
-  .intro__copy {
-    margin: 0;
-    max-width: 520px;
-    color: rgba(238, 240, 255, 0.75);
-    font-size: 0.95rem;
-  }
-
   .intro__signal {
-    margin-top: 1.4rem;
-    padding: 1rem 1.2rem;
+    margin: 0;
+    padding: 0.9rem 1.05rem;
     border-radius: 20px;
     background: rgba(8, 12, 28, 0.68);
     border: 1px solid rgba(124, 92, 255, 0.32);
@@ -330,7 +308,7 @@ CHANGELOG:
     -webkit-backdrop-filter: blur(14px);
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.6rem;
     position: relative;
     overflow: hidden;
   }
@@ -348,36 +326,12 @@ CHANGELOG:
     position: relative;
     margin: 0;
     max-width: 640px;
-    font-size: 0.88rem;
-    line-height: 1.6;
-    color: rgba(241, 244, 255, 0.85);
-    letter-spacing: 0.04em;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: rgba(241, 244, 255, 0.9);
+    letter-spacing: 0.03em;
     font-weight: 500;
     z-index: 1;
-  }
-
-  .intro__topics {
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    z-index: 1;
-  }
-
-  .intro__topic {
-    padding: 0.4rem 0.9rem;
-    border-radius: 999px;
-    border: 1px solid rgba(124, 92, 255, 0.4);
-    background: linear-gradient(135deg, rgba(124, 92, 255, 0.28), rgba(74, 209, 255, 0.18));
-    color: rgba(247, 249, 255, 0.88);
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.26em;
-    text-transform: uppercase;
-    box-shadow: 0 18px 40px rgba(6, 10, 32, 0.45);
   }
 
   .pull-indicator {
@@ -411,7 +365,7 @@ CHANGELOG:
 
   .list {
     display: grid;
-    gap: clamp(1.2rem, 1.6vw, 1.8rem);
+    gap: clamp(0.95rem, 1.2vw, 1.35rem);
     margin: 0;
     padding: 0;
   }
@@ -499,9 +453,9 @@ CHANGELOG:
     position: relative;
     display: grid;
     grid-template-columns: auto 1fr auto auto;
-    gap: 1.2rem;
+    gap: 0.95rem;
     align-items: center;
-    padding: 1.35rem 1.6rem;
+    padding: 1.1rem 1.35rem;
     cursor: pointer;
   }
 
@@ -527,11 +481,11 @@ CHANGELOG:
 
   .titleline {
     font-family: 'Space Grotesk', 'Inter', sans-serif;
-    font-size: 0.98rem;
+    font-size: 0.95rem;
     font-weight: 600;
     letter-spacing: 0.01em;
     color: var(--text);
-    margin-bottom: 0.45rem;
+    margin-bottom: 0.3rem;
     transition: color 0.35s ease;
   }
 
@@ -539,9 +493,9 @@ CHANGELOG:
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.4rem;
     color: rgba(255, 255, 255, 0.65);
-    font-size: 0.78rem;
+    font-size: 0.74rem;
   }
 
   .time {
@@ -639,8 +593,8 @@ CHANGELOG:
   }
 
   .reading-progress {
-    width: 70px;
-    height: 8px;
+    width: 62px;
+    height: 6px;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.08);
     overflow: hidden;
@@ -662,13 +616,13 @@ CHANGELOG:
     align-items: center;
     justify-content: center;
     font-family: 'Space Grotesk', 'Inter', sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--muted);
     border: 1px solid rgba(124, 92, 255, 0.22);
     border-radius: 999px;
-    padding: 0.35rem 0.5rem;
+    padding: 0.3rem 0.55rem;
     background: rgba(255, 255, 255, 0.03);
-    min-width: 72px;
+    min-width: 64px;
     white-space: nowrap;
     transition: background 0.3s ease, color 0.3s ease;
   }
@@ -679,11 +633,11 @@ CHANGELOG:
   }
 
   .card-body {
-    padding: 1.25rem 1.85rem 1.85rem;
+    padding: 1.05rem 1.5rem 1.35rem;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1rem;
   }
 
   .card-body[hidden] {
@@ -692,15 +646,15 @@ CHANGELOG:
 
   .card-summary {
     color: rgba(236, 240, 255, 0.82);
-    font-size: 0.92rem;
+    font-size: 0.88rem;
   }
 
   .card-actions {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    margin-top: 1.2rem;
+    gap: 0.9rem;
+    margin-top: 0.75rem;
     flex-wrap: wrap;
   }
 
@@ -708,13 +662,13 @@ CHANGELOG:
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
+    gap: 0.35rem;
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.74rem;
-    letter-spacing: 0.28em;
+    font-size: 0.72rem;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
-    padding: 0.65rem 1.4rem;
+    padding: 0.55rem 1.2rem;
     border-radius: 999px;
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent-soft) 100%);
     color: #030716;
@@ -1283,26 +1237,17 @@ CHANGELOG:
     }
 
     .intro {
-      padding: 1.1rem 1.2rem;
-    }
-
-    .intro__headline {
-      font-size: clamp(1.2rem, 5vw, 1.8rem);
+      padding: 0.95rem 1.05rem;
     }
 
     .intro__signal {
-      padding: 0.85rem 0.95rem;
+      padding: 0.8rem 0.9rem;
       border-radius: 18px;
-      gap: 0.6rem;
+      gap: 0.55rem;
     }
 
     .intro__summary {
-      font-size: 0.82rem;
-    }
-
-    .intro__topic {
-      font-size: 0.64rem;
-      letter-spacing: 0.2em;
+      font-size: 0.84rem;
     }
 
     .pull-indicator {
@@ -1311,8 +1256,8 @@ CHANGELOG:
 
     .card-head {
       grid-template-columns: auto 1fr auto;
-      gap: 1rem;
-      padding: 1.2rem 1.3rem;
+      gap: 0.85rem;
+      padding: 1rem 1.1rem;
     }
 
     .reading-progress {
@@ -1377,13 +1322,9 @@ CHANGELOG:
 </header>
 
 <main>
-  <section class="intro" aria-label="Signal briefing">
-    <span class="intro__label">Signal report</span>
-    <h1 class="intro__headline">Nightly intelligence on the national conversation</h1>
-    <p class="intro__copy">Follow decisive stories as they emerge across trusted publishers. Pull to refresh, tap to expand, and filter to focus the perspective you need.</p>
+  <section class="intro" aria-label="Trending briefing">
     <div class="intro__signal" aria-live="polite">
       <p class="intro__summary" id="signalSummary">Scanning for live signals…</p>
-      <ul class="intro__topics" id="signalTopics" aria-label="Trending topics"></ul>
     </div>
   </section>
   <div class="pull-indicator" id="pullIndicator" role="status" aria-live="polite">Pull to refresh</div>
@@ -1566,18 +1507,6 @@ const HAPTIC_PATTERNS = {
   'pull-ready': [30],
   mark: [12, 4, 12]
 };
-
-const TRENDING_SUMMARY_STOPWORDS = new Set([
-  'analysis',
-  'latest',
-  'report',
-  'story',
-  'today',
-  'tonight',
-  'update',
-  'video',
-  'watch'
-]);
 
 function triggerHaptic(type) {
   if (!('vibrate' in navigator)) {
@@ -3275,42 +3204,61 @@ function createCard(item, index = 0, total = 1) {
 
   applyProgress(progressValue);
 
-  const toggleCard = () => {
-    const isOpen = article.classList.toggle('open');
-    expandBtn.textContent = isOpen ? 'Hide' : 'Open';
-    header.setAttribute('aria-expanded', String(isOpen));
-    if (cardBody) {
-      cardBody.hidden = !isOpen;
+  const collapseCardElement = target => {
+    if (!target) {
+      return;
     }
 
-    if (isOpen) {
-      triggerHaptic('expand');
-      const ensured = ensureReadProgress(cardId, 40);
-      applyProgress(ensured);
-      STATE.expandedCards.add(cardId);
-      document.querySelectorAll('.card.open').forEach(card => {
-        if (card !== article) {
-          card.classList.remove('open');
-          const otherBtn = card.querySelector('.expand-btn');
-          const otherHeader = card.querySelector('.card-head');
-          const otherBody = card.querySelector('.card-body');
-          if (otherBtn) {
-            otherBtn.textContent = 'Open';
-          }
-          if (otherHeader) {
-            otherHeader.setAttribute('aria-expanded', 'false');
-          }
-          if (otherBody) {
-            otherBody.hidden = true;
-          }
-          STATE.expandedCards.delete(card.dataset.cardId);
-        }
-      });
-    } else {
-      STATE.expandedCards.delete(cardId);
-      if (cardBody) {
-        cardBody.hidden = true;
+    target.classList.remove('open');
+    const button = target === article ? expandBtn : target.querySelector('.expand-btn');
+    if (button) {
+      button.textContent = 'Open';
+    }
+
+    const targetHeader = target === article ? header : target.querySelector('.card-head');
+    if (targetHeader) {
+      targetHeader.setAttribute('aria-expanded', 'false');
+    }
+
+    const targetBody = target === article ? cardBody : target.querySelector('.card-body');
+    if (targetBody) {
+      targetBody.hidden = true;
+    }
+
+    if (target.dataset && target.dataset.cardId) {
+      STATE.expandedCards.delete(target.dataset.cardId);
+    }
+  };
+
+  const openCard = () => {
+    document.querySelectorAll('.card.open').forEach(card => {
+      if (card !== article) {
+        collapseCardElement(card);
       }
+    });
+
+    article.classList.add('open');
+    expandBtn.textContent = 'Hide';
+    header.setAttribute('aria-expanded', 'true');
+    if (cardBody) {
+      cardBody.hidden = false;
+    }
+
+    triggerHaptic('expand');
+    const ensured = ensureReadProgress(cardId, 40);
+    applyProgress(ensured);
+    STATE.expandedCards.add(cardId);
+  };
+
+  const closeCard = () => {
+    collapseCardElement(article);
+  };
+
+  const toggleCard = () => {
+    if (article.classList.contains('open')) {
+      closeCard();
+    } else {
+      openCard();
     }
 
     persistState();
@@ -3336,127 +3284,104 @@ function createCard(item, index = 0, total = 1) {
 }
 
 
-function toTitleCase(text = '') {
-  return text
-    .split(/\s+/)
-    .filter(Boolean)
-    .map(part => {
-      if (/^[A-Z0-9]+$/.test(part)) {
-        return part;
-      }
-      if (part.length <= 3) {
-        return part.toUpperCase();
-      }
-      return part.charAt(0).toUpperCase() + part.slice(1);
-    })
-    .join(' ');
+function extractLeadSentence(text = '') {
+  if (typeof text !== 'string') {
+    return '';
+  }
+
+  const normalized = text.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!normalized) {
+    return '';
+  }
+
+  const match = normalized.match(/[^.!?]+[.!?]/);
+  let sentence = match ? match[0] : normalized;
+  sentence = sentence
+    .replace(/^[\s"'“”‘’`\-–—]+/, '')
+    .replace(/["'“”‘’]+$/, '')
+    .trim();
+
+  if (!sentence) {
+    return '';
+  }
+
+  if (sentence.length > 220) {
+    const truncated = sentence.slice(0, 217);
+    const lastSpace = truncated.lastIndexOf(' ');
+    return `${truncated.slice(0, lastSpace > 160 ? lastSpace : truncated.length)}…`;
+  }
+
+  if (!/[.!?…]$/.test(sentence)) {
+    sentence += '.';
+  }
+
+  return sentence;
 }
 
-function deriveTopicFromTitle(title = '') {
-  if (typeof title !== 'string') {
+function composeTrendingSentence(item) {
+  if (!item) {
     return '';
   }
 
-  let clean = title.trim();
-  if (!clean) {
+  const lead = extractLeadSentence(item.desc || item.title || '');
+  if (!lead) {
     return '';
   }
 
-  [' - ', ' — ', ' – ', ' | '].forEach(separator => {
-    const index = clean.indexOf(separator);
-    if (index > 0) {
-      clean = clean.slice(0, index);
-    }
-  });
-
-  const colonIndex = clean.indexOf(':');
-  if (colonIndex > 0 && colonIndex < 90) {
-    clean = clean.slice(0, colonIndex);
+  if (item.source) {
+    return `${item.source}: ${lead}`;
   }
 
-  const words = clean.split(/\s+/).filter(Boolean).slice(0, 5);
-  if (!words.length) {
-    return '';
-  }
-
-  return toTitleCase(words.join(' '));
-}
-
-function formatTopicList(topics = []) {
-  if (!topics.length) {
-    return '';
-  }
-  if (topics.length === 1) {
-    return topics[0];
-  }
-  if (topics.length === 2) {
-    return `${topics[0]} and ${topics[1]}`;
-  }
-  return `${topics.slice(0, -1).join(', ')}, and ${topics[topics.length - 1]}`;
+  return lead;
 }
 
 function updateTrendingSummary(items = STATE.items) {
   const summaryEl = document.getElementById('signalSummary');
-  const topicsEl = document.getElementById('signalTopics');
 
-  if (!summaryEl || !topicsEl) {
+  if (!summaryEl) {
     return;
   }
 
   if (!Array.isArray(items) || items.length === 0) {
     summaryEl.textContent = 'Scanning for live signals…';
-    topicsEl.innerHTML = '';
     return;
   }
 
-  const keywordEntries =
-    STATE.trendingKeywords instanceof Map ? Array.from(STATE.trendingKeywords.entries()) : [];
-  const searchPool = items.map(item => `${item.title || ''} ${item.desc || ''}`.toLowerCase());
+  const sorted = items
+    .slice()
+    .sort((a, b) => (Number(b.trendingScore) || 0) - (Number(a.trendingScore) || 0));
 
-  let topics = keywordEntries
-    .filter(([word, weight]) => {
-      if (!word || typeof word !== 'string') {
-        return false;
-      }
-      if (!Number.isFinite(weight) || weight <= 0.6) {
-        return false;
-      }
-      if (TRENDING_SUMMARY_STOPWORDS.has(word)) {
-        return false;
-      }
-      if (searchPool.length && !searchPool.some(text => text.includes(word))) {
-        return false;
-      }
-      return true;
-    })
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 4)
-    .map(([word]) => toTitleCase(word));
+  const prioritized = sorted.filter(item => (Number(item.trendingScore) || 0) > 0);
+  const queue = prioritized.concat(sorted.filter(item => (Number(item.trendingScore) || 0) <= 0));
 
-  if (!topics.length) {
-    topics = items
-      .slice()
-      .sort((a, b) => (Number(b.trendingScore) || 0) - (Number(a.trendingScore) || 0))
-      .slice(0, 3)
-      .map(item => deriveTopicFromTitle(item.title))
-      .filter(Boolean);
+  const sentences = [];
+  const seen = new Set();
+
+  for (const item of queue) {
+    const sentence = composeTrendingSentence(item);
+    if (!sentence) {
+      continue;
+    }
+
+    const key = `${item.source || ''}|${sentence}`;
+    if (seen.has(key)) {
+      continue;
+    }
+
+    sentences.push(sentence);
+    seen.add(key);
+
+    if (sentences.length === 3) {
+      break;
+    }
   }
 
-  topics = topics.filter((topic, index, arr) => arr.indexOf(topic) === index);
-
-  const chips = topics.slice(0, 4);
-  topicsEl.innerHTML = chips
-    .map(topic => `<li class="intro__topic">${escapeHTML(topic)}</li>`)
-    .join('');
-
-  const summaryTopics = topics.slice(0, 3);
-  if (summaryTopics.length) {
-    const listText = formatTopicList(summaryTopics);
-    const verb = summaryTopics.length === 1 ? 'is' : 'are';
-    summaryEl.textContent = `Top signals: ${listText} ${verb} shaping tonight's conversation.`;
-  } else {
-    summaryEl.textContent = 'Top signals: A mix of developing national and political storylines are shaping the cycle.';
+  if (!sentences.length) {
+    summaryEl.textContent = 'Top stories are developing across the feed.';
+    return;
   }
+
+  summaryEl.textContent = sentences.join(' ');
 }
 
 function updateMoodIndicator(items) {
