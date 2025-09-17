@@ -45,9 +45,6 @@ CHANGELOG:
     --aurora-1: #0f766e;
     --aurora-2: #14b8a6;
     --aurora-3: #2dd4bf;
-    --bias-left: #22d3ee;
-    --bias-center: #7dd3fc;
-    --bias-right: #0ea5e9;
     --app-height: 100vh;
   }
 
@@ -366,7 +363,7 @@ CHANGELOG:
     cursor: pointer;
   }
   
-  .card-head:hover {
+  .card:not(.open) .card-head:hover {
     background: var(--hover);
   }
 
@@ -459,49 +456,6 @@ CHANGELOG:
   .badge.sentiment.very-negative {
     border-color: var(--tone-critical);
     color: var(--tone-critical);
-  }
-
-  .badge.bias {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.3rem 0.75rem;
-    background: rgba(45, 212, 191, 0.14);
-    border-color: rgba(45, 212, 191, 0.32);
-    color: var(--accent);
-    text-transform: none;
-    letter-spacing: 0.08em;
-  }
-
-  .badge.bias .badge-bias__value {
-    font-variant-numeric: tabular-nums;
-    opacity: 0.8;
-  }
-
-  .badge.bias .badge-bias__value::before {
-    content: '•';
-    margin-right: 0.25rem;
-    opacity: 0.65;
-  }
-
-  .badge.bias.left,
-  .badge.bias.left-soft {
-    color: var(--bias-left);
-    border-color: rgba(47, 107, 255, 0.38);
-    background: rgba(47, 107, 255, 0.14);
-  }
-
-  .badge.bias.center {
-    color: var(--bias-center);
-    border-color: rgba(155, 169, 200, 0.35);
-    background: rgba(155, 169, 200, 0.12);
-  }
-
-  .badge.bias.right,
-  .badge.bias.right-soft {
-    color: var(--bias-right);
-    border-color: rgba(255, 95, 95, 0.4);
-    background: rgba(255, 95, 95, 0.14);
   }
 
   .breaking-indicator {
@@ -826,6 +780,18 @@ CHANGELOG:
     border-bottom: 1px solid rgba(45, 212, 191, 0.18);
     background: linear-gradient(180deg, rgba(20, 83, 92, 0.55), rgba(6, 20, 22, 0.92));
     box-shadow: 0 24px 60px rgba(2, 12, 14, 0.55);
+    isolation: isolate;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(env(safe-area-inset-top, 0px) * -1);
+    bottom: 0;
+    background: inherit;
+    z-index: -1;
   }
 
   main {
@@ -1067,53 +1033,6 @@ CHANGELOG:
   .badge.sentiment {
     font-weight: 600;
     letter-spacing: 0.14em;
-  }
-
-  .badge.bias {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.35rem 0.9rem;
-    background: rgba(45, 212, 191, 0.18);
-    border-color: rgba(45, 212, 191, 0.35);
-    color: var(--accent);
-    text-transform: none;
-    letter-spacing: 0.12em;
-    box-shadow: 0 10px 26px rgba(8, 44, 46, 0.35);
-  }
-
-  .badge.bias .badge-bias__value {
-    font-variant-numeric: tabular-nums;
-    opacity: 0.82;
-  }
-
-  .badge.bias .badge-bias__value::before {
-    content: '•';
-    margin-right: 0.35rem;
-    opacity: 0.65;
-  }
-
-  .badge.bias.left,
-  .badge.bias.left-soft {
-    color: var(--bias-left);
-    border-color: rgba(34, 211, 238, 0.45);
-    background: rgba(34, 211, 238, 0.18);
-    box-shadow: 0 10px 28px rgba(13, 148, 166, 0.28);
-  }
-
-  .badge.bias.center {
-    color: var(--bias-center);
-    border-color: rgba(125, 211, 252, 0.38);
-    background: rgba(125, 211, 252, 0.16);
-    box-shadow: 0 10px 28px rgba(37, 99, 235, 0.18);
-  }
-
-  .badge.bias.right,
-  .badge.bias.right-soft {
-    color: var(--bias-right);
-    border-color: rgba(14, 165, 233, 0.45);
-    background: rgba(14, 165, 233, 0.18);
-    box-shadow: 0 10px 28px rgba(8, 145, 178, 0.26);
   }
 
   .badge.credibility {
@@ -2954,6 +2873,21 @@ const NON_NEWS_PATTERNS = [
   /\bmerch\b/i,
   /\bshop\b/i,
   /\bcelebrity\b/i,
+  /\bentertainment\b/i,
+  /\besports?\b/i,
+  /\bsports?\b/i,
+  /\bfootball\b/i,
+  /\bbasketball\b/i,
+  /\bbaseball\b/i,
+  /\bsoccer\b/i,
+  /\btennis\b/i,
+  /\bhockey\b/i,
+  /\bgolf\b/i,
+  /\bnfl\b/i,
+  /\bnba\b/i,
+  /\bmlb\b/i,
+  /\bnhl\b/i,
+  /\bncaa\b/i,
   /\bsubscribe\b/i,
   /click here/i
 ];
@@ -2970,7 +2904,16 @@ const NON_NEWS_PATH_FRAGMENTS = [
   '/commerce',
   '/shopping',
   '/lifestyle',
-  '/entertainment'
+  '/entertainment',
+  '/sports',
+  '/sport',
+  '/nfl',
+  '/nba',
+  '/mlb',
+  '/nhl',
+  '/soccer',
+  '/golf',
+  '/tennis'
 ];
 
 const ESCAPE_MAP = {
@@ -3250,14 +3193,6 @@ function describeBias(score) {
   return { label: 'Leans Right', className: 'right' };
 }
 
-function formatBiasScore(score = 0) {
-  if (typeof score !== 'number' || Number.isNaN(score)) {
-    return '0.0';
-  }
-  const rounded = Math.round(score * 10) / 10;
-  return `${rounded > 0 ? '+' : ''}${rounded.toFixed(1)}`;
-}
-
 function analyzeBias(item) {
   const text = `${item.title || ''} ${item.desc || ''}`.toLowerCase();
   let score = SOURCE_BIAS_BASELINES.get(item.id) ?? 0;
@@ -3451,8 +3386,6 @@ async function loadFeeds() {
 
       const bias = analyzeBias(item);
       item.biasScore = bias.score;
-      item.biasLabel = bias.label;
-      item.biasClass = bias.className;
     });
 
     render();
@@ -3525,16 +3458,6 @@ function createCard(item, index = 0, total = 1) {
   const sentimentBadge = item.sentimentLabel
     ? `<span class="badge sentiment ${sentimentTone}" title="Sentiment score ${sentimentScoreFormatted}">${escapeHTML(item.sentimentLabel)} • ${sentimentScoreFormatted}</span>`
     : '';
-  const biasLabel = item.biasLabel || 'Center';
-  const biasClass = item.biasClass || 'center';
-  const biasScore = typeof item.biasScore === 'number' && !Number.isNaN(item.biasScore) ? item.biasScore : 0;
-  const biasScoreFormatted = formatBiasScore(biasScore);
-  const biasScoreSafe = escapeHTML(biasScoreFormatted);
-  const biasLabelSafe = escapeHTML(biasLabel);
-  const biasAriaText = `Political lean ${biasLabel} with score ${biasScoreFormatted} on a -10 (Left) to +10 (Right) scale`;
-  const biasAria = escapeHTML(biasAriaText);
-  const biasBadge = `<span class="badge bias ${biasClass}" aria-label="${biasAria}" title="${biasAria}"><span class="badge-bias__label" aria-hidden="true">${biasLabelSafe}</span><span class="badge-bias__value" aria-hidden="true">${biasScoreSafe}</span><span class="sr-only">${biasAria}</span></span>`;
-
   const credibilityBadge = `<span class="badge credibility${credibility.toneClass ? ` ${credibility.toneClass}` : ''}" title="${escapeHTML(credibility.description)}">${escapeHTML(credibility.label)}</span>`;
   const freshBadge = isFresh ? '<span class="badge badge-fresh">NEW</span>' : '';
 
@@ -3552,7 +3475,6 @@ function createCard(item, index = 0, total = 1) {
         <div class="tag">
           ${escapeHTML(item.source)} • <span class="time${isFresh ? ' time--fresh' : ''}">${timeString}</span>
           ${credibilityBadge}
-          ${biasBadge}
           ${freshBadge}
           ${isTrending ? '<span class="badge trending">TRENDING</span>' : ''}
           ${sentimentBadge}
