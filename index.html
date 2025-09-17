@@ -47,6 +47,12 @@ CHANGELOG:
     --bias-right: #ff5f5f;
     --app-height: 100vh;
   }
+
+  @supports (height: 100dvh) {
+    :root {
+      --app-height: 100dvh;
+    }
+  }
   
   * {
     box-sizing: border-box;
@@ -700,6 +706,7 @@ CHANGELOG:
     --ios-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
     --tab-bar-base-gap: 0;
     --tab-bar-dynamic-offset: 0px;
+    --tab-bar-translate: 0px;
   }
 
   body {
@@ -1025,59 +1032,11 @@ CHANGELOG:
     gap: 1.6rem;
   }
 
-  .card-insights {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-    padding: 1rem 1.2rem;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.03);
-  }
-
-  @media (min-width: 720px) {
-    .card-insights {
-      flex-direction: row;
-    }
-
-    .card-insights > * {
-      flex: 1;
-    }
-  }
-
   .card-summary {
     font-size: 0.92rem;
     letter-spacing: 0.01em;
     color: rgba(244, 246, 255, 0.9);
     line-height: 1.6;
-  }
-
-  .card-credibility {
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
-  }
-
-  .card-credibility__label {
-    font-size: 0.65rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.55);
-  }
-
-  .card-credibility__value {
-    font-size: 0.95rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-  }
-
-  .card-credibility__note {
-    margin: 0;
-    font-size: 0.78rem;
-    letter-spacing: 0.04em;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.62);
   }
 
   .card-actions {
@@ -1155,8 +1114,8 @@ CHANGELOG:
   .tab-bar {
     position: fixed;
     left: 50%;
-    bottom: calc(var(--tab-bar-dynamic-offset));
-    transform: translateX(-50%);
+    bottom: 0;
+    transform: translate3d(-50%, var(--tab-bar-translate), 0);
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0.4rem;
@@ -1168,8 +1127,8 @@ CHANGELOG:
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     width: min(480px, calc(100% - 1.5rem));
-    transition: bottom 0.45s var(--ios-ease), transform 0.45s var(--ios-ease);
-    will-change: bottom, transform;
+    transition: transform 0.45s var(--ios-ease);
+    will-change: transform;
     z-index: 120;
   }
 
@@ -2008,9 +1967,25 @@ function applyViewportMetrics() {
   }
 
   const viewport = window.visualViewport;
-  const viewportHeight = viewport ? viewport.height : window.innerHeight || rootElement.clientHeight;
-  if (Number.isFinite(viewportHeight)) {
-    const roundedHeight = Math.round(viewportHeight);
+  const layoutHeightCandidate = window.innerHeight;
+  const fallbackHeight = rootElement.clientHeight;
+  const layoutHeight = Number.isFinite(layoutHeightCandidate) && layoutHeightCandidate > 0
+    ? layoutHeightCandidate
+    : Number.isFinite(fallbackHeight) && fallbackHeight > 0
+      ? fallbackHeight
+      : 0;
+
+  let targetHeight = layoutHeight;
+
+  if (viewport) {
+    const visualHeight = viewport.height + viewport.offsetTop;
+    if (Number.isFinite(visualHeight)) {
+      targetHeight = Math.max(targetHeight, visualHeight);
+    }
+  }
+
+  if (Number.isFinite(targetHeight) && targetHeight > 0) {
+    const roundedHeight = Math.round(targetHeight);
     if (lastViewportHeight !== roundedHeight) {
       rootElement.style.setProperty('--app-height', `${roundedHeight}px`);
       lastViewportHeight = roundedHeight;
@@ -2018,12 +1993,15 @@ function applyViewportMetrics() {
   }
 
   let offset = 0;
-  if (viewport) {
-    const diff = window.innerHeight - viewport.height - viewport.offsetTop;
-    if (Number.isFinite(diff)) {
-      offset = Math.max(0, diff);
-      if (offset < 4) {
-        offset = 0;
+  if (viewport && Number.isFinite(layoutHeight) && layoutHeight > 0) {
+    const visualBottom = viewport.height + viewport.offsetTop;
+    if (Number.isFinite(visualBottom)) {
+      const diff = layoutHeight - visualBottom;
+      if (Number.isFinite(diff)) {
+        offset = Math.max(0, diff);
+        if (offset < 4) {
+          offset = 0;
+        }
       }
     }
   }
@@ -2031,6 +2009,7 @@ function applyViewportMetrics() {
   const roundedOffset = Math.round(offset);
   if (lastViewportOffset !== roundedOffset) {
     rootElement.style.setProperty('--tab-bar-dynamic-offset', `${roundedOffset}px`);
+    rootElement.style.setProperty('--tab-bar-translate', `${-roundedOffset}px`);
     lastViewportOffset = roundedOffset;
   }
 }
@@ -3470,13 +3449,6 @@ function createCard(item, index = 0, total = 1) {
       <div class="expand-btn" aria-hidden="true">${isExpanded ? '▼' : '▶'}</div>
     </div>
     <div class="card-body" id="body-${cardId}" role="region">
-      <div class="card-insights">
-        <div class="card-credibility" aria-label="Credibility insight ${escapeHTML(credibility.detail)}">
-          <span class="card-credibility__label">Credibility</span>
-          <span class="card-credibility__value">${escapeHTML(credibility.detail)}</span>
-          <p class="card-credibility__note">${escapeHTML(credibility.description)}</p>
-        </div>
-      </div>
       <div class="card-summary">${escapeHTML(item.desc || 'No summary available.')}</div>
       <div class="card-actions">
         <a href="${escapeHTML(item.link)}" target="_blank" rel="noopener" class="article-link smooth">
