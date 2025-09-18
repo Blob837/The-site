@@ -2422,62 +2422,68 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 30000);
   
-  // Handle visual viewport changes for iOS keyboard
+ // Handle visual viewport changes for iOS keyboard
   if ('visualViewport' in window) {
     function handleViewportChange() {
       const viewport = window.visualViewport;
-      document.documentElement.style.setProperty('--viewport-height', ${viewport.height}px);
-}
-window.visualViewport.addEventListener('resize', handleViewportChange);
-handleViewportChange();
-}
-// Initial load
-loadFeeds();
-// Focus visible polyfill for better keyboard navigation
-function applyFocusVisiblePolyfill() {
-let hadKeyboardEvent = true;
-let keyboardThrottleTimer = 0;
-const detectKeyboardFocus = (e) => {
-  if (e.metaKey || e.altKey || e.ctrlKey) return;
-  hadKeyboardEvent = true;
-  clearTimeout(keyboardThrottleTimer);
-  keyboardThrottleTimer = setTimeout(() => {
-    hadKeyboardEvent = false;
-  }, 100);
-};
-
-const onPointerDown = () => {
-  hadKeyboardEvent = false;
-};
-
-const onFocus = (e) => {
-  if (hadKeyboardEvent || e.target.matches(':focus-visible')) {
-    e.target.classList.add('focus-visible');
+      document.documentElement.style.setProperty('--viewport-height', `${viewport.height}px`);
+    }
+    
+    window.visualViewport.addEventListener('resize', handleViewportChange);
+    handleViewportChange();
   }
-};
+  
+  // Initial load
+  loadFeeds();
+  
+  // Focus visible polyfill for better keyboard navigation
+  function applyFocusVisiblePolyfill() {
+    let hadKeyboardEvent = true;
+    let keyboardThrottleTimer = 0;
 
-const onBlur = (e) => {
-  e.target.classList.remove('focus-visible');
-};
+    const detectKeyboardFocus = (e) => {
+      if (e.metaKey || e.altKey || e.ctrlKey) return;
+      hadKeyboardEvent = true;
+      clearTimeout(keyboardThrottleTimer);
+      keyboardThrottleTimer = setTimeout(() => {
+        hadKeyboardEvent = false;
+      }, 100);
+    };
 
-document.addEventListener('keydown', detectKeyboardFocus, true);
-document.addEventListener('mousedown', onPointerDown, true);
-document.addEventListener('pointerdown', onPointerDown, true);
-document.addEventListener('touchstart', onPointerDown, true);
-document.addEventListener('focus', onFocus, true);
-document.addEventListener('blur', onBlur, true);
+    const onPointerDown = () => {
+      hadKeyboardEvent = false;
+    };
 
-document.body.classList.add('js-focus-visible');
-}
-applyFocusVisiblePolyfill();
+    const onFocus = (e) => {
+      if (hadKeyboardEvent || e.target.matches(':focus-visible')) {
+        e.target.classList.add('focus-visible');
+      }
+    };
+
+    const onBlur = (e) => {
+      e.target.classList.remove('focus-visible');
+    };
+
+    document.addEventListener('keydown', detectKeyboardFocus, true);
+    document.addEventListener('mousedown', onPointerDown, true);
+    document.addEventListener('pointerdown', onPointerDown, true);
+    document.addEventListener('touchstart', onPointerDown, true);
+    document.addEventListener('focus', onFocus, true);
+    document.addEventListener('blur', onBlur, true);
+
+    document.body.classList.add('js-focus-visible');
+  }
+
+  applyFocusVisiblePolyfill();
 });
+
 // Service worker registration for better caching (optional)
 if ('serviceWorker' in navigator) {
-window.addEventListener('load', () => {
-navigator.serviceWorker.register('/sw.js').catch(() => {
-// Silently fail - not critical
-});
-});
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {
+      // Silently fail - not critical
+    });
+  });
 }
 </script>
 </body>
