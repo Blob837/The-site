@@ -43,7 +43,7 @@
         --radius-lg: 1.75rem;
         --safe-area-top: env(safe-area-inset-top);
         --safe-area-bottom: env(safe-area-inset-bottom);
-        --header-height: 260px;
+        --header-height: auto;
         --tab-bar-height: 74px;
         font-size: 16px;
       }
@@ -107,7 +107,7 @@
       .feed-section { display: flex; flex-direction: column; gap: var(--spacing-1); }
       .feed-section header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--spacing-1); }
       .feed-section h2 { margin: 0; font-size: 1.125rem; }
-      .feed-scroller { position: relative; overflow-y: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; height: calc(100vh - var(--header-height) - var(--tab-bar-height)); padding-bottom: var(--spacing-4); scroll-snap-type: y proximity; overscroll-behavior: contain; }
+      .feed-scroller { position: relative; overflow-y: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; height: calc(100vh - var(--header-height, 0px) - var(--tab-bar-height, 0px)); padding-bottom: var(--spacing-4); scroll-snap-type: y proximity; overscroll-behavior: contain; }
       .pull-indicator { position: absolute; top: -5rem; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; color: var(--text-secondary); font-size: 0.875rem; pointer-events: none; transition: transform 0.25s ease; }
       .pull-indicator[data-state="refresh"] .spinner { animation-play-state: running; }
       .spinner { width: 1.75rem; height: 1.75rem; border-radius: 50%; border: 3px solid rgba(10,132,255,0.25); border-top-color: var(--accent); animation: spin 0.9s linear infinite paused; }
@@ -555,7 +555,6 @@
           document.head.appendChild(link);
         });
         const docEl = document.documentElement;
-        const app = document.getElementById("app");
         const header = document.querySelector(".app-header");
         const tabBar = document.querySelector(".tab-bar");
         const feedScroller = document.getElementById("feedScroller");
@@ -574,10 +573,10 @@
         const menuButton = document.getElementById("menuButton");
         const menuDrawer = document.getElementById("menuDrawer");
         const settingsOverlay = document.getElementById("settingsOverlay");
-        const sheetPanel = quickSheet.querySelector(".sheet-panel");
-        const sheetHandle = sheetPanel.querySelector("[data-drag-handle]");
-        const overlayPanel = settingsOverlay.querySelector(".overlay-panel");
-        const drawerPanel = menuDrawer.querySelector(".menu-panel");
+        const sheetPanel = quickSheet ? quickSheet.querySelector(".sheet-panel") : null;
+        const sheetHandle = sheetPanel ? sheetPanel.querySelector("[data-drag-handle]") : null;
+        const overlayPanel = settingsOverlay ? settingsOverlay.querySelector(".overlay-panel") : null;
+        const drawerPanel = menuDrawer ? menuDrawer.querySelector(".menu-panel") : null;
         const manageFeedsButton = document.getElementById("manageFeedsButton");
         const addFeedButton = document.getElementById("addFeedButton");
         const refreshNowButton = document.getElementById("refreshNowButton");
@@ -586,13 +585,50 @@
         const feedForm = document.getElementById("feedForm");
         const feedUrlInput = document.getElementById("feedUrl");
         const feedUrlError = document.getElementById("feedUrlError");
-        const saveFeedButton = document.getElementById("saveFeedButton");
         const feedListSettings = document.getElementById("feedListSettings");
         const toastStack = document.getElementById("toastStack");
         const contextMenu = document.getElementById("cardContextMenu");
         const template = document.getElementById("feedCardTemplate");
         const infiniteSentinel = document.getElementById("infiniteSentinel");
         const notifyButtons = Array.from(document.querySelectorAll("[data-notify]"));
+        if (
+          !header ||
+          !tabBar ||
+          !feedScroller ||
+          !feedList ||
+          !topSpacer ||
+          !bottomSpacer ||
+          !skeletonContainer ||
+          !pullIndicator ||
+          !pullLabel ||
+          !listEndIndicator ||
+          !feedCountLabel ||
+          !searchInput ||
+          !quickSheet ||
+          !quickActionsButton ||
+          !menuButton ||
+          !menuDrawer ||
+          !settingsOverlay ||
+          !sheetPanel ||
+          !overlayPanel ||
+          !drawerPanel ||
+          !manageFeedsButton ||
+          !addFeedButton ||
+          !refreshNowButton ||
+          !toggleOfflineButton ||
+          !shareAppButton ||
+          !feedForm ||
+          !feedUrlInput ||
+          !feedUrlError ||
+          !feedListSettings ||
+          !toastStack ||
+          !contextMenu ||
+          !template ||
+          !infiniteSentinel
+        ) {
+          console.error("Initialization aborted: required interface elements are missing.");
+          return;
+        }
         const state = {
           items: [],
           filtered: [],
@@ -620,12 +656,14 @@
         const PULL_TRIGGER = 92;
         const PULL_MAX = 160;
         const PULL_DAMPING = 0.6;
-        const layoutObserver = new ResizeObserver(() => {
+        const applyLayoutMetrics = () => {
           docEl.style.setProperty("--header-height", `${header.offsetHeight}px`);
           docEl.style.setProperty("--tab-bar-height", `${tabBar.offsetHeight}px`);
-        });
+        };
+        const layoutObserver = new ResizeObserver(applyLayoutMetrics);
         layoutObserver.observe(header);
         layoutObserver.observe(tabBar);
+        requestAnimationFrame(applyLayoutMetrics);
         const haptic = (pattern) => {
           if (navigator.vibrate) {
             navigator.vibrate(pattern);
@@ -771,6 +809,9 @@
           }
         }
         function updateVirtualWindow(force = false) {
+          if (!feedScroller || !feedList || !topSpacer || !bottomSpacer || !listEndIndicator) {
+            return;
+          }
           const total = state.filtered.length;
           if (!total) {
             feedList.innerHTML = "";
@@ -781,7 +822,13 @@
             return;
           }
           const scrollTop = feedScroller.scrollTop;
-          const viewport = feedScroller.clientHeight || window.innerHeight;
+          const viewport = feedScroller.clientHeight;
+          if (!viewport) {
+            if (force) {
+              requestAnimationFrame(() => updateVirtualWindow(true));
+            }
+            return;
+          }
           const startIndex = Math.max(0, Math.floor(scrollTop / state.cardHeight) - 3);
           const visibleCount = Math.ceil(viewport / state.cardHeight) + 6;
           const endIndex = Math.min(total, startIndex + visibleCount);
@@ -911,6 +958,7 @@
             if (event.pointerType === "mouse") {
               return;
             }
+            event.stopPropagation();
             closeContextMenu();
             active = true;
             pointerId = event.pointerId;
@@ -930,6 +978,7 @@
             if (!active || event.pointerId !== pointerId) {
               return;
             }
+            event.stopPropagation();
             const dx = event.clientX - startX;
             const dy = event.clientY - startY;
             if (!swiping && Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy)) {
@@ -950,6 +999,7 @@
             if (event.pointerId !== pointerId) {
               return;
             }
+            event.stopPropagation();
             clearPress();
             active = false;
             card.releasePointerCapture(pointerId);
@@ -1489,6 +1539,7 @@
         attachOverlaySwipe();
         updateOfflineButton();
         renderSettingsList();
+        requestAnimationFrame(() => updateVirtualWindow(true));
         loadInitialData();
         if ("serviceWorker" in navigator) {
           const swSource = `const CACHE_NAME = "hackertab-mobile-v1";
