@@ -2217,6 +2217,17 @@
         return result;
       }
 
+      function debounce(callback, wait = 200) {
+        let timeoutId;
+        return function (...args) {
+          const context = this;
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => {
+            callback.apply(context, args);
+          }, wait);
+        };
+      }
+
       function clamp(value, min, max) {
         if (Number.isNaN(value)) return min;
         return Math.min(Math.max(value, min), max);
