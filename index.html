@@ -1,1588 +1,2255 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <!-- Viewport includes viewport-fit=cover to fully utilize iPhone notch area -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>HackerTab Pro · Mobile Intelligence Hub</title>
-    <meta name="description" content="HackerTab Pro reimagined for iOS – swipeable developer intelligence with offline mode, pull-to-refresh, and buttery mobile gestures." />
-    <!-- Enable standalone PWA display on iOS -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="theme-color" content="#0b1220" />
-    <!-- Prevent unwanted input zoom and automatic formatting on iOS -->
-    <meta name="format-detection" content="telephone=no, email=no, address=no" />
-    <style>
-      :root {
-        color-scheme: light dark;
-        --font-system: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        --font-mono: "SFMono-Regular", "Menlo", monospace;
-        --surface-base: #05070f;
-        --surface-elevated: rgba(13, 19, 35, 0.82);
-        --surface-card: rgba(20, 28, 49, 0.95);
-        --surface-card-strong: rgba(26, 37, 66, 0.98);
-        --surface-border: rgba(255, 255, 255, 0.08);
-        --surface-border-strong: rgba(255, 255, 255, 0.16);
-        --text-primary: #eef3ff;
-        --text-secondary: rgba(238, 243, 255, 0.75);
-        --text-muted: rgba(238, 243, 255, 0.55);
-        --accent: #0a84ff;
-        --accent-soft: rgba(10, 132, 255, 0.16);
-        --accent-strong: #409cff;
-        --danger: #ff4d6d;
-        --warning: #ffb020;
-        --success: #32d74b;
-        --shadow-soft: 0 22px 46px rgba(5, 7, 15, 0.35);
-        --shadow-card: 0 10px 30px rgba(2, 4, 10, 0.45);
-        --spacing-1: 0.5rem;
-        --spacing-2: 1rem;
-        --spacing-3: 1.5rem;
-        --spacing-4: 2rem;
-        --radius-sm: 0.75rem;
-        --radius-md: 1.25rem;
-        --radius-lg: 1.75rem;
-        --safe-area-top: env(safe-area-inset-top);
-        --safe-area-bottom: env(safe-area-inset-bottom);
-        --header-height: auto;
-        --tab-bar-height: 74px;
-        font-size: 16px;
-      }
-      @media (prefers-color-scheme: light) {
-        :root {
-          --surface-base: #f7f9ff;
-          --surface-elevated: rgba(255, 255, 255, 0.9);
-          --surface-card: rgba(255, 255, 255, 0.92);
-          --surface-card-strong: rgba(244, 247, 255, 0.96);
-          --surface-border: rgba(4, 20, 60, 0.08);
-          --surface-border-strong: rgba(4, 20, 60, 0.16);
-          --text-primary: #0b1220;
-          --text-secondary: rgba(11, 18, 32, 0.72);
-          --text-muted: rgba(11, 18, 32, 0.54);
-          --shadow-soft: 0 24px 48px rgba(5, 17, 45, 0.08);
-          --shadow-card: 0 18px 38px rgba(8, 20, 48, 0.14);
-        }
-      }
-      *, *::before, *::after {
-        box-sizing: border-box;
-      }
-      html, body {
-        margin: 0;
-        padding: 0;
-      }
-      body {
-        font-family: var(--font-system);
-        background: var(--surface-base);
-        color: var(--text-primary);
-        min-height: 100vh;
-        line-height: 1.55;
-        -webkit-text-size-adjust: 100%;
-        overscroll-behavior-y: none;
-      }
-      a { color: inherit; }
-      img { max-width: 100%; display: block; }
-      button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; padding: 0; min-height: 44px; min-width: 44px; touch-action: manipulation; }
-      .app { display: flex; flex-direction: column; min-height: 100vh; padding-bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom)); }
-      .app-header { position: sticky; top: 0; z-index: 20; padding: calc(var(--safe-area-top) + var(--spacing-2)) var(--spacing-2) var(--spacing-2); display: grid; gap: var(--spacing-2); background: var(--surface-elevated); backdrop-filter: blur(28px) saturate(160%); border-bottom: 1px solid var(--surface-border); }
-      .header-row { display: flex; align-items: center; gap: var(--spacing-1); flex-wrap: wrap; }
-      .brand-block { display: grid; gap: 0.25rem; flex: 1; }
-      .brand-block h1 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; }
-      .brand-block p { margin: 0; color: var(--text-secondary); font-size: 0.9375rem; }
-      .product-badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.75rem; background: var(--accent-soft); color: var(--accent); border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
-      .icon-button { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--surface-border); background: var(--surface-card); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.24s ease, background 0.24s ease, border 0.24s ease; }
-      .icon-button:active { transform: scale(0.94); }
-      .pill-button { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: var(--surface-card); border-radius: 999px; border: 1px solid var(--surface-border); font-weight: 600; transition: transform 0.2s ease, background 0.2s ease, border 0.2s ease; }
-      .pill-button:active { transform: scale(0.97); }
-      .pill-button.primary { background: linear-gradient(135deg, var(--accent), var(--accent-strong)); color: #031222; border: none; box-shadow: 0 8px 22px rgba(10, 132, 255, 0.35); }
-      .pill-button.destructive { color: var(--danger); border-color: rgba(255, 77, 109, 0.35); }
-      .chips-row { display: grid; grid-auto-flow: column; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem; mask-image: linear-gradient(90deg, transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent); -webkit-overflow-scrolling: touch; }
-      .filter-chip { padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid var(--surface-border); background: var(--surface-card); color: var(--text-secondary); font-size: 0.875rem; white-space: nowrap; }
-      .filter-chip[data-active="true"] { color: var(--accent); border-color: rgba(10,132,255,0.35); background: rgba(10,132,255,0.15); }
-      .search-field { position: relative; flex: 1; }
-      .search-field input { width: 100%; background: var(--surface-card-strong); border-radius: var(--radius-md); border: 1px solid var(--surface-border); padding: 1.1rem 1.1rem 0.45rem 3rem; color: var(--text-primary); font-size: 1rem; }
-      .search-field label { position: absolute; top: 1.05rem; left: 3rem; font-size: 0.875rem; color: var(--text-muted); pointer-events: none; transition: transform 0.18s ease, font-size 0.18s ease, color 0.18s ease; }
-      .search-field svg { position: absolute; top: 0.95rem; left: 1.1rem; width: 1.2rem; height: 1.2rem; stroke: var(--text-muted); }
-      .search-field input:focus { outline: none; border-color: rgba(10,132,255,0.45); box-shadow: 0 0 0 1px rgba(10,132,255,0.45); }
-      .search-field input:focus + label, .search-field input:not(:placeholder-shown) + label { transform: translateY(-0.85rem); font-size: 0.72rem; color: var(--accent); }
-      main { flex: 1; display: flex; flex-direction: column; padding: 0 var(--spacing-2); gap: var(--spacing-2); }
-      .feed-section { display: flex; flex-direction: column; gap: var(--spacing-1); }
-      .feed-section header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--spacing-1); }
-      .feed-section h2 { margin: 0; font-size: 1.125rem; }
-      .feed-scroller { position: relative; overflow-y: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; height: calc(100vh - var(--header-height, 0px) - var(--tab-bar-height, 0px)); padding-bottom: var(--spacing-4); scroll-snap-type: y proximity; overscroll-behavior: contain; }
-      .pull-indicator { position: absolute; top: -5rem; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; color: var(--text-secondary); font-size: 0.875rem; pointer-events: none; transition: transform 0.25s ease; }
-      .pull-indicator[data-state="refresh"] .spinner { animation-play-state: running; }
-      .spinner { width: 1.75rem; height: 1.75rem; border-radius: 50%; border: 3px solid rgba(10,132,255,0.25); border-top-color: var(--accent); animation: spin 0.9s linear infinite paused; }
-      @keyframes spin { to { transform: rotate(360deg); } }
-      .feed-items { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--spacing-2); }
-      .feed-row { position: relative; scroll-snap-align: start; }
-      .action-backdrop { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, 1fr); border-radius: var(--radius-lg); overflow: hidden; pointer-events: none; }
-      .action-backdrop div { display: flex; align-items: center; justify-content: center; gap: 0.35rem; color: rgba(255,255,255,0.82); font-size: 0.75rem; font-weight: 600; }
-      .action-backdrop .action-archive { background: linear-gradient(135deg, rgba(96,205,255,0.4), rgba(10,132,255,0.6)); }
-      .action-backdrop .action-delete { background: linear-gradient(135deg, rgba(255,77,109,0.65), rgba(255,107,135,0.85)); }
-      .action-backdrop .action-share { background: linear-gradient(135deg, rgba(50,215,75,0.6), rgba(88,255,155,0.7)); }
-      .feed-card { position: relative; background: var(--surface-card); border: 1px solid var(--surface-border); border-radius: var(--radius-lg); padding: var(--spacing-2); display: grid; gap: 0.75rem; min-height: 9.5rem; box-shadow: var(--shadow-card); transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1), border 0.2s ease; touch-action: pan-y; }
-      .feed-card:focus-visible { outline: 3px solid rgba(10,132,255,0.55); outline-offset: 3px; }
-      .feed-card h3 { margin: 0; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.01em; }
-      .feed-card p { margin: 0; color: var(--text-secondary); font-size: 0.9375rem; }
-      .feed-meta { display: flex; align-items: center; gap: 0.35rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
-      .tag-row { display: flex; gap: 0.35rem; flex-wrap: wrap; }
-      .tag { font-size: 0.75rem; padding: 0.35rem 0.7rem; border-radius: 999px; background: rgba(255,255,255,0.06); color: var(--text-secondary); }
-      .card-footer { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-1); }
-      .card-footer button { border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid var(--surface-border); padding: 0.55rem 1rem; font-size: 0.85rem; }
-      .card-footer button:active { transform: scale(0.96); }
-      .skeletons { display: grid; gap: var(--spacing-2); }
-      .skeleton-card { height: 9.5rem; border-radius: var(--radius-lg); background: linear-gradient(110deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.16) 37%, rgba(255,255,255,0.06) 55%); background-size: 200% 100%; animation: shimmer 1.2s ease infinite; }
-      @keyframes shimmer { to { background-position: -200% 0; } }
-      .list-end { text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 2.5rem 0; }
-      .tab-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; background: var(--surface-elevated); backdrop-filter: blur(26px) saturate(160%); border-top: 1px solid var(--surface-border); padding: 0.35rem 0.75rem calc(0.35rem + var(--safe-area-bottom)); }
-      .tab-button { border-radius: 16px; padding: 0.5rem; display: grid; justify-items: center; color: var(--text-secondary); font-size: 0.75rem; gap: 0.3rem; }
-      .tab-button[data-active="true"] { color: var(--accent); background: rgba(10,132,255,0.18); }
-      .sheet, .overlay, .menu-drawer { position: fixed; inset: 0; display: grid; pointer-events: none; z-index: 40; }
-      .sheet[data-open="true"], .overlay[data-open="true"], .menu-drawer[data-open="true"] { pointer-events: auto; }
-      .sheet-scrim, .overlay-scrim, .drawer-scrim { position: absolute; inset: 0; background: rgba(5,7,15,0.55); opacity: 0; transition: opacity 0.24s ease; }
-      .sheet[data-open="true"] .sheet-scrim, .overlay[data-open="true"] .overlay-scrim, .menu-drawer[data-open="true"] .drawer-scrim { opacity: 1; }
-      .sheet-panel { align-self: end; background: var(--surface-card); border-radius: 1.5rem 1.5rem 0 0; padding: 1rem 1.5rem calc(1.5rem + var(--safe-area-bottom)); box-shadow: 0 -16px 48px rgba(2,6,14,0.4); transform: translateY(120%); transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1); display: grid; gap: 1rem; }
-      .sheet[data-open="true"] .sheet-panel { transform: translateY(0); }
-      .sheet-handle { width: 54px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.22); justify-self: center; }
-      .sheet-actions { display: grid; gap: 0.75rem; }
-      .sheet-actions button { width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--surface-border); background: rgba(255,255,255,0.05); padding: 0.85rem 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }
-      .overlay-panel { align-self: center; justify-self: center; width: min(640px, 100% - 2.5rem); background: var(--surface-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); max-height: calc(100vh - var(--safe-area-top) - 2rem); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; transform: translateY(24px); opacity: 0; transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.2s ease; }
-      .overlay[data-open="true"] .overlay-panel { transform: translateY(0); opacity: 1; }
-      .overlay-panel header { padding: 1.25rem 1.5rem 1rem; border-bottom: 1px solid var(--surface-border); display: grid; gap: 0.75rem; }
-      .breadcrumb { display: flex; align-items: center; gap: 0.35rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
-      .overlay-content { padding: 1.5rem; overflow-y: auto; -webkit-overflow-scrolling: touch; display: grid; gap: 1.25rem; }
-      .form-field { display: grid; gap: 0.4rem; }
-      .form-field label { font-weight: 600; font-size: 0.9rem; }
-      .form-field input, .form-field select { border-radius: var(--radius-sm); border: 1px solid var(--surface-border); background: var(--surface-card-strong); padding: 0.85rem 1rem; font-size: 1rem; color: var(--text-primary); }
-      .form-field small { color: var(--text-muted); font-size: 0.75rem; }
-      .inline-error { color: var(--danger); font-size: 0.75rem; }
-      .overlay-footer { padding: 1rem 1.5rem calc(1rem + var(--safe-area-bottom)); border-top: 1px solid var(--surface-border); display: flex; gap: 0.75rem; }
-      .menu-panel { width: min(320px, 86vw); background: var(--surface-card); border-radius: 0 1.25rem 1.25rem 0; box-shadow: var(--shadow-soft); transform: translateX(-100%); transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1); padding: calc(var(--safe-area-top) + 1.25rem) 1.5rem 1.5rem; display: grid; gap: 1rem; }
-      .menu-drawer[data-open="true"] .menu-panel { transform: translateX(0); }
-      .menu-links { display: grid; gap: 0.75rem; }
-      .menu-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; }
-      .toast-stack { position: fixed; left: 0; right: 0; top: calc(var(--safe-area-top) + 1rem); display: grid; gap: 0.5rem; padding: 0 1.25rem; pointer-events: none; z-index: 60; }
-      .toast { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem 1rem; border-radius: var(--radius-sm); background: rgba(20,28,49,0.95); border: 1px solid var(--surface-border); box-shadow: var(--shadow-card); pointer-events: auto; font-size: 0.85rem; animation: toast-in 0.3s ease forwards; }
-      .toast[data-tone="success"] { border-color: rgba(50,215,75,0.4); }
-      .toast[data-tone="error"] { border-color: rgba(255,77,109,0.6); }
-      @keyframes toast-in { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-      .context-menu { position: fixed; background: var(--surface-card); border-radius: var(--radius-sm); border: 1px solid var(--surface-border); box-shadow: var(--shadow-soft); padding: 0.35rem; display: grid; gap: 0.25rem; min-width: 200px; opacity: 0; transform: scale(0.92); transition: transform 0.2s ease, opacity 0.2s ease; pointer-events: none; z-index: 80; }
-      .context-menu[data-open="true"] { pointer-events: auto; opacity: 1; transform: scale(1); }
-      .context-menu button { width: 100%; border-radius: var(--radius-sm); padding: 0.75rem; display: flex; align-items: center; gap: 0.75rem; justify-content: flex-start; border: none; background: transparent; }
-      .context-menu button:active { background: rgba(10,132,255,0.16); }
-      @media (min-width: 768px) { .app-header { padding-left: clamp(2rem, 4vw, 3rem); padding-right: clamp(2rem, 4vw, 3rem); } main { padding-left: clamp(2rem, 4vw, 3rem); padding-right: clamp(2rem, 4vw, 3rem); } .feed-scroller { border-radius: var(--radius-lg); } }
-      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; } }
-    </style>
-  </head>
-  <body>
-    <div class="app" id="app" data-theme="auto">
-      <header class="app-header" role="banner">
-        <div class="header-row">
-          <button class="icon-button" id="menuButton" aria-label="Open navigation">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-              <path d="M4 6h16M4 12h16M4 18h10" />
-            </svg>
-          </button>
-          <div class="brand-block">
-            <span class="product-badge">HackerTab Pro • mobile-first</span>
-            <h1>Intelligence that moves with you</h1>
-            <p>Curated developer briefings, optimized for thumb flow, offline access, and lightning gestures.</p>
-          </div>
-          <button class="icon-button" id="quickActionsButton" aria-haspopup="dialog" aria-expanded="false">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
-              <path d="M12 6.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm0 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm0 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
-            </svg>
-          </button>
-        </div>
-        <div class="header-row">
-          <div class="search-field">
-            <input id="feedSearch" type="search" placeholder=" " inputmode="search" autocomplete="off" aria-label="Search feed" />
-            <label for="feedSearch">Search sources, tags, or topics</label>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="11" cy="11" r="6"></circle>
-              <path d="m20 20-3.5-3.5"></path>
-            </svg>
-          </div>
-          <button class="pill-button primary" id="addFeedButton">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            Add feed
-          </button>
-        </div>
-        <div class="header-row">
-          <div class="chips-row" role="group" aria-label="Feed filters">
-            <button class="filter-chip" data-filter="all" data-active="true" aria-pressed="true">All</button>
-            <button class="filter-chip" data-filter="frontend" aria-pressed="false">Frontend</button>
-            <button class="filter-chip" data-filter="backend" aria-pressed="false">Backend</button>
-            <button class="filter-chip" data-filter="ai" aria-pressed="false">AI</button>
-            <button class="filter-chip" data-filter="security" aria-pressed="false">Security</button>
-            <button class="filter-chip" data-filter="community" aria-pressed="false">Community</button>
-          </div>
-          <button class="pill-button" id="manageFeedsButton">Manage feeds</button>
-        </div>
-      </header>
-      <main class="app-main" role="main">
-        <section class="feed-section" aria-label="Personalized feed">
-          <header>
-            <h2>Today's intelligence</h2>
-            <span class="feed-meta" aria-live="polite" id="feedCount">0 stories</span>
-          </header>
-          <div class="feed-scroller" id="feedScroller" role="feed" aria-live="polite">
-            <div class="pull-indicator" id="pullIndicator" data-state="idle" role="status">
-              <div class="spinner" aria-hidden="true"></div>
-              <span id="pullLabel">Pull to refresh</span>
-            </div>
-            <div class="skeletons" id="skeletonContainer" aria-hidden="true">
-              <div class="skeleton-card"></div>
-              <div class="skeleton-card"></div>
-              <div class="skeleton-card"></div>
-            </div>
-            <div id="virtualTopSpacer" aria-hidden="true"></div>
-            <ul class="feed-items" id="feedList" role="list"></ul>
-            <div id="virtualBottomSpacer" aria-hidden="true"></div>
-            <div class="list-end" id="listEndIndicator" aria-hidden="true">You're all caught up.</div>
-            <div id="infiniteSentinel" aria-hidden="true"></div>
-          </div>
-        </section>
-      </main>
-      <nav class="tab-bar" role="navigation" aria-label="Primary navigation">
-        <button class="tab-button" data-active="true">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M4 6h16v12H4z" />
-          </svg>
-          Today
-        </button>
-        <button class="tab-button">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="M4 4h16M4 10h16M4 16h16" />
-          </svg>
-          Queue
-        </button>
-        <button class="tab-button">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-            <path d="m5 12 4 4L19 6" />
-          </svg>
-          Done
-        </button>
-      </nav>
-      <div class="sheet" id="quickSheet" aria-hidden="true" role="dialog" aria-modal="true">
-        <div class="sheet-scrim" data-close="quick"></div>
-        <section class="sheet-panel" role="document">
-          <div class="sheet-handle" data-drag-handle></div>
-          <h2>Quick actions</h2>
-          <div class="sheet-actions">
-            <button id="refreshNowButton">Refresh feed<span aria-hidden="true">⌘R</span></button>
-            <button id="toggleOfflineButton">Toggle offline cache<span aria-hidden="true">•</span></button>
-            <button id="shareAppButton">Share HackerTab Pro<span aria-hidden="true">↗︎</span></button>
-          </div>
-        </section>
-      </div>
-      <div class="overlay" id="settingsOverlay" aria-hidden="true" role="dialog" aria-modal="true">
-        <div class="overlay-scrim" data-close="settings"></div>
-        <section class="overlay-panel" role="document">
-          <header>
-            <nav class="breadcrumb" aria-label="Breadcrumb">
-              <span>Home</span>›<span>Settings</span>›<span aria-current="page">Feeds</span>
-            </nav>
-            <div>
-              <h2 style="margin:0;font-size:1.35rem">Feed management</h2>
-              <p style="margin:0;color:var(--text-secondary);font-size:0.95rem">Curate sources and schedule sync windows without leaving thumb reach.</p>
-            </div>
-          </header>
-          <div class="overlay-content">
-            <form id="feedForm" novalidate>
-              <div class="form-field">
-                <label for="feedUrl">Feed URL</label>
-                <input id="feedUrl" name="feed-url" type="url" inputmode="url" placeholder="https://" required pattern="https?://.+" />
-                <small>Add secure sources for the best offline reliability.</small>
-                <p class="inline-error" id="feedUrlError" role="alert" hidden></p>
-              </div>
-              <div class="form-field">
-                <label for="cadence">Sync cadence</label>
-                <select id="cadence" name="cadence">
-                  <option value="hourly">Hourly</option>
-                  <option value="daily" selected>Daily</option>
-                  <option value="weekly">Weekly</option>
-                </select>
-              </div>
-              <div class="form-field">
-                <label>Notifications</label>
-                <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
-                  <button type="button" class="pill-button" data-notify="digest">Digest</button>
-                  <button type="button" class="pill-button" data-notify="realtime">Real-time</button>
-                  <button type="button" class="pill-button" data-notify="mute">Mute</button>
-                </div>
-              </div>
-            </form>
-            <section aria-label="Current feeds">
-              <h3 style="margin:0 0 0.75rem;font-size:1rem">Active sources</h3>
-              <ul id="feedListSettings" style="list-style:none;margin:0;padding:0;display:grid;gap:0.5rem;font-size:0.9rem;color:var(--text-secondary);"></ul>
-            </section>
-          </div>
-          <div class="overlay-footer">
-            <button class="pill-button" data-close="settings">Cancel</button>
-            <button class="pill-button primary" id="saveFeedButton" type="submit" form="feedForm">Save source</button>
-          </div>
-        </section>
-      </div>
-      <aside class="menu-drawer" id="menuDrawer" aria-hidden="true">
-        <div class="drawer-scrim" data-close="menu"></div>
-        <nav class="menu-panel" aria-label="Secondary navigation">
-          <h2 style="margin:0;font-size:1.2rem">Navigation</h2>
-          <div class="menu-links">
-            <a href="#" role="button">Focus mode</a>
-            <a href="#" role="button">Highlights</a>
-            <a href="#" role="button">Archive</a>
-            <a href="#" role="button">Integrations</a>
-          </div>
-          <div class="menu-links" aria-label="Account">
-            <a href="#" role="button">Account</a>
-            <a href="#" role="button">Notifications</a>
-            <a href="#" role="button">Help center</a>
-          </div>
-        </nav>
-      </aside>
-      <div class="context-menu" id="cardContextMenu" role="menu" aria-hidden="true">
-        <button type="button" role="menuitem" data-context="open">
-          <span>Open story</span>
-        </button>
-        <button type="button" role="menuitem" data-context="save">
-          <span>Save for later</span>
-        </button>
-        <button type="button" role="menuitem" data-context="share">
-          <span>Share</span>
-        </button>
-      </div>
-      <div class="toast-stack" id="toastStack" role="status" aria-live="polite"></div>
-      <template id="feedCardTemplate">
-        <li class="feed-row" data-item-id="">
-          <div class="action-backdrop" aria-hidden="true">
-            <div class="action-archive">Archive</div>
-            <div class="action-delete">Delete</div>
-            <div class="action-share">Share</div>
-          </div>
-          <article class="feed-card" role="article" tabindex="0">
-            <header class="feed-meta">
-              <span class="feed-source"></span>
-              <span>•</span>
-              <time class="feed-time"></time>
-            </header>
-            <h3 class="feed-title"></h3>
-            <p class="feed-summary"></p>
-            <div class="tag-row" aria-label="Topics"></div>
-            <footer class="card-footer">
-              <span class="feed-readtime"></span>
-              <button type="button" class="pill-button" data-action="open">Open</button>
-            </footer>
-          </article>
-        </li>
-      </template>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"/>
+<title>UR NEWS - Terminal Intelligence</title>
+<meta name="theme-color" content="#000000" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="Real-time intelligence terminal for breaking news and political analysis">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --safe-top: env(safe-area-inset-top);
+    --safe-right: env(safe-area-inset-right);
+    --safe-bottom: env(safe-area-inset-bottom);
+    --safe-left: env(safe-area-inset-left);
+    
+    --bg-primary: #000000;
+    --bg-secondary: #0a0a0a;
+    --bg-card: #111111;
+    --bg-card-hover: #1a1a1a;
+    --terminal-green: #00ff00;
+    --terminal-amber: #ffb000;
+    --terminal-red: #ff0040;
+    --terminal-cyan: #00ffff;
+    --terminal-white: #ffffff;
+    --terminal-dim: #00aa00;
+    --terminal-dark: #004400;
+    
+    --text-primary: var(--terminal-green);
+    --text-secondary: var(--terminal-dim);
+    --text-muted: var(--terminal-dark);
+    --accent: var(--terminal-cyan);
+    --accent-bright: var(--terminal-white);
+    
+    --border: rgba(0, 255, 0, 0.3);
+    --border-strong: rgba(0, 255, 0, 0.6);
+    --border-glow: rgba(0, 255, 0, 0.8);
+    
+    --positive: var(--terminal-green);
+    --negative: var(--terminal-red);
+    --neutral: var(--terminal-amber);
+    --warning: var(--terminal-amber);
+    --fresh: var(--terminal-cyan);
+    
+    --radius: 2px;
+    --radius-lg: 4px;
+    --tab-height: 80px;
+    --header-height: 60px;
+    
+    --shadow-sm: 0 0 8px rgba(0, 255, 0, 0.2);
+    --shadow-md: 0 0 16px rgba(0, 255, 0, 0.3);
+    --shadow-lg: 0 0 24px rgba(0, 255, 0, 0.4);
+    --shadow-glow: 0 0 32px rgba(0, 255, 0, 0.5);
+    
+    --pull-distance: 0px;
+    --scan-position: 0%;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    height: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    touch-action: pan-y;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      linear-gradient(transparent 50%, rgba(0, 255, 0, 0.02) 50%),
+      radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.3) 100%);
+    background-size: 100% 4px, 100% 100%;
+    pointer-events: none;
+    z-index: 1000;
+    animation: scanlines 0.1s linear infinite;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--terminal-green), transparent);
+    opacity: 0.6;
+    z-index: 999;
+    animation: scan 2s ease-in-out infinite;
+    transform: translateY(calc(var(--scan-position) * 1vh));
+  }
+
+  @keyframes scanlines {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(4px); }
+  }
+
+  @keyframes scan {
+    0%, 100% { 
+      --scan-position: 0;
+      opacity: 0;
+    }
+    50% { 
+      --scan-position: 100;
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes glow {
+    0%, 100% { 
+      text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+    }
+    50% { 
+      text-shadow: 0 0 2px currentColor, 0 0 5px currentColor, 0 0 8px currentColor;
+    }
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    98% { opacity: 1; }
+    99% { opacity: 0.8; }
+    99.5% { opacity: 1; }
+  }
+
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.95);
+    border-bottom: 1px solid var(--border);
+    height: calc(var(--header-height) + var(--safe-top));
+    padding-top: var(--safe-top);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: var(--header-height);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .terminal-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .terminal-cursor {
+    width: 12px;
+    height: 12px;
+    background: var(--terminal-green);
+    border: 1px solid var(--border-glow);
+    box-shadow: var(--shadow-sm);
+    animation: glow 2s ease-in-out infinite, flicker 3s infinite;
+  }
+
+  .brand-text {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 700;
+    text-shadow: 0 0 8px currentColor;
+  }
+
+  .terminal-status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status-led {
+    width: 6px;
+    height: 6px;
+    background: var(--terminal-green);
+    border-radius: 1px;
+    box-shadow: 0 0 4px currentColor;
+    animation: glow 1.5s ease-in-out infinite;
+  }
+
+  .status-led.amber { background: var(--terminal-amber); }
+  .status-led.red { background: var(--terminal-red); }
+
+  main {
+    padding: calc(var(--header-height) + var(--safe-top) + 20px) 16px calc(var(--tab-height) + var(--safe-bottom) + 20px);
+    max-width: 100%;
+  }
+
+  .terminal-content {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .pull-indicator {
+    position: fixed;
+    top: calc(var(--header-height) + var(--safe-top) + 16px);
+    left: 50%;
+    transform: translateX(-50%) translateY(calc(var(--pull-distance) * 0.3));
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 90;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .pull-indicator[data-state="ready"] {
+    background: rgba(0, 170, 0, 0.2);
+    border-color: var(--border-glow);
+    color: var(--positive);
+    text-shadow: 0 0 4px currentColor;
+  }
+
+  .pull-indicator[data-state="loading"] {
+    opacity: 1;
+    color: var(--accent);
+  }
+
+  .news-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .news-item {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 16px;
+    transition: all 0.3s ease;
+    animation: item-enter 0.6s cubic-bezier(0.23, 1, 0.320, 1) both;
+    animation-delay: calc(var(--index, 0) * 80ms);
+    transform-origin: center top;
+  }
+
+  @keyframes item-enter {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scaleY(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scaleY(1);
+    }
+  }
+
+  .news-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--terminal-green), transparent);
+    transform: translateX(-100%);
+    animation: scan-item 4s ease-in-out infinite;
+    animation-delay: calc(var(--index, 0) * 200ms);
+  }
+
+  @keyframes scan-item {
+    0%, 90% { 
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    95% { 
+      transform: translateX(0);
+      opacity: 1;
+    }
+    100% { 
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  .news-item.fresh::before {
+    background: linear-gradient(90deg, transparent, var(--fresh), transparent);
+    animation-duration: 2s;
+  }
+
+  .news-item.breaking::before {
+    background: linear-gradient(90deg, transparent, var(--terminal-red), transparent);
+    animation-duration: 1s;
+  }
+
+  .news-item:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+
+  .news-item.expanded {
+    background: var(--bg-card-hover);
+    border-color: var(--border-glow);
+    box-shadow: var(--shadow-md);
+  }
+
+  .item-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .source-icon {
+    width: 24px;
+    height: 24px;
+    background: var(--terminal-green);
+    color: var(--bg-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  .item-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .item-title {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    text-shadow: 0 0 4px currentColor;
+  }
+
+  .breaking-tag {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 6px;
+    background: var(--terminal-red);
+    color: var(--bg-primary);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    vertical-align: middle;
+    animation: flicker 1s ease-in-out infinite;
+    text-shadow: none;
+  }
+
+  .item-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+  }
+
+  .meta-time {
+    color: var(--text-muted);
+  }
+
+  .meta-time.fresh {
+    color: var(--fresh);
+    text-shadow: 0 0 4px currentColor;
+  }
+
+  .meta-badge {
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .meta-badge.sentiment-very-positive {
+    border-color: var(--positive);
+    color: var(--positive);
+  }
+
+  .meta-badge.sentiment-positive {
+    border-color: var(--positive);
+    color: var(--positive);
+  }
+
+  .meta-badge.sentiment-negative {
+    border-color: var(--negative);
+    color: var(--negative);
+  }
+
+  .meta-badge.sentiment-very-negative {
+    border-color: var(--negative);
+    color: var(--negative);
+  }
+
+  .meta-badge.sentiment-neutral {
+    border-color: var(--neutral);
+    color: var(--neutral);
+  }
+
+  .meta-badge.trending {
+    background: rgba(255, 176, 0, 0.1);
+    border-color: var(--terminal-amber);
+    color: var(--terminal-amber);
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  .meta-badge.credibility-trust {
+    border-color: var(--positive);
+    color: var(--positive);
+  }
+
+  .meta-badge.credibility-watch {
+    border-color: var(--warning);
+    color: var(--warning);
+  }
+
+  .item-actions {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .progress-bar {
+    width: 40px;
+    height: 2px;
+    background: rgba(0, 255, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--terminal-green);
+    transform-origin: left;
+    transform: scaleX(var(--progress, 0));
+    transition: transform 0.3s ease;
+    box-shadow: 0 0 4px currentColor;
+  }
+
+  .expand-btn {
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .expand-btn:hover,
+  .expand-btn:focus {
+    background: rgba(0, 170, 0, 0.2);
+    border-color: var(--border-glow);
+    color: var(--text-primary);
+  }
+
+  .expand-btn:active {
+    transform: scale(0.95);
+  }
+
+  .item-body {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    animation: expand 0.3s ease-out;
+  }
+
+  @keyframes expand {
+    from { 
+      opacity: 0; 
+      max-height: 0; 
+      transform: translateY(-10px);
+    }
+    to { 
+      opacity: 1; 
+      max-height: 500px; 
+      transform: translateY(0);
+    }
+  }
+
+  .item-body[hidden] {
+    display: none !important;
+  }
+
+  .item-summary {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+
+  .item-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    text-shadow: 0 0 4px currentColor;
+  }
+
+  .item-link:hover,
+  .item-link:focus {
+    background: rgba(0, 255, 255, 0.2);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+  }
+
+  .item-link:active {
+    transform: scale(0.95) translateY(0);
+  }
+
+  .empty-state {
+    padding: 60px 24px;
+    text-align: center;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  .empty-state h3 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--terminal-amber);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 4px currentColor;
+  }
+
+  .empty-state p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .loading-item {
+    padding: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+    animation: loading-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes loading-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 0.8; }
+  }
+
+  .loading-title,
+  .loading-meta {
+    height: 12px;
+    background: rgba(0, 255, 0, 0.1);
+    margin-bottom: 8px;
+    animation: loading-shimmer 2s ease-in-out infinite;
+  }
+
+  @keyframes loading-shimmer {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+    100% { opacity: 0.3; }
+  }
+
+  .loading-title {
+    height: 16px;
+    width: 85%;
+  }
+
+  .loading-meta {
+    height: 10px;
+    width: 60%;
+  }
+
+  .terminal-toast {
+    position: fixed;
+    bottom: calc(var(--tab-height) + var(--safe-bottom) + 20px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid var(--border-glow);
+    color: var(--text-primary);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 4px currentColor;
+    box-shadow: var(--shadow-lg);
+    z-index: 200;
+    animation: toast-enter 0.3s ease;
+  }
+
+  @keyframes toast-enter {
+    from { 
+      transform: translateX(-50%) translateY(100%); 
+      opacity: 0;
+    }
+    to { 
+      transform: translateX(-50%) translateY(0); 
+      opacity: 1;
+    }
+  }
+
+  .terminal-toast.success {
+    border-color: var(--positive);
+    color: var(--positive);
+  }
+
+  .terminal-toast.error {
+    border-color: var(--negative);
+    color: var(--negative);
+  }
+
+  .terminal-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(var(--tab-height) + var(--safe-bottom));
+    padding-bottom: var(--safe-bottom);
+    background: rgba(0, 0, 0, 0.98);
+    border-top: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 90;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .nav-container {
+    height: var(--tab-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px;
+  }
+
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 12px 8px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    font-family: inherit;
+    text-transform: uppercase;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-btn:active {
+    transform: scale(0.95);
+  }
+
+  .nav-btn.active {
+    color: var(--text-primary);
+    text-shadow: 0 0 4px currentColor;
+  }
+
+  .nav-btn.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 1px;
+    background: var(--terminal-green);
+    box-shadow: 0 0 4px currentColor;
+  }
+
+  .nav-icon {
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .nav-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .terminal-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .terminal-sheet.visible {
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  .sheet-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .sheet-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-glow);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    max-height: 80vh;
+    overflow: hidden;
+    padding-bottom: var(--safe-bottom);
+  }
+
+  .terminal-sheet.visible .sheet-panel {
+    transform: translateY(0);
+  }
+
+  .sheet-handle {
+    width: 40px;
+    height: 2px;
+    background: var(--border-strong);
+    margin: 12px auto;
+    box-shadow: 0 0 4px currentColor;
+  }
+
+  .sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sheet-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 4px currentColor;
+  }
+
+  .sheet-close {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 4px 8px;
+    font-family: inherit;
+    letter-spacing: 0.05em;
+  }
+
+  .sheet-content {
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 60vh;
+  }
+
+  .filter-section {
+    margin-bottom: 24px;
+  }
+
+  .filter-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .filter-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .filter-chip {
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    letter-spacing: 0.05em;
+  }
+
+  .filter-chip:active {
+    transform: scale(0.95);
+  }
+
+  .filter-chip.active {
+    background: rgba(0, 255, 0, 0.2);
+    border-color: var(--border-glow);
+    color: var(--text-primary);
+    text-shadow: 0 0 4px currentColor;
+  }
+
+  .source-selector {
+    width: 100%;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    font-family: inherit;
+  }
+
+  .source-selector:hover,
+  .source-selector:focus {
+    border-color: var(--border-glow);
+    background: rgba(0, 170, 0, 0.1);
+  }
+
+  .selector-label {
+    display: block;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+
+  .selector-value {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    text-shadow: 0 0 4px currentColor;
+  }
+
+  .selector-hint {
+    display: block;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .source-option {
+    padding: 14px;
+    margin-bottom: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    width: 100%;
+    text-align: left;
+  }
+
+  .source-option:active {
+    transform: scale(0.98);
+  }
+
+  .source-option[aria-selected="true"] {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: var(--border-glow);
+  }
+
+  .option-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+.option-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .option-check {
+    float: right;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    font-size: 12px;
+  }
+
+  .source-option[aria-selected="true"] .option-check {
+    opacity: 1;
+    text-shadow: 0 0 4px currentColor;
+  }
+
+  .action-group {
+    margin-bottom: 16px;
+  }
+
+  .action-btn {
+    width: 100%;
+    padding: 14px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 8px;
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .action-btn:active {
+    transform: scale(0.98);
+  }
+
+  .action-btn:hover,
+  .action-btn:focus {
+    background: rgba(0, 170, 0, 0.1);
+    border-color: var(--border-glow);
+  }
+
+  .action-btn.danger {
+    background: rgba(255, 0, 64, 0.1);
+    border-color: rgba(255, 0, 64, 0.3);
+    color: var(--negative);
+  }
+
+  .action-btn.danger:hover,
+  .action-btn.danger:focus {
+    background: rgba(255, 0, 64, 0.2);
+    border-color: var(--negative);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (min-width: 768px) {
+    .news-item {
+      max-width: 600px;
+      margin: 0 auto 16px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  @supports (padding: max(0px)) {
+    header {
+      padding-top: max(var(--safe-top), 20px);
+      height: calc(var(--header-height) + max(var(--safe-top), 20px));
+    }
+    
+    main {
+      padding-top: calc(var(--header-height) + max(var(--safe-top), 20px) + 20px);
+      padding-bottom: calc(var(--tab-height) + max(var(--safe-bottom), 20px) + 20px);
+    }
+    
+    .terminal-nav {
+      padding-bottom: max(var(--safe-bottom), 20px);
+      height: calc(var(--tab-height) + max(var(--safe-bottom), 20px));
+    }
+    
+    .terminal-toast {
+      bottom: calc(var(--tab-height) + max(var(--safe-bottom), 20px) + 20px);
+    }
+    
+    .sheet-panel {
+      padding-bottom: max(var(--safe-bottom), 20px);
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="terminal-header">
+    <div class="terminal-brand">
+      <div class="terminal-cursor" aria-label="System active"></div>
+      <div class="brand-text">UR_NEWS.exe</div>
     </div>
-    <script>
-      (function () {
-        "use strict";
-        const ICON_DATA = {
-          "57x57": [
-            "iVBORw0KGgoAAAANSUhEUgAAADkAAAA5CAYAAACMGIOFAAABNUlEQVR4nO2aSw7C",
-            "MAxE04oV9+CA3KF7DshdKCtvkJLYYSYf129bas2Tmw9pt/txnsk5++gAPQhJL4Sk",
-            "F24tN+2vBzqHic/zbfr9ZllCRsv9opVVP66zCaakz6SSnFFQ0GSrSs4sKNQyFiVX",
-            "EBRKWS+xhGQlV+qikMt87U56IiS90LR3bSG3BesxwdEla/tLuc6UpUla/ykwZSlj",
-            "0iqIujcHXBIREi16idkVKonsALJWdNICY8JA1YxOeiEkvRCSpkKMPSeoZnTSXAzY",
-            "TWgtWKWJgUsiOoAe35RO/hOSMYHRTgYkrPr12orHH0JN1sVBljDytUPMrl4ISS9k",
-            "JRnHGWyyM3jnHEMoSq7UzVLWaidXEK1lVD2uM4tqsqnH5Iyi2kymb+uE0V+GUD8g",
-            "XJVYQrwQkl74AgrrX2NfABlOAAAAAElFTkSuQmCC",
-          ].join(""),
-          "72x72": [
-            "iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAABkklEQVR4nO2bQW7D",
-            "IBQFnair3qMH7B267wF7l6YrpChSMmD4H5vOrBPwG33ABvvy/nW7bfKU6+wLODoK",
-            "AhQEKAhQEKAgQEHA24hGrt8fI5oJ4ffzp+v/l54bxSOLeWSvqF2CziTmkVZRzXPQ",
-            "meVsW/v1Nwk6u5xCS45qQavIKdTmcZkHqgStVj2FmlxWEICCVq2eAuWzggAFAQoC",
-            "FAQoCBiy3dHLqwfI2avoNEG1T9X3v5sha8oQ27s307v5tYd0Qb0hsyWlChoVLlNS",
-            "mqDRobIkpQiKCpMhKVxQdIjo9r1RBBQEhArKmkgj+7GCAAUBCgIUBCgIUBAQKihr",
-            "/yayHysIUBAQLih6mIW3H9p66SQoRMYclzbERodJWwBSeimdDQqVebqRPkn3hss+",
-            "+pmyiu0NOeNcbNrB4X1YT1aB2RJe4Y0ioCBAQYCCAAUBKGjGKyeZUD4rCKgStGoV",
-            "1eSygoBqQatVUW2epgpaRVJLjuYhdnZJrdfvV89Al6DCkUVN/W7+P+AyDygIUBCg",
-            "IEBBgIKAP9n1c5OQud7uAAAAAElFTkSuQmCC",
-          ].join(""),
-          "76x76": [
-            "iVBORw0KGgoAAAANSUhEUgAAAEwAAABMCAYAAADHl1ErAAABt0lEQVR4nO2cO27D",
-            "MBAFZSNV7pED5g7pc8DcJU5FQI2NnSX5VmTe1IbIN15+QBG6vX89HocJc6/uwGpY",
-            "GMTCIBYGsTCIhUEsDGJhkLeRD7t/f4x83FB+P3+GPOfWu9O/sqRn9MjrGpIryjqO",
-            "vn6nha0qq5Htf0rY6rIamRxY2C6yGjQPErabrAbJFRa2q6xGNJ83rhALg4SE7T4c",
-            "G5GcrjCIhUEsDGJhkKHHO728OkW4ysJTLix61HL+XaW80iGZPZcadRiYoaTCRgRu",
-            "z1BXm7zCRleHutqkwmaFU0rztgIiEza7ClRVJhGmCqNox0MSYmGQ6cLUy/7s9lxh",
-            "EAuDWBjEwiAWBrEwyHRh8uOXye25wiAWBpEIUw1LRTuyCps+t6j+FEkrGyEVNqsK",
-            "lCuxvMJGh1NvW0pes7WQXffli17mls5h6avfhW++y68KnMP7bgXkKlJe4W0FxMIg",
-            "FgaxMEhIWOV9LCWRnK4wiIVBwsJ2H5bRfKjCdpVGcuEhuZs0mic1h+0iLZMjPemv",
-            "Li3b/65VclVpPf3u/tDHmSufNlzmyyj/DW9cIRYGsTCIhUEsDGJhEAuD/AEQNneJ",
-            "ZAxqTwAAAABJRU5ErkJggg==",
-          ].join(""),
-          "114x114": [
-            "iVBORw0KGgoAAAANSUhEUgAAAHIAAAByCAYAAACP3YV9AAACpklEQVR4nO3cQVLc",
-            "MBCFYQ2VFffIAXMH9jlg7sJkE1e5IAZb6pZeP//fmhqr+rfMABoer2/PZ0N5L6sX",
-            "gBiENEFIE4Q0QUgThDRBSBOENEFIE4Q0QUgThDTxY8VFX37/XHHZqd5//Zl6vces",
-            "v37cId6RGVHTQ9454EeZQdNCEvBYRtCUNztE/FrGfMJDEvGc6DmFhiTiNZHzCgtJ",
-            "xD5RcwsJScQxEfMbDknEGKNz5Fd0JoZCshtjjcyTHWmiOyS7MUfvXNmRJghpoisk",
-            "j9VcPfNlR5ogpAlCmiCkCUKaIKSJJcchs505E+P2I5RNyKsHmvZf7xC1fMiIE2nb",
-            "a1QOWjZkxpHCykFLvtnJPrk9+7h/hFI7cuaAq+3OMjty1S6psjtLhFw9zNXXP6NE",
-            "SHxPPqTKblBZxxHpkGrDU1vPnnRInCcbUvXuV12XbEhcIxlS9a7fKK5PMiSuI6QJ",
-            "uZCKj63/UVunXEj0IaQJQpogpAlCmiCkCUKaIKQJuZBlDjuJrVMuJPoQ0oRkSLXH",
-            "1keK65MMietkQyre9a0Jr2v1AhBDOqTa3a+2nj3pkK3pDE9lHUfkQ+KcEiFX74bV",
-            "1z+jRMjW1g2zQsTWin3QdRvqjINPVQJuyuzIvewhV4vYWrEduZexOysG3JQNuYkI",
-            "WjngpnzIzT4G//nKhFukM0q+2cFnhDRBSBOENEFIE4Q00RVS7UOebnrmy440QUgT",
-            "3SF5vObonSs70sRQSHZlrKG/4ASuAwsNh2RXxhidY8iOJOaYiPmFPVqJ2SdqbqHf",
-            "I4l5Teh5o7BX+oeY50TPKeVdKzG/ljGfx+vb8xn+qjt3PD9zJPMGTw+5uXPQGU+o",
-            "aSH37hB19reXJSERj1/RmSCkCUKaIKQJQpogpAlCmiCkCUKaIKQJQpr4C6QUuAmX",
-            "3ay5AAAAAElFTkSuQmCC",
-          ].join(""),
-          "120x120": [
-            "iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAACv0lEQVR4nO3dQU7D",
-            "MBCFYbdi1XtwQO7AngNyF8oqkgVUJPGM/eb1/9aIWPNrUigBLrf3+73B1nX1AZCL",
-            "wOYIbI7A5ghsjsDmCGyOwOYIbI7A5ghsjsDmCGzuZeXFrx+vKy8/1dfb55LrXmb/",
-            "uPCZoj4yM/a0wIT9bUbo9MCE/V9m6NQvsoi7T+acUjaYsOdFb3P4BhN3TPT8QgMT",
-            "N0bkHHmjw1xYYLY3VtQ8QwITN0fEXLlFmxsOzPbmGp0vG2xuKDDbO8fInNlgcwQ2",
-            "dzowt+e5zs6bDTZHYHMENkdgcwQ2R2BzS5+LnmHPIzDO3/JZBj76XFP/8W6xbQJH",
-            "PazmFtviNTjrueJVv24SqfQGzwiwXaPqNpfd4NnbVXWbSwZeNeyKkcsFXj3k1dc/",
-            "qlRgleGqnGOPMoHVhqp2nkfKBMY5JQKrbovquXrygdWHqH4++cAYQ2Bz0oHVb38b",
-            "5XNKB8Y4ApuTDax82/uL6nllAyMGgc0R2ByBzRHYHIHNEdgcgc3JBq72mKrqeWUD",
-            "IwaBzUkHVr3t/aR8TunAGEdgc/KBlW9/rRU43+oD7KE6RNVz9UoExnllAqtti9p5",
-            "HikTuDWdoaqcY49SgVtbP9zV1z+qXODW1g25WtzWigZubf6wK8ZtrfgfYdmGnvrf",
-            "O4uG3ZTd4F5WhOpxWyu+wb0+xshGO0Tt2QTuHY3tFrVnGbjnHG8Pi9dgPEZgcwQ2",
-            "R2BzBDZHYHOnA6v+Rrurs/Nmg80R2NxQYG7Tcwy9tx54DggaDswW5xqdLxtsLiQw",
-            "W5wjYq5hG0zkWFHz5BZtLjQwWxwjco7hG0zkMdHzu9ze7/fQz9h59sdljshajNTX",
-            "YLZ5n8w5pW5wj23+bcYCTAu8IfTcO9v0wL1nir3q5WppYOTjjQ5zBDZHYHMENkdg",
-            "cwQ2R2BzBDZHYHMENkdgcwQ29w3aIcAnDvhsWwAAAABJRU5ErkJggg==",
-          ].join(""),
-          "144x144": [
-            "iVBORw0KGgoAAAANSUhEUgAAAJAAAACQCAYAAADnRuK4AAADZklEQVR4nO3cS27b",
-            "QBBF0ZaRkfeRBWYPnmeB2UuUQUKAkCPA1Kuu7z1z2y3WZYuyTd7eP+73BbzoLXoB",
-            "qI2AICEgSAgIEgKChIAgISBICAgSAoKEgCAhIEgICBICgoSAICEgSAgIkm/RC3jm",
-            "7ef36CWk8/vHr+glfHLL8h+JBHNdhqDCAyIcXWRIYQERjr2IkNwDIpz9PENy/RRG",
-            "PD48j7NbQMTjy+t4uwREPDE8jvv2gIgn1u7jvzUg4slh5xy2BUQ8ueyax5aAiCen",
-            "HXPhj6mQmAfE7pOb9XzYgSAxDYjdpwbLObEDQWIWELtPLVbzYgeChIAgISBITALi",
-            "+qcmi7mxA0FCQJAQECQEBAkBQUJAkBAQJGkfrhDhyg15/O7rr/EBvXoX5/nrJsc0",
-            "MiDrW38nxzQqII97xo+fMSWkMRfR3k+uyPDsHg8jAooa5oSIWr+FZRhg97e0tjtQ",
-            "hnjOsq3HSsuAsg4r67oU7QLKPqTs67uqXUDw1SqgKmd3lXV+RZuAqg2l2nqfaRFQ",
-            "1WFUXfdZi4AQp3xA1c/i6usvHxBiERAkpQOqvv0fKr+O0gEhHgFBUjagytv+/1R9",
-            "PWUDQg4EBAkBQUJAkBAQJAQECQFBQkCQEBAkBARJ2YC63elZ9fWUDQg5EBAkpQOq",
-            "uu0/qvw6SgeEeAQESfmAKm//azVYf/QCUFuLgKqexVXXfdYioLXqDaPaep9pE9Ba",
-            "dYZSZZ1f0Sog+GsXUPazO/v6rmoX0Fp5h5R1XYqWAa2Vb1jZ1mOl9YPGj6FF3vXZ",
-            "NZxD2x3oLGqI3eNZa0hAa/kPc0I8azV/C3vk8ZY2JZzDqIAO5yFbxDQtmrORAZ29",
-            "GtPkaM7GB3RGFNeNuYjGHgQECQFBQkCQEBAkBAQJAUFiElDVZxxPZ/JbeIN1YDAC",
-            "goSAIDELiOugWqzmxQ4EiWlA7EI1WM6JHQgS84DYhXKzng87ECRbAmIXymnHXLbt",
-            "QESUy655bH0LI6Ictt7GtO07/0NEsXYff5eLaCKK4XHc3T6FEZEvr+Pt+jGeiHx4",
-            "Hufb+8f97vbTTriJz17ECRoW0IGQdJE7e3hAB0K6LsMlQZqAHhHUZxmCeZQ2INTA",
-            "H1MhISBICAgSAoKEgCAhIEgICBICgoSAICEgSAgIEgKChIAgISBICAiSP0oO4Vvf",
-            "xZ0TAAAAAElFTkSuQmCC",
-          ].join(""),
-          "152x152": [
-            "iVBORw0KGgoAAAANSUhEUgAAAJgAAACYCAYAAAAYwiAhAAADoUlEQVR4nO3dTXIa",
-            "MRRFYeHKyPvIArMHz7PA7CVkEHeVqgtjG3Tfz9X55gE177QaGze5vL5drwMQecle",
-            "ALwRGKQIDFIEBikCgxSBQYrAIEVgkCIwSBEYpAgMUgQGKQKDFIFBisAgRWCQIjBI",
-            "/chewGdefv/MXkJ5f3/9yV7Chy4V/2SaqB5XLbYygRHVehViSw+MsPQyQ0t9k09c",
-            "MTJf55QdjLDyRO9m4TsYceWKfv1DAyOuGiLnEBYYcdUSNY+QwIirpoi5yAMjrtrU",
-            "85EGRlw9KOfEh92QkgXG7tWLal6SwIirJ8XcuERCanlg7F69rZ4fOxikCAxSSwPj",
-            "8uhh5RzZwSBFYJBaFhiXRy+r5skOBikCgxSBQYrAIEVgkCIwSBEYpMp/u06m79yk",
-            "yu8BbyOwyTN3PZ//LcH9R2BDczv98Zi7h7Z1YBHf07B7aFsGlvF1RruGtt1Pkdlf",
-            "ypb9/NG2CqzKcKusI8IWl8iKA93lkmm/g1WMa1Z9fc+yDqzL8Lqs8xHWgSGfbWDd",
-            "doVu6/0qy8C6Dqvruu+xC6z7kLqv/8wuMNRiFZjL2e9yHGOYBYZ6bAJzOuvH8Dke",
-            "m8BQk0VgLmf7mcNxWQSGuggMUgQGqfaBObxPuaf78bUPDLURGKQIDFIEBikCgxSB",
-            "QYrAIEVgkCIwSBEYpNoHZn/rffPjax8YaiMwSBEYpCwC6/4+5SMOx2URGOqyCczh",
-            "bJ+5HI9NYKjJKjCbs97kOMYwCwz12AXW/ezvvv4zu8DG6Dukruu+xzKwMfoNq9t6",
-            "v8o2MNRgHViXXaHLOh9hHdgY9YdXfX3P2uK/kjmGWOk2fPewDvY72KzKUKusI8JW",
-            "gY2RP9zs54+2xSXyLOOSuVtYhy0DO0SEtmtYh60DOyhC2z2sA4FNzlF8JziCuo3A",
-            "7iCa5233UyRiERikCAxSBAYpAoMUgUGKwCC1LLBKfwqD562aJzsYpAgMUksD4zLp",
-            "YemH/sseCbiBwCC1PDAuk72tnh87GKQkgbGL9aSYm2wHI7JeVPPiEgkpaWDsYj1I",
-            "76qSPfI7IqtNPZ+QSySR1RQxl7D3YERWS9Q8Qt/kE1kNoV+ZEPZM74gsV/Trf3l9",
-            "u15Dn3HCja1xsk7s1N+DsZvFyHydU3ewGbvZehVO4DKBzYjtcRWimpUMbEZsn6sW",
-            "1ax8YOiND7shRWCQIjBIERikCAxSBAYpAoMUgUGKwCBFYJAiMEgRGKQIDFIEBikC",
-            "gxSBQeofYa3wbzuykx0AAAAASUVORK5CYII=",
-          ].join(""),
-          "180x180": [
-            "iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAESElEQVR4nO3dQXIT",
-            "SRCG0TbBintwwLkDew44dxmzGCuiQ9iWZHV1Zf353h5cpfoiXTTQfvnx6/V1gxDf",
-            "Zi8AjiRoogiaKIImiqCJImiiCJoogiaKoIkiaKIImiiCJoqgiSJoogiaKIImiqCJ",
-            "ImiiCJoogibK99kLeNa33z9nLyHOf//8O3sJX/ay2v/6FvD5Vgp8iaBFXEf1uEsH",
-            "LeS6qoZdMmghr6Na2OWecoh5LdXOq8yErvbB8LgK07rEhBZzhgrnOD3oCh8Cx5l9",
-            "nlODnr15xph5rtOCFnO2Wec7JWgx9zDjnE8PWsy9nH3epwYt5p7OPPfpTzngSKcF",
-            "bTr3dtb5nxK0mNm2czpw5SDK8KBNZ/ZG92BCE2Vo0KYz7xnZhQlNFEETZVjQrht8",
-            "ZlQfJjRRBE0UQRNlSNDuz9xjRCcmNFEETRRBE0XQRBE0UQRNFEETRdBEWf5nrFT0",
-            "yFs4/SXUsQR9gGdeI3v9awX+HEF/0ah3Ie9/X3E/TtAPOvOl3pevJez7CfpOM99O",
-            "L+z7CfqGCj9m4ULYt3ls94lKMe9VXVcFgv5A9Wiqr28WV44rK4XiCvI3E3pnpZj3",
-            "Vl33CIJ+s3oUq6//KILecmJI2cczBE2U9kGnTbW0/TyqddCph5+6r3u0DTr90NP3",
-            "95G2QZOpZdBdpleXfe61DJpc7YLuNrW67bdd0GRrFXS3aXXRad+tgiafoInSJuhO",
-            "33bf02X/bYKmB0ETRdBEaRF0l/vjLR0+hxZB04egiSJoogiaKIImiqCJImiiCJoo",
-            "giaKoInSImivm/1fh8+hRdD0IWiiCJoobYLucH/8TJf9twmaHgRNlFZBd/m2e63T",
-            "vlsFTb52QXeaVtvWcL+zFwBHahl0l6nVZZ97LYMmV9ug06dX+v4+0jbobcs99NR9",
-            "3aN10NuWd/hp+3lU+6DJIugtZ6ql7OMZgn6zegyrr/8ogt5ZNYpV1z3C99kLqOYS",
-            "xwqvnhXy30zoD1SPpfr6ZhH0J6pGU3VdFbhy3FDpCiLk2wR9p5lhC/l+gn7QmWEL",
-            "+XGC/qJ9bEfGLeLnCPoA1xE+EriAjyXoAUQ6j8d2RBE0UQRNFEETRdBEETRRBE0U",
-            "QRNlSNAV/mUa9Y3oxIQmiqCJImiiDAvaPZrPjOrDhCaKoIkyNGjXDt4zsgsTmijD",
-            "gzal2RvdgwlNlFOCNqXZtpNe/TD8K7wRdW9nnb8rB1FODdqU7unMcz99Qou6l7PP",
-            "e8qVQ9Q9THmx5elf8Y2os80636l/KBR1ppnnOv0ph6izzD7P6UFv2/wPgWNUOMeX",
-            "H79eX2cvYs+bO9dTIeSLEhN6r9KHw23VzqvchN4zreuqFvJF6aAvhF1H1ZAvlgh6",
-            "T9znqx7x3nJBXxP48VYK+NryQcNeuacc8AxBE0XQRBE0UQRNFEETRdBEETRRBE0U",
-            "QRNF0EQRNFEETRRBE0XQRBE0UQRNFEETRdBE+QMpiRzQz4xpIAAAAABJRU5ErkJg",
-            "gg==",
-          ].join(""),
-        };
-        const manifest = {
-          name: 'HackerTab Pro',
-          short_name: 'HackerTab',
-          start_url: './',
-          display: 'standalone',
-          background_color: '#05070f',
-          theme_color: '#0b1220',
-          description: 'Competition-grade mobile HackerTab experience',
-          icons: Object.entries(ICON_DATA).map(([size, data]) => ({
-            src: `data:image/png;base64,${data}`,
-            sizes: size,
-            type: 'image/png'
-          }))
-        };
-        const manifestBlob = new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" });
-        const manifestUrl = URL.createObjectURL(manifestBlob);
-        const manifestLink = document.createElement("link");
-        manifestLink.rel = "manifest";
-        manifestLink.href = manifestUrl;
-        document.head.appendChild(manifestLink);
-        window.addEventListener("pagehide", () => URL.revokeObjectURL(manifestUrl), { once: true });
-        Object.entries(ICON_DATA).forEach(([size, data]) => {
-          const link = document.createElement("link");
-          link.rel = "apple-touch-icon";
-          link.sizes = size;
-          link.href = `data:image/png;base64,${data}`;
-          document.head.appendChild(link);
-        });
-        const docEl = document.documentElement;
-        const header = document.querySelector(".app-header");
-        const tabBar = document.querySelector(".tab-bar");
-        const feedScroller = document.getElementById("feedScroller");
-        const feedList = document.getElementById("feedList");
-        const topSpacer = document.getElementById("virtualTopSpacer");
-        const bottomSpacer = document.getElementById("virtualBottomSpacer");
-        const skeletonContainer = document.getElementById("skeletonContainer");
-        const pullIndicator = document.getElementById("pullIndicator");
-        const pullLabel = document.getElementById("pullLabel");
-        const listEndIndicator = document.getElementById("listEndIndicator");
-        const feedCountLabel = document.getElementById("feedCount");
-        const searchInput = document.getElementById("feedSearch");
-        const filterButtons = Array.from(document.querySelectorAll(".filter-chip"));
-        const quickSheet = document.getElementById("quickSheet");
-        const quickActionsButton = document.getElementById("quickActionsButton");
-        const menuButton = document.getElementById("menuButton");
-        const menuDrawer = document.getElementById("menuDrawer");
-        const settingsOverlay = document.getElementById("settingsOverlay");
-        const sheetPanel = quickSheet ? quickSheet.querySelector(".sheet-panel") : null;
-        const sheetHandle = sheetPanel ? sheetPanel.querySelector("[data-drag-handle]") : null;
-        const overlayPanel = settingsOverlay ? settingsOverlay.querySelector(".overlay-panel") : null;
-        const drawerPanel = menuDrawer ? menuDrawer.querySelector(".menu-panel") : null;
-        const manageFeedsButton = document.getElementById("manageFeedsButton");
-        const addFeedButton = document.getElementById("addFeedButton");
-        const refreshNowButton = document.getElementById("refreshNowButton");
-        const toggleOfflineButton = document.getElementById("toggleOfflineButton");
-        const shareAppButton = document.getElementById("shareAppButton");
-        const feedForm = document.getElementById("feedForm");
-        const feedUrlInput = document.getElementById("feedUrl");
-        const feedUrlError = document.getElementById("feedUrlError");
-        const feedListSettings = document.getElementById("feedListSettings");
-        const toastStack = document.getElementById("toastStack");
-        const contextMenu = document.getElementById("cardContextMenu");
-        const template = document.getElementById("feedCardTemplate");
-        const infiniteSentinel = document.getElementById("infiniteSentinel");
-        const notifyButtons = Array.from(document.querySelectorAll("[data-notify]"));
-        if (
-          !header ||
-          !tabBar ||
-          !feedScroller ||
-          !feedList ||
-          !topSpacer ||
-          !bottomSpacer ||
-          !skeletonContainer ||
-          !pullIndicator ||
-          !pullLabel ||
-          !listEndIndicator ||
-          !feedCountLabel ||
-          !searchInput ||
-          !quickSheet ||
-          !quickActionsButton ||
-          !menuButton ||
-          !menuDrawer ||
-          !settingsOverlay ||
-          !sheetPanel ||
-          !overlayPanel ||
-          !drawerPanel ||
-          !manageFeedsButton ||
-          !addFeedButton ||
-          !refreshNowButton ||
-          !toggleOfflineButton ||
-          !shareAppButton ||
-          !feedForm ||
-          !feedUrlInput ||
-          !feedUrlError ||
-          !feedListSettings ||
-          !toastStack ||
-          !contextMenu ||
-          !template ||
-          !infiniteSentinel
-        ) {
-          console.error("Initialization aborted: required interface elements are missing.");
-          return;
-        }
-        const state = {
-          items: [],
-          filtered: [],
-          archivedIds: new Set(),
-          activeFilter: 'all',
-          searchTerm: '',
-          cardHeight: 176,
-          virtualization: { start: 0, end: 0 },
-          isRefreshing: false,
-          loadingMore: false,
-          page: 1,
-          offlineEnabled: true
-        };
-        let searchTimer = 0;
-        let longPressTimeout = null;
-        let contextItem = null;
-        let pullStartY = 0;
-        let pullDistance = 0;
-        let pulling = false;
-        let scrollFrame = 0;
-        let lastOverlayTrigger = null;
-        const LONG_PRESS_DELAY = 550;
-        const SWIPE_THRESHOLD = 72;
-        const DELETE_THRESHOLD = 138;
-        const PULL_TRIGGER = 92;
-        const PULL_MAX = 160;
-        const PULL_DAMPING = 0.6;
-        const applyLayoutMetrics = () => {
-          docEl.style.setProperty("--header-height", `${header.offsetHeight}px`);
-          docEl.style.setProperty("--tab-bar-height", `${tabBar.offsetHeight}px`);
-        };
-        const layoutObserver = new ResizeObserver(applyLayoutMetrics);
-        layoutObserver.observe(header);
-        layoutObserver.observe(tabBar);
-        requestAnimationFrame(applyLayoutMetrics);
-        const haptic = (pattern) => {
-          if (navigator.vibrate) {
-            navigator.vibrate(pattern);
-          }
-        };
-        function showToast(message, tone = "info") {
-          const toast = document.createElement("div");
-          toast.className = "toast";
-          toast.dataset.tone = tone;
-          toast.innerHTML = `<span>${message}</span>`;
-          toastStack.appendChild(toast);
-          setTimeout(() => {
-            toast.style.transition = "opacity 0.28s ease, transform 0.28s ease";
-            toast.style.opacity = "0";
-            toast.style.transform = "translateY(-8px)";
-            setTimeout(() => toast.remove(), 320);
-          }, 3600);
-        }
-        window.addEventListener("error", (event) => {
-          showToast(`Error: ${event.message}`, "error");
-        });
-        window.addEventListener("unhandledrejection", (event) => {
-          const reason = event.reason && event.reason.message ? event.reason.message : event.reason;
-          showToast(`Network hiccup: ${reason}`, "error");
-        });
-        const tagPool = ["React", "Rust", "Security", "AI", "iOS", "DevOps", "Web", "Testing", "Design", "Cloud"];
-        const sourcePool = ["Hacker News", "GitHub", "Product Hunt", "Stack Overflow", "Dev.to", "Reddit", "OSS Radar"];
-        const summaryPool = [
-          "New framework benchmarks show significant gains for edge rendering.",
-          "Maintainers debate the future of package registries on stage at NextConf.",
-          "Incident response postmortem reveals subtle race condition in auth flow.",
-          "Apple quietly ships Safari update that unlocks new WebKit experimental flags.",
-          "Developers crowd-source best practices for AI-assisted code reviews.",
-          "Research team open-sources dataset to help tune small language models.",
-          "Industry report highlights hiring rebound for senior ICs across iOS and web.",
-          "CNCF announces graduated status for long-awaited observability project.",
-          "Founder AMA reveals the roadmap for the popular productivity CLI."
-        ];
-        let idSeed = 0;
-        const randomFrom = (arr) => arr[Math.floor(Math.random() * arr.length)];
-        const headlinePool = [
-          "Playbook for taming flaky tests lands on GitHub",
-          "Design tokens finally arrive for UIKit parity",
-          "New CLI pairs AI copilots with secure review gates",
-          "Edge functions graduate with per-request caching",
-          "WWDC labs quietly preview SwiftUI performance wins",
-          "Browser vendors align on Web Push permission UX",
-          "Open telemetry spec adds opinionated mobile schema"
-        ];
-        function createMockItem(focusTag = randomFrom(tagPool)) {
-          const now = Date.now();
-          const ageMinutes = Math.floor(Math.random() * 240);
-          const tags = new Set([focusTag]);
-          while (tags.size < 3) {
-            tags.add(randomFrom(tagPool));
-          }
-          return {
-            id: `item-${++idSeed}`,
-            title: randomFrom(headlinePool),
-            summary: randomFrom(summaryPool),
-            source: randomFrom(sourcePool),
-            url: "#",
-            tags: Array.from(tags).slice(0, 3),
-            readingTime: Math.max(2, Math.ceil(Math.random() * 8)),
-            published: now - ageMinutes * 60 * 1000
-          };
-        }
-        const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
-        function formatRelativeTime(timestamp) {
-          const diff = Date.now() - timestamp;
-          const minutes = Math.max(1, Math.round(diff / 60000));
-          if (minutes < 60) {
-            return rtf.format(-minutes, "minute");
-          }
-          const hours = Math.round(minutes / 60);
-          if (hours < 24) {
-            return rtf.format(-hours, "hour");
-          }
-          const days = Math.round(hours / 24);
-          return rtf.format(-days, "day");
-        }
-        const subscriptions = new Set([
-          "https://hnrss.org/frontpage",
-          "https://github.com/trending",
-          "https://developer.apple.com/news/rss/news.rss"
-        ]);
-        function renderSettingsList() {
-          feedListSettings.innerHTML = "";
-          subscriptions.forEach((url) => {
-            const li = document.createElement("li");
-            li.textContent = url;
-            feedListSettings.appendChild(li);
-          });
-        }
-        function updateFeedCount() {
-          const total = state.filtered.length;
-          feedCountLabel.textContent = `${total} ${total === 1 ? "story" : "stories"}`;
-        }
-        function createCardElement(item) {
-          const fragment = template.content.cloneNode(true);
-          const row = fragment.querySelector(".feed-row");
-          const card = fragment.querySelector(".feed-card");
-          const openButton = card.querySelector('[data-action="open"]');
-          row.dataset.itemId = item.id;
-          card.querySelector(".feed-source").textContent = item.source;
-          card.querySelector(".feed-time").textContent = formatRelativeTime(item.published);
-          card.querySelector(".feed-title").textContent = item.title;
-          card.querySelector(".feed-summary").textContent = item.summary;
-          card.querySelector(".feed-readtime").textContent = `${item.readingTime} min read`;
-          const tagsContainer = card.querySelector(".tag-row");
-          tagsContainer.innerHTML = "";
-          item.tags.forEach((tag) => {
-            const span = document.createElement("span");
-            span.className = "tag";
-            span.textContent = tag;
-            tagsContainer.appendChild(span);
-          });
-          if (openButton) {
-            openButton.addEventListener("click", (event) => {
-              event.stopPropagation();
-              openItem(item);
-            });
-          }
-          card.addEventListener("click", () => openItem(item));
-          initCardGestures(row, card, item);
-          return row;
-        }
-        function renderSlice(start, end) {
-          feedList.innerHTML = "";
-          const fragment = document.createDocumentFragment();
-          for (let i = start; i < end; i += 1) {
-            const item = state.filtered[i];
-            if (!item) continue;
-            fragment.appendChild(createCardElement(item));
-          }
-          feedList.appendChild(fragment);
-          const sample = feedList.querySelector(".feed-card");
-          if (sample) {
-            const height = Math.round(sample.getBoundingClientRect().height);
-            if (height && Math.abs(height - state.cardHeight) > 4) {
-              state.cardHeight = height;
-            }
-          }
-        }
-        function updateVirtualWindow(force = false) {
-          if (!feedScroller || !feedList || !topSpacer || !bottomSpacer || !listEndIndicator) {
-            return;
-          }
-          const total = state.filtered.length;
-          if (!total) {
-            feedList.innerHTML = "";
-            topSpacer.style.height = "0px";
-            bottomSpacer.style.height = "0px";
-            listEndIndicator.textContent = state.searchTerm ? "No results. Try another query." : "You're all caught up.";
-            listEndIndicator.setAttribute("aria-hidden", "false");
-            return;
-          }
-          const scrollTop = feedScroller.scrollTop;
-          const viewport = feedScroller.clientHeight;
-          if (!viewport) {
-            if (force) {
-              requestAnimationFrame(() => updateVirtualWindow(true));
-            }
-            return;
-          }
-          const startIndex = Math.max(0, Math.floor(scrollTop / state.cardHeight) - 3);
-          const visibleCount = Math.ceil(viewport / state.cardHeight) + 6;
-          const endIndex = Math.min(total, startIndex + visibleCount);
-          if (!force && state.virtualization.start === startIndex && state.virtualization.end === endIndex) {
-            return;
-          }
-          state.virtualization.start = startIndex;
-          state.virtualization.end = endIndex;
-          topSpacer.style.height = `${startIndex * state.cardHeight}px`;
-          const remaining = Math.max(total - endIndex, 0);
-          bottomSpacer.style.height = `${remaining * state.cardHeight}px`;
-          renderSlice(startIndex, endIndex);
-          listEndIndicator.setAttribute("aria-hidden", remaining > 0 || state.loadingMore ? "true" : "false");
-        }
-        function applyFilters(force = false) {
-          const term = state.searchTerm;
-          const filterKey = state.activeFilter;
-          state.filtered = state.items.filter((item) => {
-            if (state.archivedIds.has(item.id)) {
-              return false;
-            }
-            if (filterKey !== "all" && !item.tags.some((tag) => tag.toLowerCase() === filterKey)) {
-              return false;
-            }
-            if (!term) {
-              return true;
-            }
-            const haystack = `${item.title} ${item.summary} ${item.tags.join(" ")}`.toLowerCase();
-            return haystack.includes(term);
-          });
-          updateFeedCount();
-          updateVirtualWindow(force);
-        }
-        function populateItems(count = 24) {
-          const newItems = [];
-          for (let i = 0; i < count; i += 1) {
-            newItems.push(createMockItem(randomFrom(tagPool)));
-          }
-          return newItems;
-        }
-        function loadInitialData() {
-          skeletonContainer.hidden = false;
-          setTimeout(() => {
-            state.items = populateItems(36);
-            applyFilters(true);
-            skeletonContainer.hidden = true;
-          }, 520);
-        }
-        function openItem(item) {
-          showToast(`Opening: ${item.title}`, "success");
-        }
-        function archiveItem(item) {
-          state.archivedIds.add(item.id);
-          showToast("Archived to queue", "success");
-          applyFilters(true);
-        }
-        function deleteItem(item) {
-          state.items = state.items.filter((entry) => entry.id !== item.id);
-          state.archivedIds.delete(item.id);
-          showToast("Removed from feed", "info");
-          applyFilters(true);
-        }
-        async function shareItem(item) {
-          try {
-            if (navigator.share) {
-              await navigator.share({ title: item.title, text: item.summary, url: item.url || window.location.href });
-              showToast("Shared", "success");
-            } else if (navigator.clipboard) {
-              await navigator.clipboard.writeText(item.url || window.location.href);
-              showToast("Link copied", "success");
-            } else {
-              showToast("Share not supported", "error");
-            }
-          } catch (error) {
-            showToast(`Share failed: ${error.message}`, "error");
-          }
-        }
-        function resolveSwipeAction(delta) {
-          if (delta <= -DELETE_THRESHOLD) return "delete";
-          if (delta <= -SWIPE_THRESHOLD) return "archive";
-          if (delta >= SWIPE_THRESHOLD) return "share";
-          return null;
-        }
-        function resetCard(card, row) {
-          row.removeAttribute("data-swipe-intent");
-          card.style.transition = "transform 0.24s ease";
-          card.style.transform = "translateX(0)";
-          setTimeout(() => { card.style.transition = ""; }, 260);
-        }
-        function updateSwipeIntent(row, delta) {
-          const intent = resolveSwipeAction(delta);
-          if (intent) {
-            row.dataset.swipeIntent = intent;
-          } else {
-            row.removeAttribute("data-swipe-intent");
-          }
-        }
-        function handleSwipeAction(intent, item, row) {
-          if (!intent) {
-            return;
-          }
-          if (intent === "archive") {
-            haptic(25);
-            archiveItem(item);
-          } else if (intent === "delete") {
-            haptic([16, 32]);
-            deleteItem(item);
-          } else if (intent === "share") {
-            haptic(15);
-            shareItem(item);
-          }
-        }
-        function initCardGestures(row, card, item) {
-          let pointerId = null;
-          let startX = 0;
-          let startY = 0;
-          let translateX = 0;
-          let swiping = false;
-          let active = false;
-          const clearPress = () => {
-            if (longPressTimeout) {
-              clearTimeout(longPressTimeout);
-              longPressTimeout = null;
-            }
-          };
-          card.addEventListener("pointerdown", (event) => {
-            if (event.pointerType === "mouse") {
-              return;
-            }
-            event.stopPropagation();
-            closeContextMenu();
-            active = true;
-            pointerId = event.pointerId;
-            startX = event.clientX;
-            startY = event.clientY;
-            translateX = 0;
-            swiping = false;
-            card.setPointerCapture(pointerId);
-            longPressTimeout = window.setTimeout(() => {
-              active = false;
-              clearPress();
-              card.releasePointerCapture(pointerId);
-              openContextMenu(item, startX, startY);
-            }, LONG_PRESS_DELAY);
-          });
-          card.addEventListener("pointermove", (event) => {
-            if (!active || event.pointerId !== pointerId) {
-              return;
-            }
-            event.stopPropagation();
-            const dx = event.clientX - startX;
-            const dy = event.clientY - startY;
-            if (!swiping && Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy)) {
-              swiping = true;
-              feedScroller.style.scrollSnapType = "none";
-              clearPress();
-            }
-            if (swiping) {
-              event.preventDefault();
-              translateX = Math.max(-200, Math.min(200, dx));
-              card.style.transform = `translateX(${translateX}px)`;
-              updateSwipeIntent(row, translateX);
-            } else if (Math.abs(dy) > 12) {
-              clearPress();
-            }
-          }, { passive: false });
-          const handlePointerEnd = (event) => {
-            if (event.pointerId !== pointerId) {
-              return;
-            }
-            event.stopPropagation();
-            clearPress();
-            active = false;
-            card.releasePointerCapture(pointerId);
-            feedScroller.style.scrollSnapType = "";
-            if (swiping) {
-              const intent = resolveSwipeAction(translateX);
-              resetCard(card, row);
-              handleSwipeAction(intent, item, row);
-            } else {
-              resetCard(card, row);
-            }
-            swiping = false;
-            translateX = 0;
-          };
-          card.addEventListener("pointerup", handlePointerEnd);
-          card.addEventListener("pointercancel", handlePointerEnd);
-        }
-        function closeContextMenu() {
-          contextMenu.dataset.open = "false";
-          contextMenu.setAttribute("aria-hidden", "true");
-          contextItem = null;
-        }
-        function openContextMenu(item, x, y) {
-          contextItem = item;
-          const maxLeft = window.innerWidth - 220;
-          const maxTop = window.innerHeight - 200;
-          contextMenu.style.left = `${Math.max(12, Math.min(maxLeft, x - 110))}px`;
-          contextMenu.style.top = `${Math.max(12, Math.min(maxTop, y - 60))}px`;
-          contextMenu.dataset.open = "true";
-          contextMenu.setAttribute("aria-hidden", "false");
-          requestAnimationFrame(() => {
-            const focusTarget = contextMenu.querySelector("button");
-            if (focusTarget) {
-              focusTarget.focus({ preventScroll: true });
-            }
-          });
-        }
-        function handleContextSelection(action) {
-          if (!contextItem) {
-            return;
-          }
-          if (action === "open") {
-            openItem(contextItem);
-          } else if (action === "save") {
-            state.archivedIds.add(contextItem.id);
-            showToast("Saved for later", "success");
-            applyFilters(true);
-          } else if (action === "share") {
-            shareItem(contextItem);
-          }
-          closeContextMenu();
-        }
-        contextMenu.addEventListener("click", (event) => {
-          const button = event.target.closest("button[data-context]");
-          if (!button) {
-            return;
-          }
-          event.preventDefault();
-          handleContextSelection(button.dataset.context);
-        });
-        document.addEventListener("pointerdown", (event) => {
-          if (contextMenu.dataset.open === "true" && !contextMenu.contains(event.target)) {
-            closeContextMenu();
+    <div class="terminal-status">
+      <div class="status-indicator">
+        <div class="status-led" id="connectionLed"></div>
+        <span id="lastSync">SYNC</span>
+      </div>
+      <div class="status-indicator">
+        <div class="status-led amber" id="moodLed"></div>
+        <span id="moodStatus">CALM</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="terminal-content">
+    <div class="pull-indicator" id="pullIndicator" role="status" aria-live="polite">Pull to refresh</div>
+    <div class="news-feed" id="newsFeed" role="main" aria-live="polite"></div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <h3>NO_SIGNAL_DETECTED</h3>
+      <p>Adjust filters or check back shortly.</p>
+    </div>
+  </div>
+</main>
+
+<nav class="terminal-nav" id="terminalNav" role="tablist" aria-label="Primary navigation">
+  <div class="nav-container">
+    <button type="button" class="nav-btn active" data-view-target="all" role="tab" aria-selected="true">
+      <span class="nav-icon">◉</span>
+      <span class="nav-label">ALL</span>
+    </button>
+    <button type="button" class="nav-btn" data-view-target="popular" role="tab" aria-selected="false">
+      <span class="nav-icon">★</span>
+      <span class="nav-label">HOT</span>
+    </button>
+    <button type="button" class="nav-btn" data-view-target="breaking" role="tab" aria-selected="false">
+      <span class="nav-icon">!</span>
+      <span class="nav-label">ALERT</span>
+    </button>
+    <button type="button" class="nav-btn" id="filterBtn" data-filter-trigger role="tab" aria-selected="false" aria-haspopup="dialog" aria-expanded="false">
+      <span class="nav-icon">▢</span>
+      <span class="nav-label">FILTER</span>
+    </button>
+    <button type="button" class="nav-btn" id="moreBtn" data-sheet-trigger="true" role="tab" aria-selected="false" aria-haspopup="dialog" aria-expanded="false">
+      <span class="nav-icon">≡</span>
+      <span class="nav-label">SYS</span>
+    </button>
+  </div>
+</nav>
+
+<div class="terminal-sheet" id="filterSheet" role="dialog" aria-modal="true" hidden>
+  <div class="sheet-overlay" data-filter-close></div>
+  <div class="sheet-panel" role="document">
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title">FEED_CONTROLS</h2>
+      <button type="button" class="sheet-close" data-filter-close>CLOSE</button>
+    </div>
+    <div class="sheet-content">
+      <div class="filter-section">
+        <h3 class="filter-title">VIEW_MODE</h3>
+        <div class="filter-chips" id="filterChips" role="tablist" aria-label="Content filters">
+          <button class="filter-chip active" data-view="all" role="tab" aria-selected="true">ALL</button>
+          <button class="filter-chip" data-view="popular" role="tab" aria-selected="false">HOT</button>
+          <button class="filter-chip" data-view="by-source" role="tab" aria-selected="false">BY_SOURCE</button>
+          <button class="filter-chip" data-view="conservative" role="tab" aria-selected="false">CONSERVATIVE</button>
+          <button class="filter-chip" data-view="populist" role="tab" aria-selected="false">POPULIST</button>
+          <button class="filter-chip" data-view="breaking" role="tab" aria-selected="false">BREAKING</button>
+        </div>
+      </div>
+      <div class="filter-section">
+        <h3 class="filter-title">SOURCE_SELECT</h3>
+        <button type="button" class="source-selector" id="sourceSelector" aria-haspopup="dialog" aria-expanded="false">
+          <span class="selector-label">CURRENT_SOURCE</span>
+          <span class="selector-value" id="sourceValue">ALL_SOURCES</span>
+          <span class="selector-hint">Tap to focus on single outlet</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="terminal-sheet" id="sourceSheet" role="dialog" aria-modal="true" hidden>
+  <div class="sheet-overlay" data-source-close></div>
+  <div class="sheet-panel" role="document">
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="sheet-header">
+      <button type="button" class="sheet-close" data-source-close>CANCEL</button>
+      <span class="sheet-title">SELECT_SOURCE</span>
+      <button type="button" class="sheet-close" id="clearSource">ALL</button>
+    </div>
+    <div class="sheet-content" id="sourceList" role="listbox" aria-label="News sources"></div>
+  </div>
+</div>
+
+<div class="terminal-sheet" id="actionSheet" role="dialog" aria-modal="true" hidden>
+  <div class="sheet-overlay" data-sheet-close></div>
+  <div class="sheet-panel" role="document">
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="sheet-content">
+      <div class="action-group">
+        <button type="button" class="action-btn" data-sheet-action="refresh">REFRESH_FEED</button>
+        <button type="button" class="action-btn" data-sheet-action="mark-read">MARK_ALL_READ</button>
+      </div>
+      <div class="action-group">
+        <button type="button" class="action-btn danger" data-sheet-action="reset">RESET_SYSTEM</button>
+      </div>
+      <div class="action-group">
+        <button type="button" class="action-btn" data-sheet-close>CANCEL</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SOURCES = [
+  { id: 'breitbart', name: 'BREITBART', url: 'https://www.breitbart.com/feed/', lane: 'populist', bias: 7.5 },
+  { id: 'federalist', name: 'FEDERALIST', url: 'https://thefederalist.com/feed/', lane: 'conservative', bias: 6.2 },
+  { id: 'dailywire', name: 'DAILY_WIRE', url: 'https://www.dailywire.com/feeds/rss.xml', lane: 'conservative', bias: 6.8 },
+  { id: 'gateway', name: 'GATEWAY_PUNDIT', url: 'https://www.thegatewaypundit.com/feed/', lane: 'populist', bias: 8.4 },
+  { id: 'infowars', name: 'INFOWARS', url: 'https://www.infowars.com/rss.xml', lane: 'populist', bias: 9 },
+  { id: 'revolver', name: 'REVOLVER_NEWS', url: 'https://www.revolver.news/feed/', lane: 'populist', bias: 7.8 },
+  { id: 'natfile', name: 'NATIONAL_FILE', url: 'https://nationalfile.com/feed/', lane: 'populist', bias: 8.2 },
+  { id: 'tplvoice', name: 'PEOPLES_VOICE', url: 'https://thepeoplesvoice.tv/feed/', lane: 'populist', bias: 8.8 },
+  { id: 'libertydaily', name: 'LIBERTY_DAILY', url: 'https://thelibertydaily.com/rss.xml', lane: 'populist', bias: 7.6 },
+  { id: 'naturalnews', name: 'NATURAL_NEWS', url: 'https://www.naturalnews.com/rss.xml', lane: 'populist', bias: 8.5 },
+  { id: 'dailycaller', name: 'DAILY_CALLER', url: 'https://dailycaller.com/feed/', lane: 'conservative', bias: 5.2 },
+  { id: 'redstate', name: 'REDSTATE', url: 'https://redstate.com/feed/', lane: 'conservative', bias: 6.4 },
+  { id: 'amgreat', name: 'AM_GREATNESS', url: 'https://amgreatness.com/feed/', lane: 'conservative', bias: 6.9 },
+  { id: 'pjm', name: 'PJ_MEDIA', url: 'https://pjmedia.com/feeds/latest', lane: 'conservative', bias: 5.8 },
+  { id: 'nypost', name: 'NY_POST', url: 'https://nypost.com/feed/', lane: 'populist', bias: 3.2 },
+  { id: 'townhall', name: 'TOWNHALL', url: 'https://townhall.com/rss', lane: 'conservative', bias: 5.6 },
+  { id: 'foxnews', name: 'FOX_NEWS', url: 'https://feeds.foxnews.com/foxnews/latest', lane: 'conservative', bias: 4.2 },
+  { id: 'washexam', name: 'WASH_EXAMINER', url: 'https://www.washingtonexaminer.com/feed', lane: 'conservative', bias: 3.8 },
+  { id: 'theblaze', name: 'THE_BLAZE', url: 'https://www.theblaze.com/feeds/latest.rss', lane: 'conservative', bias: 6.5 },
+  { id: 'nbcnews', name: 'NBC_NEWS', url: 'https://feeds.nbcnews.com/nbcnews/public/news', lane: 'mainstream', bias: -3 },
+  { id: 'abcnews', name: 'ABC_NEWS', url: 'https://abcnews.go.com/abcnews/topstories', lane: 'mainstream', bias: -2.2 },
+  { id: 'cnn', name: 'CNN', url: 'https://rss.cnn.com/rss/cnn_topstories.rss', lane: 'mainstream', bias: -4 }
+];
+
+const persistedState = loadPersistedState();
+
+const TERMINAL_STATE = {
+  items: [],
+  view: persistedState.view || 'all',
+  loading: false,
+  lastFetch: 0,
+  cache: new Map(),
+  expandedCards: new Set(persistedState.expanded || []),
+  trendingKeywords: new Map(),
+  sourceFilter: persistedState.sourceFilter || null,
+  readProgress: new Map(
+    Object.entries(persistedState.progress || {}).map(([key, value]) => [key, Number(value) || 0])
+  )
+};
+
+const CACHE_TTL = 120000;
+const FETCH_TIMEOUT = 4000;
+
+const HAPTIC_PATTERNS = {
+  tap: [8],
+  tab: [12],
+  expand: [14, 6, 14],
+  action: [16, 8, 16],
+  refresh: [24, 18, 24],
+  success: [18],
+  'pull-ready': [30],
+  mark: [12, 4, 12]
+};
+
+const SENTIMENT_LEXICON = new Map([
+  ['victory', 4.5], ['victories', 4.5], ['landslide', 5], ['triumph', 4], ['triumphant', 4],
+  ['win', 3.5], ['wins', 3.5], ['won', 3.5], ['winning', 3.2], ['record', 3], ['records', 3],
+  ['breakthrough', 4], ['surge', 2.6], ['surging', 2.6], ['surged', 2.6], ['boom', 3.1],
+  ['booming', 3.4], ['boon', 2.5], ['resilient', 2.2], ['resilience', 2.2], ['relief', 2.4],
+  ['stability', 2.1], ['stabilize', 2.1], ['stabilized', 2.1], ['improves', 2.2], ['improved', 2.2],
+  ['improving', 2.2], ['progress', 2.5], ['peace', 2.6], ['peaceful', 2.6], ['secure', 2.1],
+  ['secured', 2.1], ['support', 2], ['supports', 2], ['praise', 2.5], ['praised', 2.5],
+  ['optimism', 2.5], ['optimistic', 2.5], ['growth', 2.3], ['grows', 2.3], ['growing', 2.3],
+  ['rebound', 2.6], ['rebounds', 2.6], ['rebounded', 2.6], ['strength', 2.4], ['strengthen', 2.4],
+  ['strengthens', 2.4], ['strengthened', 2.4],
+  ['crisis', -3.5], ['crises', -3.5], ['catastrophe', -5.5], ['disaster', -5], ['collapse', -4.5],
+  ['collapsed', -4.5], ['collapsing', -4.5], ['chaos', -3.5], ['chaotic', -3], ['shooting', -5],
+  ['shootings', -5], ['attack', -3.5], ['attacks', -3.5], ['assault', -3], ['massacre', -6],
+  ['tragedy', -5], ['fatal', -4], ['deadly', -4.5], ['murder', -5], ['murdered', -5],
+  ['violence', -4], ['violent', -4], ['threat', -3], ['threats', -3], ['warning', -2.5],
+  ['warnings', -2.5], ['fear', -2.5], ['fears', -2.5], ['panic', -4], ['emergency', -3.5],
+  ['fraud', -3], ['scandal', -3.5], ['scandals', -3.5], ['corruption', -3.5], ['corrupt', -3],
+  ['indicted', -4], ['indictment', -4], ['charged', -3], ['charges', -3], ['arrested', -3.5],
+  ['arrests', -3.5], ['lawsuit', -2.5], ['lawsuits', -2.5], ['investigation', -2.2],
+  ['investigations', -2.2], ['probe', -2.2], ['probes', -2.2], ['meltdown', -5],
+  ['shortage', -2.5], ['shortages', -2.5], ['decline', -2.5], ['declines', -2.5],
+  ['plunge', -3.5], ['plunges', -3.5], ['slump', -3], ['slumps', -3], ['sanction', -2.5],
+  ['sanctions', -2.5], ['ban', -2.5], ['banned', -2.5], ['outage', -2], ['outages', -2],
+  ['breach', -3], ['breaches', -3]
+]);
+
+const POSITIVE_WORDS = new Set([
+  'good', 'great', 'positive', 'upbeat', 'hope', 'hopes', 'hopeful', 'advance', 'advances',
+  'advancing', 'strong', 'stronger', 'sturdy', 'rescue', 'rescued', 'rescues', 'ally', 'allies',
+  'agreement', 'agreements', 'calm', 'steady', 'supportive', 'boost', 'boosts', 'benefit',
+  'benefits', 'recover', 'recovery', 'recovered', 'healing', 'relief', 'relieved', 'progressive',
+  'peaceful', 'stable', 'stability', 'balanced', 'constructive', 'diplomatic', 'unity', 'unite',
+  'unites', 'secured', 'security', 'resilient', 'cooperate', 'cooperation', 'truce', 'win-win'
+]);
+
+const NEGATIVE_WORDS = new Set([
+  'loss', 'losses', 'lost', 'defeat', 'defeated', 'risk', 'risks', 'concern', 'concerns', 'doubt',
+  'doubts', 'fear', 'fears', 'worry', 'worries', 'worried', 'drop', 'drops', 'fall', 'falls',
+  'fallen', 'negative', 'bad', 'threat', 'threaten', 'threatened', 'danger', 'dangerous', 'fraud',
+  'crash', 'crashes', 'collapsed', 'collapse', 'lawsuit', 'lawsuits', 'probe', 'probes', 'charge',
+  'charges', 'investigation', 'chaos', 'violent', 'violence', 'crime', 'crimes', 'criminal',
+  'riot', 'riots', 'riotous', 'storm', 'storms', 'hurricane', 'earthquake', 'wildfire', 'fire',
+  'fires', 'shooting', 'shootings', 'attack', 'attacks', 'murder', 'murdered', 'extremist',
+  'extremism', 'terror', 'terrorism', 'terrorist', 'scandal', 'panic', 'shortage', 'shortages',
+  'decline', 'declines', 'slump', 'slumps', 'collapse', 'opposition', 'backlash', 'controversy'
+]);
+
+const BOOSTER_WORDS = new Set(['very', 'extremely', 'highly', 'truly', 'deeply', 'major', 'massive', 'hugely', 'seriously', 'significantly']);
+const DAMPENER_WORDS = new Set(['slightly', 'barely', 'somewhat', 'mildly', 'modestly', 'partially']);
+const NEGATION_WORDS = new Set(['no', 'not', 'never', 'without', 'hardly', 'rarely', 'scarcely', 'neither']);
+
+function triggerHaptic(type) {
+  if (!('vibrate' in navigator)) return;
+  const pattern = HAPTIC_PATTERNS[type];
+  if (pattern) navigator.vibrate(pattern);
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function loadPersistedState() {
+  try {
+    const expanded = JSON.parse(localStorage.getItem('terminal.expanded'));
+    const storedSource = localStorage.getItem('terminal.sourceFilter');
+    const progressRaw = localStorage.getItem('terminal.progress');
+    const viewPreference = localStorage.getItem('terminal.view');
+    let progress = {};
+
+    if (progressRaw) {
+      try {
+        const parsed = JSON.parse(progressRaw);
+        if (parsed && typeof parsed === 'object') progress = parsed;
+      } catch (error) {
+        progress = {};
+      }
+    }
+
+    return {
+      expanded: Array.isArray(expanded) ? expanded : null,
+      sourceFilter: storedSource || null,
+      progress,
+      view: viewPreference || 'all'
+    };
+  } catch (error) {
+    return { expanded: null, sourceFilter: null, progress: {}, view: 'all' };
+  }
+}
+
+function persistState() {
+  try {
+    localStorage.setItem('terminal.expanded', JSON.stringify([...TERMINAL_STATE.expandedCards]));
+    localStorage.setItem('terminal.view', TERMINAL_STATE.view);
+    localStorage.setItem('terminal.progress', JSON.stringify(Object.fromEntries(TERMINAL_STATE.readProgress)));
+    if (TERMINAL_STATE.sourceFilter) {
+      localStorage.setItem('terminal.sourceFilter', TERMINAL_STATE.sourceFilter);
+    } else {
+      localStorage.removeItem('terminal.sourceFilter');
+    }
+  } catch (error) {
+    console.warn('Storage failed:', error);
+  }
+}
+
+function getCached(url) {
+  const cached = TERMINAL_STATE.cache.get(url);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data;
+  return null;
+}
+
+function setCached(url, data) {
+  TERMINAL_STATE.cache.set(url, { data, timestamp: Date.now() });
+}
+
+function fetchProxy(url) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+
+  const promise = fetch(url, { signal: controller.signal }).then(response => {
+    clearTimeout(timer);
+    if (!response.ok) throw new Error('Bad response');
+    return response;
+  }).catch(error => {
+    clearTimeout(timer);
+    throw error;
+  });
+
+  return {
+    promise,
+    cancel() {
+      clearTimeout(timer);
+      controller.abort();
+    }
+  };
+}
+
+function firstSuccessful(promises) {
+  return new Promise((resolve, reject) => {
+    let remaining = promises.length;
+    const errors = [];
+
+    promises.forEach((promise, index) => {
+      promise
+        .then(value => resolve({ value, index }))
+        .catch(error => {
+          errors.push(error);
+          remaining -= 1;
+          if (remaining === 0) {
+            reject(errors[errors.length - 1] || new Error('All proxies failed'));
           }
         });
-        function setPullState(stateName) {
-          if (pullIndicator.dataset.state === stateName) {
-            return;
-          }
-          pullIndicator.dataset.state = stateName;
-          if (stateName === "ready") {
-            pullLabel.textContent = "Release to refresh";
-          } else if (stateName === "refresh") {
-            pullLabel.textContent = "Refreshing…";
-          } else {
-            pullLabel.textContent = "Pull to refresh";
-          }
-        }
-        function resetPull(animated = true) {
-          const indicatorStyle = pullIndicator.style;
-          indicatorStyle.transition = animated ? "transform 0.32s cubic-bezier(0.33, 1, 0.68, 1)" : "none";
-          indicatorStyle.transform = "translateY(0px)";
-          if (animated) {
-            setTimeout(() => {
-              indicatorStyle.transition = "";
-            }, 340);
-          } else {
-            indicatorStyle.transition = "";
-          }
-          setPullState("idle");
-          pulling = false;
-          pullDistance = 0;
-        }
-        async function triggerRefresh(origin = "pull") {
-          if (state.isRefreshing) {
-            return;
-          }
-          state.isRefreshing = true;
-          setPullState("refresh");
-          pullIndicator.style.transition = "transform 0.24s ease";
-          pullIndicator.style.transform = "translateY(52px)";
-          try {
-            await new Promise((resolve) => setTimeout(resolve, 640));
-            const incoming = populateItems(8);
-            state.items = [...incoming, ...state.items];
-            applyFilters(true);
-            feedScroller.scrollTo({ top: 0, behavior: "smooth" });
-            if (origin !== "auto") {
-              haptic([22, 12, 22]);
-            }
-            showToast("Feed updated", "success");
-          } catch (error) {
-            showToast(`Refresh failed: ${error.message || error}`, "error");
-          } finally {
-            state.isRefreshing = false;
-            resetPull();
-          }
-        }
-        async function loadMoreItems() {
-          if (state.loadingMore) {
-            return;
-          }
-          state.loadingMore = true;
-          listEndIndicator.textContent = "Loading more intelligence…";
-          listEndIndicator.setAttribute("aria-hidden", "false");
-          try {
-            await new Promise((resolve) => setTimeout(resolve, 720));
-            const more = populateItems(10);
-            state.items = [...state.items, ...more];
-            applyFilters(true);
-            state.page += 1;
-          } finally {
-            state.loadingMore = false;
-            listEndIndicator.textContent = "You're all caught up.";
-          }
-        }
-        function updateOfflineButton() {
-          const label = state.offlineEnabled ? "Disable offline cache" : "Enable offline cache";
-          toggleOfflineButton.innerHTML = `${label}<span aria-hidden="true">•</span>`;
-          toggleOfflineButton.setAttribute("aria-pressed", state.offlineEnabled ? "true" : "false");
-        }
-        function setQuickSheetOpen(open) {
-          quickSheet.dataset.open = open ? "true" : "false";
-          quickSheet.setAttribute("aria-hidden", open ? "false" : "true");
-          quickActionsButton.setAttribute("aria-expanded", open ? "true" : "false");
-          if (!open) {
-            sheetPanel.style.transform = "";
-            quickActionsButton.focus({ preventScroll: true });
-            return;
-          }
-          requestAnimationFrame(() => {
-            const first = quickSheet.querySelector("button");
-            first?.focus({ preventScroll: true });
-          });
-        }
-        function setMenuOpen(open) {
-          menuDrawer.dataset.open = open ? "true" : "false";
-          menuDrawer.setAttribute("aria-hidden", open ? "false" : "true");
-          menuButton.setAttribute("aria-expanded", open ? "true" : "false");
-          if (!open) {
-            drawerPanel.style.transform = "";
-            menuButton.focus({ preventScroll: true });
-            return;
-          }
-          requestAnimationFrame(() => {
-            const first = drawerPanel.querySelector("a,button");
-            first?.focus({ preventScroll: true });
-          });
-        }
-        function setSettingsOpen(open, focusField = false) {
-          settingsOverlay.dataset.open = open ? "true" : "false";
-          settingsOverlay.setAttribute("aria-hidden", open ? "false" : "true");
-          if (!open) {
-            overlayPanel.style.transform = "";
-            overlayPanel.style.opacity = "";
-            if (lastOverlayTrigger) {
-              lastOverlayTrigger.focus({ preventScroll: true });
-              lastOverlayTrigger = null;
-            }
-            return;
-          }
-          requestAnimationFrame(() => {
-            if (focusField) {
-              feedUrlInput.focus({ preventScroll: true });
-            } else {
-              const focusable = overlayPanel.querySelector("input,select,button");
-              focusable?.focus({ preventScroll: true });
-            }
-          });
-        }
-        function attachSheetGestures() {
-          if (!sheetHandle) {
-            return;
-          }
-          let pointerId = null;
-          let startY = 0;
-          let currentY = 0;
-          let dragging = false;
-          const endDrag = (event) => {
-            if (!dragging || event.pointerId !== pointerId) {
-              return;
-            }
-            dragging = false;
-            sheetHandle.releasePointerCapture(pointerId);
-            sheetPanel.style.transition = "";
-            if (currentY > 120) {
-              setQuickSheetOpen(false);
-            } else {
-              sheetPanel.style.transform = "";
-            }
-          };
-          sheetHandle.addEventListener("pointerdown", (event) => {
-            if (event.pointerType === "mouse" || quickSheet.dataset.open !== "true") {
-              return;
-            }
-            pointerId = event.pointerId;
-            startY = event.clientY;
-            currentY = 0;
-            dragging = true;
-            sheetPanel.style.transition = "none";
-            sheetHandle.setPointerCapture(pointerId);
-          });
-          sheetHandle.addEventListener("pointermove", (event) => {
-            if (!dragging || event.pointerId !== pointerId) {
-              return;
-            }
-            const delta = Math.max(0, event.clientY - startY);
-            currentY = delta;
-            sheetPanel.style.transform = `translateY(${delta}px)`;
-          });
-          sheetHandle.addEventListener("pointerup", endDrag);
-          sheetHandle.addEventListener("pointercancel", endDrag);
-        }
-        function attachDrawerGestures() {
-          if (!drawerPanel) {
-            return;
-          }
-          let pointerId = null;
-          let startX = 0;
-          let translateX = 0;
-          let dragging = false;
-          const finishDrag = (event) => {
-            if (!dragging || event.pointerId !== pointerId) {
-              return;
-            }
-            dragging = false;
-            drawerPanel.releasePointerCapture(pointerId);
-            drawerPanel.style.transition = "";
-            if (Math.abs(translateX) > drawerPanel.offsetWidth * 0.35) {
-              setMenuOpen(false);
-            } else {
-              drawerPanel.style.transform = "";
-            }
-          };
-          drawerPanel.addEventListener("pointerdown", (event) => {
-            if (event.pointerType === "mouse" || menuDrawer.dataset.open !== "true") {
-              return;
-            }
-            pointerId = event.pointerId;
-            startX = event.clientX;
-            translateX = 0;
-            dragging = true;
-            drawerPanel.style.transition = "none";
-            drawerPanel.setPointerCapture(pointerId);
-          });
-          drawerPanel.addEventListener("pointermove", (event) => {
-            if (!dragging || event.pointerId !== pointerId) {
-              return;
-            }
-            const delta = event.clientX - startX;
-            if (delta < 0) {
-              event.preventDefault();
-              translateX = Math.max(delta, -drawerPanel.offsetWidth);
-              drawerPanel.style.transform = `translateX(${translateX}px)`;
-            }
-          }, { passive: false });
-          drawerPanel.addEventListener("pointerup", finishDrag);
-          drawerPanel.addEventListener("pointercancel", finishDrag);
-        }
-        function attachOverlaySwipe() {
-          if (!overlayPanel) {
-            return;
-          }
-          let pointerId = null;
-          let startX = 0;
-          let translateX = 0;
-          let dragging = false;
-          const stopSwipe = (event) => {
-            if (!dragging || event.pointerId !== pointerId) {
-              return;
-            }
-            dragging = false;
-            overlayPanel.releasePointerCapture(pointerId);
-            overlayPanel.style.transition = "";
-            if (translateX > overlayPanel.offsetWidth * 0.35) {
-              setSettingsOpen(false);
-            } else {
-              overlayPanel.style.transform = "";
-              overlayPanel.style.opacity = "";
-            }
-          };
-          overlayPanel.addEventListener("pointerdown", (event) => {
-            if (event.pointerType === "mouse" || settingsOverlay.dataset.open !== "true") {
-              return;
-            }
-            const bounds = overlayPanel.getBoundingClientRect();
-            if (event.clientX - bounds.left > 36) {
-              return;
-            }
-            pointerId = event.pointerId;
-            startX = event.clientX;
-            translateX = 0;
-            dragging = true;
-            overlayPanel.style.transition = "none";
-            overlayPanel.setPointerCapture(pointerId);
-          });
-          overlayPanel.addEventListener("pointermove", (event) => {
-            if (!dragging || event.pointerId !== pointerId) {
-              return;
-            }
-            const delta = event.clientX - startX;
-            if (delta > 0) {
-              event.preventDefault();
-              translateX = Math.min(delta, overlayPanel.offsetWidth);
-              overlayPanel.style.transform = `translateX(${translateX}px)`;
-              overlayPanel.style.opacity = `${Math.max(0.2, 1 - translateX / overlayPanel.offsetWidth)}`;
-            }
-          }, { passive: false });
-          overlayPanel.addEventListener("pointerup", stopSwipe);
-          overlayPanel.addEventListener("pointercancel", stopSwipe);
-        }
-        const infiniteObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && !state.loadingMore && !state.isRefreshing) {
-              loadMoreItems();
-            }
-          });
-        }, { root: feedScroller, threshold: 0.1 });
-        infiniteObserver.observe(infiniteSentinel);
-        filterButtons.forEach((button) => {
-          button.addEventListener("click", () => {
-            const filter = button.dataset.filter;
-            if (state.activeFilter === filter) {
-              return;
-            }
-            filterButtons.forEach((chip) => {
-              const active = chip === button;
-              chip.dataset.active = active ? "true" : "false";
-              chip.setAttribute("aria-pressed", active ? "true" : "false");
-            });
-            state.activeFilter = filter;
-            applyFilters(true);
-            haptic(18);
-          });
-        });
-        searchInput.addEventListener("input", () => {
-          clearTimeout(searchTimer);
-          searchTimer = window.setTimeout(() => {
-            state.searchTerm = searchInput.value.trim().toLowerCase();
-            applyFilters(true);
-          }, 300);
-        });
-        searchInput.addEventListener("search", () => {
-          clearTimeout(searchTimer);
-          state.searchTerm = searchInput.value.trim().toLowerCase();
-          applyFilters(true);
-        });
-        quickActionsButton.addEventListener("click", () => {
-          const open = quickSheet.dataset.open === "true";
-          setQuickSheetOpen(!open);
-        });
-        refreshNowButton.addEventListener("click", () => {
-          setQuickSheetOpen(false);
-          triggerRefresh("manual");
-        });
-        toggleOfflineButton.addEventListener("click", () => {
-          state.offlineEnabled = !state.offlineEnabled;
-          updateOfflineButton();
-          showToast(state.offlineEnabled ? "Offline cache enabled" : "Offline cache disabled", "info");
-          haptic(16);
-        });
-        shareAppButton.addEventListener("click", async () => {
-          setQuickSheetOpen(false);
-          try {
-            if (navigator.share) {
-              await navigator.share({ title: document.title, text: "Check out this mobile-first HackerTab Pro experience", url: window.location.href });
-            } else if (navigator.clipboard) {
-              await navigator.clipboard.writeText(window.location.href);
-              showToast("Link copied", "success");
-            }
-          } catch (error) {
-            showToast(`Share failed: ${error.message || error}`, "error");
-          }
-        });
-        menuButton.addEventListener("click", () => {
-          setMenuOpen(true);
-        });
-        manageFeedsButton.addEventListener("click", () => {
-          lastOverlayTrigger = manageFeedsButton;
-          setSettingsOpen(true);
-        });
-        addFeedButton.addEventListener("click", () => {
-          lastOverlayTrigger = addFeedButton;
-          setSettingsOpen(true, true);
-        });
-        document.addEventListener("click", (event) => {
-          const target = event.target.closest("[data-close]");
-          if (!target) {
-            return;
-          }
-          if (target.dataset.close === "quick") {
-            setQuickSheetOpen(false);
-          } else if (target.dataset.close === "settings") {
-            setSettingsOpen(false);
-          } else if (target.dataset.close === "menu") {
-            setMenuOpen(false);
-          }
-        });
-        document.addEventListener("keydown", (event) => {
-          if (event.key !== "Escape") {
-            return;
-          }
-          if (contextMenu.dataset.open === "true") {
-            closeContextMenu();
-          } else if (quickSheet.dataset.open === "true") {
-            setQuickSheetOpen(false);
-          } else if (settingsOverlay.dataset.open === "true") {
-            setSettingsOpen(false);
-          } else if (menuDrawer.dataset.open === "true") {
-            setMenuOpen(false);
-          }
-        });
-        feedScroller.addEventListener("scroll", () => {
-          if (contextMenu.dataset.open === "true") {
-            closeContextMenu();
-          }
-          if (!scrollFrame) {
-            scrollFrame = requestAnimationFrame(() => {
-              scrollFrame = 0;
-              updateVirtualWindow();
-            });
-          }
-        });
-        feedScroller.addEventListener("touchstart", (event) => {
-          if (state.isRefreshing) {
-            return;
-          }
-          if (feedScroller.scrollTop <= 0) {
-            pulling = true;
-            pullStartY = event.touches[0].clientY;
-            pullIndicator.style.transition = "none";
-          }
-        }, { passive: true });
-        feedScroller.addEventListener("touchmove", (event) => {
-          if (!pulling) {
-            return;
-          }
-          const currentY = event.touches[0].clientY;
-          const delta = currentY - pullStartY;
-          if (delta <= 0) {
-            pullDistance = 0;
-            pullIndicator.style.transform = "translateY(0px)";
-            setPullState("idle");
-            return;
-          }
-          if (feedScroller.scrollTop > 0) {
-            pulling = false;
-            resetPull(false);
-            return;
-          }
-          event.preventDefault();
-          pullDistance = Math.min(PULL_MAX, delta * PULL_DAMPING);
-          pullIndicator.style.transform = `translateY(${pullDistance}px)`;
-          setPullState(pullDistance > PULL_TRIGGER ? "ready" : "pull");
-        }, { passive: false });
-        const endPull = () => {
-          if (!pulling) {
-            return;
-          }
-          if (pullDistance > PULL_TRIGGER) {
-            triggerRefresh("pull");
-          } else {
-            resetPull();
-          }
-        };
-        feedScroller.addEventListener("touchend", endPull);
-        feedScroller.addEventListener("touchcancel", () => {
-          if (pulling) {
-            resetPull();
-          }
-        });
-        notifyButtons.forEach((button) => {
-          button.addEventListener("click", () => {
-            notifyButtons.forEach((btn) => btn.classList.toggle("primary", btn === button));
-            showToast(`Notifications set to ${button.dataset.notify}`, "info");
-            haptic(12);
-          });
-        });
-        feedForm.addEventListener("submit", (event) => {
-          event.preventDefault();
-          const url = feedUrlInput.value.trim();
-          if (!url) {
-            feedUrlError.textContent = "Enter a feed URL.";
-            feedUrlError.hidden = false;
-            feedUrlInput.focus();
-            return;
-          }
-          if (!feedUrlInput.checkValidity()) {
-            feedUrlError.textContent = "Provide a valid http or https URL.";
-            feedUrlError.hidden = false;
-            feedUrlInput.focus();
-            return;
-          }
-          subscriptions.add(url);
-          renderSettingsList();
-          feedUrlInput.value = "";
-          feedUrlError.hidden = true;
-          feedUrlError.textContent = "";
-          showToast("Source saved", "success");
-        });
-        feedUrlInput.addEventListener("input", () => {
-          if (!feedUrlError.hidden) {
-            feedUrlError.hidden = true;
-            feedUrlError.textContent = "";
-          }
-        });
-        window.addEventListener("resize", () => {
-          updateVirtualWindow(true);
-        });
-        document.addEventListener("visibilitychange", () => {
-          if (!document.hidden && !state.isRefreshing) {
-            updateVirtualWindow(true);
-          }
-        });
-        attachSheetGestures();
-        attachDrawerGestures();
-        attachOverlaySwipe();
-        updateOfflineButton();
-        renderSettingsList();
-        requestAnimationFrame(() => updateVirtualWindow(true));
-        loadInitialData();
-        if ("serviceWorker" in navigator) {
-          const swSource = `const CACHE_NAME = "hackertab-mobile-v1";
-const CORE = ["./"]; 
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE)).then(() => self.skipWaiting())
-  );
-});
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))).then(() => self.clients.claim())
-  );
-});
-self.addEventListener("fetch", (event) => {
-  const { request } = event;
-  if (request.method !== "GET") {
+    });
+  });
+}
+
+async function fetchFast(url) {
+  const cached = getCached(url);
+  if (cached) return cached;
+
+  const targets = [
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    `https://corsproxy.io/?${encodeURIComponent(url)}`
+  ].map(fetchProxy);
+
+  try {
+    const { value: response, index } = await firstSuccessful(targets.map(target => target.promise));
+    const text = await response.text();
+    targets.forEach((target, idx) => {
+      if (idx !== index) target.cancel();
+    });
+    if (!text || text.length < 100) throw new Error('Empty feed');
+    setCached(url, text);
+    return text;
+  } finally {
+    targets.forEach(target => target.cancel());
+  }
+}
+
+function calculateTrending(items) {
+  const keywords = new Map();
+  const now = Date.now();
+
+  items.forEach(item => {
+    const ageHours = (now - new Date(item.pubDate)) / (1000 * 60 * 60);
+    if (ageHours > 24) return;
+
+    const text = `${item.title} ${item.desc}`.toLowerCase();
+    const words = text.match(/\b[a-z]{4,}\b/g) || [];
+
+    words.forEach(word => {
+      if (!/^(with|that|this|from|have|were|been|their|about|would|could|should)$/.test(word)) {
+        const current = keywords.get(word) || 0;
+        keywords.set(word, current + (1 / Math.max(1, ageHours / 6)));
+      }
+    });
+  });
+
+  TERMINAL_STATE.trendingKeywords = keywords;
+
+  items.forEach(item => {
+    const text = `${item.title} ${item.desc}`.toLowerCase();
+    let score = 0;
+    keywords.forEach((weight, word) => {
+      if (text.includes(word)) score += weight;
+    });
+    item.trendingScore = score;
+  });
+}
+
+function scoreTokens(tokens, scale = 1) {
+  let total = 0;
+
+  for (let i = 0; i < tokens.length; i += 1) {
+    const word = tokens[i];
+    let weight = 0;
+
+    if (SENTIMENT_LEXICON.has(word)) {
+      weight = SENTIMENT_LEXICON.get(word);
+    } else if (POSITIVE_WORDS.has(word)) {
+      weight = 1;
+    } else if (NEGATIVE_WORDS.has(word)) {
+      weight = -1;
+    }
+
+    if (weight !== 0) {
+      const previous = tokens[i - 1];
+      if (previous && NEGATION_WORDS.has(previous)) weight *= -1;
+      if (previous && BOOSTER_WORDS.has(previous)) {
+        weight *= 1.4;
+      } else if (previous && DAMPENER_WORDS.has(previous)) {
+        weight *= 0.5;
+      }
+      total += weight * scale;
+    }
+  }
+
+  return total;
+}
+
+function describeSentiment(score) {
+  if (score >= 6) return { label: 'ELECTRIC', tone: 'very-positive' };
+  if (score >= 3) return { label: 'OPTIMISTIC', tone: 'positive' };
+  if (score > -2) return { label: 'STEADY', tone: 'neutral' };
+  if (score > -5) return { label: 'WARY', tone: 'negative' };
+  return { label: 'ALARMED', tone: 'very-negative' };
+}
+
+function analyzeSentiment(item) {
+  const titleTokens = (item.title || '').toLowerCase().match(/\b[a-z'-]+\b/g) || [];
+  const descTokens = (item.desc || '').toLowerCase().match(/\b[a-z'-]+\b/g) || [];
+
+  let score = 0;
+  score += scoreTokens(titleTokens, 1.4);
+  score += scoreTokens(descTokens, 0.8);
+
+  const exclamations = (item.title.match(/!/g) || []).length;
+  if (exclamations > 1) score -= (exclamations - 1) * 0.6;
+
+  score = Math.max(-12, Math.min(12, score));
+  const descriptor = describeSentiment(score);
+
+  return { label: descriptor.label, tone: descriptor.tone, score };
+}
+
+function parseRSS(xmlString, source) {
+  const doc = new DOMParser().parseFromString(xmlString, 'text/xml');
+  if (doc.getElementsByTagName('parsererror')[0]) return [];
+
+  return Array.from(doc.querySelectorAll('item, entry'))
+    .slice(0, 15)
+    .map(entry => {
+      const title = (entry.querySelector('title')?.textContent || '').trim();
+      const link = (entry.querySelector('link')?.getAttribute('href') || entry.querySelector('link')?.textContent || '').trim();
+      const pubDate = (entry.querySelector('pubDate, updated, published')?.textContent || '').trim();
+      const desc = (entry.querySelector('description, summary')?.textContent || '').trim();
+
+      return {
+        title,
+        link,
+        pubDate: pubDate || new Date().toISOString(),
+        source: source.name,
+        lane: source.lane,
+        id: source.id,
+        desc: stripHTML(desc).slice(0, 250),
+        isBreaking: /breaking|urgent|just in|developing|exclusive/i.test(title),
+        trendingScore: 0
+      };
+    })
+    .filter(item => item.title && item.link && item.title.length > 15);
+}
+
+function stripHTML(html) {
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  return temp.textContent.replace(/\s+/g, ' ').trim();
+}
+
+function isLikelyNews(item) {
+  const title = (item.title || '').trim();
+  if (!title) return false;
+
+  const description = (item.desc || '').trim();
+  const combined = `${title} ${description}`.toLowerCase();
+
+  if (/\?{2,}/.test(title) || /!{2,}/.test(title)) return false;
+
+  const clickbaitPatterns = [
+    /you won't believe/i, /jaw[-\s]?dropping/i, /what happens next/i,
+    /this is why/i, /must see/i, /goes viral/i, /shocking/i, /insane/i,
+    /crazy/i, /unbelievable/i, /bombshell/i, /mic drop/i
+  ];
+
+  if (clickbaitPatterns.some(pattern => pattern.test(combined))) return false;
+
+  const nonNewsPatterns = [
+    /^watch:/i, /^video:/i, /\bopinion\b/i, /\bcommentary\b/i, /\bpodcast\b/i,
+    /\bsports?\b/i, /\bentertainment\b/i, /\bsubscribe\b/i, /click here/i
+  ];
+
+  if (nonNewsPatterns.some(pattern => pattern.test(title)) || 
+      nonNewsPatterns.some(pattern => pattern.test(description))) return false;
+
+  const exclamationCount = (title.match(/!/g) || []).length;
+  if (exclamationCount > 2) return false;
+
+  return true;
+}
+
+function createCardId(link) {
+  let hash = 0;
+  for (let i = 0; i < link.length; i += 1) {
+    hash = (hash << 5) - hash + link.charCodeAt(i);
+    hash |= 0;
+  }
+  return `card-${Math.abs(hash)}`;
+}
+
+function getReadProgress(cardId) {
+  return TERMINAL_STATE.readProgress.get(cardId) || 0;
+}
+
+function setReadProgress(cardId, progress) {
+  const clamped = clamp(progress, 0, 100);
+  TERMINAL_STATE.readProgress.set(cardId, clamped);
+  persistState();
+  return clamped;
+}
+
+function formatTerminalTime(timestamp) {
+  const diff = Date.now() - new Date(timestamp);
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  
+  if (seconds < 60) return 'NOW';
+  if (minutes < 60) return `${minutes}M`;
+  if (hours < 24) return `${hours}H`;
+  return `${days}D`;
+}
+
+function escapeHTML(str = '') {
+  if (typeof str !== 'string') str = String(str || '');
+  const escapeMap = {
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  };
+  return str.replace(/[&<>"']/g, char => escapeMap[char]);
+}
+
+function createTerminalCard(item, index = 0) {
+  const cardId = createCardId(item.link);
+  const isExpanded = TERMINAL_STATE.expandedCards.has(cardId);
+  const isFresh = (Date.now() - new Date(item.pubDate)) < 1200000; // 20 min
+  const isBreaking = /breaking|urgent|just in|developing|exclusive/i.test(item.title);
+  const progressValue = getReadProgress(cardId);
+  
+  const article = document.createElement('article');
+  article.className = `news-item ${isExpanded ? 'expanded' : ''} ${isFresh ? 'fresh' : ''} ${isBreaking ? 'breaking' : ''}`;
+  article.dataset.cardId = cardId;
+  article.style.setProperty('--index', index);
+  
+  const sourceInitials = item.source.split('_').map(word => word.charAt(0)).join('').slice(0, 2);
+  const timeStr = formatTerminalTime(item.pubDate);
+  const sentiment = analyzeSentiment(item);
+  
+  article.innerHTML = `
+    <div class="item-header" tabindex="0" role="button" aria-expanded="${isExpanded}">
+      <div class="source-icon">${sourceInitials}</div>
+      <div class="item-content">
+        <div class="item-title">
+          ${escapeHTML(item.title)}
+          ${isBreaking ? '<span class="breaking-tag">BREAKING</span>' : ''}
+        </div>
+        <div class="item-meta">
+          <span>${item.source}</span>
+          <span class="meta-time${isFresh ? ' fresh' : ''}">${timeStr}</span>
+          ${sentiment.score !== 0 ? `<span class="meta-badge sentiment-${sentiment.tone}">${sentiment.label}</span>` : ''}
+          ${item.trendingScore > 5 ? '<span class="meta-badge trending">HOT</span>' : ''}
+        </div>
+      </div>
+      <div class="item-actions">
+        <div class="progress-bar">
+          <div class="progress-fill" style="--progress: ${(progressValue / 100).toFixed(2)}"></div>
+        </div>
+        <button type="button" class="expand-btn">${isExpanded ? 'HIDE' : 'OPEN'}</button>
+      </div>
+    </div>
+    <div class="item-body"${isExpanded ? '' : ' hidden'}>
+      <div class="item-summary">${escapeHTML(item.desc || 'No summary available.')}</div>
+      <a href="${escapeHTML(item.link)}" target="_blank" rel="noopener" class="item-link">
+        ACCESS_ARTICLE
+      </a>
+    </div>
+  `;
+  
+  const header = article.querySelector('.item-header');
+  const expandBtn = article.querySelector('.expand-btn');
+  const itemLink = article.querySelector('.item-link');
+  
+  const toggleExpand = () => {
+    const expanded = !TERMINAL_STATE.expandedCards.has(cardId);
+    if (expanded) {
+      TERMINAL_STATE.expandedCards.add(cardId);
+      article.classList.add('expanded');
+      article.querySelector('.item-body').hidden = false;
+      expandBtn.textContent = 'HIDE';
+      setReadProgress(cardId, Math.max(40, progressValue));
+    } else {
+      TERMINAL_STATE.expandedCards.delete(cardId);
+      article.classList.remove('expanded');
+      article.querySelector('.item-body').hidden = true;
+      expandBtn.textContent = 'OPEN';
+    }
+    header.setAttribute('aria-expanded', expanded);
+    persistState();
+    triggerHaptic('expand');
+  };
+  
+  header.addEventListener('click', toggleExpand);
+  header.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleExpand();
+    }
+  });
+  
+  expandBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    toggleExpand();
+  });
+  
+  itemLink.addEventListener('click', () => {
+    setReadProgress(cardId, 100);
+    const progressFill = article.querySelector('.progress-fill');
+    progressFill.style.setProperty('--progress', '1');
+    triggerHaptic('select');
+  });
+  
+  return article;
+}
+
+function showTerminalLoading() {
+  const feed = document.getElementById('newsFeed');
+  feed.innerHTML = '';
+  
+  for (let i = 0; i < 6; i++) {
+    const skeleton = document.createElement('div');
+    skeleton.className = 'loading-item';
+    skeleton.innerHTML = `
+      <div class="loading-title"></div>
+      <div class="loading-meta"></div>
+    `;
+    feed.appendChild(skeleton);
+  }
+}
+
+function updateTerminalStatus(items = []) {
+  const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  document.getElementById('lastSync').textContent = timestamp;
+  
+  if (items.length === 0) {
+    document.getElementById('moodStatus').textContent = 'QUIET';
+    document.getElementById('moodLed').className = 'status-led';
     return;
   }
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      const networkFetch = fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          const sameOrigin = new URL(request.url).origin === self.location.origin;
-          if (sameOrigin && response.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          }
-          return response;
+  
+  const avgSentiment = items.reduce((sum, item) => sum + (item.sentimentScore || 0), 0) / items.length;
+  let mood = 'CALM';
+  let ledClass = 'status-led amber';
+  
+  if (avgSentiment > 3) {
+    mood = 'POSITIVE';
+    ledClass = 'status-led';
+  } else if (avgSentiment < -3) {
+    mood = 'CRITICAL';
+    ledClass = 'status-led red';
+  }
+  
+  document.getElementById('moodStatus').textContent = mood;
+  document.getElementById('moodLed').className = ledClass;
+}
+
+function showTerminalToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `terminal-toast ${type}`;
+  toast.textContent = message.toUpperCase().replace(/ /g, '_');
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+function renderFeed() {
+  const feed = document.getElementById('newsFeed');
+  const empty = document.getElementById('emptyState');
+  
+  feed.innerHTML = '';
+  let filtered = TERMINAL_STATE.items.slice();
+  
+  if (TERMINAL_STATE.sourceFilter) {
+    filtered = filtered.filter(item => item.id === TERMINAL_STATE.sourceFilter);
+  }
+  
+  let viewItems;
+  
+  switch (TERMINAL_STATE.view) {
+    case 'popular':
+      viewItems = filtered
+        .slice()
+        .sort((a, b) => b.trendingScore - a.trendingScore)
+        .slice(0, 30);
+      break;
+    case 'conservative':
+      viewItems = filtered.filter(item => item.lane === 'conservative');
+      break;
+    case 'populist':
+      viewItems = filtered.filter(item => item.lane === 'populist');
+      break;
+    case 'breaking':
+      viewItems = filtered.filter(item => item.isBreaking);
+      break;
+    case 'by-source':
+      viewItems = filtered.slice();
+      break;
+    default:
+      viewItems = filtered.slice(0, 60);
+  }
+  
+  if (viewItems.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  
+  empty.style.display = 'none';
+  
+  const fragment = document.createDocumentFragment();
+  viewItems.forEach((item, idx) => {
+    fragment.appendChild(createTerminalCard(item, idx));
+  });
+  
+  feed.appendChild(fragment);
+  updateTerminalStatus(viewItems);
+}
+
+async function loadFeeds() {
+  if (TERMINAL_STATE.loading) return;
+  
+  TERMINAL_STATE.loading = true;
+  showTerminalLoading();
+  
+  const indicator = document.getElementById('pullIndicator');
+  if (indicator && (indicator.dataset.state === 'ready' || indicator.dataset.state === 'loading')) {
+    indicator.dataset.state = 'loading';
+    indicator.textContent = 'UPDATING...';
+    indicator.style.opacity = '1';
+  }
+  
+  try {
+    const fetches = SOURCES.map(source =>
+      fetchFast(source.url)
+        .then(text => parseRSS(text, source))
+        .catch(error => {
+          console.warn('Feed failed:', source.name, error);
+          return [];
         })
-        .catch(() => cached);
-      return cached || networkFetch;
-    })
-  );
-});`;
-          const swBlob = new Blob([swSource], { type: "application/javascript" });
-          const swUrl = URL.createObjectURL(swBlob);
-          navigator.serviceWorker.register(swUrl).catch((error) => {
-            console.warn("Service worker registration failed", error);
-          });
-          window.addEventListener("pagehide", () => URL.revokeObjectURL(swUrl), { once: true });
+    );
+    
+    const results = await Promise.all(fetches);
+    const allItems = results.flat();
+    
+    const deduped = [];
+    const seen = new Set();
+    
+    allItems
+      .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
+      .forEach(item => {
+        if (!seen.has(item.link)) {
+          seen.add(item.link);
+          deduped.push(item);
         }
-      })();
-    </script>
-  </body>
+      });
+    
+    const curated = deduped.filter(isLikelyNews);
+    TERMINAL_STATE.items = curated.slice(0, 100);
+    calculateTrending(TERMINAL_STATE.items);
+    
+    TERMINAL_STATE.items.forEach(item => {
+      const sentiment = analyzeSentiment(item);
+      item.sentimentScore = Number(sentiment.score.toFixed(2));
+      item.sentimentLabel = sentiment.label;
+      item.sentimentTone = sentiment.tone;
+    });
+    
+    renderFeed();
+    
+    const reportMessage = TERMINAL_STATE.items.length ? `${TERMINAL_STATE.items.length}_REPORTS_LOADED` : 'FEED_REFRESHED';
+    showTerminalToast(reportMessage, 'success');
+    triggerHaptic('success');
+    
+    if (indicator && indicator.dataset.state === 'loading') {
+      indicator.dataset.state = 'updated';
+      indicator.textContent = 'UPDATED';
+      setTimeout(() => {
+        indicator.style.opacity = '0';
+        indicator.textContent = 'PULL_TO_REFRESH';
+      }, 1400);
+    }
+  } catch (error) {
+    console.error('Failed:', error);
+    document.getElementById('lastSync').textContent = 'ERROR';
+    showTerminalToast('LOADING_FAILED', 'error');
+    
+    if (indicator && indicator.dataset.state === 'loading') {
+      indicator.dataset.state = 'updated';
+      indicator.textContent = 'REFRESH_FAILED';
+      setTimeout(() => {
+        indicator.style.opacity = '0';
+        indicator.textContent = 'PULL_TO_REFRESH';
+      }, 1400);
+    }
+  } finally {
+    TERMINAL_STATE.loading = false;
+  }
+}
+
+function changeView(view) {
+  if (!view || view === TERMINAL_STATE.view) {
+    syncActiveNav();
+    triggerHaptic('tap');
+    return;
+  }
+  
+  TERMINAL_STATE.view = view;
+  persistState();
+  renderFeed();
+  syncActiveNav();
+  triggerHaptic('tab');
+}
+
+function syncActiveNav() {
+  const currentView = TERMINAL_STATE.view;
+  
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    const active = chip.dataset.view === currentView;
+    chip.classList.toggle('active', active);
+    chip.setAttribute('aria-selected', String(active));
+  });
+  
+  document.querySelectorAll('.nav-btn').forEach(button => {
+    const view = button.dataset.viewTarget;
+    const active = Boolean(view && view === currentView);
+    if (view) {
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-selected', String(active));
+    }
+  });
+}
+
+function setupPullToRefresh() {
+  const indicator = document.getElementById('pullIndicator');
+  if (!indicator) return;
+  
+  let startY = 0;
+  let pulling = false;
+  let ready = false;
+  let pullActive = false;
+  
+  const resetPull = () => {
+    document.body.style.setProperty('--pull-distance', '0px');
+    pulling = false;
+    ready = false;
+    pullActive = false;
+    indicator.dataset.state = 'idle';
+    indicator.style.opacity = 0;
+  };
+  
+  window.addEventListener('touchstart', event => {
+    if (TERMINAL_STATE.loading || window.scrollY > 0) return;
+    startY = event.touches[0].clientY;
+    pulling = true;
+    ready = false;
+    pullActive = false;
+  }, { passive: true });
+  
+  window.addEventListener('touchmove', event => {
+    if (!pulling) return;
+    if (window.scrollY > 0) {
+      resetPull();
+      return;
+    }
+    
+    const delta = event.touches[0].clientY - startY;
+    if (delta <= 0) {
+      resetPull();
+      return;
+    }
+    
+    if (!pullActive && delta < 32) return;
+    
+    if (!pullActive) pullActive = true;
+    
+    event.preventDefault();
+    const limited = Math.min(220, delta);
+    const eased = Math.pow(limited / 220, 0.85) * 220;
+    document.body.style.setProperty('--pull-distance', `${eased}px`);
+    indicator.style.opacity = Math.min(1, eased / 120);
+    
+    if (eased > 140) {
+      indicator.dataset.state = 'ready';
+      indicator.textContent = 'RELEASE_TO_REFRESH';
+      if (!ready) {
+        triggerHaptic('pull-ready');
+        ready = true;
+      }
+    } else {
+      indicator.dataset.state = 'idle';
+      indicator.textContent = 'PULL_TO_REFRESH';
+      ready = false;
+    }
+  }, { passive: false });
+  
+  const endPull = () => {
+    if (!pulling) return;
+    
+    document.body.style.setProperty('--pull-distance', '0px');
+    indicator.style.opacity = 0;
+    
+    if (ready && pullActive && !TERMINAL_STATE.loading) {
+      indicator.dataset.state = 'loading';
+      indicator.textContent = 'UPDATING...';
+      triggerHaptic('refresh');
+      loadFeeds();
+    } else {
+      indicator.dataset.state = 'idle';
+    }
+    
+    pulling = false;
+    ready = false;
+    pullActive = false;
+  };
+  
+  window.addEventListener('touchend', endPull);
+  window.addEventListener('touchcancel', endPull);
+}
+
+function setupSheets() {
+  let activeSheet = null;
+  
+  function openSheet(sheetId, trigger) {
+    if (activeSheet && activeSheet !== sheetId) closeSheet(activeSheet);
+    
+    const sheet = document.getElementById(sheetId);
+    if (!sheet) return;
+    
+    sheet.hidden = false;
+    sheet.classList.add('visible');
+    activeSheet = sheetId;
+    
+    if (trigger) {
+      trigger.setAttribute('aria-expanded', 'true');
+    }
+    
+    triggerHaptic('action');
+  }
+  
+  function closeSheet(sheetId) {
+    const sheet = document.getElementById(sheetId);
+    if (!sheet) return;
+    
+    sheet.classList.remove('visible');
+    
+    setTimeout(() => {
+      sheet.hidden = true;
+    }, 300);
+    
+    if (activeSheet === sheetId) {
+      activeSheet = null;
+    }
+  }
+  
+  // Filter sheet
+  document.getElementById('filterBtn').addEventListener('click', () => {
+    openSheet('filterSheet', document.getElementById('filterBtn'));
+  });
+  
+  document.querySelectorAll('[data-filter-close]').forEach(btn => {
+    btn.addEventListener('click', () => closeSheet('filterSheet'));
+  });
+  
+  // Source sheet
+  document.getElementById('sourceSelector').addEventListener('click', () => {
+    buildSourceList();
+    openSheet('sourceSheet', document.getElementById('sourceSelector'));
+  });
+  
+  document.querySelectorAll('[data-source-close]').forEach(btn => {
+    btn.addEventListener('click', () => closeSheet('sourceSheet'));
+  });
+  
+  document.getElementById('clearSource').addEventListener('click', () => {
+    TERMINAL_STATE.sourceFilter = null;
+    persistState();
+    updateSourceDisplay();
+    renderFeed();
+    closeSheet('sourceSheet');
+    triggerHaptic('tab');
+  });
+  
+  // Action sheet
+  document.getElementById('moreBtn').addEventListener('click', () => {
+    openSheet('actionSheet', document.getElementById('moreBtn'));
+  });
+  
+  document.querySelectorAll('[data-sheet-close]').forEach(btn => {
+    btn.addEventListener('click', () => closeSheet('actionSheet'));
+  });
+  
+  document.querySelectorAll('[data-sheet-action]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const action = e.target.dataset.sheetAction;
+      
+      switch (action) {
+        case 'refresh':
+          triggerHaptic('refresh');
+          loadFeeds();
+          break;
+        case 'mark-read':
+          markAllRead();
+          break;
+        case 'reset':
+          if (confirm('Reset all settings and data?')) {
+            triggerHaptic('action');
+            localStorage.clear();
+            location.reload();
+          }
+          break;
+      }
+      
+      closeSheet('actionSheet');
+    });
+  });
+  
+  // Close on overlay click
+  document.querySelectorAll('.sheet-overlay').forEach(overlay => {
+    overlay.addEventListener('click', () => {
+      if (activeSheet) closeSheet(activeSheet);
+    });
+  });
+  
+  // Close on escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && activeSheet) {
+      closeSheet(activeSheet);
+    }
+  });
+}
+
+function buildSourceList() {
+  const container = document.getElementById('sourceList');
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  const allOption = document.createElement('button');
+  allOption.className = 'source-option';
+  allOption.setAttribute('aria-selected', !TERMINAL_STATE.sourceFilter);
+  allOption.innerHTML = `
+    <span class="option-name">ALL_SOURCES</span>
+    <span class="option-meta">
+      <span>ALL_OUTLETS</span>
+    </span>
+    <span class="option-check">✓</span>
+  `;
+  
+  allOption.addEventListener('click', () => {
+    TERMINAL_STATE.sourceFilter = null;
+    persistState();
+    updateSourceDisplay();
+    renderFeed();
+    buildSourceList();
+    triggerHaptic('tab');
+  });
+  
+  container.appendChild(allOption);
+  
+  SOURCES.forEach(source => {
+    const isActive = TERMINAL_STATE.sourceFilter === source.id;
+    const button = document.createElement('button');
+    button.className = 'source-option';
+    button.setAttribute('aria-selected', isActive);
+    
+    const laneLabel = source.lane ? source.lane.toUpperCase() : 'GENERAL';
+    const biasLabel = Number.isFinite(source.bias) 
+      ? `BIAS_${source.bias >= 0 ? '+' : ''}${source.bias.toFixed(1)}`
+      : 'BIAS_N/A';
+    
+    button.innerHTML = `
+      <span class="option-name">${source.name}</span>
+      <span class="option-meta">
+        <span>${laneLabel}</span>
+        <span>${biasLabel}</span>
+      </span>
+      <span class="option-check">✓</span>
+    `;
+    
+    button.addEventListener('click', () => {
+      TERMINAL_STATE.sourceFilter = source.id;
+      persistState();
+      updateSourceDisplay();
+      renderFeed();
+      buildSourceList();
+      triggerHaptic('tab');
+    });
+    
+    container.appendChild(button);
+  });
+}
+
+function updateSourceDisplay() {
+  const valueEl = document.getElementById('sourceValue');
+  const selection = SOURCES.find(source => source.id === TERMINAL_STATE.sourceFilter);
+  
+  if (valueEl) {
+    valueEl.textContent = selection ? selection.name : 'ALL_SOURCES';
+  }
+}
+
+function markAllRead() {
+  TERMINAL_STATE.items.forEach(item => {
+    const cardId = createCardId(item.link);
+    setReadProgress(cardId, 100);
+  });
+  
+  document.querySelectorAll('.progress-fill').forEach(fill => {
+    fill.style.setProperty('--progress', '1');
+  });
+  
+  triggerHaptic('mark');
+  showTerminalToast('MARKED_ALL_READ', 'success');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateSourceDisplay();
+  syncActiveNav();
+  setupSheets();
+  setupPullToRefresh();
+  
+  // Navigation
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const view = btn.dataset.viewTarget;
+      if (view) changeView(view);
+    });
+  });
+  
+  // Filter chips
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const view = chip.dataset.view;
+      if (view) {
+        changeView(view);
+        setTimeout(() => {
+          const sheet = document.getElementById('filterSheet');
+          if (sheet && !sheet.hidden) {
+            sheet.classList.remove('visible');
+            setTimeout(() => sheet.hidden = true, 300);
+          }
+        }, 100);
+      }
+    });
+  });
+  
+  // Auto refresh
+  setInterval(() => {
+    if (!TERMINAL_STATE.loading && Date.now() - TERMINAL_STATE.lastFetch > 120000) {
+      loadFeeds();
+    }
+  }, 30000);
+  
+  // Initial load
+  loadFeeds();
+});
+</script>
+</body>
 </html>
