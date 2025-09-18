@@ -1,2294 +1,1537 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>HackerTab Pro - Production Ready Tech Dashboard</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #070b16;
-      --bg-elevated: #0f1629;
-      --bg-overlay: rgba(7, 11, 22, 0.88);
-      --card: #111a33;
-      --card-hover: #162245;
-      --border: rgba(255, 255, 255, 0.08);
-      --border-strong: rgba(255, 255, 255, 0.16);
-      --text: #ecf3ff;
-      --text-muted: rgba(236, 243, 255, 0.7);
-      --accent: #61dafb;
-      --accent-strong: #33b5e5;
-      --danger: #ff6b81;
-      --warning: #ffa94d;
-      --success: #69db7c;
-      --font-body: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 16px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: var(--font-body);
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.55;
-      -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    a:hover,
-    a:focus {
-      text-decoration: underline;
-    }
-
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-      color: inherit;
-    }
-
-    button {
-      cursor: pointer;
-      background: var(--card);
-      border: 1px solid var(--border);
-      padding: 0.75rem 1rem;
-      border-radius: 0.75rem;
-      min-height: 44px;
-      transition: background 0.2s ease, border 0.2s ease, transform 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      justify-content: center;
-    }
-
-    button:hover,
-    button:focus-visible {
-      background: var(--card-hover);
-      border-color: var(--accent);
-      outline: none;
-    }
-
-    button[disabled] {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .primary-btn {
-      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-      color: #02040a;
-      font-weight: 600;
-      border: none;
-    }
-
-    .primary-btn:hover,
-    .primary-btn:focus-visible {
-      border: none;
-      filter: brightness(1.05);
-    }
-
-    .danger {
-      background: rgba(255, 107, 129, 0.12);
-      border-color: rgba(255, 107, 129, 0.35);
-    }
-
-    .danger:hover,
-    .danger:focus-visible {
-      border-color: var(--danger);
-      color: var(--danger);
-    }
-
-    .muted-btn {
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .app-shell {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    header.top-bar {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      background: rgba(15, 22, 41, 0.6);
-      border: 1px solid var(--border);
-      border-radius: 1.25rem;
-      padding: 1rem;
-      backdrop-filter: blur(16px);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .brand-area {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .brand-area h1 {
-      font-size: 1.5rem;
-      margin: 0;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-    }
-
-    .badge {
-      border-radius: 999px;
-      padding: 0.25rem 0.75rem;
-      background: rgba(97, 218, 251, 0.15);
-      border: 1px solid rgba(97, 218, 251, 0.4);
-      font-size: 0.875rem;
-      color: var(--accent);
-    }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      align-items: center;
-    }
-
-    .search-box {
-      flex: 1 1 220px;
-      position: relative;
-    }
-
-    .search-box input[type="search"] {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      padding-left: 2.5rem;
-      border-radius: 0.9rem;
-      border: 1px solid var(--border);
-      background: rgba(17, 26, 51, 0.9);
-      color: var(--text);
-      min-height: 44px;
-      transition: border 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .search-box input[type="search"]:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(97, 218, 251, 0.25);
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 0.85rem;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 1.1rem;
-      height: 1.1rem;
-      opacity: 0.7;
-      pointer-events: none;
-    }
-
-    #status-area {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .banner {
-      border-radius: 1rem;
-      padding: 0.75rem 1rem;
-      font-size: 0.95rem;
-      display: none;
-      border: 1px solid transparent;
-    }
-
-    .banner.show {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .banner.offline {
-      background: rgba(255, 169, 77, 0.16);
-      border-color: rgba(255, 169, 77, 0.32);
-      color: var(--warning);
-    }
-
-    .banner.error {
-      background: rgba(255, 107, 129, 0.16);
-      border-color: rgba(255, 107, 129, 0.32);
-      color: var(--danger);
-    }
-
-    .feed-status-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1rem;
-    }
-
-    .feed-card {
-      border-radius: 1rem;
-      border: 1px solid var(--border);
-      background: var(--card);
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      transition: background 0.2s ease, border 0.2s ease;
-    }
-
-    .feed-card:hover {
-      background: var(--card-hover);
-      border-color: rgba(97, 218, 251, 0.35);
-    }
-
-    .feed-card header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 0.5rem;
-    }
-
-    .feed-card h2 {
-      margin: 0;
-      font-size: 1.1rem;
-    }
-
-    .feed-meta {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .status-pill {
-      font-size: 0.75rem;
-      border-radius: 999px;
-      padding: 0.2rem 0.6rem;
-      align-self: flex-start;
-      border: 1px solid transparent;
-    }
-
-    .status-pill.ok {
-      background: rgba(105, 219, 124, 0.15);
-      border-color: rgba(105, 219, 124, 0.35);
-      color: var(--success);
-    }
-
-    .status-pill.warn {
-      background: rgba(255, 169, 77, 0.12);
-      border-color: rgba(255, 169, 77, 0.3);
-      color: var(--warning);
-    }
-
-    .status-pill.fail {
-      background: rgba(255, 107, 129, 0.12);
-      border-color: rgba(255, 107, 129, 0.3);
-      color: var(--danger);
-    }
-
-    .feed-card footer {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    .toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-size: 0.85rem;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .toggle input {
-      width: 44px;
-      height: 24px;
-    }
-
-    main#main-content {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    #pull-indicator {
-      text-align: center;
-      padding: 0.5rem;
-      border-radius: 1rem;
-      background: rgba(97, 218, 251, 0.1);
-      border: 1px dashed rgba(97, 218, 251, 0.3);
-      max-width: 220px;
-      margin: 0 auto;
-      opacity: 0;
-      transform: translateY(-30px);
-      transition: opacity 0.2s ease, transform 0.2s ease;
-    }
-
-    #pull-indicator.active {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    #feed-list {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-
-    @media (min-width: 720px) {
-      header.top-bar {
-        flex-direction: column;
+  <head>
+    <meta charset="utf-8" />
+    <!-- Viewport includes viewport-fit=cover to fully utilize iPhone notch area -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>HackerTab Pro · Mobile Intelligence Hub</title>
+    <meta name="description" content="HackerTab Pro reimagined for iOS – swipeable developer intelligence with offline mode, pull-to-refresh, and buttery mobile gestures." />
+    <!-- Enable standalone PWA display on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#0b1220" />
+    <!-- Prevent unwanted input zoom and automatic formatting on iOS -->
+    <meta name="format-detection" content="telephone=no, email=no, address=no" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --font-system: "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --font-mono: "SFMono-Regular", "Menlo", monospace;
+        --surface-base: #05070f;
+        --surface-elevated: rgba(13, 19, 35, 0.82);
+        --surface-card: rgba(20, 28, 49, 0.95);
+        --surface-card-strong: rgba(26, 37, 66, 0.98);
+        --surface-border: rgba(255, 255, 255, 0.08);
+        --surface-border-strong: rgba(255, 255, 255, 0.16);
+        --text-primary: #eef3ff;
+        --text-secondary: rgba(238, 243, 255, 0.75);
+        --text-muted: rgba(238, 243, 255, 0.55);
+        --accent: #0a84ff;
+        --accent-soft: rgba(10, 132, 255, 0.16);
+        --accent-strong: #409cff;
+        --danger: #ff4d6d;
+        --warning: #ffb020;
+        --success: #32d74b;
+        --shadow-soft: 0 22px 46px rgba(5, 7, 15, 0.35);
+        --shadow-card: 0 10px 30px rgba(2, 4, 10, 0.45);
+        --spacing-1: 0.5rem;
+        --spacing-2: 1rem;
+        --spacing-3: 1.5rem;
+        --spacing-4: 2rem;
+        --radius-sm: 0.75rem;
+        --radius-md: 1.25rem;
+        --radius-lg: 1.75rem;
+        --safe-area-top: env(safe-area-inset-top);
+        --safe-area-bottom: env(safe-area-inset-bottom);
+        --header-height: 260px;
+        --tab-bar-height: 74px;
+        font-size: 16px;
       }
-
-      .actions {
-        justify-content: flex-end;
+      @media (prefers-color-scheme: light) {
+        :root {
+          --surface-base: #f7f9ff;
+          --surface-elevated: rgba(255, 255, 255, 0.9);
+          --surface-card: rgba(255, 255, 255, 0.92);
+          --surface-card-strong: rgba(244, 247, 255, 0.96);
+          --surface-border: rgba(4, 20, 60, 0.08);
+          --surface-border-strong: rgba(4, 20, 60, 0.16);
+          --text-primary: #0b1220;
+          --text-secondary: rgba(11, 18, 32, 0.72);
+          --text-muted: rgba(11, 18, 32, 0.54);
+          --shadow-soft: 0 24px 48px rgba(5, 17, 45, 0.08);
+          --shadow-card: 0 18px 38px rgba(8, 20, 48, 0.14);
+        }
       }
-
-      #feed-list {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      *, *::before, *::after {
+        box-sizing: border-box;
       }
-    }
-
-    .feed-item {
-      border: 1px solid var(--border);
-      border-radius: 1.1rem;
-      padding: 1rem;
-      background: var(--card);
-      display: flex;
-      flex-direction: column;
-      gap: 0.65rem;
-      min-height: 120px;
-      transition: transform 0.2s ease, background 0.2s ease;
-    }
-
-    .feed-item:hover,
-    .feed-item:focus-within {
-      background: var(--card-hover);
-      transform: translateY(-3px);
-      border-color: rgba(97, 218, 251, 0.35);
-    }
-
-    .feed-item h3 {
-      margin: 0;
-      font-size: 1.05rem;
-      font-weight: 600;
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    .feed-item .source-tag {
-      font-size: 0.75rem;
-      padding: 0.1rem 0.5rem;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .feed-item .meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .feed-item .description {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      max-height: 5.5rem;
-      overflow: hidden;
-    }
-
-    .load-more {
-      margin: 0 auto;
-      width: min(320px, 100%);
-    }
-
-    .spinner {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      border-top-color: var(--accent);
-      animation: spin 0.7s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
+      html, body {
+        margin: 0;
+        padding: 0;
       }
-    }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(3, 6, 12, 0.65);
-      backdrop-filter: blur(8px);
-      display: none;
-      z-index: 40;
-    }
-
-    .modal-backdrop.show {
-      display: block;
-    }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-      z-index: 50;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-content {
-      background: rgba(11, 17, 34, 0.95);
-      border: 1px solid var(--border-strong);
-      border-radius: 1.25rem;
-      width: min(840px, 100%);
-      max-height: 95vh;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .modal-content header {
-      padding: 1.25rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-body {
-      padding: 1.25rem;
-      overflow-y: auto;
-      display: grid;
-      gap: 1.5rem;
-    }
-
-    .settings-section {
-      border: 1px solid var(--border);
-      border-radius: 1rem;
-      padding: 1rem;
-      background: rgba(17, 26, 51, 0.55);
-      display: grid;
-      gap: 1rem;
-    }
-
-    .settings-section h2 {
-      margin: 0;
-      font-size: 1.1rem;
-    }
-
-    .feed-management-list {
-      display: grid;
-      gap: 0.75rem;
-    }
-
-    .feed-management-item {
-      border: 1px solid var(--border);
-      border-radius: 0.9rem;
-      padding: 0.75rem;
-      display: grid;
-      gap: 0.5rem;
-      background: rgba(9, 15, 28, 0.55);
-    }
-
-    .feed-management-item header {
-      display: flex;
-      justify-content: space-between;
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    .feed-management-item .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .feed-management-item .small {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    form.feed-form {
-      display: grid;
-      gap: 0.75rem;
-    }
-
-    form.feed-form label {
-      display: grid;
-      gap: 0.35rem;
-      font-size: 0.95rem;
-    }
-
-    form.feed-form input,
-    form.feed-form select,
-    form.feed-form textarea {
-      background: rgba(9, 15, 28, 0.8);
-      border: 1px solid var(--border);
-      border-radius: 0.75rem;
-      padding: 0.65rem 0.75rem;
-      min-height: 44px;
-    }
-
-    form.feed-form input:focus,
-    form.feed-form textarea:focus,
-    form.feed-form select:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(97, 218, 251, 0.2);
-    }
-
-    form.feed-form textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    .form-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-    }
-
-    .preview-panel {
-      border: 1px dashed rgba(255, 255, 255, 0.18);
-      border-radius: 0.9rem;
-      padding: 0.75rem;
-      display: grid;
-      gap: 0.6rem;
-      background: rgba(8, 13, 24, 0.8);
-    }
-
-    .preview-panel h3 {
-      margin: 0;
-      font-size: 1rem;
-    }
-
-    .preview-item {
-      border: 1px solid var(--border);
-      border-radius: 0.75rem;
-      padding: 0.75rem;
-      display: grid;
-      gap: 0.35rem;
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .suggestions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .suggestion {
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      padding: 0.4rem 0.75rem;
-      background: rgba(255, 255, 255, 0.05);
-      font-size: 0.85rem;
-    }
-
-    .keyboard-shortcuts {
-      display: grid;
-      gap: 0.35rem;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    .keyboard-shortcuts span {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    .kbd {
-      border-radius: 0.4rem;
-      border: 1px solid var(--border);
-      padding: 0.1rem 0.4rem;
-      font-size: 0.85rem;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text);
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 2rem;
-      border: 1px dashed var(--border);
-      border-radius: 1rem;
-      color: var(--text-muted);
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 1.5rem;
-      left: 50%;
-      transform: translateX(-50%) translateY(120%);
-      background: rgba(17, 26, 51, 0.95);
-      border-radius: 999px;
-      padding: 0.75rem 1.25rem;
-      border: 1px solid var(--border);
-      transition: transform 0.3s ease;
-      max-width: 90vw;
-      text-align: center;
-      z-index: 60;
-      font-size: 0.95rem;
-    }
-
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-    }
-
-    @media (min-width: 960px) {
-      header.top-bar {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
+      body {
+        font-family: var(--font-system);
+        background: var(--surface-base);
+        color: var(--text-primary);
+        min-height: 100vh;
+        line-height: 1.55;
+        -webkit-text-size-adjust: 100%;
+        overscroll-behavior-y: none;
       }
-
-      .brand-area {
-        flex: 1;
-      }
-
-      .actions {
-        flex: 1;
-        justify-content: flex-end;
-      }
-
-      .modal-body {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="app-shell">
-    <header class="top-bar" aria-label="HackerTab controls">
-      <div class="brand-area">
-        <div>
-          <h1>HackerTab Pro</h1>
-          <p class="text-muted" style="margin:0;font-size:0.9rem;color:var(--text-muted);">Production-ready tech dashboard. Fast. Reliable. Yours.</p>
+      a { color: inherit; }
+      img { max-width: 100%; display: block; }
+      button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; padding: 0; min-height: 44px; min-width: 44px; touch-action: manipulation; }
+      .app { display: flex; flex-direction: column; min-height: 100vh; padding-bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom)); }
+      .app-header { position: sticky; top: 0; z-index: 20; padding: calc(var(--safe-area-top) + var(--spacing-2)) var(--spacing-2) var(--spacing-2); display: grid; gap: var(--spacing-2); background: var(--surface-elevated); backdrop-filter: blur(28px) saturate(160%); border-bottom: 1px solid var(--surface-border); }
+      .header-row { display: flex; align-items: center; gap: var(--spacing-1); flex-wrap: wrap; }
+      .brand-block { display: grid; gap: 0.25rem; flex: 1; }
+      .brand-block h1 { margin: 0; font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; }
+      .brand-block p { margin: 0; color: var(--text-secondary); font-size: 0.9375rem; }
+      .product-badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.75rem; background: var(--accent-soft); color: var(--accent); border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+      .icon-button { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--surface-border); background: var(--surface-card); display: inline-flex; align-items: center; justify-content: center; transition: transform 0.24s ease, background 0.24s ease, border 0.24s ease; }
+      .icon-button:active { transform: scale(0.94); }
+      .pill-button { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: var(--surface-card); border-radius: 999px; border: 1px solid var(--surface-border); font-weight: 600; transition: transform 0.2s ease, background 0.2s ease, border 0.2s ease; }
+      .pill-button:active { transform: scale(0.97); }
+      .pill-button.primary { background: linear-gradient(135deg, var(--accent), var(--accent-strong)); color: #031222; border: none; box-shadow: 0 8px 22px rgba(10, 132, 255, 0.35); }
+      .pill-button.destructive { color: var(--danger); border-color: rgba(255, 77, 109, 0.35); }
+      .chips-row { display: grid; grid-auto-flow: column; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem; mask-image: linear-gradient(90deg, transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent); -webkit-overflow-scrolling: touch; }
+      .filter-chip { padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid var(--surface-border); background: var(--surface-card); color: var(--text-secondary); font-size: 0.875rem; white-space: nowrap; }
+      .filter-chip[data-active="true"] { color: var(--accent); border-color: rgba(10,132,255,0.35); background: rgba(10,132,255,0.15); }
+      .search-field { position: relative; flex: 1; }
+      .search-field input { width: 100%; background: var(--surface-card-strong); border-radius: var(--radius-md); border: 1px solid var(--surface-border); padding: 1.1rem 1.1rem 0.45rem 3rem; color: var(--text-primary); font-size: 1rem; }
+      .search-field label { position: absolute; top: 1.05rem; left: 3rem; font-size: 0.875rem; color: var(--text-muted); pointer-events: none; transition: transform 0.18s ease, font-size 0.18s ease, color 0.18s ease; }
+      .search-field svg { position: absolute; top: 0.95rem; left: 1.1rem; width: 1.2rem; height: 1.2rem; stroke: var(--text-muted); }
+      .search-field input:focus { outline: none; border-color: rgba(10,132,255,0.45); box-shadow: 0 0 0 1px rgba(10,132,255,0.45); }
+      .search-field input:focus + label, .search-field input:not(:placeholder-shown) + label { transform: translateY(-0.85rem); font-size: 0.72rem; color: var(--accent); }
+      main { flex: 1; display: flex; flex-direction: column; padding: 0 var(--spacing-2); gap: var(--spacing-2); }
+      .feed-section { display: flex; flex-direction: column; gap: var(--spacing-1); }
+      .feed-section header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--spacing-1); }
+      .feed-section h2 { margin: 0; font-size: 1.125rem; }
+      .feed-scroller { position: relative; overflow-y: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; height: calc(100vh - var(--header-height) - var(--tab-bar-height)); padding-bottom: var(--spacing-4); scroll-snap-type: y proximity; overscroll-behavior: contain; }
+      .pull-indicator { position: absolute; top: -5rem; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; color: var(--text-secondary); font-size: 0.875rem; pointer-events: none; transition: transform 0.25s ease; }
+      .pull-indicator[data-state="refresh"] .spinner { animation-play-state: running; }
+      .spinner { width: 1.75rem; height: 1.75rem; border-radius: 50%; border: 3px solid rgba(10,132,255,0.25); border-top-color: var(--accent); animation: spin 0.9s linear infinite paused; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .feed-items { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--spacing-2); }
+      .feed-row { position: relative; scroll-snap-align: start; }
+      .action-backdrop { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, 1fr); border-radius: var(--radius-lg); overflow: hidden; pointer-events: none; }
+      .action-backdrop div { display: flex; align-items: center; justify-content: center; gap: 0.35rem; color: rgba(255,255,255,0.82); font-size: 0.75rem; font-weight: 600; }
+      .action-backdrop .action-archive { background: linear-gradient(135deg, rgba(96,205,255,0.4), rgba(10,132,255,0.6)); }
+      .action-backdrop .action-delete { background: linear-gradient(135deg, rgba(255,77,109,0.65), rgba(255,107,135,0.85)); }
+      .action-backdrop .action-share { background: linear-gradient(135deg, rgba(50,215,75,0.6), rgba(88,255,155,0.7)); }
+      .feed-card { position: relative; background: var(--surface-card); border: 1px solid var(--surface-border); border-radius: var(--radius-lg); padding: var(--spacing-2); display: grid; gap: 0.75rem; min-height: 9.5rem; box-shadow: var(--shadow-card); transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1), border 0.2s ease; touch-action: pan-y; }
+      .feed-card:focus-visible { outline: 3px solid rgba(10,132,255,0.55); outline-offset: 3px; }
+      .feed-card h3 { margin: 0; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.01em; }
+      .feed-card p { margin: 0; color: var(--text-secondary); font-size: 0.9375rem; }
+      .feed-meta { display: flex; align-items: center; gap: 0.35rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
+      .tag-row { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+      .tag { font-size: 0.75rem; padding: 0.35rem 0.7rem; border-radius: 999px; background: rgba(255,255,255,0.06); color: var(--text-secondary); }
+      .card-footer { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-1); }
+      .card-footer button { border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid var(--surface-border); padding: 0.55rem 1rem; font-size: 0.85rem; }
+      .card-footer button:active { transform: scale(0.96); }
+      .skeletons { display: grid; gap: var(--spacing-2); }
+      .skeleton-card { height: 9.5rem; border-radius: var(--radius-lg); background: linear-gradient(110deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.16) 37%, rgba(255,255,255,0.06) 55%); background-size: 200% 100%; animation: shimmer 1.2s ease infinite; }
+      @keyframes shimmer { to { background-position: -200% 0; } }
+      .list-end { text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 2.5rem 0; }
+      .tab-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; background: var(--surface-elevated); backdrop-filter: blur(26px) saturate(160%); border-top: 1px solid var(--surface-border); padding: 0.35rem 0.75rem calc(0.35rem + var(--safe-area-bottom)); }
+      .tab-button { border-radius: 16px; padding: 0.5rem; display: grid; justify-items: center; color: var(--text-secondary); font-size: 0.75rem; gap: 0.3rem; }
+      .tab-button[data-active="true"] { color: var(--accent); background: rgba(10,132,255,0.18); }
+      .sheet, .overlay, .menu-drawer { position: fixed; inset: 0; display: grid; pointer-events: none; z-index: 40; }
+      .sheet[data-open="true"], .overlay[data-open="true"], .menu-drawer[data-open="true"] { pointer-events: auto; }
+      .sheet-scrim, .overlay-scrim, .drawer-scrim { position: absolute; inset: 0; background: rgba(5,7,15,0.55); opacity: 0; transition: opacity 0.24s ease; }
+      .sheet[data-open="true"] .sheet-scrim, .overlay[data-open="true"] .overlay-scrim, .menu-drawer[data-open="true"] .drawer-scrim { opacity: 1; }
+      .sheet-panel { align-self: end; background: var(--surface-card); border-radius: 1.5rem 1.5rem 0 0; padding: 1rem 1.5rem calc(1.5rem + var(--safe-area-bottom)); box-shadow: 0 -16px 48px rgba(2,6,14,0.4); transform: translateY(120%); transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1); display: grid; gap: 1rem; }
+      .sheet[data-open="true"] .sheet-panel { transform: translateY(0); }
+      .sheet-handle { width: 54px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.22); justify-self: center; }
+      .sheet-actions { display: grid; gap: 0.75rem; }
+      .sheet-actions button { width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--surface-border); background: rgba(255,255,255,0.05); padding: 0.85rem 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }
+      .overlay-panel { align-self: center; justify-self: center; width: min(640px, 100% - 2.5rem); background: var(--surface-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); max-height: calc(100vh - var(--safe-area-top) - 2rem); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; transform: translateY(24px); opacity: 0; transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.2s ease; }
+      .overlay[data-open="true"] .overlay-panel { transform: translateY(0); opacity: 1; }
+      .overlay-panel header { padding: 1.25rem 1.5rem 1rem; border-bottom: 1px solid var(--surface-border); display: grid; gap: 0.75rem; }
+      .breadcrumb { display: flex; align-items: center; gap: 0.35rem; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; }
+      .overlay-content { padding: 1.5rem; overflow-y: auto; -webkit-overflow-scrolling: touch; display: grid; gap: 1.25rem; }
+      .form-field { display: grid; gap: 0.4rem; }
+      .form-field label { font-weight: 600; font-size: 0.9rem; }
+      .form-field input, .form-field select { border-radius: var(--radius-sm); border: 1px solid var(--surface-border); background: var(--surface-card-strong); padding: 0.85rem 1rem; font-size: 1rem; color: var(--text-primary); }
+      .form-field small { color: var(--text-muted); font-size: 0.75rem; }
+      .inline-error { color: var(--danger); font-size: 0.75rem; }
+      .overlay-footer { padding: 1rem 1.5rem calc(1rem + var(--safe-area-bottom)); border-top: 1px solid var(--surface-border); display: flex; gap: 0.75rem; }
+      .menu-panel { width: min(320px, 86vw); background: var(--surface-card); border-radius: 0 1.25rem 1.25rem 0; box-shadow: var(--shadow-soft); transform: translateX(-100%); transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1); padding: calc(var(--safe-area-top) + 1.25rem) 1.5rem 1.5rem; display: grid; gap: 1rem; }
+      .menu-drawer[data-open="true"] .menu-panel { transform: translateX(0); }
+      .menu-links { display: grid; gap: 0.75rem; }
+      .menu-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; }
+      .toast-stack { position: fixed; left: 0; right: 0; top: calc(var(--safe-area-top) + 1rem); display: grid; gap: 0.5rem; padding: 0 1.25rem; pointer-events: none; z-index: 60; }
+      .toast { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.85rem 1rem; border-radius: var(--radius-sm); background: rgba(20,28,49,0.95); border: 1px solid var(--surface-border); box-shadow: var(--shadow-card); pointer-events: auto; font-size: 0.85rem; animation: toast-in 0.3s ease forwards; }
+      .toast[data-tone="success"] { border-color: rgba(50,215,75,0.4); }
+      .toast[data-tone="error"] { border-color: rgba(255,77,109,0.6); }
+      @keyframes toast-in { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      .context-menu { position: fixed; background: var(--surface-card); border-radius: var(--radius-sm); border: 1px solid var(--surface-border); box-shadow: var(--shadow-soft); padding: 0.35rem; display: grid; gap: 0.25rem; min-width: 200px; opacity: 0; transform: scale(0.92); transition: transform 0.2s ease, opacity 0.2s ease; pointer-events: none; z-index: 80; }
+      .context-menu[data-open="true"] { pointer-events: auto; opacity: 1; transform: scale(1); }
+      .context-menu button { width: 100%; border-radius: var(--radius-sm); padding: 0.75rem; display: flex; align-items: center; gap: 0.75rem; justify-content: flex-start; border: none; background: transparent; }
+      .context-menu button:active { background: rgba(10,132,255,0.16); }
+      @media (min-width: 768px) { .app-header { padding-left: clamp(2rem, 4vw, 3rem); padding-right: clamp(2rem, 4vw, 3rem); } main { padding-left: clamp(2rem, 4vw, 3rem); padding-right: clamp(2rem, 4vw, 3rem); } .feed-scroller { border-radius: var(--radius-lg); } }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; } }
+    </style>
+  </head>
+  <body>
+    <div class="app" id="app" data-theme="auto">
+      <header class="app-header" role="banner">
+        <div class="header-row">
+          <button class="icon-button" id="menuButton" aria-label="Open navigation">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+              <path d="M4 6h16M4 12h16M4 18h10" />
+            </svg>
+          </button>
+          <div class="brand-block">
+            <span class="product-badge">HackerTab Pro • mobile-first</span>
+            <h1>Intelligence that moves with you</h1>
+            <p>Curated developer briefings, optimized for thumb flow, offline access, and lightning gestures.</p>
+          </div>
+          <button class="icon-button" id="quickActionsButton" aria-haspopup="dialog" aria-expanded="false">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+              <path d="M12 6.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm0 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm0 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
+            </svg>
+          </button>
         </div>
-        <span class="badge" id="content-count">Loading…</span>
-      </div>
-      <div class="actions">
-        <label class="search-box" aria-label="Search all feeds">
-          <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
-          </svg>
-          <input id="search" type="search" placeholder="Search Hacker News, GitHub, TechCrunch, and your feeds" autocomplete="off" spellcheck="false" />
-        </label>
-        <button type="button" id="refresh-all" class="muted-btn" aria-label="Refresh all feeds">
-          <span class="spinner hidden" id="global-spinner"></span>
-          <span>Refresh</span>
-        </button>
-        <button type="button" id="open-settings" class="primary-btn" aria-haspopup="dialog" aria-controls="settings-modal">Settings</button>
-      </div>
-    </header>
-
-    <section id="status-area" aria-live="polite">
-      <div class="banner offline" id="offline-banner" role="status">
-        <strong>Offline mode:</strong>
-        <span>Showing cached content. Changes will sync when you're back online.</span>
-      </div>
-      <div class="banner error" id="error-banner" role="alert"></div>
-    </section>
-
-    <section class="feed-status-grid" id="feed-status" aria-label="Feed health"></section>
-
-    <main id="main-content" role="main">
-      <div id="pull-indicator">Pull to refresh…</div>
-      <section id="feed-list" aria-live="polite" aria-busy="false"></section>
-      <button id="load-more" class="load-more muted-btn">Load more</button>
-    </main>
-  </div>
-
-  <div class="modal-backdrop" id="modal-backdrop"></div>
-  <div class="modal" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
-    <div class="modal-content">
-      <header>
-        <h2 id="settings-title">Settings</h2>
-        <button type="button" id="close-settings" class="muted-btn" aria-label="Close settings">Close</button>
+        <div class="header-row">
+          <div class="search-field">
+            <input id="feedSearch" type="search" placeholder=" " inputmode="search" autocomplete="off" aria-label="Search feed" />
+            <label for="feedSearch">Search sources, tags, or topics</label>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="6"></circle>
+              <path d="m20 20-3.5-3.5"></path>
+            </svg>
+          </div>
+          <button class="pill-button primary" id="addFeedButton">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            Add feed
+          </button>
+        </div>
+        <div class="header-row">
+          <div class="chips-row" role="group" aria-label="Feed filters">
+            <button class="filter-chip" data-filter="all" data-active="true" aria-pressed="true">All</button>
+            <button class="filter-chip" data-filter="frontend" aria-pressed="false">Frontend</button>
+            <button class="filter-chip" data-filter="backend" aria-pressed="false">Backend</button>
+            <button class="filter-chip" data-filter="ai" aria-pressed="false">AI</button>
+            <button class="filter-chip" data-filter="security" aria-pressed="false">Security</button>
+            <button class="filter-chip" data-filter="community" aria-pressed="false">Community</button>
+          </div>
+          <button class="pill-button" id="manageFeedsButton">Manage feeds</button>
+        </div>
       </header>
-      <div class="modal-body">
-        <section class="settings-section" aria-label="Feed management">
-          <h2>Feeds</h2>
-          <div class="feed-management-list" id="feed-management-list"></div>
-          <form class="feed-form" id="feed-form" autocomplete="off">
-            <input type="hidden" id="feed-id" />
-            <label>
-              Feed name
-              <input type="text" id="feed-name" required minlength="3" maxlength="80" />
-            </label>
-            <label>
-              Feed URL
-              <input type="url" id="feed-url" placeholder="https://example.com/feed" required />
-            </label>
-            <label>
-              Refresh every (minutes)
-              <input type="number" id="feed-refresh" min="5" max="360" step="1" required />
-            </label>
-            <label>
-              Item limit
-              <input type="number" id="feed-limit" min="5" max="100" step="5" required />
-            </label>
-            <label class="toggle" for="feed-enabled">
-              <input type="checkbox" id="feed-enabled" />
-              <span>Feed enabled</span>
-            </label>
-            <div class="form-actions">
-              <button type="button" id="preview-feed" class="muted-btn">Preview feed</button>
-              <button type="submit" class="primary-btn">Save feed</button>
-              <button type="button" id="cancel-feed" class="muted-btn">Cancel</button>
+      <main class="app-main" role="main">
+        <section class="feed-section" aria-label="Personalized feed">
+          <header>
+            <h2>Today's intelligence</h2>
+            <span class="feed-meta" aria-live="polite" id="feedCount">0 stories</span>
+          </header>
+          <div class="feed-scroller" id="feedScroller" role="feed" aria-live="polite">
+            <div class="pull-indicator" id="pullIndicator" data-state="idle" role="status">
+              <div class="spinner" aria-hidden="true"></div>
+              <span id="pullLabel">Pull to refresh</span>
             </div>
-          </form>
-          <div class="preview-panel hidden" id="feed-preview">
-            <h3>Feed preview</h3>
-            <div id="preview-content"></div>
-          </div>
-          <div>
-            <h3 style="margin:0;font-size:1rem;">Popular suggestions</h3>
-            <p style="margin:0;color:var(--text-muted);font-size:0.85rem;">Quick add trusted developer feeds.</p>
-            <div class="suggestions" id="feed-suggestions"></div>
-          </div>
-          <div>
-            <h3 style="margin:0;font-size:1rem;">Import / Export</h3>
-            <p style="margin:0;color:var(--text-muted);font-size:0.85rem;">Export your configuration as JSON or import feeds from another device.</p>
-            <textarea id="import-export" placeholder='{"feeds": [...], "filters": {...}}'></textarea>
-            <div class="form-actions">
-              <button type="button" id="export-config" class="muted-btn">Export</button>
-              <button type="button" id="import-config" class="muted-btn">Import</button>
-              <button type="button" id="reset-defaults" class="danger">Reset to defaults</button>
+            <div class="skeletons" id="skeletonContainer" aria-hidden="true">
+              <div class="skeleton-card"></div>
+              <div class="skeleton-card"></div>
+              <div class="skeleton-card"></div>
             </div>
+            <div id="virtualTopSpacer" aria-hidden="true"></div>
+            <ul class="feed-items" id="feedList" role="list"></ul>
+            <div id="virtualBottomSpacer" aria-hidden="true"></div>
+            <div class="list-end" id="listEndIndicator" aria-hidden="true">You're all caught up.</div>
+            <div id="infiniteSentinel" aria-hidden="true"></div>
           </div>
         </section>
-        <section class="settings-section" aria-label="Display options">
-          <h2>Display &amp; Filters</h2>
-          <label>
-            Items per batch (lazy load)
-            <input type="number" id="batch-size" min="10" max="60" step="5" />
-          </label>
-          <label>
-            Date format
-            <select id="date-format">
-              <option value="relative">Relative (5 minutes ago)</option>
-              <option value="absolute">Absolute (2024-05-09 14:32)</option>
-            </select>
-          </label>
-          <label>
-            Content filter keywords (comma separated)
-            <input type="text" id="filter-keywords" placeholder="blockchain, meme" />
-          </label>
-          <div class="keyboard-shortcuts">
-            <strong>Keyboard shortcuts</strong>
-            <span><span class="kbd">S</span> Focus search</span>
-            <span><span class="kbd">R</span> Refresh all feeds</span>
-            <span><span class="kbd">O</span> Open settings</span>
+      </main>
+      <nav class="tab-bar" role="navigation" aria-label="Primary navigation">
+        <button class="tab-button" data-active="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M4 6h16v12H4z" />
+          </svg>
+          Today
+        </button>
+        <button class="tab-button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M4 4h16M4 10h16M4 16h16" />
+          </svg>
+          Queue
+        </button>
+        <button class="tab-button">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="m5 12 4 4L19 6" />
+          </svg>
+          Done
+        </button>
+      </nav>
+      <div class="sheet" id="quickSheet" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="sheet-scrim" data-close="quick"></div>
+        <section class="sheet-panel" role="document">
+          <div class="sheet-handle" data-drag-handle></div>
+          <h2>Quick actions</h2>
+          <div class="sheet-actions">
+            <button id="refreshNowButton">Refresh feed<span aria-hidden="true">⌘R</span></button>
+            <button id="toggleOfflineButton">Toggle offline cache<span aria-hidden="true">•</span></button>
+            <button id="shareAppButton">Share HackerTab Pro<span aria-hidden="true">↗︎</span></button>
           </div>
         </section>
       </div>
-    </div>
-  </div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <script>
-    (function () {
-      'use strict';
-
-      const STORAGE_KEY = 'hackertab.pro.state.v1';
-      const CACHE_KEY = 'hackertab.pro.cache.v1';
-      const MAX_TIMEOUT = 5000;
-      const MAX_CONCURRENT_REQUESTS = 4;
-      const MAX_FAILURE_BEFORE_DEAD = 3;
-      const DEFAULT_BATCH = 20;
-
-      const builtinFeeds = [
-        {
-          id: 'hacker-news',
-          name: 'Hacker News',
-          type: 'hn',
-          refreshMinutes: 10,
-          itemLimit: 40,
-          enabled: true,
-          locked: true,
-        },
-        {
-          id: 'github-trending',
-          name: 'GitHub Trending',
-          type: 'rss',
-          url: 'https://rsshub.app/github/trending/daily',
-          refreshMinutes: 30,
-          itemLimit: 30,
-          enabled: true,
-          locked: true,
-          fallbackUrls: [
-            'https://rsshub.app/github/trending/weekly',
-            'https://rsshub.app/github/trending/monthly',
-          ],
-        },
-        {
-          id: 'techcrunch',
-          name: 'TechCrunch',
-          type: 'rss',
-          url: 'https://techcrunch.com/feed/',
-          refreshMinutes: 20,
-          itemLimit: 30,
-          enabled: true,
-          locked: true,
-        },
-        {
-          id: 'ars-technica',
-          name: 'Ars Technica',
-          type: 'rss',
-          url: 'https://feeds.arstechnica.com/arstechnica/index',
-          refreshMinutes: 25,
-          itemLimit: 30,
-          enabled: true,
-          locked: true,
-        },
-      ];
-
-      const defaultSuggestions = [
-        { name: 'GitHub Blog', url: 'https://github.blog/feed/' },
-        { name: 'Stack Overflow Blog', url: 'https://stackoverflow.blog/feed/' },
-        { name: 'Smashing Magazine', url: 'https://www.smashingmagazine.com/feed/' },
-        { name: 'The Verge Tech', url: 'https://www.theverge.com/rss/index.xml' },
-        { name: 'CSS-Tricks', url: 'https://css-tricks.com/feed/' },
-        { name: 'Dev.to', url: 'https://dev.to/feed' },
-      ];
-
-      const defaultState = {
-        feeds: builtinFeeds.map((feed) => ({ ...feed })),
-        feedOrder: builtinFeeds.map((feed) => feed.id),
-        display: {
-          batchSize: DEFAULT_BATCH,
-          loaded: DEFAULT_BATCH,
-          dateFormat: 'relative',
-        },
-        filters: {
-          keywords: [],
-        },
-        version: 1,
-      };
-
-      const state = loadState();
-      const feedCache = loadCache();
-      const requestLimiter = createLimiter(MAX_CONCURRENT_REQUESTS);
-      const inflightFetches = new Map();
-      const scheduledRefresh = new Map();
-      let globalErrorTimeout = null;
-
-      const elements = {
-        search: document.getElementById('search'),
-        feedList: document.getElementById('feed-list'),
-        loadMore: document.getElementById('load-more'),
-        feedStatus: document.getElementById('feed-status'),
-        offlineBanner: document.getElementById('offline-banner'),
-        errorBanner: document.getElementById('error-banner'),
-        refreshAll: document.getElementById('refresh-all'),
-        globalSpinner: document.getElementById('global-spinner'),
-        badge: document.getElementById('content-count'),
-        pullIndicator: document.getElementById('pull-indicator'),
-        settingsModal: document.getElementById('settings-modal'),
-        modalBackdrop: document.getElementById('modal-backdrop'),
-        openSettings: document.getElementById('open-settings'),
-        closeSettings: document.getElementById('close-settings'),
-        feedManagementList: document.getElementById('feed-management-list'),
-        feedForm: document.getElementById('feed-form'),
-        feedName: document.getElementById('feed-name'),
-        feedUrl: document.getElementById('feed-url'),
-        feedRefresh: document.getElementById('feed-refresh'),
-        feedLimit: document.getElementById('feed-limit'),
-        feedEnabled: document.getElementById('feed-enabled'),
-        feedId: document.getElementById('feed-id'),
-        cancelFeed: document.getElementById('cancel-feed'),
-        previewFeed: document.getElementById('preview-feed'),
-        previewPanel: document.getElementById('feed-preview'),
-        previewContent: document.getElementById('preview-content'),
-        suggestions: document.getElementById('feed-suggestions'),
-        importExport: document.getElementById('import-export'),
-        exportConfig: document.getElementById('export-config'),
-        importConfig: document.getElementById('import-config'),
-        resetDefaults: document.getElementById('reset-defaults'),
-        batchSize: document.getElementById('batch-size'),
-        dateFormat: document.getElementById('date-format'),
-        filterKeywords: document.getElementById('filter-keywords'),
-        toast: document.getElementById('toast'),
-        main: document.getElementById('main-content'),
-      };
-
-      init();
-
-      function init() {
-        ensureBuiltinFeeds();
-        hydrateSettingsForm();
-        renderSuggestions();
-        bindEvents();
-        renderFeedManagement();
-        renderAll();
-        updateBusyState();
-        resumeCachedFeeds();
-        refreshDueFeeds(true);
-        scheduleBackgroundRefresh();
-        updateOfflineBanner(!navigator.onLine);
-        window.addEventListener('online', () => {
-          updateOfflineBanner(false);
-          showToast('Back online. Syncing feeds…');
-          refreshDueFeeds(false, true);
-        });
-        window.addEventListener('offline', () => {
-          updateOfflineBanner(true);
-          showToast('Offline mode enabled. Serving cached content.');
-        });
-      }
-
-      function loadState() {
-        try {
-          const stored = localStorage.getItem(STORAGE_KEY);
-          if (!stored) return JSON.parse(JSON.stringify(defaultState));
-          const parsed = JSON.parse(stored);
-          return migrateState(parsed);
-        } catch (error) {
-          console.error('Failed to load state', error);
-          return JSON.parse(JSON.stringify(defaultState));
-        }
-      }
-
-      function loadCache() {
-        try {
-          const stored = localStorage.getItem(CACHE_KEY);
-          if (!stored) {
-            return {};
-          }
-          return JSON.parse(stored);
-        } catch (error) {
-          console.error('Failed to load cache', error);
-          return {};
-        }
-      }
-
-      function migrateState(parsed) {
-        const base = JSON.parse(JSON.stringify(defaultState));
-        if (!parsed || typeof parsed !== 'object') {
-          return base;
-        }
-        const feeds = Array.isArray(parsed.feeds) ? parsed.feeds : base.feeds;
-        const feedOrder = Array.isArray(parsed.feedOrder) ? parsed.feedOrder : base.feedOrder;
-        const display = Object.assign({}, base.display, parsed.display);
-        const filters = Object.assign({}, base.filters, parsed.filters);
-        return { feeds, feedOrder, display, filters, version: 1 };
-      }
-
-      function ensureBuiltinFeeds() {
-        const existingIds = new Set(state.feeds.map((feed) => feed.id));
-        let mutated = false;
-        for (const builtin of builtinFeeds) {
-          if (!existingIds.has(builtin.id)) {
-            state.feeds.push({ ...builtin });
-            mutated = true;
-          }
-        }
-        if (mutated) {
-          saveState();
-        }
-        const orderSet = new Set(state.feedOrder);
-        for (const builtin of builtinFeeds) {
-          if (!orderSet.has(builtin.id)) {
-            state.feedOrder.push(builtin.id);
-          }
-        }
-      }
-
-      function saveState() {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        } catch (error) {
-          console.error('Failed to save state', error);
-        }
-      }
-
-      function saveCache() {
-        try {
-          localStorage.setItem(CACHE_KEY, JSON.stringify(feedCache));
-        } catch (error) {
-          console.error('Failed to save cache', error);
-        }
-      }
-
-      function hydrateSettingsForm() {
-        elements.batchSize.value = state.display.batchSize;
-        elements.dateFormat.value = state.display.dateFormat;
-        elements.filterKeywords.value = state.filters.keywords.join(', ');
-      }
-
-      function renderSuggestions() {
-        elements.suggestions.innerHTML = '';
-        defaultSuggestions.forEach((suggestion) => {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'suggestion add-suggestion';
-          button.textContent = suggestion.name;
-          button.setAttribute('data-url', suggestion.url);
-          button.setAttribute('data-name', suggestion.name);
-          button.addEventListener('click', () => {
-            prepareNewFeed(suggestion.name, suggestion.url);
-          });
-          elements.suggestions.appendChild(button);
-        });
-      }
-
-      function bindEvents() {
-        elements.search.addEventListener('input', debounce((event) => {
-          state.display.loaded = state.display.batchSize;
-          state.searchTerm = event.target.value.trim();
-          renderFeedItems();
-        }, 200));
-
-        elements.loadMore.addEventListener('click', () => {
-          state.display.loaded += state.display.batchSize;
-          renderFeedItems();
-        });
-
-        elements.refreshAll.addEventListener('click', () => {
-          refreshDueFeeds(false, true, true);
-        });
-
-        elements.openSettings.addEventListener('click', openSettingsModal);
-        elements.closeSettings.addEventListener('click', closeSettingsModal);
-        elements.modalBackdrop.addEventListener('click', closeSettingsModal);
-
-        elements.feedForm.addEventListener('submit', handleFeedSubmit);
-        elements.cancelFeed.addEventListener('click', resetFeedForm);
-        elements.previewFeed.addEventListener('click', handlePreviewFeed);
-        elements.exportConfig.addEventListener('click', handleExportConfig);
-        elements.importConfig.addEventListener('click', handleImportConfig);
-        elements.resetDefaults.addEventListener('click', handleResetDefaults);
-
-        elements.batchSize.addEventListener('change', (event) => {
-          const value = clamp(Number(event.target.value), 10, 60);
-          state.display.batchSize = value;
-          state.display.loaded = value;
-          saveState();
-          renderFeedItems();
-          showToast('Updated batch size');
-        });
-
-        elements.dateFormat.addEventListener('change', (event) => {
-          state.display.dateFormat = event.target.value;
-          saveState();
-          renderFeedItems();
-          showToast('Updated date format');
-        });
-
-        elements.filterKeywords.addEventListener('change', (event) => {
-          state.filters.keywords = event.target.value
-            .split(',')
-            .map((word) => word.trim())
-            .filter(Boolean);
-          saveState();
-          renderFeedItems();
-          showToast('Updated filters');
-        });
-
-        document.addEventListener('keydown', (event) => {
-          if (event.target && ['INPUT', 'TEXTAREA'].includes(event.target.tagName)) {
-            return;
-          }
-          if (event.key === 's' || event.key === 'S') {
-            event.preventDefault();
-            elements.search.focus();
-          } else if (event.key === 'r' || event.key === 'R') {
-            event.preventDefault();
-            refreshDueFeeds(false, true, true);
-          } else if (event.key === 'o' || event.key === 'O') {
-            event.preventDefault();
-            openSettingsModal();
-          }
-        });
-
-        bindPullToRefresh();
-        window.addEventListener('scroll', handleInfiniteScroll, { passive: true });
-      }
-
-      function bindPullToRefresh() {
-        let startY = 0;
-        let pulling = false;
-        let activated = false;
-
-        elements.main.addEventListener(
-          'touchstart',
-          (event) => {
-            if (document.scrollingElement.scrollTop <= 0) {
-              startY = event.touches[0].clientY;
-              pulling = true;
-              activated = false;
-            }
-          },
-          { passive: true }
-        );
-
-        elements.main.addEventListener(
-          'touchmove',
-          (event) => {
-            if (!pulling) return;
-            const delta = event.touches[0].clientY - startY;
-            if (delta > 0) {
-              event.preventDefault();
-              const offset = Math.min(delta, 140);
-              elements.pullIndicator.classList.add('active');
-              elements.pullIndicator.style.transform = `translateY(${offset / 2}px)`;
-              elements.pullIndicator.textContent = offset > 90 ? 'Release to refresh…' : 'Pull to refresh…';
-              activated = offset > 90;
-            } else {
-              resetIndicator();
-            }
-          },
-          { passive: false }
-        );
-
-        elements.main.addEventListener(
-          'touchend',
-          () => {
-            if (pulling && activated) {
-              refreshDueFeeds(false, true, true);
-            }
-            resetIndicator();
-          },
-          { passive: true }
-        );
-
-        function resetIndicator() {
-          pulling = false;
-          activated = false;
-          elements.pullIndicator.classList.remove('active');
-          elements.pullIndicator.style.transform = 'translateY(-30px)';
-          elements.pullIndicator.textContent = 'Pull to refresh…';
-        }
-      }
-
-      function handleInfiniteScroll() {
-        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-        if (scrollTop + clientHeight >= scrollHeight - 200) {
-          if (state.display.loaded < getFilteredItems().length) {
-            state.display.loaded += state.display.batchSize;
-            renderFeedItems();
-          }
-        }
-      }
-
-      function resumeCachedFeeds() {
-        Object.entries(feedCache).forEach(([feedId, cache]) => {
-          if (cache && Array.isArray(cache.items)) {
-            cache.status = cache.status || 'cached';
-          }
-        });
-      }
-
-      function refreshDueFeeds(initial = false, manual = false, force = false) {
-        const now = Date.now();
-        let hasPending = false;
-        const enabledFeeds = getOrderedFeeds().filter((feed) => feed.enabled !== false);
-        enabledFeeds.forEach((feed) => {
-          const cache = feedCache[feed.id];
-          const due =
-            !cache ||
-            !cache.lastFetched ||
-            now - cache.lastFetched > feed.refreshMinutes * 60 * 1000 ||
-            force;
-          if (due) {
-            hasPending = true;
-            refreshFeed(feed, { manual, force });
-          }
-        });
-        if (manual && !hasPending) {
-          showToast('Feeds already fresh. Loaded from cache.');
-        }
-      }
-
-      function refreshFeed(feed, options = {}) {
-        if (!navigator.onLine && !options.force) {
-          setFeedError(feed.id, 'Offline. Showing cached results.');
-          return;
-        }
-        if (inflightFetches.has(feed.id)) {
-          return;
-        }
-        inflightFetches.set(feed.id, true);
-        updateBusyState();
-        updateFeedStatus(feed.id, { status: 'loading' });
-        if (options.manual) {
-          setGlobalLoading(true);
-        }
-        fetchFeed(feed)
-          .then((result) => {
-            if (result && Array.isArray(result.items)) {
-              feedCache[feed.id] = {
-                items: result.items,
-                lastFetched: Date.now(),
-                sourceTitle: result.title || feed.name,
-                sourceDescription: result.description || '',
-                status: 'ok',
-                consecutiveFailures: 0,
-              };
-              saveCache();
-              updateFeedStatus(feed.id, { status: 'ok', message: `Updated ${formatRelativeTime(new Date())}` });
-              renderFeedItems();
-              setGlobalError(null);
-            }
-          })
-          .catch((error) => {
-            console.error('Failed to refresh feed', feed.name, error);
-            const cache = feedCache[feed.id] || { items: [] };
-            cache.consecutiveFailures = (cache.consecutiveFailures || 0) + 1;
-            cache.status = 'error';
-            cache.lastError = error.message;
-            feedCache[feed.id] = cache;
-            saveCache();
-            const message = cache.consecutiveFailures >= MAX_FAILURE_BEFORE_DEAD
-              ? 'Feed appears to be offline. Check the source.'
-              : error.message || 'Failed to refresh feed';
-            updateFeedStatus(feed.id, { status: cache.consecutiveFailures >= MAX_FAILURE_BEFORE_DEAD ? 'dead' : 'error', message });
-            setGlobalError(`${feed.name}: ${message}`);
-            renderFeedItems();
-          })
-          .finally(() => {
-            inflightFetches.delete(feed.id);
-            updateBusyState();
-            if (options.manual) {
-              setGlobalLoading(false);
-            }
-            scheduleNextRefresh(feed);
-          });
-      }
-
-      function scheduleBackgroundRefresh() {
-        setInterval(() => {
-          refreshDueFeeds(false, false, false);
-        }, 60000);
-      }
-
-      function scheduleNextRefresh(feed) {
-        const existing = scheduledRefresh.get(feed.id);
-        if (existing) {
-          clearTimeout(existing);
-        }
-        const cache = feedCache[feed.id];
-        const failures = cache ? cache.consecutiveFailures || 0 : 0;
-        const backoffMinutes = Math.min(30, Math.pow(2, failures)) * (failures > 0 ? 1 : 0);
-        const nextDelay = (feed.refreshMinutes + backoffMinutes) * 60 * 1000;
-        const timeoutId = setTimeout(() => refreshFeed(feed), nextDelay);
-        scheduledRefresh.set(feed.id, timeoutId);
-      }
-
-      function fetchFeed(feed) {
-        switch (feed.type) {
-          case 'hn':
-            return fetchHackerNews(feed);
-          case 'rss':
-          default:
-            return fetchRSSFeed(feed);
-        }
-      }
-
-      async function fetchHackerNews(feed) {
-        const topStoriesUrl = 'https://hacker-news.firebaseio.com/v0/topstories.json';
-        const ids = await fetchJsonWithFallback(topStoriesUrl);
-        const limit = Math.min(feed.itemLimit || 40, 60);
-        const selected = Array.isArray(ids) ? ids.slice(0, limit * 2) : [];
-        const stories = [];
-        for (const chunk of chunkArray(selected, 10)) {
-          const chunkResults = await Promise.all(
-            chunk.map((id) =>
-              requestLimiter(() =>
-                fetchWithTimeout(`https://hacker-news.firebaseio.com/v0/item/${id}.json`, {
-                  headers: { Accept: 'application/json' },
-                })
-                  .then((response) => {
-                    if (!response.ok) {
-                      throw new Error('Hacker News API error');
-                    }
-                    return response.json();
-                  })
-                  .catch(() => null)
-              )
-            )
-          );
-          stories.push(...chunkResults.filter(Boolean));
-          if (stories.length >= limit) {
-            break;
-          }
-        }
-        const items = stories
-          .map((story) => ({
-            id: String(story.id),
-            title: sanitizeText(story.title || 'Untitled'),
-            link: safeURL(story.url ? story.url : `https://news.ycombinator.com/item?id=${story.id}`),
-            published: (story.time || 0) * 1000,
-            author: story.by,
-            score: story.score,
-            comments: story.descendants,
-            feedId: feed.id,
-            feedName: feed.name,
-            description: `${story.score || 0} points · ${story.descendants || 0} comments`,
-          }))
-          .slice(0, limit);
-        return {
-          title: 'Hacker News',
-          description: 'Top stories from Hacker News',
-          items,
-        };
-      }
-
-      async function fetchRSSFeed(feed) {
-        const urls = [];
-        if (feed.url) {
-          urls.push(feed.url);
-          if (feed.url.startsWith('http://')) {
-            urls.unshift(feed.url.replace('http://', 'https://'));
-          }
-        }
-        if (Array.isArray(feed.fallbackUrls)) {
-          for (const fallback of feed.fallbackUrls) {
-            if (!urls.includes(fallback)) {
-              urls.push(fallback);
-            }
-          }
-        }
-        let lastError = null;
-        for (const url of urls) {
-          try {
-            const text = await fetchTextWithFallback(url);
-            const parsed = parseRSS(text, feed, url);
-            if (!parsed.items.length) {
-              throw new Error('Feed returned no items');
-            }
-            return parsed;
-          } catch (error) {
-            lastError = error;
-          }
-        }
-        throw lastError || new Error('Failed to load feed');
-      }
-
-      async function fetchJsonWithFallback(url) {
-        try {
-          const response = await fetchWithTimeout(url, {
-            headers: { Accept: 'application/json' },
-            cache: 'no-store',
-          });
-          if (!response.ok) {
-            throw new Error('Network error');
-          }
-          return await response.json();
-        } catch (error) {
-          throw new Error('Failed to fetch JSON data');
-        }
-      }
-
-      async function fetchTextWithFallback(url) {
-        const attempts = [];
-        const normalized = normalizeURL(url);
-        attempts.push(normalized);
-        attempts.push(`https://api.allorigins.win/raw?url=${encodeURIComponent(normalized)}`);
-        attempts.push(`https://api.allorigins.win/get?url=${encodeURIComponent(normalized)}`);
-        attempts.push(`https://r.jina.ai/${normalized}`);
-        let lastError = null;
-        for (const attempt of attempts) {
-          try {
-            const response = await requestLimiter(() =>
-              fetchWithTimeout(attempt, {
-                headers: {
-                  Accept: 'application/rss+xml, application/xml, text/xml, text/plain; charset=utf-8',
-                },
-                cache: 'no-store',
-              })
-            );
-            if (!response.ok) {
-              throw new Error(`HTTP ${response.status}`);
-            }
-            const text = await response.text();
-            if (attempt.includes('/get?')) {
-              const payload = JSON.parse(text);
-              if (!payload || !payload.contents) {
-                throw new Error('Proxy returned empty payload');
-              }
-              return payload.contents;
-            }
-            return text;
-          } catch (error) {
-            lastError = error;
-          }
-        }
-        throw lastError || new Error('Unable to fetch feed');
-      }
-
-      function parseRSS(xmlText, feed, requestedUrl) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(xmlText, 'application/xml');
-        if (doc.querySelector('parsererror')) {
-          throw new Error('Invalid XML/RSS structure');
-        }
-        const channel = doc.querySelector('channel');
-        const feedTitle = sanitizeText(
-          (channel && channel.querySelector('title') && channel.querySelector('title').textContent) ||
-            (doc.querySelector('feed > title') && doc.querySelector('feed > title').textContent) ||
-            feed.name
-        );
-        const feedDescription = sanitizeText(
-          (channel && channel.querySelector('description') && channel.querySelector('description').textContent) ||
-            (doc.querySelector('feed > subtitle') && doc.querySelector('feed > subtitle').textContent) ||
-            ''
-        );
-
-        const items = [];
-        const nodes = doc.querySelectorAll('item, entry');
-        nodes.forEach((node) => {
-          const titleNode = node.querySelector('title');
-          const linkNode = node.querySelector('link');
-          const guidNode = node.querySelector('guid');
-          const descriptionNode =
-            node.querySelector('description') ||
-            node.querySelector('content') ||
-            node.querySelector('summary');
-          const dateNode =
-            node.querySelector('pubDate') ||
-            node.querySelector('updated') ||
-            node.querySelector('published');
-
-          const title = sanitizeText(titleNode ? titleNode.textContent : 'Untitled');
-          const rawLink = linkNode ? linkNode.getAttribute('href') || linkNode.textContent : requestedUrl;
-          const link = safeURL(rawLink || requestedUrl);
-          const description = sanitizeHTML(descriptionNode ? descriptionNode.textContent || descriptionNode.innerHTML || '' : '');
-          const published = dateNode ? Date.parse(dateNode.textContent) : Date.now();
-          const authorNode = node.querySelector('author name, author');
-          const author = authorNode ? sanitizeText(authorNode.textContent) : '';
-          items.push({
-            id: (guidNode && guidNode.textContent) || link || title,
-            title,
-            link,
-            description,
-            published: Number.isFinite(published) ? published : Date.now(),
-            author,
-            feedId: feed.id,
-            feedName: feed.name,
-          });
-        });
-
-        const limit = clamp(feed.itemLimit || DEFAULT_BATCH, 5, 100);
-        const filteredItems = items
-          .filter((item) => item.title && item.link)
-          .slice(0, limit)
-          .map((item) => ({
-            ...item,
-            description: truncate(item.description, 260),
-          }));
-
-        if (!filteredItems.length) {
-          throw new Error('No readable items in feed');
-        }
-
-        return {
-          title: feedTitle,
-          description: feedDescription,
-          items: filteredItems,
-        };
-      }
-
-      function setGlobalLoading(isLoading) {
-        if (isLoading) {
-          elements.globalSpinner.classList.remove('hidden');
-        } else {
-          elements.globalSpinner.classList.add('hidden');
-        }
-      }
-
-      function updateFeedStatus(feedId, { status, message }) {
-        const card = elements.feedStatus.querySelector(`[data-feed-id="${feedId}"]`);
-        const feed = getFeed(feedId);
-        if (!card || !feed) return;
-        const statusPill = card.querySelector('.status-pill');
-        const statusMessage = card.querySelector('.status-message');
-        statusPill.className = 'status-pill';
-        if (status === 'ok' || status === 'cached') {
-          statusPill.classList.add('ok');
-          statusPill.textContent = status === 'cached' ? 'Cached' : 'Healthy';
-        } else if (status === 'loading') {
-          statusPill.classList.add('warn');
-          statusPill.textContent = 'Refreshing…';
-        } else if (status === 'dead') {
-          statusPill.classList.add('fail');
-          statusPill.textContent = 'Unreachable';
-        } else if (status === 'disabled') {
-          statusPill.classList.add('warn');
-          statusPill.textContent = 'Disabled';
-        } else {
-          statusPill.classList.add('warn');
-          statusPill.textContent = 'Issues detected';
-        }
-        const defaultMessage = status === 'loading' ? 'Refreshing…' : 'Idle';
-        statusMessage.textContent = message || defaultMessage;
-        if (status === 'dead') {
-          statusMessage.textContent += ' (Check URL or try again later)';
-        }
-      }
-      function renderAll() {
-        renderFeedStatus();
-        renderFeedItems();
-      }
-
-      function renderFeedStatus() {
-        elements.feedStatus.innerHTML = '';
-        getOrderedFeeds().forEach((feed) => {
-          const card = document.createElement('article');
-          card.className = 'feed-card';
-          card.dataset.feedId = feed.id;
-
-          const cache = feedCache[feed.id];
-          const lastFetched = cache && cache.lastFetched ? new Date(cache.lastFetched) : null;
-          let status = 'ok';
-          if (feed.enabled === false) {
-            status = 'disabled';
-          } else if (cache && cache.status) {
-            status = cache.status;
-          }
-          const message = feed.enabled === false
-            ? 'Feed disabled'
-            : cache && cache.lastFetched
-              ? `${status === 'cached' ? 'Cached copy from' : 'Updated'} ${formatRelativeTime(lastFetched)}`
-              : 'Awaiting refresh';
-
-          card.innerHTML = `
-            <header>
-              <div>
-                <h2>${escapeHTML(feed.name)}</h2>
-                <div class="feed-meta">
-                  <span>${feed.type === 'hn' ? 'Hacker News API' : 'RSS Feed'}</span>
-                  <span>${feed.refreshMinutes} min refresh · limit ${feed.itemLimit}</span>
+      <div class="overlay" id="settingsOverlay" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="overlay-scrim" data-close="settings"></div>
+        <section class="overlay-panel" role="document">
+          <header>
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+              <span>Home</span>›<span>Settings</span>›<span aria-current="page">Feeds</span>
+            </nav>
+            <div>
+              <h2 style="margin:0;font-size:1.35rem">Feed management</h2>
+              <p style="margin:0;color:var(--text-secondary);font-size:0.95rem">Curate sources and schedule sync windows without leaving thumb reach.</p>
+            </div>
+          </header>
+          <div class="overlay-content">
+            <form id="feedForm" novalidate>
+              <div class="form-field">
+                <label for="feedUrl">Feed URL</label>
+                <input id="feedUrl" name="feed-url" type="url" inputmode="url" placeholder="https://" required pattern="https?://.+" />
+                <small>Add secure sources for the best offline reliability.</small>
+                <p class="inline-error" id="feedUrlError" role="alert" hidden></p>
+              </div>
+              <div class="form-field">
+                <label for="cadence">Sync cadence</label>
+                <select id="cadence" name="cadence">
+                  <option value="hourly">Hourly</option>
+                  <option value="daily" selected>Daily</option>
+                  <option value="weekly">Weekly</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>Notifications</label>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+                  <button type="button" class="pill-button" data-notify="digest">Digest</button>
+                  <button type="button" class="pill-button" data-notify="realtime">Real-time</button>
+                  <button type="button" class="pill-button" data-notify="mute">Mute</button>
                 </div>
               </div>
-              <span class="status-pill">Status</span>
+            </form>
+            <section aria-label="Current feeds">
+              <h3 style="margin:0 0 0.75rem;font-size:1rem">Active sources</h3>
+              <ul id="feedListSettings" style="list-style:none;margin:0;padding:0;display:grid;gap:0.5rem;font-size:0.9rem;color:var(--text-secondary);"></ul>
+            </section>
+          </div>
+          <div class="overlay-footer">
+            <button class="pill-button" data-close="settings">Cancel</button>
+            <button class="pill-button primary" id="saveFeedButton" type="submit" form="feedForm">Save source</button>
+          </div>
+        </section>
+      </div>
+      <aside class="menu-drawer" id="menuDrawer" aria-hidden="true">
+        <div class="drawer-scrim" data-close="menu"></div>
+        <nav class="menu-panel" aria-label="Secondary navigation">
+          <h2 style="margin:0;font-size:1.2rem">Navigation</h2>
+          <div class="menu-links">
+            <a href="#" role="button">Focus mode</a>
+            <a href="#" role="button">Highlights</a>
+            <a href="#" role="button">Archive</a>
+            <a href="#" role="button">Integrations</a>
+          </div>
+          <div class="menu-links" aria-label="Account">
+            <a href="#" role="button">Account</a>
+            <a href="#" role="button">Notifications</a>
+            <a href="#" role="button">Help center</a>
+          </div>
+        </nav>
+      </aside>
+      <div class="context-menu" id="cardContextMenu" role="menu" aria-hidden="true">
+        <button type="button" role="menuitem" data-context="open">
+          <span>Open story</span>
+        </button>
+        <button type="button" role="menuitem" data-context="save">
+          <span>Save for later</span>
+        </button>
+        <button type="button" role="menuitem" data-context="share">
+          <span>Share</span>
+        </button>
+      </div>
+      <div class="toast-stack" id="toastStack" role="status" aria-live="polite"></div>
+      <template id="feedCardTemplate">
+        <li class="feed-row" data-item-id="">
+          <div class="action-backdrop" aria-hidden="true">
+            <div class="action-archive">Archive</div>
+            <div class="action-delete">Delete</div>
+            <div class="action-share">Share</div>
+          </div>
+          <article class="feed-card" role="article" tabindex="0">
+            <header class="feed-meta">
+              <span class="feed-source"></span>
+              <span>•</span>
+              <time class="feed-time"></time>
             </header>
-            <div class="feed-meta status-message">${escapeHTML(message)}</div>
-            <footer>
-              <button type="button" class="muted-btn refresh-feed" data-feed-id="${feed.id}">Refresh</button>
-              <label class="toggle">
-                <input type="checkbox" class="toggle-feed" data-feed-id="${feed.id}" ${feed.enabled !== false ? 'checked' : ''} />
-                <span>${feed.enabled !== false ? 'Enabled' : 'Disabled'}</span>
-              </label>
-              <button type="button" class="muted-btn edit-feed" data-feed-id="${feed.id}">Edit</button>
+            <h3 class="feed-title"></h3>
+            <p class="feed-summary"></p>
+            <div class="tag-row" aria-label="Topics"></div>
+            <footer class="card-footer">
+              <span class="feed-readtime"></span>
+              <button type="button" class="pill-button" data-action="open">Open</button>
             </footer>
-          `;
-
-          elements.feedStatus.appendChild(card);
-          updateFeedStatus(feed.id, { status, message });
+          </article>
+        </li>
+      </template>
+    </div>
+    <script>
+      (function () {
+        "use strict";
+        const ICON_DATA = {
+          "57x57": [
+            "iVBORw0KGgoAAAANSUhEUgAAADkAAAA5CAYAAACMGIOFAAABNUlEQVR4nO2aSw7C",
+            "MAxE04oV9+CA3KF7DshdKCtvkJLYYSYf129bas2Tmw9pt/txnsk5++gAPQhJL4Sk",
+            "F24tN+2vBzqHic/zbfr9ZllCRsv9opVVP66zCaakz6SSnFFQ0GSrSs4sKNQyFiVX",
+            "EBRKWS+xhGQlV+qikMt87U56IiS90LR3bSG3BesxwdEla/tLuc6UpUla/ykwZSlj",
+            "0iqIujcHXBIREi16idkVKonsALJWdNICY8JA1YxOeiEkvRCSpkKMPSeoZnTSXAzY",
+            "TWgtWKWJgUsiOoAe35RO/hOSMYHRTgYkrPr12orHH0JN1sVBljDytUPMrl4ISS9k",
+            "JRnHGWyyM3jnHEMoSq7UzVLWaidXEK1lVD2uM4tqsqnH5Iyi2kymb+uE0V+GUD8g",
+            "XJVYQrwQkl74AgrrX2NfABlOAAAAAElFTkSuQmCC",
+          ].join(""),
+          "72x72": [
+            "iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAABkklEQVR4nO2bQW7D",
+            "IBQFnair3qMH7B267wF7l6YrpChSMmD4H5vOrBPwG33ABvvy/nW7bfKU6+wLODoK",
+            "AhQEKAhQEKAgQEHA24hGrt8fI5oJ4ffzp+v/l54bxSOLeWSvqF2CziTmkVZRzXPQ",
+            "meVsW/v1Nwk6u5xCS45qQavIKdTmcZkHqgStVj2FmlxWEICCVq2eAuWzggAFAQoC",
+            "FAQoCBiy3dHLqwfI2avoNEG1T9X3v5sha8oQ27s307v5tYd0Qb0hsyWlChoVLlNS",
+            "mqDRobIkpQiKCpMhKVxQdIjo9r1RBBQEhArKmkgj+7GCAAUBCgIUBCgIUBAQKihr",
+            "/yayHysIUBAQLih6mIW3H9p66SQoRMYclzbERodJWwBSeimdDQqVebqRPkn3hss+",
+            "+pmyiu0NOeNcbNrB4X1YT1aB2RJe4Y0ioCBAQYCCAAUBKGjGKyeZUD4rCKgStGoV",
+            "1eSygoBqQatVUW2epgpaRVJLjuYhdnZJrdfvV89Al6DCkUVN/W7+P+AyDygIUBCg",
+            "IEBBgIKAP9n1c5OQud7uAAAAAElFTkSuQmCC",
+          ].join(""),
+          "76x76": [
+            "iVBORw0KGgoAAAANSUhEUgAAAEwAAABMCAYAAADHl1ErAAABt0lEQVR4nO2cO27D",
+            "MBAFZSNV7pED5g7pc8DcJU5FQI2NnSX5VmTe1IbIN15+QBG6vX89HocJc6/uwGpY",
+            "GMTCIBYGsTCIhUEsDGJhkLeRD7t/f4x83FB+P3+GPOfWu9O/sqRn9MjrGpIryjqO",
+            "vn6nha0qq5Htf0rY6rIamRxY2C6yGjQPErabrAbJFRa2q6xGNJ83rhALg4SE7T4c",
+            "G5GcrjCIhUEsDGJhkKHHO728OkW4ysJTLix61HL+XaW80iGZPZcadRiYoaTCRgRu",
+            "z1BXm7zCRleHutqkwmaFU0rztgIiEza7ClRVJhGmCqNox0MSYmGQ6cLUy/7s9lxh",
+            "EAuDWBjEwiAWBrEwyHRh8uOXye25wiAWBpEIUw1LRTuyCps+t6j+FEkrGyEVNqsK",
+            "lCuxvMJGh1NvW0pes7WQXffli17mls5h6avfhW++y68KnMP7bgXkKlJe4W0FxMIg",
+            "FgaxMEhIWOV9LCWRnK4wiIVBwsJ2H5bRfKjCdpVGcuEhuZs0mic1h+0iLZMjPemv",
+            "Li3b/65VclVpPf3u/tDHmSufNlzmyyj/DW9cIRYGsTCIhUEsDGJhEAuD/AEQNneJ",
+            "ZAxqTwAAAABJRU5ErkJggg==",
+          ].join(""),
+          "114x114": [
+            "iVBORw0KGgoAAAANSUhEUgAAAHIAAAByCAYAAACP3YV9AAACpklEQVR4nO3cQVLc",
+            "MBCFYQ2VFffIAXMH9jlg7sJkE1e5IAZb6pZeP//fmhqr+rfMABoer2/PZ0N5L6sX",
+            "gBiENEFIE4Q0QUgThDRBSBOENEFIE4Q0QUgThDTxY8VFX37/XHHZqd5//Zl6vces",
+            "v37cId6RGVHTQ9454EeZQdNCEvBYRtCUNztE/FrGfMJDEvGc6DmFhiTiNZHzCgtJ",
+            "xD5RcwsJScQxEfMbDknEGKNz5Fd0JoZCshtjjcyTHWmiOyS7MUfvXNmRJghpoisk",
+            "j9VcPfNlR5ogpAlCmiCkCUKaIKSJJcchs505E+P2I5RNyKsHmvZf7xC1fMiIE2nb",
+            "a1QOWjZkxpHCykFLvtnJPrk9+7h/hFI7cuaAq+3OMjty1S6psjtLhFw9zNXXP6NE",
+            "SHxPPqTKblBZxxHpkGrDU1vPnnRInCcbUvXuV12XbEhcIxlS9a7fKK5PMiSuI6QJ",
+            "uZCKj63/UVunXEj0IaQJQpogpAlCmiCkCUKaIKQJuZBlDjuJrVMuJPoQ0oRkSLXH",
+            "1keK65MMietkQyre9a0Jr2v1AhBDOqTa3a+2nj3pkK3pDE9lHUfkQ+KcEiFX74bV",
+            "1z+jRMjW1g2zQsTWin3QdRvqjINPVQJuyuzIvewhV4vYWrEduZexOysG3JQNuYkI",
+            "WjngpnzIzT4G//nKhFukM0q+2cFnhDRBSBOENEFIE4Q00RVS7UOebnrmy440QUgT",
+            "3SF5vObonSs70sRQSHZlrKG/4ASuAwsNh2RXxhidY8iOJOaYiPmFPVqJ2SdqbqHf",
+            "I4l5Teh5o7BX+oeY50TPKeVdKzG/ljGfx+vb8xn+qjt3PD9zJPMGTw+5uXPQGU+o",
+            "aSH37hB19reXJSERj1/RmSCkCUKaIKQJQpogpAlCmiCkCUKaIKQJQpr4C6QUuAmX",
+            "3ay5AAAAAElFTkSuQmCC",
+          ].join(""),
+          "120x120": [
+            "iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAACv0lEQVR4nO3dQU7D",
+            "MBCFYbdi1XtwQO7AngNyF8oqkgVUJPGM/eb1/9aIWPNrUigBLrf3+73B1nX1AZCL",
+            "wOYIbI7A5ghsjsDmCGyOwOYIbI7A5ghsjsDmCGzuZeXFrx+vKy8/1dfb55LrXmb/",
+            "uPCZoj4yM/a0wIT9bUbo9MCE/V9m6NQvsoi7T+acUjaYsOdFb3P4BhN3TPT8QgMT",
+            "N0bkHHmjw1xYYLY3VtQ8QwITN0fEXLlFmxsOzPbmGp0vG2xuKDDbO8fInNlgcwQ2",
+            "dzowt+e5zs6bDTZHYHMENkdgcwQ2R2BzS5+LnmHPIzDO3/JZBj76XFP/8W6xbQJH",
+            "PazmFtviNTjrueJVv24SqfQGzwiwXaPqNpfd4NnbVXWbSwZeNeyKkcsFXj3k1dc/",
+            "qlRgleGqnGOPMoHVhqp2nkfKBMY5JQKrbovquXrygdWHqH4++cAYQ2Bz0oHVb38b",
+            "5XNKB8Y4ApuTDax82/uL6nllAyMGgc0R2ByBzRHYHIHNEdgcgc3JBq72mKrqeWUD",
+            "IwaBzUkHVr3t/aR8TunAGEdgc/KBlW9/rRU43+oD7KE6RNVz9UoExnllAqtti9p5",
+            "HikTuDWdoaqcY49SgVtbP9zV1z+qXODW1g25WtzWigZubf6wK8ZtrfgfYdmGnvrf",
+            "O4uG3ZTd4F5WhOpxWyu+wb0+xshGO0Tt2QTuHY3tFrVnGbjnHG8Pi9dgPEZgcwQ2",
+            "R2BzBDZHYHOnA6v+Rrurs/Nmg80R2NxQYG7Tcwy9tx54DggaDswW5xqdLxtsLiQw",
+            "W5wjYq5hG0zkWFHz5BZtLjQwWxwjco7hG0zkMdHzu9ze7/fQz9h59sdljshajNTX",
+            "YLZ5n8w5pW5wj23+bcYCTAu8IfTcO9v0wL1nir3q5WppYOTjjQ5zBDZHYHMENkdg",
+            "cwQ2R2BzBDZHYHMENkdgcwQ29w3aIcAnDvhsWwAAAABJRU5ErkJggg==",
+          ].join(""),
+          "144x144": [
+            "iVBORw0KGgoAAAANSUhEUgAAAJAAAACQCAYAAADnRuK4AAADZklEQVR4nO3cS27b",
+            "QBBF0ZaRkfeRBWYPnmeB2UuUQUKAkCPA1Kuu7z1z2y3WZYuyTd7eP+73BbzoLXoB",
+            "qI2AICEgSAgIEgKChIAgISBICAgSAoKEgCAhIEgICBICgoSAICEgSAgIkm/RC3jm",
+            "7ef36CWk8/vHr+glfHLL8h+JBHNdhqDCAyIcXWRIYQERjr2IkNwDIpz9PENy/RRG",
+            "PD48j7NbQMTjy+t4uwREPDE8jvv2gIgn1u7jvzUg4slh5xy2BUQ8ueyax5aAiCen",
+            "HXPhj6mQmAfE7pOb9XzYgSAxDYjdpwbLObEDQWIWELtPLVbzYgeChIAgISBITALi",
+            "+qcmi7mxA0FCQJAQECQEBAkBQUJAkBAQJGkfrhDhyg15/O7rr/EBvXoX5/nrJsc0",
+            "MiDrW38nxzQqII97xo+fMSWkMRfR3k+uyPDsHg8jAooa5oSIWr+FZRhg97e0tjtQ",
+            "hnjOsq3HSsuAsg4r67oU7QLKPqTs67uqXUDw1SqgKmd3lXV+RZuAqg2l2nqfaRFQ",
+            "1WFUXfdZi4AQp3xA1c/i6usvHxBiERAkpQOqvv0fKr+O0gEhHgFBUjagytv+/1R9",
+            "PWUDQg4EBAkBQUJAkBAQJAQECQFBQkCQEBAkBARJ2YC63elZ9fWUDQg5EBAkpQOq",
+            "uu0/qvw6SgeEeAQESfmAKm//azVYf/QCUFuLgKqexVXXfdYioLXqDaPaep9pE9Ba",
+            "dYZSZZ1f0Sog+GsXUPazO/v6rmoX0Fp5h5R1XYqWAa2Vb1jZ1mOl9YPGj6FF3vXZ",
+            "NZxD2x3oLGqI3eNZa0hAa/kPc0I8azV/C3vk8ZY2JZzDqIAO5yFbxDQtmrORAZ29",
+            "GtPkaM7GB3RGFNeNuYjGHgQECQFBQkCQEBAkBAQJAUFiElDVZxxPZ/JbeIN1YDAC",
+            "goSAIDELiOugWqzmxQ4EiWlA7EI1WM6JHQgS84DYhXKzng87ECRbAmIXymnHXLbt",
+            "QESUy655bH0LI6Ictt7GtO07/0NEsXYff5eLaCKK4XHc3T6FEZEvr+Pt+jGeiHx4",
+            "Hufb+8f97vbTTriJz17ECRoW0IGQdJE7e3hAB0K6LsMlQZqAHhHUZxmCeZQ2INTA",
+            "H1MhISBICAgSAoKEgCAhIEgICBICgoSAICEgSAgIEgKChIAgISBICAiSP0oO4Vvf",
+            "xZ0TAAAAAElFTkSuQmCC",
+          ].join(""),
+          "152x152": [
+            "iVBORw0KGgoAAAANSUhEUgAAAJgAAACYCAYAAAAYwiAhAAADoUlEQVR4nO3dTXIa",
+            "MRRFYeHKyPvIArMHz7PA7CVkEHeVqgtjG3Tfz9X55gE177QaGze5vL5drwMQecle",
+            "ALwRGKQIDFIEBikCgxSBQYrAIEVgkCIwSBEYpAgMUgQGKQKDFIFBisAgRWCQIjBI",
+            "/chewGdefv/MXkJ5f3/9yV7Chy4V/2SaqB5XLbYygRHVehViSw+MsPQyQ0t9k09c",
+            "MTJf55QdjLDyRO9m4TsYceWKfv1DAyOuGiLnEBYYcdUSNY+QwIirpoi5yAMjrtrU",
+            "85EGRlw9KOfEh92QkgXG7tWLal6SwIirJ8XcuERCanlg7F69rZ4fOxikCAxSSwPj",
+            "8uhh5RzZwSBFYJBaFhiXRy+r5skOBikCgxSBQYrAIEVgkCIwSBEYpMp/u06m79yk",
+            "yu8BbyOwyTN3PZ//LcH9R2BDczv98Zi7h7Z1YBHf07B7aFsGlvF1RruGtt1Pkdlf",
+            "ypb9/NG2CqzKcKusI8IWl8iKA93lkmm/g1WMa1Z9fc+yDqzL8Lqs8xHWgSGfbWDd",
+            "doVu6/0qy8C6Dqvruu+xC6z7kLqv/8wuMNRiFZjL2e9yHGOYBYZ6bAJzOuvH8Dke",
+            "m8BQk0VgLmf7mcNxWQSGuggMUgQGqfaBObxPuaf78bUPDLURGKQIDFIEBikCgxSB",
+            "QYrAIEVgkCIwSBEYpNoHZn/rffPjax8YaiMwSBEYpCwC6/4+5SMOx2URGOqyCczh",
+            "bJ+5HI9NYKjJKjCbs97kOMYwCwz12AXW/ezvvv4zu8DG6Dukruu+xzKwMfoNq9t6",
+            "v8o2MNRgHViXXaHLOh9hHdgY9YdXfX3P2uK/kjmGWOk2fPewDvY72KzKUKusI8JW",
+            "gY2RP9zs54+2xSXyLOOSuVtYhy0DO0SEtmtYh60DOyhC2z2sA4FNzlF8JziCuo3A",
+            "7iCa5233UyRiERikCAxSBAYpAoMUgUGKwCC1LLBKfwqD562aJzsYpAgMUksD4zLp",
+            "YemH/sseCbiBwCC1PDAuk72tnh87GKQkgbGL9aSYm2wHI7JeVPPiEgkpaWDsYj1I",
+            "76qSPfI7IqtNPZ+QSySR1RQxl7D3YERWS9Q8Qt/kE1kNoV+ZEPZM74gsV/Trf3l9",
+            "u15Dn3HCja1xsk7s1N+DsZvFyHydU3ewGbvZehVO4DKBzYjtcRWimpUMbEZsn6sW",
+            "1ax8YOiND7shRWCQIjBIERikCAxSBAYpAoMUgUGKwCBFYJAiMEgRGKQIDFIEBikC",
+            "gxSBQeofYa3wbzuykx0AAAAASUVORK5CYII=",
+          ].join(""),
+          "180x180": [
+            "iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAESElEQVR4nO3dQXIT",
+            "SRCG0TbBintwwLkDew44dxmzGCuiQ9iWZHV1Zf353h5cpfoiXTTQfvnx6/V1gxDf",
+            "Zi8AjiRoogiaKIImiqCJImiiCJoogiaKoIkiaKIImiiCJoqgiSJoogiaKIImiqCJ",
+            "ImiiCJoogibK99kLeNa33z9nLyHOf//8O3sJX/ay2v/6FvD5Vgp8iaBFXEf1uEsH",
+            "LeS6qoZdMmghr6Na2OWecoh5LdXOq8yErvbB8LgK07rEhBZzhgrnOD3oCh8Cx5l9",
+            "nlODnr15xph5rtOCFnO2Wec7JWgx9zDjnE8PWsy9nH3epwYt5p7OPPfpTzngSKcF",
+            "bTr3dtb5nxK0mNm2czpw5SDK8KBNZ/ZG92BCE2Vo0KYz7xnZhQlNFEETZVjQrht8",
+            "ZlQfJjRRBE0UQRNlSNDuz9xjRCcmNFEETRRBE0XQRBE0UQRNFEETRdBEWf5nrFT0",
+            "yFs4/SXUsQR9gGdeI3v9awX+HEF/0ah3Ie9/X3E/TtAPOvOl3pevJez7CfpOM99O",
+            "L+z7CfqGCj9m4ULYt3ls94lKMe9VXVcFgv5A9Wiqr28WV44rK4XiCvI3E3pnpZj3",
+            "Vl33CIJ+s3oUq6//KILecmJI2cczBE2U9kGnTbW0/TyqddCph5+6r3u0DTr90NP3",
+            "95G2QZOpZdBdpleXfe61DJpc7YLuNrW67bdd0GRrFXS3aXXRad+tgiafoInSJuhO",
+            "33bf02X/bYKmB0ETRdBEaRF0l/vjLR0+hxZB04egiSJoogiaKIImiqCJImiiCJoo",
+            "giaKoInSImivm/1fh8+hRdD0IWiiCJoobYLucH/8TJf9twmaHgRNlFZBd/m2e63T",
+            "vlsFTb52QXeaVtvWcL+zFwBHahl0l6nVZZ97LYMmV9ug06dX+v4+0jbobcs99NR9",
+            "3aN10NuWd/hp+3lU+6DJIugtZ6ql7OMZgn6zegyrr/8ogt5ZNYpV1z3C99kLqOYS",
+            "xwqvnhXy30zoD1SPpfr6ZhH0J6pGU3VdFbhy3FDpCiLk2wR9p5lhC/l+gn7QmWEL",
+            "+XGC/qJ9bEfGLeLnCPoA1xE+EriAjyXoAUQ6j8d2RBE0UQRNFEETRdBEETRRBE0U",
+            "QRNlSNAV/mUa9Y3oxIQmiqCJImiiDAvaPZrPjOrDhCaKoIkyNGjXDt4zsgsTmijD",
+            "gzal2RvdgwlNlFOCNqXZtpNe/TD8K7wRdW9nnb8rB1FODdqU7unMcz99Qou6l7PP",
+            "e8qVQ9Q9THmx5elf8Y2os80636l/KBR1ppnnOv0ph6izzD7P6UFv2/wPgWNUOMeX",
+            "H79eX2cvYs+bO9dTIeSLEhN6r9KHw23VzqvchN4zreuqFvJF6aAvhF1H1ZAvlgh6",
+            "T9znqx7x3nJBXxP48VYK+NryQcNeuacc8AxBE0XQRBE0UQRNFEETRdBEETRRBE0U",
+            "QRNF0EQRNFEETRRBE0XQRBE0UQRNFEETRdBE+QMpiRzQz4xpIAAAAABJRU5ErkJg",
+            "gg==",
+          ].join(""),
+        };
+        const manifest = {
+          name: 'HackerTab Pro',
+          short_name: 'HackerTab',
+          start_url: './',
+          display: 'standalone',
+          background_color: '#05070f',
+          theme_color: '#0b1220',
+          description: 'Competition-grade mobile HackerTab experience',
+          icons: Object.entries(ICON_DATA).map(([size, data]) => ({
+            src: `data:image/png;base64,${data}`,
+            sizes: size,
+            type: 'image/png'
+          }))
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" });
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        const manifestLink = document.createElement("link");
+        manifestLink.rel = "manifest";
+        manifestLink.href = manifestUrl;
+        document.head.appendChild(manifestLink);
+        window.addEventListener("pagehide", () => URL.revokeObjectURL(manifestUrl), { once: true });
+        Object.entries(ICON_DATA).forEach(([size, data]) => {
+          const link = document.createElement("link");
+          link.rel = "apple-touch-icon";
+          link.sizes = size;
+          link.href = `data:image/png;base64,${data}`;
+          document.head.appendChild(link);
         });
-
-        elements.feedStatus.querySelectorAll('.refresh-feed').forEach((button) => {
-          button.addEventListener('click', () => {
-            const feedId = button.getAttribute('data-feed-id');
-            const feed = getFeed(feedId);
-            if (feed) {
-              refreshFeed(feed, { manual: true, force: true });
-            }
-          });
+        const docEl = document.documentElement;
+        const app = document.getElementById("app");
+        const header = document.querySelector(".app-header");
+        const tabBar = document.querySelector(".tab-bar");
+        const feedScroller = document.getElementById("feedScroller");
+        const feedList = document.getElementById("feedList");
+        const topSpacer = document.getElementById("virtualTopSpacer");
+        const bottomSpacer = document.getElementById("virtualBottomSpacer");
+        const skeletonContainer = document.getElementById("skeletonContainer");
+        const pullIndicator = document.getElementById("pullIndicator");
+        const pullLabel = document.getElementById("pullLabel");
+        const listEndIndicator = document.getElementById("listEndIndicator");
+        const feedCountLabel = document.getElementById("feedCount");
+        const searchInput = document.getElementById("feedSearch");
+        const filterButtons = Array.from(document.querySelectorAll(".filter-chip"));
+        const quickSheet = document.getElementById("quickSheet");
+        const quickActionsButton = document.getElementById("quickActionsButton");
+        const menuButton = document.getElementById("menuButton");
+        const menuDrawer = document.getElementById("menuDrawer");
+        const settingsOverlay = document.getElementById("settingsOverlay");
+        const sheetPanel = quickSheet.querySelector(".sheet-panel");
+        const sheetHandle = sheetPanel.querySelector("[data-drag-handle]");
+        const overlayPanel = settingsOverlay.querySelector(".overlay-panel");
+        const drawerPanel = menuDrawer.querySelector(".menu-panel");
+        const manageFeedsButton = document.getElementById("manageFeedsButton");
+        const addFeedButton = document.getElementById("addFeedButton");
+        const refreshNowButton = document.getElementById("refreshNowButton");
+        const toggleOfflineButton = document.getElementById("toggleOfflineButton");
+        const shareAppButton = document.getElementById("shareAppButton");
+        const feedForm = document.getElementById("feedForm");
+        const feedUrlInput = document.getElementById("feedUrl");
+        const feedUrlError = document.getElementById("feedUrlError");
+        const saveFeedButton = document.getElementById("saveFeedButton");
+        const feedListSettings = document.getElementById("feedListSettings");
+        const toastStack = document.getElementById("toastStack");
+        const contextMenu = document.getElementById("cardContextMenu");
+        const template = document.getElementById("feedCardTemplate");
+        const infiniteSentinel = document.getElementById("infiniteSentinel");
+        const notifyButtons = Array.from(document.querySelectorAll("[data-notify]"));
+        const state = {
+          items: [],
+          filtered: [],
+          archivedIds: new Set(),
+          activeFilter: 'all',
+          searchTerm: '',
+          cardHeight: 176,
+          virtualization: { start: 0, end: 0 },
+          isRefreshing: false,
+          loadingMore: false,
+          page: 1,
+          offlineEnabled: true
+        };
+        let searchTimer = 0;
+        let longPressTimeout = null;
+        let contextItem = null;
+        let pullStartY = 0;
+        let pullDistance = 0;
+        let pulling = false;
+        let scrollFrame = 0;
+        let lastOverlayTrigger = null;
+        const LONG_PRESS_DELAY = 550;
+        const SWIPE_THRESHOLD = 72;
+        const DELETE_THRESHOLD = 138;
+        const PULL_TRIGGER = 92;
+        const PULL_MAX = 160;
+        const PULL_DAMPING = 0.6;
+        const layoutObserver = new ResizeObserver(() => {
+          docEl.style.setProperty("--header-height", `${header.offsetHeight}px`);
+          docEl.style.setProperty("--tab-bar-height", `${tabBar.offsetHeight}px`);
         });
-
-        elements.feedStatus.querySelectorAll('.toggle-feed').forEach((checkbox) => {
-          checkbox.addEventListener('change', (event) => {
-            const feedId = checkbox.getAttribute('data-feed-id');
-            const feed = getFeed(feedId);
-            if (!feed) return;
-            feed.enabled = event.target.checked;
-            saveState();
-            if (feed.enabled) {
-              refreshFeed(feed, { manual: true });
-            } else {
-              updateFeedStatus(feed.id, { status: 'warn', message: 'Feed disabled' });
-              renderFeedItems();
-            }
-          });
+        layoutObserver.observe(header);
+        layoutObserver.observe(tabBar);
+        const haptic = (pattern) => {
+          if (navigator.vibrate) {
+            navigator.vibrate(pattern);
+          }
+        };
+        function showToast(message, tone = "info") {
+          const toast = document.createElement("div");
+          toast.className = "toast";
+          toast.dataset.tone = tone;
+          toast.innerHTML = `<span>${message}</span>`;
+          toastStack.appendChild(toast);
+          setTimeout(() => {
+            toast.style.transition = "opacity 0.28s ease, transform 0.28s ease";
+            toast.style.opacity = "0";
+            toast.style.transform = "translateY(-8px)";
+            setTimeout(() => toast.remove(), 320);
+          }, 3600);
+        }
+        window.addEventListener("error", (event) => {
+          showToast(`Error: ${event.message}`, "error");
         });
-
-        elements.feedStatus.querySelectorAll('.edit-feed').forEach((button) => {
-          button.addEventListener('click', () => {
-            openSettingsModal();
-            populateFeedForm(button.getAttribute('data-feed-id'));
-          });
+        window.addEventListener("unhandledrejection", (event) => {
+          const reason = event.reason && event.reason.message ? event.reason.message : event.reason;
+          showToast(`Network hiccup: ${reason}`, "error");
         });
-      }
-
-      function renderFeedItems() {
-        const items = getFilteredItems();
-        const limit = state.display.loaded || state.display.batchSize;
-        const sliced = items.slice(0, limit);
-        elements.feedList.innerHTML = '';
-
-        if (!sliced.length) {
-          const empty = document.createElement('div');
-          empty.className = 'empty-state';
-          empty.innerHTML = '<p>No stories match your filters yet.</p><p>Try refreshing feeds or adjusting filters.</p>';
-          elements.feedList.appendChild(empty);
-        } else {
-          sliced.forEach((item) => {
-            const article = document.createElement('article');
-            article.className = 'feed-item';
-            article.innerHTML = `
-              <h3>
-                <span class="source-tag">${escapeHTML(item.feedName)}</span>
-                <a href="${escapeAttribute(item.link)}" target="_blank" rel="noopener noreferrer">${escapeHTML(item.title)}</a>
-              </h3>
-              <div class="meta">
-                <span>${formatDate(item.published)}</span>
-                ${item.author ? `<span>by ${escapeHTML(item.author)}</span>` : ''}
-                ${typeof item.score === 'number' ? `<span>${item.score} points</span>` : ''}
-                ${typeof item.comments === 'number' ? `<span>${item.comments} comments</span>` : ''}
-              </div>
-              ${item.description ? `<p class="description">${escapeHTML(item.description)}</p>` : ''}
-            `;
-            elements.feedList.appendChild(article);
+        const tagPool = ["React", "Rust", "Security", "AI", "iOS", "DevOps", "Web", "Testing", "Design", "Cloud"];
+        const sourcePool = ["Hacker News", "GitHub", "Product Hunt", "Stack Overflow", "Dev.to", "Reddit", "OSS Radar"];
+        const summaryPool = [
+          "New framework benchmarks show significant gains for edge rendering.",
+          "Maintainers debate the future of package registries on stage at NextConf.",
+          "Incident response postmortem reveals subtle race condition in auth flow.",
+          "Apple quietly ships Safari update that unlocks new WebKit experimental flags.",
+          "Developers crowd-source best practices for AI-assisted code reviews.",
+          "Research team open-sources dataset to help tune small language models.",
+          "Industry report highlights hiring rebound for senior ICs across iOS and web.",
+          "CNCF announces graduated status for long-awaited observability project.",
+          "Founder AMA reveals the roadmap for the popular productivity CLI."
+        ];
+        let idSeed = 0;
+        const randomFrom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        const headlinePool = [
+          "Playbook for taming flaky tests lands on GitHub",
+          "Design tokens finally arrive for UIKit parity",
+          "New CLI pairs AI copilots with secure review gates",
+          "Edge functions graduate with per-request caching",
+          "WWDC labs quietly preview SwiftUI performance wins",
+          "Browser vendors align on Web Push permission UX",
+          "Open telemetry spec adds opinionated mobile schema"
+        ];
+        function createMockItem(focusTag = randomFrom(tagPool)) {
+          const now = Date.now();
+          const ageMinutes = Math.floor(Math.random() * 240);
+          const tags = new Set([focusTag]);
+          while (tags.size < 3) {
+            tags.add(randomFrom(tagPool));
+          }
+          return {
+            id: `item-${++idSeed}`,
+            title: randomFrom(headlinePool),
+            summary: randomFrom(summaryPool),
+            source: randomFrom(sourcePool),
+            url: "#",
+            tags: Array.from(tags).slice(0, 3),
+            readingTime: Math.max(2, Math.ceil(Math.random() * 8)),
+            published: now - ageMinutes * 60 * 1000
+          };
+        }
+        const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+        function formatRelativeTime(timestamp) {
+          const diff = Date.now() - timestamp;
+          const minutes = Math.max(1, Math.round(diff / 60000));
+          if (minutes < 60) {
+            return rtf.format(-minutes, "minute");
+          }
+          const hours = Math.round(minutes / 60);
+          if (hours < 24) {
+            return rtf.format(-hours, "hour");
+          }
+          const days = Math.round(hours / 24);
+          return rtf.format(-days, "day");
+        }
+        const subscriptions = new Set([
+          "https://hnrss.org/frontpage",
+          "https://github.com/trending",
+          "https://developer.apple.com/news/rss/news.rss"
+        ]);
+        function renderSettingsList() {
+          feedListSettings.innerHTML = "";
+          subscriptions.forEach((url) => {
+            const li = document.createElement("li");
+            li.textContent = url;
+            feedListSettings.appendChild(li);
           });
         }
-
-        if (items.length > sliced.length) {
-          elements.loadMore.classList.remove('hidden');
-        } else {
-          elements.loadMore.classList.add('hidden');
+        function updateFeedCount() {
+          const total = state.filtered.length;
+          feedCountLabel.textContent = `${total} ${total === 1 ? "story" : "stories"}`;
         }
-
-        elements.badge.textContent = `${items.length} stories`;
-      }
-
-      function getFilteredItems() {
-        const allItems = [];
-        const keywords = state.filters.keywords.map((word) => word.toLowerCase());
-        getOrderedFeeds().forEach((feed) => {
-          if (feed.enabled === false) return;
-          const cache = feedCache[feed.id];
-          if (!cache || !Array.isArray(cache.items)) return;
-          const filtered = cache.items.filter((item) => {
-            if (!item || !item.title) return false;
-            if (keywords.length && containsKeyword(item, keywords)) {
+        function createCardElement(item) {
+          const fragment = template.content.cloneNode(true);
+          const row = fragment.querySelector(".feed-row");
+          const card = fragment.querySelector(".feed-card");
+          const openButton = card.querySelector('[data-action="open"]');
+          row.dataset.itemId = item.id;
+          card.querySelector(".feed-source").textContent = item.source;
+          card.querySelector(".feed-time").textContent = formatRelativeTime(item.published);
+          card.querySelector(".feed-title").textContent = item.title;
+          card.querySelector(".feed-summary").textContent = item.summary;
+          card.querySelector(".feed-readtime").textContent = `${item.readingTime} min read`;
+          const tagsContainer = card.querySelector(".tag-row");
+          tagsContainer.innerHTML = "";
+          item.tags.forEach((tag) => {
+            const span = document.createElement("span");
+            span.className = "tag";
+            span.textContent = tag;
+            tagsContainer.appendChild(span);
+          });
+          if (openButton) {
+            openButton.addEventListener("click", (event) => {
+              event.stopPropagation();
+              openItem(item);
+            });
+          }
+          card.addEventListener("click", () => openItem(item));
+          initCardGestures(row, card, item);
+          return row;
+        }
+        function renderSlice(start, end) {
+          feedList.innerHTML = "";
+          const fragment = document.createDocumentFragment();
+          for (let i = start; i < end; i += 1) {
+            const item = state.filtered[i];
+            if (!item) continue;
+            fragment.appendChild(createCardElement(item));
+          }
+          feedList.appendChild(fragment);
+          const sample = feedList.querySelector(".feed-card");
+          if (sample) {
+            const height = Math.round(sample.getBoundingClientRect().height);
+            if (height && Math.abs(height - state.cardHeight) > 4) {
+              state.cardHeight = height;
+            }
+          }
+        }
+        function updateVirtualWindow(force = false) {
+          const total = state.filtered.length;
+          if (!total) {
+            feedList.innerHTML = "";
+            topSpacer.style.height = "0px";
+            bottomSpacer.style.height = "0px";
+            listEndIndicator.textContent = state.searchTerm ? "No results. Try another query." : "You're all caught up.";
+            listEndIndicator.setAttribute("aria-hidden", "false");
+            return;
+          }
+          const scrollTop = feedScroller.scrollTop;
+          const viewport = feedScroller.clientHeight || window.innerHeight;
+          const startIndex = Math.max(0, Math.floor(scrollTop / state.cardHeight) - 3);
+          const visibleCount = Math.ceil(viewport / state.cardHeight) + 6;
+          const endIndex = Math.min(total, startIndex + visibleCount);
+          if (!force && state.virtualization.start === startIndex && state.virtualization.end === endIndex) {
+            return;
+          }
+          state.virtualization.start = startIndex;
+          state.virtualization.end = endIndex;
+          topSpacer.style.height = `${startIndex * state.cardHeight}px`;
+          const remaining = Math.max(total - endIndex, 0);
+          bottomSpacer.style.height = `${remaining * state.cardHeight}px`;
+          renderSlice(startIndex, endIndex);
+          listEndIndicator.setAttribute("aria-hidden", remaining > 0 || state.loadingMore ? "true" : "false");
+        }
+        function applyFilters(force = false) {
+          const term = state.searchTerm;
+          const filterKey = state.activeFilter;
+          state.filtered = state.items.filter((item) => {
+            if (state.archivedIds.has(item.id)) {
               return false;
             }
-            if (state.searchTerm) {
-              const term = state.searchTerm.toLowerCase();
-              return (
-                item.title.toLowerCase().includes(term) ||
-                (item.description && item.description.toLowerCase().includes(term)) ||
-                (item.author && item.author.toLowerCase().includes(term))
-              );
+            if (filterKey !== "all" && !item.tags.some((tag) => tag.toLowerCase() === filterKey)) {
+              return false;
             }
-            return true;
+            if (!term) {
+              return true;
+            }
+            const haystack = `${item.title} ${item.summary} ${item.tags.join(" ")}`.toLowerCase();
+            return haystack.includes(term);
           });
-          allItems.push(
-            ...filtered.map((item) => ({
-              ...item,
-              feedName: feed.name,
-            }))
-          );
-        });
-        allItems.sort((a, b) => b.published - a.published);
-        return allItems;
-      }
-
-      function containsKeyword(item, keywords) {
-        const content = `${item.title} ${item.description || ''}`.toLowerCase();
-        return keywords.some((keyword) => content.includes(keyword));
-      }
-
-      function renderFeedManagement() {
-        elements.feedManagementList.innerHTML = '';
-        getOrderedFeeds().forEach((feed, index) => {
-          const item = document.createElement('article');
-          item.className = 'feed-management-item';
-          item.dataset.feedId = feed.id;
-          item.innerHTML = `
-            <header>
-              <div>
-                <strong>${escapeHTML(feed.name)}</strong>
-                <div class="small">${feed.type === 'hn' ? 'Hacker News API' : escapeHTML(feed.url || '')}</div>
-              </div>
-              ${feed.locked ? '<span class="badge">Built-in</span>' : ''}
-            </header>
-            <div class="controls">
-              <button type="button" class="muted-btn edit-feed" data-feed-id="${feed.id}">Edit</button>
-              <button type="button" class="muted-btn move-up" data-feed-id="${feed.id}" ${index === 0 ? 'disabled' : ''}>Move up</button>
-              <button type="button" class="muted-btn move-down" data-feed-id="${feed.id}" ${index === state.feedOrder.length - 1 ? 'disabled' : ''}>Move down</button>
-              ${feed.locked ? '' : `<button type="button" class="danger delete-feed" data-feed-id="${feed.id}">Remove</button>`}
-            </div>
-          `;
-          elements.feedManagementList.appendChild(item);
-        });
-
-        elements.feedManagementList.querySelectorAll('.edit-feed').forEach((button) => {
-          button.addEventListener('click', () => populateFeedForm(button.getAttribute('data-feed-id')));
-        });
-
-        elements.feedManagementList.querySelectorAll('.move-up').forEach((button) => {
-          button.addEventListener('click', () => moveFeed(button.getAttribute('data-feed-id'), -1));
-        });
-
-        elements.feedManagementList.querySelectorAll('.move-down').forEach((button) => {
-          button.addEventListener('click', () => moveFeed(button.getAttribute('data-feed-id'), 1));
-        });
-
-        elements.feedManagementList.querySelectorAll('.delete-feed').forEach((button) => {
-          button.addEventListener('click', () => removeFeed(button.getAttribute('data-feed-id')));
-        });
-      }
-
-      function populateFeedForm(feedId) {
-        const feed = getFeed(feedId);
-        if (!feed) return;
-        elements.feedId.value = feed.id;
-        elements.feedName.value = feed.name;
-        elements.feedUrl.value = feed.url || '';
-        elements.feedUrl.disabled = feed.type === 'hn';
-        elements.feedRefresh.value = feed.refreshMinutes;
-        elements.feedLimit.value = feed.itemLimit;
-        elements.feedEnabled.checked = feed.enabled !== false;
-        elements.previewPanel.classList.add('hidden');
-        elements.previewPanel.dataset.validated = '';
-        elements.previewContent.innerHTML = '';
-      }
-
-      function prepareNewFeed(name = '', url = '') {
-        elements.feedId.value = '';
-        elements.feedName.value = name;
-        elements.feedUrl.value = url;
-        elements.feedUrl.disabled = false;
-        elements.feedRefresh.value = 30;
-        elements.feedLimit.value = 30;
-        elements.feedEnabled.checked = true;
-        elements.previewPanel.classList.add('hidden');
-        elements.previewPanel.dataset.validated = '';
-        elements.previewContent.innerHTML = '';
-        openSettingsModal();
-        elements.feedName.focus();
-      }
-
-      function handleFeedSubmit(event) {
-        event.preventDefault();
-        const id = elements.feedId.value;
-        const name = sanitizeText(elements.feedName.value.trim());
-        const urlInput = elements.feedUrl.value.trim();
-        const refreshMinutes = clamp(Number(elements.feedRefresh.value), 5, 360);
-        const itemLimit = clamp(Number(elements.feedLimit.value), 5, 100);
-        const enabled = elements.feedEnabled.checked;
-
-        if (!name) {
-          showToast('Feed name is required');
-          return;
+          updateFeedCount();
+          updateVirtualWindow(force);
         }
-
-        let finalUrl = urlInput;
-        if (id) {
-          const existing = getFeed(id);
-          if (existing && existing.type === 'hn') {
-            finalUrl = existing.url || '';
+        function populateItems(count = 24) {
+          const newItems = [];
+          for (let i = 0; i < count; i += 1) {
+            newItems.push(createMockItem(randomFrom(tagPool)));
+          }
+          return newItems;
+        }
+        function loadInitialData() {
+          skeletonContainer.hidden = false;
+          setTimeout(() => {
+            state.items = populateItems(36);
+            applyFilters(true);
+            skeletonContainer.hidden = true;
+          }, 520);
+        }
+        function openItem(item) {
+          showToast(`Opening: ${item.title}`, "success");
+        }
+        function archiveItem(item) {
+          state.archivedIds.add(item.id);
+          showToast("Archived to queue", "success");
+          applyFilters(true);
+        }
+        function deleteItem(item) {
+          state.items = state.items.filter((entry) => entry.id !== item.id);
+          state.archivedIds.delete(item.id);
+          showToast("Removed from feed", "info");
+          applyFilters(true);
+        }
+        async function shareItem(item) {
+          try {
+            if (navigator.share) {
+              await navigator.share({ title: item.title, text: item.summary, url: item.url || window.location.href });
+              showToast("Shared", "success");
+            } else if (navigator.clipboard) {
+              await navigator.clipboard.writeText(item.url || window.location.href);
+              showToast("Link copied", "success");
+            } else {
+              showToast("Share not supported", "error");
+            }
+          } catch (error) {
+            showToast(`Share failed: ${error.message}`, "error");
           }
         }
-
-        if (!id && !isValidURL(finalUrl)) {
-          showToast('Provide a valid RSS/Atom URL');
-          return;
+        function resolveSwipeAction(delta) {
+          if (delta <= -DELETE_THRESHOLD) return "delete";
+          if (delta <= -SWIPE_THRESHOLD) return "archive";
+          if (delta >= SWIPE_THRESHOLD) return "share";
+          return null;
         }
-
-        if (!id && isDuplicateURL(finalUrl)) {
-          showToast('Feed already exists');
-          return;
+        function resetCard(card, row) {
+          row.removeAttribute("data-swipe-intent");
+          card.style.transition = "transform 0.24s ease";
+          card.style.transform = "translateX(0)";
+          setTimeout(() => { card.style.transition = ""; }, 260);
         }
-
-        if (!id && !elements.previewPanel.dataset.validated) {
-          showToast('Preview the feed before saving to ensure it works.');
-          return;
+        function updateSwipeIntent(row, delta) {
+          const intent = resolveSwipeAction(delta);
+          if (intent) {
+            row.dataset.swipeIntent = intent;
+          } else {
+            row.removeAttribute("data-swipe-intent");
+          }
         }
-
-        const normalizedFeed = {
-          id: id || `feed-${Date.now()}`,
-          name,
-          type: id && getFeed(id) ? getFeed(id).type : 'rss',
-          url: finalUrl,
-          refreshMinutes,
-          itemLimit,
-          enabled,
-          locked: id ? getFeed(id).locked : false,
-        };
-
-        if (id) {
-          const index = state.feeds.findIndex((feed) => feed.id === id);
-          state.feeds[index] = Object.assign({}, state.feeds[index], normalizedFeed);
-        } else {
-          state.feeds.push(normalizedFeed);
-          state.feedOrder.push(normalizedFeed.id);
+        function handleSwipeAction(intent, item, row) {
+          if (!intent) {
+            return;
+          }
+          if (intent === "archive") {
+            haptic(25);
+            archiveItem(item);
+          } else if (intent === "delete") {
+            haptic([16, 32]);
+            deleteItem(item);
+          } else if (intent === "share") {
+            haptic(15);
+            shareItem(item);
+          }
         }
-
-        saveState();
-        renderFeedManagement();
-        renderFeedStatus();
-        if (enabled) {
-          refreshFeed(normalizedFeed, { manual: true, force: true });
-        }
-        showToast(id ? 'Feed updated' : 'Feed added');
-        resetFeedForm();
-      }
-
-      function resetFeedForm() {
-        elements.feedForm.reset();
-        elements.feedId.value = '';
-        elements.feedUrl.disabled = false;
-        elements.previewPanel.classList.add('hidden');
-        elements.previewPanel.dataset.validated = '';
-        elements.previewContent.innerHTML = '';
-      }
-
-      function handlePreviewFeed() {
-        const url = elements.feedUrl.value.trim();
-        if (!isValidURL(url)) {
-          showToast('Enter a valid RSS/Atom URL starting with http or https');
-          return;
-        }
-        elements.previewPanel.classList.remove('hidden');
-        elements.previewPanel.dataset.validated = '';
-        elements.previewContent.innerHTML = '<div class="spinner" aria-label="Loading preview"></div>';
-        validateAndPreviewFeed(url)
-          .then((items) => {
-            elements.previewContent.innerHTML = '';
-            items.slice(0, 3).forEach((item) => {
-              const div = document.createElement('div');
-              div.className = 'preview-item';
-              div.innerHTML = `
-                <strong>${escapeHTML(item.title)}</strong>
-                <span>${formatDate(item.published)}</span>
-                <p>${escapeHTML(truncate(item.description || '', 160))}</p>
-              `;
-              elements.previewContent.appendChild(div);
-            });
-            elements.previewPanel.dataset.validated = 'true';
-            showToast('Feed verified');
-          })
-          .catch((error) => {
-            elements.previewContent.innerHTML = `<p style="color:var(--danger);">${escapeHTML(error.message)}</p>`;
-            showToast(error.message);
+        function initCardGestures(row, card, item) {
+          let pointerId = null;
+          let startX = 0;
+          let startY = 0;
+          let translateX = 0;
+          let swiping = false;
+          let active = false;
+          const clearPress = () => {
+            if (longPressTimeout) {
+              clearTimeout(longPressTimeout);
+              longPressTimeout = null;
+            }
+          };
+          card.addEventListener("pointerdown", (event) => {
+            if (event.pointerType === "mouse") {
+              return;
+            }
+            closeContextMenu();
+            active = true;
+            pointerId = event.pointerId;
+            startX = event.clientX;
+            startY = event.clientY;
+            translateX = 0;
+            swiping = false;
+            card.setPointerCapture(pointerId);
+            longPressTimeout = window.setTimeout(() => {
+              active = false;
+              clearPress();
+              card.releasePointerCapture(pointerId);
+              openContextMenu(item, startX, startY);
+            }, LONG_PRESS_DELAY);
           });
-      }
-
-      async function validateAndPreviewFeed(url) {
-        const normalized = normalizeURL(url);
-        const text = await fetchTextWithFallback(normalized);
-        const parsed = parseRSS(text, { id: 'preview', name: 'Preview', itemLimit: 10 }, normalized);
-        return parsed.items;
-      }
-
-      function moveFeed(feedId, direction) {
-        const index = state.feedOrder.indexOf(feedId);
-        if (index === -1) return;
-        const newIndex = index + direction;
-        if (newIndex < 0 || newIndex >= state.feedOrder.length) return;
-        const [removed] = state.feedOrder.splice(index, 1);
-        state.feedOrder.splice(newIndex, 0, removed);
-        saveState();
-        renderFeedManagement();
-        renderFeedStatus();
-        renderFeedItems();
-      }
-
-      function removeFeed(feedId) {
-        const feed = getFeed(feedId);
-        if (!feed || feed.locked) return;
-        const confirmed = confirm(`Remove feed "${feed.name}"? Cached content will be deleted.`);
-        if (!confirmed) return;
-        state.feeds = state.feeds.filter((f) => f.id !== feedId);
-        state.feedOrder = state.feedOrder.filter((id) => id !== feedId);
-        delete feedCache[feedId];
-        saveState();
-        saveCache();
-        renderFeedManagement();
-        renderFeedStatus();
-        renderFeedItems();
-        showToast('Feed removed');
-      }
-
-      function handleExportConfig() {
-        const exportData = {
-          feeds: state.feeds.filter((feed) => !feed.locked),
-          filters: state.filters,
-          display: state.display,
-        };
-        const payload = JSON.stringify(exportData, null, 2);
-        elements.importExport.value = payload;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard
-            .writeText(payload)
-            .then(() => showToast('Configuration copied to clipboard'))
-            .catch(() => {
-              copyToClipboardFallback();
-              showToast('Configuration ready. Copy manually if needed.');
-            });
-        } else {
-          const copied = copyToClipboardFallback();
-          showToast(copied ? 'Configuration copied to clipboard' : 'Configuration ready. Copy manually if needed.');
+          card.addEventListener("pointermove", (event) => {
+            if (!active || event.pointerId !== pointerId) {
+              return;
+            }
+            const dx = event.clientX - startX;
+            const dy = event.clientY - startY;
+            if (!swiping && Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy)) {
+              swiping = true;
+              feedScroller.style.scrollSnapType = "none";
+              clearPress();
+            }
+            if (swiping) {
+              event.preventDefault();
+              translateX = Math.max(-200, Math.min(200, dx));
+              card.style.transform = `translateX(${translateX}px)`;
+              updateSwipeIntent(row, translateX);
+            } else if (Math.abs(dy) > 12) {
+              clearPress();
+            }
+          }, { passive: false });
+          const handlePointerEnd = (event) => {
+            if (event.pointerId !== pointerId) {
+              return;
+            }
+            clearPress();
+            active = false;
+            card.releasePointerCapture(pointerId);
+            feedScroller.style.scrollSnapType = "";
+            if (swiping) {
+              const intent = resolveSwipeAction(translateX);
+              resetCard(card, row);
+              handleSwipeAction(intent, item, row);
+            } else {
+              resetCard(card, row);
+            }
+            swiping = false;
+            translateX = 0;
+          };
+          card.addEventListener("pointerup", handlePointerEnd);
+          card.addEventListener("pointercancel", handlePointerEnd);
         }
-      }
-
-      function handleImportConfig() {
-        try {
-          const parsed = JSON.parse(elements.importExport.value);
-          if (!parsed || typeof parsed !== 'object') {
-            throw new Error('Invalid configuration format');
-          }
-          if (Array.isArray(parsed.feeds)) {
-            parsed.feeds.forEach((feed) => {
-              if (!feed.id) {
-                feed.id = `feed-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-              }
-              if (!isValidURL(feed.url || '')) {
-                throw new Error(`Invalid URL for feed ${feed.name || feed.id}`);
-              }
-            });
-            const customIds = new Set(parsed.feeds.map((feed) => feed.id));
-            state.feeds = state.feeds.filter((feed) => feed.locked).concat(parsed.feeds.map((feed) => ({ ...feed, locked: false })));
-            state.feedOrder = state.feeds.map((feed) => feed.id);
-            state.feedOrder = state.feedOrder.filter((id, idx, arr) => arr.indexOf(id) === idx);
-          }
-          if (parsed.filters) {
-            state.filters = Object.assign({}, state.filters, parsed.filters);
-          }
-          if (parsed.display) {
-            state.display = Object.assign({}, state.display, parsed.display);
-          }
-          saveState();
-          hydrateSettingsForm();
-          renderFeedManagement();
-          renderFeedStatus();
-          renderFeedItems();
-          showToast('Configuration imported');
-        } catch (error) {
-          console.error('Import failed', error);
-          showToast(error.message || 'Failed to import configuration');
+        function closeContextMenu() {
+          contextMenu.dataset.open = "false";
+          contextMenu.setAttribute("aria-hidden", "true");
+          contextItem = null;
         }
-      }
-
-      function handleResetDefaults() {
-        const confirmed = confirm('Reset all settings and feeds to defaults? This clears custom feeds and cache.');
-        if (!confirmed) return;
-        Object.assign(state, JSON.parse(JSON.stringify(defaultState)));
-        Object.keys(feedCache).forEach((key) => delete feedCache[key]);
-        saveState();
-        saveCache();
-        hydrateSettingsForm();
-        renderFeedManagement();
-        renderFeedStatus();
-        renderFeedItems();
-        refreshDueFeeds(false, true, true);
-        showToast('Dashboard reset to defaults');
-      }
-
-      function handleImportConfigFromFile(file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          elements.importExport.value = reader.result;
-          handleImportConfig();
-        };
-        reader.readAsText(file);
-      }
-
-      function openSettingsModal() {
-        elements.settingsModal.classList.add('show');
-        elements.modalBackdrop.classList.add('show');
-      }
-
-      function closeSettingsModal() {
-        elements.settingsModal.classList.remove('show');
-        elements.modalBackdrop.classList.remove('show');
-      }
-
-      function updateOfflineBanner(isOffline) {
-        if (isOffline) {
-          elements.offlineBanner.classList.add('show');
-        } else {
-          elements.offlineBanner.classList.remove('show');
-        }
-      }
-
-      function setFeedError(feedId, message) {
-        updateFeedStatus(feedId, { status: 'warn', message });
-        const feed = getFeed(feedId);
-        if (feed) {
-          setGlobalError(`${feed.name}: ${message}`);
-        }
-      }
-
-      function getOrderedFeeds() {
-        const map = new Map(state.feeds.map((feed) => [feed.id, feed]));
-        return state.feedOrder
-          .map((id) => map.get(id))
-          .filter(Boolean)
-          .concat(state.feeds.filter((feed) => !state.feedOrder.includes(feed.id)));
-      }
-
-      function getFeed(feedId) {
-        return state.feeds.find((feed) => feed.id === feedId);
-      }
-
-      function fetchWithTimeout(url, options = {}, timeout = MAX_TIMEOUT) {
-        const controller = new AbortController();
-        const id = setTimeout(() => controller.abort(), timeout);
-        return fetch(url, { ...options, signal: controller.signal })
-          .finally(() => clearTimeout(id));
-      }
-
-      function createLimiter(maxConcurrent) {
-        let active = 0;
-        const queue = [];
-        const runNext = () => {
-          if (active >= maxConcurrent || queue.length === 0) return;
-          const { task, resolve, reject } = queue.shift();
-          active += 1;
-          Promise.resolve()
-            .then(task)
-            .then(resolve)
-            .catch(reject)
-            .finally(() => {
-              active -= 1;
-              runNext();
-            });
-        };
-        return (task) =>
-          new Promise((resolve, reject) => {
-            queue.push({ task, resolve, reject });
-            runNext();
-          });
-      }
-
-      function getFeedByURL(url) {
-        const normalized = normalizeURL(url);
-        return state.feeds.find((feed) => feed.url && normalizeURL(feed.url) === normalized);
-      }
-
-      function isDuplicateURL(url) {
-        return Boolean(getFeedByURL(url));
-      }
-
-      function normalizeURL(url) {
-        try {
-          const fixed = url.startsWith('http') ? url : `https://${url}`;
-          const normalized = new URL(fixed);
-          normalized.hash = '';
-          return normalized.toString();
-        } catch (error) {
-          return url;
-        }
-      }
-
-      function isValidURL(url) {
-        if (!url) return false;
-        try {
-          const parsed = new URL(url.startsWith('http') ? url : `https://${url}`);
-          return ['http:', 'https:'].includes(parsed.protocol);
-        } catch (error) {
-          return false;
-        }
-      }
-
-      function sanitizeText(text) {
-        if (!text) return '';
-        return text.replace(/[\u0000-\u001F\u007F]/g, '').trim();
-      }
-
-      function sanitizeHTML(html) {
-        if (!html) return '';
-        const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
-        const disallowed = ['script', 'style', 'iframe', 'object', 'embed'];
-        disallowed.forEach((selector) => {
-          doc.querySelectorAll(selector).forEach((el) => el.remove());
-        });
-        doc.querySelectorAll('*').forEach((el) => {
-          [...el.attributes].forEach((attr) => {
-            if (attr.name.startsWith('on') || /javascript:/i.test(attr.value)) {
-              el.removeAttribute(attr.name);
+        function openContextMenu(item, x, y) {
+          contextItem = item;
+          const maxLeft = window.innerWidth - 220;
+          const maxTop = window.innerHeight - 200;
+          contextMenu.style.left = `${Math.max(12, Math.min(maxLeft, x - 110))}px`;
+          contextMenu.style.top = `${Math.max(12, Math.min(maxTop, y - 60))}px`;
+          contextMenu.dataset.open = "true";
+          contextMenu.setAttribute("aria-hidden", "false");
+          requestAnimationFrame(() => {
+            const focusTarget = contextMenu.querySelector("button");
+            if (focusTarget) {
+              focusTarget.focus({ preventScroll: true });
             }
           });
+        }
+        function handleContextSelection(action) {
+          if (!contextItem) {
+            return;
+          }
+          if (action === "open") {
+            openItem(contextItem);
+          } else if (action === "save") {
+            state.archivedIds.add(contextItem.id);
+            showToast("Saved for later", "success");
+            applyFilters(true);
+          } else if (action === "share") {
+            shareItem(contextItem);
+          }
+          closeContextMenu();
+        }
+        contextMenu.addEventListener("click", (event) => {
+          const button = event.target.closest("button[data-context]");
+          if (!button) {
+            return;
+          }
+          event.preventDefault();
+          handleContextSelection(button.dataset.context);
         });
-        return doc.body.textContent || '';
-      }
-
-      function safeURL(url, fallback = '#') {
-        if (!url) return fallback;
-        try {
-          const parsed = new URL(url, window.location.href);
-          if (!['http:', 'https:'].includes(parsed.protocol)) {
-            return fallback;
+        document.addEventListener("pointerdown", (event) => {
+          if (contextMenu.dataset.open === "true" && !contextMenu.contains(event.target)) {
+            closeContextMenu();
           }
-          parsed.hash = '';
-          return parsed.toString();
-        } catch (error) {
-          return fallback;
+        });
+        function setPullState(stateName) {
+          if (pullIndicator.dataset.state === stateName) {
+            return;
+          }
+          pullIndicator.dataset.state = stateName;
+          if (stateName === "ready") {
+            pullLabel.textContent = "Release to refresh";
+          } else if (stateName === "refresh") {
+            pullLabel.textContent = "Refreshing…";
+          } else {
+            pullLabel.textContent = "Pull to refresh";
+          }
         }
-      }
-
-      function escapeHTML(value) {
-        return String(value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#39;');
-      }
-
-      function escapeAttribute(value) {
-        return escapeHTML(value).replace(/`/g, '&#96;');
-      }
-
-      function truncate(text, length) {
-        if (!text) return '';
-        return text.length > length ? `${text.slice(0, length)}…` : text;
-      }
-
-      function formatRelativeTime(date) {
-        if (!(date instanceof Date) || isNaN(date)) return 'Unknown';
-        const diff = Date.now() - date.getTime();
-        const seconds = Math.round(diff / 1000);
-        if (seconds < 60) return 'Just now';
-        const minutes = Math.round(seconds / 60);
-        if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
-        const hours = Math.round(minutes / 60);
-        if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
-        const days = Math.round(hours / 24);
-        return `${days} day${days === 1 ? '' : 's'} ago`;
-      }
-
-      function formatDate(timestamp) {
-        const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
-        if (state.display.dateFormat === 'absolute') {
-          return date.toISOString().replace('T', ' ').slice(0, 16);
+        function resetPull(animated = true) {
+          const indicatorStyle = pullIndicator.style;
+          indicatorStyle.transition = animated ? "transform 0.32s cubic-bezier(0.33, 1, 0.68, 1)" : "none";
+          indicatorStyle.transform = "translateY(0px)";
+          if (animated) {
+            setTimeout(() => {
+              indicatorStyle.transition = "";
+            }, 340);
+          } else {
+            indicatorStyle.transition = "";
+          }
+          setPullState("idle");
+          pulling = false;
+          pullDistance = 0;
         }
-        return formatRelativeTime(date);
-      }
-
-      function chunkArray(array, size) {
-        const result = [];
-        for (let i = 0; i < array.length; i += size) {
-          result.push(array.slice(i, i + size));
+        async function triggerRefresh(origin = "pull") {
+          if (state.isRefreshing) {
+            return;
+          }
+          state.isRefreshing = true;
+          setPullState("refresh");
+          pullIndicator.style.transition = "transform 0.24s ease";
+          pullIndicator.style.transform = "translateY(52px)";
+          try {
+            await new Promise((resolve) => setTimeout(resolve, 640));
+            const incoming = populateItems(8);
+            state.items = [...incoming, ...state.items];
+            applyFilters(true);
+            feedScroller.scrollTo({ top: 0, behavior: "smooth" });
+            if (origin !== "auto") {
+              haptic([22, 12, 22]);
+            }
+            showToast("Feed updated", "success");
+          } catch (error) {
+            showToast(`Refresh failed: ${error.message || error}`, "error");
+          } finally {
+            state.isRefreshing = false;
+            resetPull();
+          }
         }
-        return result;
-      }
-
-      function debounce(callback, wait = 200) {
-        let timeoutId;
-        return function (...args) {
-          const context = this;
-          clearTimeout(timeoutId);
-          timeoutId = setTimeout(() => {
-            callback.apply(context, args);
-          }, wait);
+        async function loadMoreItems() {
+          if (state.loadingMore) {
+            return;
+          }
+          state.loadingMore = true;
+          listEndIndicator.textContent = "Loading more intelligence…";
+          listEndIndicator.setAttribute("aria-hidden", "false");
+          try {
+            await new Promise((resolve) => setTimeout(resolve, 720));
+            const more = populateItems(10);
+            state.items = [...state.items, ...more];
+            applyFilters(true);
+            state.page += 1;
+          } finally {
+            state.loadingMore = false;
+            listEndIndicator.textContent = "You're all caught up.";
+          }
+        }
+        function updateOfflineButton() {
+          const label = state.offlineEnabled ? "Disable offline cache" : "Enable offline cache";
+          toggleOfflineButton.innerHTML = `${label}<span aria-hidden="true">•</span>`;
+          toggleOfflineButton.setAttribute("aria-pressed", state.offlineEnabled ? "true" : "false");
+        }
+        function setQuickSheetOpen(open) {
+          quickSheet.dataset.open = open ? "true" : "false";
+          quickSheet.setAttribute("aria-hidden", open ? "false" : "true");
+          quickActionsButton.setAttribute("aria-expanded", open ? "true" : "false");
+          if (!open) {
+            sheetPanel.style.transform = "";
+            quickActionsButton.focus({ preventScroll: true });
+            return;
+          }
+          requestAnimationFrame(() => {
+            const first = quickSheet.querySelector("button");
+            first?.focus({ preventScroll: true });
+          });
+        }
+        function setMenuOpen(open) {
+          menuDrawer.dataset.open = open ? "true" : "false";
+          menuDrawer.setAttribute("aria-hidden", open ? "false" : "true");
+          menuButton.setAttribute("aria-expanded", open ? "true" : "false");
+          if (!open) {
+            drawerPanel.style.transform = "";
+            menuButton.focus({ preventScroll: true });
+            return;
+          }
+          requestAnimationFrame(() => {
+            const first = drawerPanel.querySelector("a,button");
+            first?.focus({ preventScroll: true });
+          });
+        }
+        function setSettingsOpen(open, focusField = false) {
+          settingsOverlay.dataset.open = open ? "true" : "false";
+          settingsOverlay.setAttribute("aria-hidden", open ? "false" : "true");
+          if (!open) {
+            overlayPanel.style.transform = "";
+            overlayPanel.style.opacity = "";
+            if (lastOverlayTrigger) {
+              lastOverlayTrigger.focus({ preventScroll: true });
+              lastOverlayTrigger = null;
+            }
+            return;
+          }
+          requestAnimationFrame(() => {
+            if (focusField) {
+              feedUrlInput.focus({ preventScroll: true });
+            } else {
+              const focusable = overlayPanel.querySelector("input,select,button");
+              focusable?.focus({ preventScroll: true });
+            }
+          });
+        }
+        function attachSheetGestures() {
+          if (!sheetHandle) {
+            return;
+          }
+          let pointerId = null;
+          let startY = 0;
+          let currentY = 0;
+          let dragging = false;
+          const endDrag = (event) => {
+            if (!dragging || event.pointerId !== pointerId) {
+              return;
+            }
+            dragging = false;
+            sheetHandle.releasePointerCapture(pointerId);
+            sheetPanel.style.transition = "";
+            if (currentY > 120) {
+              setQuickSheetOpen(false);
+            } else {
+              sheetPanel.style.transform = "";
+            }
+          };
+          sheetHandle.addEventListener("pointerdown", (event) => {
+            if (event.pointerType === "mouse" || quickSheet.dataset.open !== "true") {
+              return;
+            }
+            pointerId = event.pointerId;
+            startY = event.clientY;
+            currentY = 0;
+            dragging = true;
+            sheetPanel.style.transition = "none";
+            sheetHandle.setPointerCapture(pointerId);
+          });
+          sheetHandle.addEventListener("pointermove", (event) => {
+            if (!dragging || event.pointerId !== pointerId) {
+              return;
+            }
+            const delta = Math.max(0, event.clientY - startY);
+            currentY = delta;
+            sheetPanel.style.transform = `translateY(${delta}px)`;
+          });
+          sheetHandle.addEventListener("pointerup", endDrag);
+          sheetHandle.addEventListener("pointercancel", endDrag);
+        }
+        function attachDrawerGestures() {
+          if (!drawerPanel) {
+            return;
+          }
+          let pointerId = null;
+          let startX = 0;
+          let translateX = 0;
+          let dragging = false;
+          const finishDrag = (event) => {
+            if (!dragging || event.pointerId !== pointerId) {
+              return;
+            }
+            dragging = false;
+            drawerPanel.releasePointerCapture(pointerId);
+            drawerPanel.style.transition = "";
+            if (Math.abs(translateX) > drawerPanel.offsetWidth * 0.35) {
+              setMenuOpen(false);
+            } else {
+              drawerPanel.style.transform = "";
+            }
+          };
+          drawerPanel.addEventListener("pointerdown", (event) => {
+            if (event.pointerType === "mouse" || menuDrawer.dataset.open !== "true") {
+              return;
+            }
+            pointerId = event.pointerId;
+            startX = event.clientX;
+            translateX = 0;
+            dragging = true;
+            drawerPanel.style.transition = "none";
+            drawerPanel.setPointerCapture(pointerId);
+          });
+          drawerPanel.addEventListener("pointermove", (event) => {
+            if (!dragging || event.pointerId !== pointerId) {
+              return;
+            }
+            const delta = event.clientX - startX;
+            if (delta < 0) {
+              event.preventDefault();
+              translateX = Math.max(delta, -drawerPanel.offsetWidth);
+              drawerPanel.style.transform = `translateX(${translateX}px)`;
+            }
+          }, { passive: false });
+          drawerPanel.addEventListener("pointerup", finishDrag);
+          drawerPanel.addEventListener("pointercancel", finishDrag);
+        }
+        function attachOverlaySwipe() {
+          if (!overlayPanel) {
+            return;
+          }
+          let pointerId = null;
+          let startX = 0;
+          let translateX = 0;
+          let dragging = false;
+          const stopSwipe = (event) => {
+            if (!dragging || event.pointerId !== pointerId) {
+              return;
+            }
+            dragging = false;
+            overlayPanel.releasePointerCapture(pointerId);
+            overlayPanel.style.transition = "";
+            if (translateX > overlayPanel.offsetWidth * 0.35) {
+              setSettingsOpen(false);
+            } else {
+              overlayPanel.style.transform = "";
+              overlayPanel.style.opacity = "";
+            }
+          };
+          overlayPanel.addEventListener("pointerdown", (event) => {
+            if (event.pointerType === "mouse" || settingsOverlay.dataset.open !== "true") {
+              return;
+            }
+            const bounds = overlayPanel.getBoundingClientRect();
+            if (event.clientX - bounds.left > 36) {
+              return;
+            }
+            pointerId = event.pointerId;
+            startX = event.clientX;
+            translateX = 0;
+            dragging = true;
+            overlayPanel.style.transition = "none";
+            overlayPanel.setPointerCapture(pointerId);
+          });
+          overlayPanel.addEventListener("pointermove", (event) => {
+            if (!dragging || event.pointerId !== pointerId) {
+              return;
+            }
+            const delta = event.clientX - startX;
+            if (delta > 0) {
+              event.preventDefault();
+              translateX = Math.min(delta, overlayPanel.offsetWidth);
+              overlayPanel.style.transform = `translateX(${translateX}px)`;
+              overlayPanel.style.opacity = `${Math.max(0.2, 1 - translateX / overlayPanel.offsetWidth)}`;
+            }
+          }, { passive: false });
+          overlayPanel.addEventListener("pointerup", stopSwipe);
+          overlayPanel.addEventListener("pointercancel", stopSwipe);
+        }
+        const infiniteObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !state.loadingMore && !state.isRefreshing) {
+              loadMoreItems();
+            }
+          });
+        }, { root: feedScroller, threshold: 0.1 });
+        infiniteObserver.observe(infiniteSentinel);
+        filterButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            const filter = button.dataset.filter;
+            if (state.activeFilter === filter) {
+              return;
+            }
+            filterButtons.forEach((chip) => {
+              const active = chip === button;
+              chip.dataset.active = active ? "true" : "false";
+              chip.setAttribute("aria-pressed", active ? "true" : "false");
+            });
+            state.activeFilter = filter;
+            applyFilters(true);
+            haptic(18);
+          });
+        });
+        searchInput.addEventListener("input", () => {
+          clearTimeout(searchTimer);
+          searchTimer = window.setTimeout(() => {
+            state.searchTerm = searchInput.value.trim().toLowerCase();
+            applyFilters(true);
+          }, 300);
+        });
+        searchInput.addEventListener("search", () => {
+          clearTimeout(searchTimer);
+          state.searchTerm = searchInput.value.trim().toLowerCase();
+          applyFilters(true);
+        });
+        quickActionsButton.addEventListener("click", () => {
+          const open = quickSheet.dataset.open === "true";
+          setQuickSheetOpen(!open);
+        });
+        refreshNowButton.addEventListener("click", () => {
+          setQuickSheetOpen(false);
+          triggerRefresh("manual");
+        });
+        toggleOfflineButton.addEventListener("click", () => {
+          state.offlineEnabled = !state.offlineEnabled;
+          updateOfflineButton();
+          showToast(state.offlineEnabled ? "Offline cache enabled" : "Offline cache disabled", "info");
+          haptic(16);
+        });
+        shareAppButton.addEventListener("click", async () => {
+          setQuickSheetOpen(false);
+          try {
+            if (navigator.share) {
+              await navigator.share({ title: document.title, text: "Check out this mobile-first HackerTab Pro experience", url: window.location.href });
+            } else if (navigator.clipboard) {
+              await navigator.clipboard.writeText(window.location.href);
+              showToast("Link copied", "success");
+            }
+          } catch (error) {
+            showToast(`Share failed: ${error.message || error}`, "error");
+          }
+        });
+        menuButton.addEventListener("click", () => {
+          setMenuOpen(true);
+        });
+        manageFeedsButton.addEventListener("click", () => {
+          lastOverlayTrigger = manageFeedsButton;
+          setSettingsOpen(true);
+        });
+        addFeedButton.addEventListener("click", () => {
+          lastOverlayTrigger = addFeedButton;
+          setSettingsOpen(true, true);
+        });
+        document.addEventListener("click", (event) => {
+          const target = event.target.closest("[data-close]");
+          if (!target) {
+            return;
+          }
+          if (target.dataset.close === "quick") {
+            setQuickSheetOpen(false);
+          } else if (target.dataset.close === "settings") {
+            setSettingsOpen(false);
+          } else if (target.dataset.close === "menu") {
+            setMenuOpen(false);
+          }
+        });
+        document.addEventListener("keydown", (event) => {
+          if (event.key !== "Escape") {
+            return;
+          }
+          if (contextMenu.dataset.open === "true") {
+            closeContextMenu();
+          } else if (quickSheet.dataset.open === "true") {
+            setQuickSheetOpen(false);
+          } else if (settingsOverlay.dataset.open === "true") {
+            setSettingsOpen(false);
+          } else if (menuDrawer.dataset.open === "true") {
+            setMenuOpen(false);
+          }
+        });
+        feedScroller.addEventListener("scroll", () => {
+          if (contextMenu.dataset.open === "true") {
+            closeContextMenu();
+          }
+          if (!scrollFrame) {
+            scrollFrame = requestAnimationFrame(() => {
+              scrollFrame = 0;
+              updateVirtualWindow();
+            });
+          }
+        });
+        feedScroller.addEventListener("touchstart", (event) => {
+          if (state.isRefreshing) {
+            return;
+          }
+          if (feedScroller.scrollTop <= 0) {
+            pulling = true;
+            pullStartY = event.touches[0].clientY;
+            pullIndicator.style.transition = "none";
+          }
+        }, { passive: true });
+        feedScroller.addEventListener("touchmove", (event) => {
+          if (!pulling) {
+            return;
+          }
+          const currentY = event.touches[0].clientY;
+          const delta = currentY - pullStartY;
+          if (delta <= 0) {
+            pullDistance = 0;
+            pullIndicator.style.transform = "translateY(0px)";
+            setPullState("idle");
+            return;
+          }
+          if (feedScroller.scrollTop > 0) {
+            pulling = false;
+            resetPull(false);
+            return;
+          }
+          event.preventDefault();
+          pullDistance = Math.min(PULL_MAX, delta * PULL_DAMPING);
+          pullIndicator.style.transform = `translateY(${pullDistance}px)`;
+          setPullState(pullDistance > PULL_TRIGGER ? "ready" : "pull");
+        }, { passive: false });
+        const endPull = () => {
+          if (!pulling) {
+            return;
+          }
+          if (pullDistance > PULL_TRIGGER) {
+            triggerRefresh("pull");
+          } else {
+            resetPull();
+          }
         };
-      }
-
-      function clamp(value, min, max) {
-        if (Number.isNaN(value)) return min;
-        return Math.min(Math.max(value, min), max);
-      }
-
-      function showToast(message) {
-        elements.toast.textContent = message;
-        elements.toast.classList.add('show');
-        clearTimeout(showToast.timeoutId);
-        showToast.timeoutId = setTimeout(() => {
-          elements.toast.classList.remove('show');
-        }, 2800);
-      }
-
-      function setGlobalError(message, sticky = false) {
-        if (!message) {
-          elements.errorBanner.textContent = '';
-          elements.errorBanner.classList.remove('show');
-          if (globalErrorTimeout) {
-            clearTimeout(globalErrorTimeout);
-            globalErrorTimeout = null;
+        feedScroller.addEventListener("touchend", endPull);
+        feedScroller.addEventListener("touchcancel", () => {
+          if (pulling) {
+            resetPull();
           }
-          return;
-        }
-        elements.errorBanner.textContent = message;
-        elements.errorBanner.classList.add('show');
-        if (!sticky) {
-          if (globalErrorTimeout) {
-            clearTimeout(globalErrorTimeout);
+        });
+        notifyButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            notifyButtons.forEach((btn) => btn.classList.toggle("primary", btn === button));
+            showToast(`Notifications set to ${button.dataset.notify}`, "info");
+            haptic(12);
+          });
+        });
+        feedForm.addEventListener("submit", (event) => {
+          event.preventDefault();
+          const url = feedUrlInput.value.trim();
+          if (!url) {
+            feedUrlError.textContent = "Enter a feed URL.";
+            feedUrlError.hidden = false;
+            feedUrlInput.focus();
+            return;
           }
-          globalErrorTimeout = setTimeout(() => {
-            elements.errorBanner.classList.remove('show');
-            elements.errorBanner.textContent = '';
-          }, 6000);
+          if (!feedUrlInput.checkValidity()) {
+            feedUrlError.textContent = "Provide a valid http or https URL.";
+            feedUrlError.hidden = false;
+            feedUrlInput.focus();
+            return;
+          }
+          subscriptions.add(url);
+          renderSettingsList();
+          feedUrlInput.value = "";
+          feedUrlError.hidden = true;
+          feedUrlError.textContent = "";
+          showToast("Source saved", "success");
+        });
+        feedUrlInput.addEventListener("input", () => {
+          if (!feedUrlError.hidden) {
+            feedUrlError.hidden = true;
+            feedUrlError.textContent = "";
+          }
+        });
+        window.addEventListener("resize", () => {
+          updateVirtualWindow(true);
+        });
+        document.addEventListener("visibilitychange", () => {
+          if (!document.hidden && !state.isRefreshing) {
+            updateVirtualWindow(true);
+          }
+        });
+        attachSheetGestures();
+        attachDrawerGestures();
+        attachOverlaySwipe();
+        updateOfflineButton();
+        renderSettingsList();
+        loadInitialData();
+        if ("serviceWorker" in navigator) {
+          const swSource = `const CACHE_NAME = "hackertab-mobile-v1";
+const CORE = ["./"]; 
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE)).then(() => self.skipWaiting())
+  );
+});
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))).then(() => self.clients.claim())
+  );
+});
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  if (request.method !== "GET") {
+    return;
+  }
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      const networkFetch = fetch(request)
+        .then((response) => {
+          const copy = response.clone();
+          const sameOrigin = new URL(request.url).origin === self.location.origin;
+          if (sameOrigin && response.status === 200) {
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() => cached);
+      return cached || networkFetch;
+    })
+  );
+});`;
+          const swBlob = new Blob([swSource], { type: "application/javascript" });
+          const swUrl = URL.createObjectURL(swBlob);
+          navigator.serviceWorker.register(swUrl).catch((error) => {
+            console.warn("Service worker registration failed", error);
+          });
+          window.addEventListener("pagehide", () => URL.revokeObjectURL(swUrl), { once: true });
         }
-      }
-
-      function copyToClipboardFallback() {
-        try {
-          elements.importExport.focus();
-          elements.importExport.select();
-          return document.execCommand && document.execCommand('copy');
-        } catch (error) {
-          return false;
-        }
-      }
-
-      function updateBusyState() {
-        elements.feedList.setAttribute('aria-busy', inflightFetches.size ? 'true' : 'false');
-      }
-
-      // Manual file import (optional)
-      elements.importExport.addEventListener('drop', (event) => {
-        event.preventDefault();
-        if (event.dataTransfer.files.length) {
-          handleImportConfigFromFile(event.dataTransfer.files[0]);
-        }
-      });
-      elements.importExport.addEventListener('dragover', (event) => event.preventDefault());
-
-    })();
-  </script>
-</body>
+      })();
+    </script>
+  </body>
 </html>
