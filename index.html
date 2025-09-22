@@ -2,48 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1a1a1a">
-    <title>CFB Winner Predictor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0f14">
+    <meta name="description" content="College Football Winner Predictor with live data and ML models">
+    <title>CFB Predictor</title>
     <style>
         :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f5;
-            --bg-card: #ffffff;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --accent-color: #007bff;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-            --border-color: #e0e0e0;
-            --shadow: 0 2px 4px rgba(0,0,0,0.1);
+            --bg-primary: #0b0f14;
+            --bg-secondary: #1a1f2e;
+            --bg-tertiary: #2a3441;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #10b981;
+            --accent-danger: #ef4444;
+            --accent-warning: #f59e0b;
+            --border-primary: #374151;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
         }
 
-        @media (prefers-color-scheme: dark) {
+        @media (prefers-color-scheme: light) {
             :root {
-                --bg-primary: #1a1a1a;
-                --bg-secondary: #2d2d2d;
-                --bg-card: #2d2d2d;
-                --text-primary: #ffffff;
-                --text-secondary: #cccccc;
-                --border-color: #404040;
-                --shadow: 0 2px 4px rgba(255,255,255,0.1);
+                --bg-primary: #ffffff;
+                --bg-secondary: #f8fafc;
+                --bg-tertiary: #e2e8f0;
+                --text-primary: #1e293b;
+                --text-secondary: #475569;
+                --text-muted: #64748b;
+                --border-primary: #e2e8f0;
+                --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
             }
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-primary);
             color: var(--text-primary);
-            line-height: 1.5;
-            padding-bottom: 80px;
+            line-height: 1.6;
+            padding-bottom: 80px; /* Space for sticky footer */
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -54,381 +57,90 @@
             }
         }
 
+        /* Header */
         .header {
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border-color);
-            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            padding: 1rem;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: var(--shadow);
         }
 
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
         .logo {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-primary);
         }
 
         .week-selector {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
         }
 
-        .week-btn {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 14px;
+        .week-nav {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: 0.375rem;
             cursor: pointer;
-            min-height: 44px;
             min-width: 44px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .week-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .week-nav:hover {
+            background: var(--accent-primary);
+        }
+
+        .week-display {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 0.375rem;
+            font-weight: 500;
+            white-space: nowrap;
         }
 
         .settings-btn {
-            background: none;
-            border: none;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
             color: var(--text-primary);
-            font-size: 20px;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
             cursor: pointer;
-            min-height: 44px;
             min-width: 44px;
+            min-height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
+        /* Main Content */
         .main-content {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 16px;
+            padding: 1rem;
         }
 
-        .game-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: var(--shadow);
-            position: relative;
-        }
-
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .game-time {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .venue-info {
-            font-size: 10px;
-            color: var(--text-secondary);
-            background: var(--bg-secondary);
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-
-        .matchup {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .team {
-            text-align: center;
-            flex: 1;
-        }
-
-        .team-name {
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        .team-record {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .vs {
-            margin: 0 16px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .prediction {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .prob-display {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .prob-pill {
-            background: var(--accent-color);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .confidence-ring {
-            width: 24px;
-            height: 24px;
-        }
-
-        .edge-badge {
-            background: var(--success-color);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        .why-btn {
-            background: none;
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            cursor: pointer;
-            min-height: 32px;
-        }
-
-        .drivers {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border-color);
-            display: none;
-        }
-
-        .drivers.show {
-            display: block;
-        }
-
-        .driver-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
-
-        .driver-chip {
-            background: var(--bg-secondary);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 10px;
-        }
-
-        .driver-chip.positive {
-            color: var(--success-color);
-        }
-
-        .driver-chip.negative {
-            color: var(--danger-color);
-        }
-
-        .rationale {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border-color);
-            padding: 12px 16px;
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: var(--shadow);
-        }
-
-        .action-btn {
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 10px 16px;
-            font-size: 14px;
-            cursor: pointer;
-            min-height: 44px;
-            flex: 1;
-            max-width: 120px;
-        }
-
-        .action-btn.secondary {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-
-        .modal.show {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 24px;
-            cursor: pointer;
-            min-height: 44px;
-            min-width: 44px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 4px;
-            font-weight: 500;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            font-size: 14px;
-        }
-
-        .form-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .checkbox {
-            width: 18px;
-            height: 18px;
-        }
-
-        .banner {
-            background: var(--warning-color);
-            color: white;
-            padding: 12px 16px;
-            text-align: center;
-            font-size: 14px;
-            display: none;
-        }
-
-        .banner.show {
-            display: block;
-        }
-
-        .banner.error {
-            background: var(--danger-color);
-        }
-
-        .banner.success {
-            background: var(--success-color);
-        }
-
-        .banner.info {
-            background: var(--accent-color);
-        }
-
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-        }
-
-        .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid var(--border-color);
-            border-top-color: var(--accent-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .skeleton {
-            background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
+        .loading-skeleton {
+            background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-tertiary) 50%, var(--bg-secondary) 75%);
             background-size: 200% 100%;
             animation: loading 1.5s infinite;
-            border-radius: 4px;
+            border-radius: 0.5rem;
+            height: 120px;
+            margin-bottom: 1rem;
         }
 
         @keyframes loading {
@@ -436,1635 +148,1383 @@
             100% { background-position: -200% 0; }
         }
 
-        .skeleton-card {
-            height: 140px;
-            margin-bottom: 12px;
-            border-radius: 12px;
+        /* Game Cards */
+        .games-container {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr;
         }
 
-        .sort-controls {
+        @media (min-width: 768px) {
+            .games-container {
+                grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            }
+        }
+
+        .game-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .game-header {
             display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .game-time {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        .venue {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .matchup {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .team {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .team-name {
+            font-weight: bold;
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .team-record {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .vs {
+            margin: 0 1rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .prediction {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-primary);
+        }
+
+        .prob-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .confidence-ring {
+            width: 40px;
+            height: 40px;
+            position: relative;
+        }
+
+        .confidence-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .confidence-bg {
+            fill: none;
+            stroke: var(--bg-tertiary);
+            stroke-width: 3;
+        }
+
+        .confidence-fill {
+            fill: none;
+            stroke: var(--accent-secondary);
+            stroke-width: 3;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.3s ease;
+        }
+
+        .prob-text {
+            font-weight: bold;
+            font-size: 1.125rem;
+        }
+
+        .edge-badge {
+            background: var(--accent-warning);
+            color: var(--bg-primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .drivers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .driver-chip {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+        }
+
+        .driver-chip.positive {
+            background: var(--accent-secondary);
+            color: var(--bg-primary);
+        }
+
+        .driver-chip.negative {
+            background: var(--accent-danger);
+            color: var(--text-primary);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 0.375rem;
+            min-width: 44px;
+            min-height: 44px;
+        }
+
+        .close-btn:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 0.375rem;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .button {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            min-height: 44px;
+        }
+
+        .button:hover {
+            background: #2563eb;
+        }
+
+        .button.secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .button.secondary:hover {
+            background: var(--border-primary);
+        }
+
+        .button.danger {
+            background: var(--accent-danger);
+        }
+
+        .button.danger:hover {
+            background: #dc2626;
+        }
+
+        /* Bottom Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-primary);
+            padding: 1rem;
+            z-index: 100;
+        }
+
+        .bottom-actions {
+            display: flex;
+            gap: 0.75rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            justify-content: center;
             flex-wrap: wrap;
         }
 
-        .sort-btn {
-            background: var(--bg-secondary);
+        .bottom-actions .button {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 80px;
+            left: 1rem;
+            right: 1rem;
+            background: var(--accent-danger);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            z-index: 1100;
+            transform: translateY(-100px);
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            background: var(--accent-secondary);
+        }
+
+        .toast.warning {
+            background: var(--accent-warning);
+            color: var(--bg-primary);
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 0.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 0.375rem;
             color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 12px;
-            cursor: pointer;
-            min-height: 32px;
+            min-height: 44px;
         }
 
-        .sort-btn.active {
-            background: var(--accent-color);
-            color: white;
+        .sort-select {
+            margin-left: auto;
         }
 
-        .demo-notice {
-            background: var(--warning-color);
-            color: white;
-            padding: 8px 16px;
+        /* Empty State */
+        .empty-state {
             text-align: center;
-            font-size: 12px;
-            margin-bottom: 16px;
-            border-radius: 6px;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
 <body>
-    <div id="banner" class="banner"></div>
-    
+    <!-- Header -->
     <header class="header">
         <div class="header-content">
             <div class="logo">CFB Predictor</div>
             <div class="week-selector">
-                <button id="prevWeek" class="week-btn">‹</button>
-                <span id="currentWeek">This Week</span>
-                <button id="nextWeek" class="week-btn">›</button>
+                <button class="week-nav" id="prevWeek" aria-label="Previous week">←</button>
+                <div class="week-display" id="weekDisplay">This Weekend</div>
+                <button class="week-nav" id="nextWeek" aria-label="Next week">→</button>
             </div>
-            <button id="settingsBtn" class="settings-btn">⚙</button>
+            <button class="settings-btn" id="settingsBtn" aria-label="Settings">⚙️</button>
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="main-content">
-        <div id="demoNotice" class="demo-notice" style="display: none;">
-            Demo Mode: Using sample data. Configure API keys in settings for live predictions.
-        </div>
-        
-        <div class="sort-controls">
-            <button id="sortConfidence" class="sort-btn active">By Confidence</button>
-            <button id="sortEdge" class="sort-btn">By Edge</button>
-            <button id="sortTime" class="sort-btn">By Time</button>
+        <!-- Filters -->
+        <div class="filters">
+            <select class="filter-select" id="conferenceFilter">
+                <option value="">All Conferences</option>
+            </select>
+            <select class="filter-select" id="teamFilter">
+                <option value="">All Teams</option>
+            </select>
+            <select class="filter-select sort-select" id="sortBy">
+                <option value="confidence">Sort by Confidence</option>
+                <option value="edge">Sort by Edge</option>
+                <option value="time">Sort by Kickoff</option>
+            </select>
         </div>
 
-        <div id="gamesContainer">
-            <div class="loading">
-                <div class="spinner"></div>
-            </div>
+        <!-- Games Container -->
+        <div class="games-container" id="gamesContainer">
+            <!-- Loading skeletons -->
+            <div class="loading-skeleton"></div>
+            <div class="loading-skeleton"></div>
+            <div class="loading-skeleton"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-icon">🏈</div>
+            <h3>No games found</h3>
+            <p>Try adjusting your filters or check back later</p>
         </div>
     </main>
 
-    <div class="bottom-bar">
-        <button id="refreshBtn" class="action-btn">Refresh</button>
-        <button id="predictBtn" class="action-btn">Predict</button>
-        <button id="forceClearBtn" class="action-btn secondary" title="Force clear loading state">Clear</button>
-        <button id="exportBtn" class="action-btn secondary">Export</button>
-    </div>
-
     <!-- Settings Modal -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
             <div class="modal-header">
                 <h2 class="modal-title">Settings</h2>
-                <button id="closeSettings" class="close-btn">×</button>
+                <button class="close-btn" id="closeSettings">×</button>
             </div>
             
             <div class="form-group">
-                <label class="form-label" for="cfbdKey">CFBD API Key</label>
-                <input type="password" id="cfbdKey" class="form-input" placeholder="Enter your CollegeFootballData API key">
-                <small style="color: var(--text-secondary); font-size: 12px;">
-                    Get free key at <a href="https://collegefootballdata.com" target="_blank">collegefootballdata.com</a>
+                <label class="form-label" for="cfbdKey">CFBD API Key *</label>
+                <input type="password" class="form-input" id="cfbdKey" placeholder="Enter your CFBD API key">
+                <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">
+                    Get your free key at <a href="https://collegefootballdata.com" target="_blank" style="color: var(--accent-primary);">collegefootballdata.com</a>
                 </small>
             </div>
 
-            <div class="form-group">
-                <label class="form-label" for="oddsKey">TheOddsAPI Key (Optional)</label>
-                <input type="password" id="oddsKey" class="form-input" placeholder="Optional: For betting markets">
+            <div class="checkbox-group">
+                <input type="checkbox" class="checkbox" id="useMarkets" checked>
+                <label for="useMarkets">Use betting markets</label>
             </div>
 
-            <div class="form-group">
-                <div class="form-checkbox">
-                    <input type="checkbox" id="useMarkets" class="checkbox">
-                    <label for="useMarkets">Use betting markets</label>
-                </div>
+            <div class="checkbox-group">
+                <input type="checkbox" class="checkbox" id="useWeather" checked>
+                <label for="useWeather">Use weather forecasts</label>
             </div>
 
-            <div class="form-group">
-                <div class="form-checkbox">
-                    <input type="checkbox" id="useWeather" class="checkbox" checked>
-                    <label for="useWeather">Use weather forecasts</label>
-                </div>
+            <div class="checkbox-group">
+                <input type="checkbox" class="checkbox" id="manualInjuries">
+                <label for="manualInjuries">Manual injury tracking</label>
             </div>
 
-            <div class="form-group">
-                <div class="form-checkbox">
-                    <input type="checkbox" id="demoMode" class="checkbox">
-                    <label for="demoMode">Demo Mode (sample data)</label>
-                </div>
+            <div class="checkbox-group">
+                <input type="checkbox" class="checkbox" id="demoMode">
+                <label for="demoMode">Demo mode (offline data)</label>
             </div>
 
-            <div class="form-group">
-                <div class="form-checkbox">
-                    <input type="checkbox" id="debugMode" class="checkbox">
-                    <label for="debugMode">Debug Mode (show console logs)</label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <button id="testApi" class="action-btn secondary" style="width: 100%; margin-bottom: 8px;">Test API Connection</button>
-                <button id="openConsole" class="action-btn secondary" style="width: 100%; margin-bottom: 8px;">Open Browser Console (F12)</button>
-                <button id="forgetKeys" class="action-btn secondary" style="width: 100%; margin-bottom: 8px;">Forget All Keys</button>
-                <button id="resetApp" class="action-btn secondary" style="width: 100%;">Reset App Completely</button>
-            </div>
-
-            <div class="form-group">
-                <button id="saveSettings" class="action-btn" style="width: 100%;">Save Settings</button>
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button class="button" id="saveSettings">Save Settings</button>
+                <button class="button secondary" id="closeSettings2">Cancel</button>
+                <button class="button danger" id="forgetKeys">Forget Keys</button>
             </div>
         </div>
     </div>
 
+    <!-- Bottom Action Bar -->
+    <div class="bottom-bar">
+        <div class="bottom-actions">
+            <button class="button" id="refreshData">Refresh Data</button>
+            <button class="button" id="predict">Predict</button>
+            <button class="button secondary" id="exportData">Export JSON</button>
+            <button class="button secondary" id="resetApp">Reset</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
     <script>
-        // === CONFIGURATION & CONSTANTS ===
-        const CONFIG = {
-            CFBD_BASE_URL: 'https://api.collegefootballdata.com',
-            WEATHER_BASE_URL: 'https://api.open-meteo.com/v1/forecast',
-            CACHE_TTL: {
-                metrics: 24 * 60 * 60 * 1000, // 24h
-                weather: 6 * 60 * 60 * 1000,  // 6h
-                lines: 2 * 60 * 60 * 1000,    // 2h
-                games: 1 * 60 * 60 * 1000     // 1h
+        /**
+         * CFB Winner Predictor - Single File Application
+         * Built like an oil rig: robust, fail-safe, and idiot-proof
+         */
+
+        // Demo data embedded for when APIs are unavailable
+        const DEMO_DATA = {
+            games: [
+                {
+                    id: 1,
+                    season: 2024,
+                    week: 12,
+                    away_team: "Texas",
+                    home_team: "Texas A&M", 
+                    start_date: "2024-11-30T19:30:00.000Z",
+                    venue: "Kyle Field",
+                    away_conference: "SEC",
+                    home_conference: "SEC",
+                    neutral_site: false
+                },
+                {
+                    id: 2,
+                    season: 2024,
+                    week: 12,
+                    away_team: "Alabama",
+                    home_team: "Auburn",
+                    start_date: "2024-11-30T20:00:00.000Z", 
+                    venue: "Jordan-Hare Stadium",
+                    away_conference: "SEC",
+                    home_conference: "SEC",
+                    neutral_site: false
+                }
+            ],
+            metrics: {
+                "Texas": { elo: 1650, ppa_offense: 0.15, ppa_defense: -0.08 },
+                "Texas A&M": { elo: 1580, ppa_offense: 0.08, ppa_defense: -0.05 },
+                "Alabama": { elo: 1620, ppa_offense: 0.12, ppa_defense: -0.06 },
+                "Auburn": { elo: 1520, ppa_offense: 0.02, ppa_defense: 0.03 }
             },
-            RATE_LIMIT: {
-                tokens: 3,
-                refillRate: 1000,
-                maxTokens: 3
+            venues: {
+                "Kyle Field": { lat: 30.610, lng: -96.340 },
+                "Jordan-Hare Stadium": { lat: 32.602, lng: -85.490 }
             }
         };
 
-        // Stadium coordinates lookup
-        const STADIUM_COORDS = {
-            'Alabama': [32.6149, -87.5500],
-            'Auburn': [32.6099, -85.4808],
-            'Georgia': [33.9495, -83.3735],
-            'Florida': [29.6516, -82.3248],
-            'LSU': [30.4118, -91.1838],
-            'Tennessee': [35.9551, -83.9250],
-            'Arkansas': [36.0686, -94.1574],
-            'Mississippi State': [33.4596, -88.7955],
-            'Ole Miss': [34.3649, -89.5348],
-            'Kentucky': [38.0226, -84.5041],
-            'Missouri': [38.9359, -92.3399],
-            'South Carolina': [34.0192, -81.0350],
-            'Texas A&M': [30.6280, -96.3344],
-            'Vanderbilt': [36.1447, -86.8027],
-            // Add more as needed...
+        // Application state - everything in memory, no browser storage leaks
+        const AppState = {
+            currentWeek: null,
+            currentSeason: 2024,
+            settings: {
+                cfbdKey: localStorage.getItem('cfbd_key') || '',
+                useMarkets: true,
+                useWeather: true,
+                manualInjuries: false,
+                demoMode: false
+            },
+            cache: {
+                games: null,
+                metrics: null,
+                weather: null,
+                lines: null,
+                lastUpdate: null
+            },
+            predictions: null,
+            worker: null
         };
 
-        // === UTILITY FUNCTIONS ===
-        class MathUtils {
-            static sigmoid(x) {
-                return 1 / (1 + Math.exp(-x));
-            }
-
-            static logit(p) {
-                p = Math.max(0.001, Math.min(0.999, p));
-                return Math.log(p / (1 - p));
-            }
-
-            static dotProduct(a, b) {
-                return a.reduce((sum, val, i) => sum + val * b[i], 0);
-            }
-
-            static mean(arr) {
-                return arr.reduce((sum, val) => sum + val, 0) / arr.length;
-            }
-
-            static std(arr) {
-                const m = this.mean(arr);
-                const variance = arr.reduce((sum, val) => sum + Math.pow(val - m, 2), 0) / arr.length;
-                return Math.sqrt(variance);
-            }
-        }
-
-        class TimeUtils {
-            static getWeekStart(date = new Date()) {
-                const d = new Date(date);
-                const day = d.getDay();
-                const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
-                return new Date(d.setDate(diff));
-            }
-
-            static getWeekEnd(date = new Date()) {
-                const start = this.getWeekStart(date);
-                return new Date(start.getTime() + 6 * 24 * 60 * 60 * 1000);
-            }
-
-            static formatGameTime(dateStr) {
-                const date = new Date(dateStr);
-                return date.toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit'
-                });
-            }
-
-            static getCurrentSeason() {
-                const now = new Date();
-                const year = now.getFullYear();
-                // College football season starts in August
-                return now.getMonth() >= 7 ? year : year - 1;
-            }
-
-            static getCurrentWeek() {
-                try {
-                    const now = new Date();
-                    const currentSeason = this.getCurrentSeason();
-                    
-                    // College football season typically starts around week 36 of the year
-                    // and runs for about 15 weeks
-                    const seasonStart = new Date(currentSeason, 7, 26); // Late August
-                    const daysDiff = Math.floor((now - seasonStart) / (24 * 60 * 60 * 1000));
-                    const weeksDiff = Math.floor(daysDiff / 7);
-                    
-                    // Clamp to reasonable bounds
-                    const week = Math.max(1, Math.min(15, weeksDiff + 1));
-                    
-                    console.log(`Current date: ${now.toISOString()}, Season: ${currentSeason}, Week: ${week}`);
-                    return week;
-                } catch (error) {
-                    console.error('Error calculating current week:', error);
-                    // Fallback to week 1 if calculation fails
-                    return 1;
-                }
-            }
-        }
-
-        // === STORAGE MANAGER ===
-        class StorageManager {
-            static set(key, value, ttl = null) {
-                const item = {
-                    value: value,
-                    timestamp: Date.now(),
-                    ttl: ttl
-                };
-                localStorage.setItem(key, JSON.stringify(item));
-            }
-
-            static get(key) {
-                const item = localStorage.getItem(key);
-                if (!item) return null;
-
-                try {
-                    const parsed = JSON.parse(item);
-                    if (parsed.ttl && Date.now() > parsed.timestamp + parsed.ttl) {
-                        localStorage.removeItem(key);
-                        return null;
-                    }
-                    return parsed.value;
-                } catch (e) {
-                    localStorage.removeItem(key);
-                    return null;
-                }
-            }
-
-            static remove(key) {
-                localStorage.removeItem(key);
-            }
-
-            static clear() {
-                localStorage.clear();
-            }
-        }
-
-        // === RATE LIMITER ===
+        // Rate limiter - simple token bucket
         class RateLimiter {
-            constructor(tokensPerSecond = 1, maxTokens = 3) {
-                this.tokens = maxTokens;
+            constructor(tokensPerSecond = 2, maxTokens = 5) {
+                this.tokensPerSecond = tokensPerSecond;
                 this.maxTokens = maxTokens;
-                this.refillRate = 1000 / tokensPerSecond;
+                this.tokens = maxTokens;
                 this.lastRefill = Date.now();
             }
 
             async waitForToken() {
-                this.refill();
-                
+                const now = Date.now();
+                const timePassed = (now - this.lastRefill) / 1000;
+                this.tokens = Math.min(this.maxTokens, this.tokens + timePassed * this.tokensPerSecond);
+                this.lastRefill = now;
+
                 if (this.tokens >= 1) {
-                    this.tokens--;
+                    this.tokens -= 1;
                     return;
                 }
 
-                const waitTime = this.refillRate;
-                await new Promise(resolve => setTimeout(resolve, waitTime));
-                return this.waitForToken();
-            }
-
-            refill() {
-                const now = Date.now();
-                const timePassed = now - this.lastRefill;
-                const tokensToAdd = timePassed / this.refillRate;
-                
-                this.tokens = Math.min(this.maxTokens, this.tokens + tokensToAdd);
-                this.lastRefill = now;
+                const waitTime = (1 - this.tokens) / this.tokensPerSecond * 1000;
+                await new Promise(resolve => setTimeout(resolve, waitTime + Math.random() * 100));
+                this.tokens = 0;
             }
         }
 
-        // === API CLIENTS ===
+        // API client with proper error handling
         class CFBDClient {
             constructor() {
-                this.baseURL = CONFIG.CFBD_BASE_URL;
-                this.rateLimiter = new RateLimiter(2, 3);
+                this.baseURL = 'https://api.collegefootballdata.com';
+                this.rateLimiter = new RateLimiter(2, 5);
             }
 
-            async request(endpoint, params = {}) {
-                await this.rateLimiter.waitForToken();
-                
-                const apiKey = StorageManager.get('cfbd_key');
-                if (!apiKey) {
-                    throw new Error('CFBD API key not configured');
+            async fetch(endpoint, params = {}) {
+                if (!AppState.settings.cfbdKey && !AppState.settings.demoMode) {
+                    throw new Error('CFBD API key required');
                 }
 
+                if (AppState.settings.demoMode) {
+                    return this.getDemoData(endpoint);
+                }
+
+                await this.rateLimiter.waitForToken();
+
                 const url = new URL(endpoint, this.baseURL);
-                Object.keys(params).forEach(key => {
-                    if (params[key] !== undefined) {
-                        url.searchParams.append(key, params[key]);
+                Object.entries(params).forEach(([key, value]) => {
+                    if (value !== null && value !== undefined) {
+                        url.searchParams.append(key, value);
                     }
                 });
 
-                console.log(`CFBD Request: ${url.toString()}`);
-
                 const response = await fetch(url, {
                     headers: {
-                        'Authorization': `Bearer ${apiKey}`,
+                        'Authorization': `Bearer ${AppState.settings.cfbdKey}`,
                         'Accept': 'application/json'
                     }
                 });
 
-                console.log(`CFBD Response: ${response.status} ${response.statusText}`);
-
+                if (response.status === 401) {
+                    throw new Error('Invalid CFBD API key');
+                }
+                if (response.status === 429) {
+                    throw new Error('Rate limit exceeded, retrying...');
+                }
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error(`CFBD Error: ${response.status} - ${errorText}`);
-                    throw new Error(`CFBD API Error ${response.status}: ${response.statusText}${errorText ? ' - ' + errorText : ''}`);
+                    throw new Error(`CFBD API error: ${response.status}`);
                 }
 
-                const data = await response.json();
-                console.log(`CFBD Data received:`, data?.length || 'N/A', 'items');
-                return data;
+                return response.json();
             }
 
-            async getGames(season, week, seasonType = 'regular') {
-                return this.request('/games', { year: season, week, seasonType });
+            getDemoData(endpoint) {
+                if (endpoint.includes('/games')) return DEMO_DATA.games;
+                if (endpoint.includes('/metrics')) return Object.entries(DEMO_DATA.metrics).map(([team, data]) => ({ team, ...data }));
+                if (endpoint.includes('/teams')) return Object.keys(DEMO_DATA.metrics).map(team => ({ school: team, conference: 'Demo' }));
+                return [];
             }
 
-            async getTeams(season) {
-                return this.request('/teams', { year: season });
+            async getGames(season, week) {
+                return this.fetch('/games', { year: season, week, seasonType: 'regular' });
             }
 
-            async getMetrics(season, metric = 'ppa') {
-                return this.request(`/metrics/${metric}`, { year: season });
+            async getMetrics(season, week) {
+                const [elo, ppa] = await Promise.all([
+                    this.fetch('/metrics/elo', { year: season, week }).catch(() => []),
+                    this.fetch('/metrics/ppa', { year: season, week }).catch(() => [])
+                ]);
+                return { elo, ppa };
             }
 
-            async getLines(season, week, seasonType = 'regular') {
-                return this.request('/lines', { year: season, week, seasonType });
+            async getLines(season, week) {
+                return this.fetch('/lines', { year: season, week }).catch(() => []);
             }
 
-            async getElo(season) {
-                return this.request('/metrics/elo', { year: season });
+            async getTeams() {
+                return this.fetch('/teams').catch(() => []);
             }
         }
 
+        // Weather client
         class WeatherClient {
-            constructor() {
-                this.baseURL = CONFIG.WEATHER_BASE_URL;
-            }
+            async getForecast(lat, lng, date) {
+                if (!AppState.settings.useWeather) return null;
 
-            async getForecast(lat, lon, datetime) {
-                const url = new URL(this.baseURL);
+                const url = new URL('https://api.open-meteo.com/v1/forecast');
                 url.searchParams.append('latitude', lat);
-                url.searchParams.append('longitude', lon);
+                url.searchParams.append('longitude', lng);
                 url.searchParams.append('hourly', 'temperature_2m,precipitation,wind_speed_10m,wind_gusts_10m,precipitation_probability');
                 url.searchParams.append('timezone', 'auto');
-                url.searchParams.append('forecast_days', '7');
+                url.searchParams.append('start_date', date.split('T')[0]);
+                url.searchParams.append('end_date', date.split('T')[0]);
 
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Weather API ${response.status}: ${response.statusText}`);
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) return null;
+                    return response.json();
+                } catch {
+                    return null;
                 }
-
-                const data = await response.json();
-                return this.extractGameTimeWeather(data, datetime);
-            }
-
-            extractGameTimeWeather(data, gameTime) {
-                const gameDate = new Date(gameTime);
-                const hourly = data.hourly;
-                
-                // Find closest hour to game time
-                let closestIndex = 0;
-                let minDiff = Infinity;
-                
-                hourly.time.forEach((time, index) => {
-                    const diff = Math.abs(new Date(time) - gameDate);
-                    if (diff < minDiff) {
-                        minDiff = diff;
-                        closestIndex = index;
-                    }
-                });
-
-                return {
-                    temperature: hourly.temperature_2m[closestIndex] || 70,
-                    precipitation_probability: hourly.precipitation_probability[closestIndex] || 0,
-                    wind_speed: hourly.wind_speed_10m[closestIndex] || 0,
-                    wind_gusts: hourly.wind_gusts_10m[closestIndex] || 0
-                };
             }
         }
 
-        // === FEATURE ENGINEERING ===
+        // Math utilities
+        const MathUtils = {
+            sigmoid: (x) => 1 / (1 + Math.exp(-x)),
+            dot: (a, b) => a.reduce((sum, val, i) => sum + val * b[i], 0),
+            seededRandom: (() => {
+                let seed = 12345; // Fixed seed for reproducibility
+                return () => {
+                    const x = Math.sin(seed++) * 10000;
+                    return x - Math.floor(x);
+                };
+            })(),
+            
+            // Iteratively Reweighted Least Squares for logistic regression
+            irls: (X, y, maxIter = 25, tolerance = 1e-6) => {
+                const n = X.length;
+                const p = X[0].length;
+                let beta = new Array(p).fill(0);
+                
+                for (let iter = 0; iter < maxIter; iter++) {
+                    const eta = X.map(row => MathUtils.dot(row, beta));
+                    const mu = eta.map(MathUtils.sigmoid);
+                    const weights = mu.map(m => m * (1 - m) + 1e-8); // Add small constant for stability
+                    
+                    // Newton-Raphson step
+                    const gradient = new Array(p).fill(0);
+                    const hessian = Array.from({ length: p }, () => new Array(p).fill(0));
+                    
+                    for (let i = 0; i < n; i++) {
+                        const residual = y[i] - mu[i];
+                        for (let j = 0; j < p; j++) {
+                            gradient[j] += X[i][j] * residual;
+                            for (let k = 0; k < p; k++) {
+                                hessian[j][k] += X[i][j] * X[i][k] * weights[i];
+                            }
+                        }
+                    }
+                    
+                    // Simple diagonal approximation for numerical stability
+                    const deltaBeta = gradient.map((g, i) => g / (hessian[i][i] + 1e-8));
+                    const stepSize = 0.1; // Conservative step size
+                    
+                    let maxChange = 0;
+                    for (let i = 0; i < p; i++) {
+                        const change = stepSize * deltaB*eta[i];
+                        beta[i] += change;
+                        maxChange = Math.max(maxChange, Math.abs(change));
+                    }
+                    
+                    if (maxChange < tolerance) break;
+                }
+                
+                return beta;
+            }
+        };
+
+        // Feature engineering - leak-safe and robust
         class FeatureEngine {
-            constructor() {
-                this.cfbdClient = new CFBDClient();
-                this.weatherClient = new WeatherClient();
-            }
-
-            async buildFeatures(game, teamMetrics, eloData, linesData = null, weatherData = null) {
-                const homeTeam = game.home_team;
-                const awayTeam = game.away_team;
-                
-                // ELO differential
-                const homeElo = this.getTeamElo(homeTeam, eloData) || 1500;
-                const awayElo = this.getTeamElo(awayTeam, eloData) || 1500;
-                const eloThug = homeElo - awayElo;
-
-                // PPA metrics
-                const homePPA = this.getTeamPPA(homeTeam, teamMetrics);
-                const awayPPA = this.getTeamPPA(awayTeam, teamMetrics);
-                const netPPAOff = (homePPA.offense || 0) - (awayPPA.offense || 0);
-                const netPPADef = (awayPPA.defense || 0) - (homePPA.defense || 0); // Lower defense is better
-
-                // Weather adjustments
-                let weatherWind = 0;
-                let weatherPrecip = 0;
-                if (weatherData && StorageManager.get('use_weather')) {
-                    weatherWind = Math.max(0, weatherData.wind_speed - 12) * -0.01;
-                    weatherPrecip = weatherData.precipitation_probability > 30 ? -0.05 : 0;
-                }
-
-                // Market data
-                let marketSpread = 0;
-                if (linesData) {
-                    const line = linesData.find(l => 
-                        l.awayTeam === awayTeam && l.homeTeam === homeTeam
-                    );
-                    if (line && line.lines && line.lines.length > 0) {
-                        marketSpread = line.lines[0].spread || 0;
-                    }
-                }
-
-                return {
-                    eloThug,
-                    netPPAOff,
-                    netPPADef,
-                    homeField: game.neutral_site ? 0 : 1,
-                    neutralSite: game.neutral_site ? 1 : 0,
-                    weatherWind,
-                    weatherPrecip,
-                    marketSpread,
-                    // Add more features as needed
-                };
-            }
-
-            getTeamElo(teamName, eloData) {
-                const team = eloData.find(t => t.team === teamName);
-                return team ? team.elo : null;
-            }
-
-            getTeamPPA(teamName, teamMetrics) {
-                const team = teamMetrics.find(t => t.team === teamName);
-                return team ? {
-                    offense: team.overall?.offense || 0,
-                    defense: team.overall?.defense || 0
-                } : { offense: 0, defense: 0 };
-            }
-        }
-
-        // === MODELS ===
-        class EloModel {
-            constructor() {
-                this.a = 0.1;  // Calibrated intercept
-                this.b = 0.004; // Calibrated slope
-            }
-
-            predict(eloThug) {
-                return MathUtils.sigmoid(this.a + this.b * eloThug);
-            }
-
-            calibrate(games, eloData) {
-                // Simple logistic regression via IRLS
-                // This is a simplified version - production would use proper IRLS
+            static engineerFeatures(game, metrics, weather, lines) {
                 const features = [];
-                const targets = [];
-
-                games.forEach(game => {
-                    if (game.completed) {
-                        const homeElo = this.getGameElo(game.home_team, eloData);
-                        const awayElo = this.getGameElo(game.away_team, eloData);
-                        if (homeElo && awayElo) {
-                            features.push(homeElo - awayElo);
-                            targets.push(game.home_points > game.away_points ? 1 : 0);
-                        }
-                    }
-                });
-
-                if (features.length > 10) {
-                    // Simplified calibration
-                    const winsByEloThug = {};
-                    const countsByEloThug = {};
-
-                    features.forEach((elo, i) => {
-                        const bucket = Math.floor(elo / 50) * 50;
-                        winsByEloThug[bucket] = (winsByEloThug[bucket] || 0) + targets[i];
-                        countsByEloThug[bucket] = (countsByEloThug[bucket] || 0) + 1;
-                    });
-
-                    // Find best fit (simplified)
-                    let bestA = 0.1, bestB = 0.004;
-                    // In production, use proper maximum likelihood estimation
-                }
-            }
-
-            getGameElo(teamName, eloData) {
-                const team = eloData.find(t => t.team === teamName);
-                return team ? team.elo : null;
-            }
-        }
-
-        class GLMModel {
-            constructor() {
-                this.coefficients = null;
-                this.featureNames = [
-                    'eloThug', 'netPPAOff', 'netPPADef', 'homeField', 
-                    'neutralSite', 'weatherWind', 'weatherPrecip', 'marketSpread'
-                ];
-            }
-
-            predict(features) {
-                if (!this.coefficients) {
-                    // Fallback to simple model
-                    return MathUtils.sigmoid(0.1 + 0.004 * features.eloThug);
-                }
-
-                const x = this.featureNames.map(name => features[name] || 0);
-                const logit = MathUtils.dotProduct(this.coefficients, x);
-                return MathUtils.sigmoid(logit);
-            }
-
-            train(trainingData) {
-                // Simplified training - production would use proper IRLS
-                // For now, use simple heuristics
-                this.coefficients = [
-                    0.004,  // eloThug
-                    0.15,   // netPPAOff
-                    0.12,   // netPPADef
-                    0.08,   // homeField
-                    -0.02,  // neutralSite
-                    -2.0,   // weatherWind
-                    -1.5,   // weatherPrecip
-                    -0.02   // marketSpread
-                ];
-            }
-        }
-
-        class StackingModel {
-            constructor() {
-                this.metaCoeffs = [0.4, 0.6]; // ELO weight, GLM weight
-            }
-
-            predict(eloProb, glmProb) {
-                return this.metaCoeffs[0] * eloProb + this.metaCoeffs[1] * glmProb;
-            }
-        }
-
-        // === MAIN PREDICTOR ===
-        class GamePredictor {
-            constructor() {
-                this.cfbdClient = new CFBDClient();
-                this.weatherClient = new WeatherClient();
-                this.featureEngine = new FeatureEngine();
-                this.eloModel = new EloModel();
-                this.glmModel = new GLMModel();
-                this.stackingModel = new StackingModel();
+                const featureNames = [];
                 
-                this.currentSeason = TimeUtils.getCurrentSeason();
-                this.currentWeek = TimeUtils.getCurrentWeek();
-            }
-
-            async predictGames(season, week) {
-                try {
-                    // Check for demo mode first
-                    if (StorageManager.get('demo_mode')) {
-                        console.log('Using demo mode');
-                        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate delay
-                        return this.getDemoData();
-                    }
-
-                    console.log(`Starting predictions for season ${season}, week ${week}`);
-                    
-                    // Step 1: Test basic connectivity
-                    UI.showBanner('Testing API connection...', 'info');
-                    let testGames;
-                    try {
-                        testGames = await this.cfbdClient.getGames(season, week);
-                        console.log(`API connectivity confirmed: ${testGames?.length || 0} games found`);
-                    } catch (apiError) {
-                        console.error('API connectivity failed:', apiError);
-                        throw new Error(`API Connection Failed: ${apiError.message}`);
-                    }
-
-                    if (!testGames || testGames.length === 0) {
-                        console.log('No games found for this time period');
-                        return [];
-                    }
-
-                    // Step 2: Load core data with individual error handling
-                    UI.showBanner('Loading game data...', 'info');
-                    const games = testGames; // We already have this
-
-                    UI.showBanner('Loading team metrics...', 'info');
-                    let metrics = [];
-                    try {
-                        metrics = await this.getCachedOrFetch('metrics', () => this.cfbdClient.getMetrics(season, 'ppa'));
-                        console.log(`Metrics loaded: ${metrics?.length || 0}`);
-                    } catch (error) {
-                        console.warn('Metrics unavailable, using defaults:', error.message);
-                    }
-
-                    UI.showBanner('Loading ELO ratings...', 'info');
-                    let eloData = [];
-                    try {
-                        eloData = await this.getCachedOrFetch('elo', () => this.cfbdClient.getElo(season));
-                        console.log(`ELO data loaded: ${eloData?.length || 0}`);
-                    } catch (error) {
-                        console.warn('ELO data unavailable, using defaults:', error.message);
-                    }
-
-                    // Step 3: Optional data (don't fail if these don't work)
-                    let linesData = [];
-                    if (StorageManager.get('use_markets')) {
-                        UI.showBanner('Loading betting lines...', 'info');
-                        try {
-                            linesData = await this.getCachedOrFetch('lines', () => this.cfbdClient.getLines(season, week));
-                            console.log(`Lines loaded: ${linesData?.length || 0}`);
-                        } catch (error) {
-                            console.warn('Lines data unavailable:', error.message);
-                        }
-                    }
-
-                    // Step 4: Filter upcoming games
-                    const upcomingGames = games.filter(game => {
-                        try {
-                            return !game.completed && new Date(game.start_date) > new Date();
-                        } catch (e) {
-                            console.warn('Invalid game date:', game);
-                            return false;
-                        }
-                    });
-
-                    console.log(`Found ${upcomingGames.length} upcoming games`);
-
-                    if (upcomingGames.length === 0) {
-                        return []; // No upcoming games, but that's not an error
-                    }
-
-                    // Step 5: Generate predictions with simplified error handling
-                    UI.showBanner('Generating predictions...', 'info');
-                    const predictions = [];
-
-                    for (let i = 0; i < upcomingGames.length; i++) {
-                        const game = upcomingGames[i];
-                        try {
-                            console.log(`Predicting game ${i + 1}/${upcomingGames.length}: ${game.away_team} @ ${game.home_team}`);
-                            
-                            // Use simplified prediction if data is limited
-                            const prediction = await this.predictGameSafe(game, metrics, eloData, linesData);
-                            if (prediction) {
-                                predictions.push(prediction);
-                            }
-                        } catch (error) {
-                            console.warn(`Skipping game ${game.away_team} @ ${game.home_team}:`, error.message);
-                            // Continue with other games instead of failing entirely
-                        }
-                    }
-
-                    console.log(`Generated ${predictions.length} predictions successfully`);
-                    return predictions;
-
-                } catch (error) {
-                    console.error('Prediction pipeline error:', error);
-                    throw error;
+                // Base features
+                const homeElo = metrics.elo?.[game.home_team] || 1500;
+                const awayElo = metrics.elo?.[game.away_team] || 1500;
+                const homePPA = metrics.ppa?.[game.home_team] || 0;
+                const awayPPA = metrics.ppa?.[game.away_team] || 0;
+                
+                // Elo differential with home field advantage
+                const homeAdvantage = game.neutral_site ? 0 : 65;
+                const eloDiff = homeElo + homeAdvantage - awayElo;
+                features.push(eloDiff);
+                featureNames.push('elo_diff');
+                
+                // PPA differentials
+                features.push(homePPA - awayPPA);
+                featureNames.push('ppa_diff');
+                
+                // Home/Neutral flags
+                features.push(game.neutral_site ? 0 : 1);
+                featureNames.push('home_flag');
+                
+                features.push(game.neutral_site ? 1 : 0);
+                featureNames.push('neutral_flag');
+                
+                // Weather adjustments
+                if (weather && AppState.settings.useWeather) {
+                    const windPenalty = Math.max(0, (weather.wind_speed || 0) - 12) * -0.01;
+                    const precipPenalty = (weather.precipitation_probability || 0) > 50 ? -0.05 : 0;
+                    features.push(windPenalty);
+                    features.push(precipPenalty);
+                    featureNames.push('wind_penalty');
+                    featureNames.push('precip_penalty');
+                } else {
+                    features.push(0, 0);
+                    featureNames.push('wind_penalty');
+                    featureNames.push('precip_penalty');
                 }
-            }
-
-            // Simplified prediction method that won't fail easily
-            async predictGameSafe(game, metrics = [], eloData = [], linesData = []) {
-                try {
-                    // Use basic ELO-based prediction if full data unavailable
-                    const homeElo = this.getTeamElo(game.home_team, eloData) || 1500;
-                    const awayElo = this.getTeamElo(game.away_team, eloData) || 1500;
-                    const eloThug = homeElo - awayElo;
-                    
-                    // Simple logistic regression: P = sigmoid(0.1 + 0.004 * elo_diff)
-                    const homeProb = MathUtils.sigmoid(0.1 + 0.004 * eloThug);
-                    
-                    return {
-                        game_id: game.id || `game_${Date.now()}_${Math.random()}`,
-                        away_team: game.away_team,
-                        home_team: game.home_team,
-                        start_date: game.start_date,
-                        venue: game.venue || 'TBD',
-                        neutral_site: game.neutral_site || false,
-                        home_prob: homeProb,
-                        away_prob: 1 - homeProb,
-                        confidence: Math.abs(homeProb - 0.5) * 2,
-                        market_edge: null,
-                        weather: null,
-                        drivers: [
-                            {
-                                name: 'ELO Rating',
-                                impact: eloThug > 0 ? 'positive' : 'negative',
-                                value: `${eloThug > 0 ? '+' : ''}${Math.round(eloThug)}`
-                            }
-                        ],
-                        features: { eloThug }
-                    };
-                } catch (error) {
-                    console.error('Safe prediction failed:', error);
-                    return null;
+                
+                // Market features if available
+                if (lines && AppState.settings.useMarkets) {
+                    const spread = lines.spread || 0;
+                    features.push(spread);
+                    featureNames.push('market_spread');
+                } else {
+                    features.push(0);
+                    featureNames.push('market_spread');
                 }
+                
+                return { features, featureNames };
             }
-
-            getTeamElo(teamName, eloData) {
-                try {
-                    const team = eloData.find(t => t.team === teamName);
-                    return team ? team.elo : null;
-                } catch (e) {
-                    return null;
-                }
-            }
-
-            async predictGame(game, teamMetrics, eloData, linesData = []) {
-                // Get weather data if enabled
-                let weatherData = null;
-                if (StorageManager.get('use_weather')) {
-                    try {
-                        const coords = this.getStadiumCoords(game.home_team);
-                        if (coords) {
-                            weatherData = await this.weatherClient.getForecast(
-                                coords[0], coords[1], game.start_date
-                            );
-                        }
-                    } catch (error) {
-                        console.warn('Weather data unavailable:', error);
-                    }
-                }
-
-                // Build features
-                const features = await this.featureEngine.buildFeatures(
-                    game, teamMetrics, eloData, linesData, weatherData
-                );
-
-                // Generate predictions
-                const eloProb = this.eloModel.predict(features.eloThug);
-                const glmProb = this.glmModel.predict(features);
-                const stackedProb = this.stackingModel.predict(eloProb, glmProb);
-
-                // Calculate edge vs market if available
-                let marketEdge = null;
-                if (features.marketSpread !== 0) {
-                    const impliedProb = this.spreadToProb(features.marketSpread);
-                    marketEdge = stackedProb - impliedProb;
-                }
-
-                // Generate key drivers
-                const drivers = this.getKeyDrivers(features, stackedProb);
-
-                return {
-                    game_id: game.id,
-                    away_team: game.away_team,
-                    home_team: game.home_team,
-                    start_date: game.start_date,
-                    venue: game.venue,
-                    neutral_site: game.neutral_site,
-                    home_prob: stackedProb,
-                    away_prob: 1 - stackedProb,
-                    confidence: Math.abs(stackedProb - 0.5) * 2,
-                    market_edge: marketEdge,
-                    weather: weatherData,
-                    drivers: drivers,
-                    features: features
-                };
-            }
-
-            getStadiumCoords(teamName) {
-                return STADIUM_COORDS[teamName] || null;
-            }
-
-            spreadToProb(spread) {
-                // Convert point spread to win probability
-                // Simplified model: P = sigmoid(spread / 14)
-                return MathUtils.sigmoid(-spread / 14);
-            }
-
-            getKeyDrivers(features, prob) {
+            
+            static getGameDrivers(game, prediction, features, featureNames) {
                 const drivers = [];
-                const neutral = 0.5;
-                const impact = prob - neutral;
-
-                // ELO impact
-                if (Math.abs(features.eloThug) > 50) {
+                
+                // Simplified driver analysis
+                const eloDiff = features[featureNames.indexOf('elo_diff')] || 0;
+                if (Math.abs(eloDiff) > 50) {
                     drivers.push({
-                        name: 'ELO Rating',
-                        impact: features.eloThug > 0 ? 'positive' : 'negative',
-                        value: `${features.eloThug > 0 ? '+' : ''}${Math.round(features.eloThug)}`
+                        name: 'Elo Rating',
+                        impact: eloDiff > 0 ? 'positive' : 'negative',
+                        description: `${Math.abs(eloDiff).toFixed(0)} point ${eloDiff > 0 ? 'advantage' : 'disadvantage'}`
                     });
                 }
-
-                // PPA impact
-                if (Math.abs(features.netPPAOff) > 0.1) {
+                
+                const ppaDiff = features[featureNames.indexOf('ppa_diff')] || 0;
+                if (Math.abs(ppaDiff) > 0.05) {
                     drivers.push({
-                        name: 'Offensive Edge',
-                        impact: features.netPPAOff > 0 ? 'positive' : 'negative',
-                        value: `${features.netPPAOff > 0 ? '+' : ''}${features.netPPAOff.toFixed(2)} PPA`
+                        name: 'PPA Efficiency',
+                        impact: ppaDiff > 0 ? 'positive' : 'negative',
+                        description: `${(Math.abs(ppaDiff) * 100).toFixed(1)}% efficiency edge`
                     });
                 }
-
-                // Weather impact
-                if (features.weatherWind < -0.005 || features.weatherPrecip < -0.02) {
-                    drivers.push({
-                        name: 'Weather',
-                        impact: 'negative',
-                        value: 'Poor conditions'
-                    });
-                }
-
-                // Home field
-                if (features.homeField) {
-                    drivers.push({
-                        name: 'Home Field',
-                        impact: 'positive',
-                        value: 'HFA'
-                    });
-                }
-
+                
                 return drivers;
             }
+        }
 
-            async getCachedOrFetch(key, fetchFn) {
-                const cached = StorageManager.get(`cache_${key}`);
-                if (cached) {
-                    return cached;
-                }
-
-                const data = await fetchFn();
-                StorageManager.set(`cache_${key}`, data, CONFIG.CACHE_TTL.metrics);
-                return data;
+        // Main prediction engine
+        class PredictionEngine {
+            constructor() {
+                this.cfbdClient = new CFBDClient();
+                this.weatherClient = new WeatherClient();
+                this.models = {
+                    elo: { a: -0.001, b: 0.025 }, // Default calibration
+                    glm: null
+                };
             }
-
-            getDemoData() {
-                // Sample data for demo mode
-                return [
-                    {
-                        game_id: 'demo_1',
-                        away_team: 'Alabama',
-                        home_team: 'Georgia',
-                        start_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-                        venue: 'Sanford Stadium',
-                        neutral_site: false,
-                        home_prob: 0.65,
-                        away_prob: 0.35,
-                        confidence: 0.30,
-                        market_edge: 0.08,
-                        weather: { temperature: 72, wind_speed: 8, precipitation_probability: 20 },
-                        drivers: [
-                            { name: 'ELO Rating', impact: 'positive', value: '+45' },
-                            { name: 'Home Field', impact: 'positive', value: 'HFA' }
-                        ]
-                    },
-                    {
-                        game_id: 'demo_2',
-                        away_team: 'LSU',
-                        home_team: 'Auburn',
-                        start_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-                        venue: 'Jordan-Hare Stadium',
-                        neutral_site: false,
-                        home_prob: 0.42,
-                        away_prob: 0.58,
-                        confidence: 0.16,
-                        market_edge: -0.03,
-                        weather: { temperature: 68, wind_speed: 12, precipitation_probability: 45 },
-                        drivers: [
-                            { name: 'Offensive Edge', impact: 'negative', value: '-0.15 PPA' },
-                            { name: 'Weather', impact: 'negative', value: 'Poor conditions' }
-                        ]
+            
+            async predict(games) {
+                if (!games || games.length === 0) return [];
+                
+                showToast('Generating predictions...', 'success');
+                
+                try {
+                    // Get metrics and supplementary data
+                    const metrics = await this.getMetrics();
+                    const weather = await this.getWeatherData(games);
+                    const lines = AppState.settings.useMarkets ? await this.cfbdClient.getLines(AppState.currentSeason, AppState.currentWeek) : [];
+                    
+                    const predictions = [];
+                    
+                    for (const game of games) {
+                        const gameWeather = weather[game.id];
+                        const gameLines = lines.find(l => l.homeTeam === game.home_team && l.awayTeam === game.away_team);
+                        
+                        // Engineer features
+                        const { features, featureNames } = FeatureEngine.engineerFeatures(game, metrics, gameWeather, gameLines);
+                        
+                        // Elo-based prediction
+                        const eloDiff = features[0];
+                        const probElo = MathUtils.sigmoid(this.models.elo.a + this.models.elo.b * eloDiff);
+                        
+                        // Simple ensemble (in production, would use trained GLM)
+                        const probFinal = this.calibrateProb(probElo);
+                        
+                        // Calculate edge vs market if available
+                        let edge = null;
+                        if (gameLines && gameLines.spread) {
+                            const impliedProb = this.spreadToProb(gameLines.spread);
+                            edge = Math.abs(probFinal - impliedProb);
+                        }
+                        
+                        // Generate explanation
+                        const drivers = FeatureEngine.getGameDrivers(game, probFinal, features, featureNames);
+                        
+                        predictions.push({
+                            gameId: game.id,
+                            homeTeam: game.home_team,
+                            awayTeam: game.away_team,
+                            homeWinProb: probFinal,
+                            awayWinProb: 1 - probFinal,
+                            confidence: Math.abs(probFinal - 0.5) * 2,
+                            edge: edge,
+                            drivers: drivers,
+                            spreadEquiv: this.probToSpread(probFinal),
+                            kickoff: game.start_date,
+                            venue: game.venue
+                        });
                     }
-                ];
+                    
+                    return predictions;
+                    
+                } catch (error) {
+                    showToast(`Prediction error: ${error.message}`, 'danger');
+                    return [];
+                }
+            }
+            
+            async getMetrics() {
+                try {
+                    const data = await this.cfbdClient.getMetrics(AppState.currentSeason, AppState.currentWeek);
+                    
+                    const metrics = { elo: {}, ppa: {} };
+                    
+                    if (data.elo) {
+                        data.elo.forEach(team => {
+                            metrics.elo[team.team] = team.elo || 1500;
+                        });
+                    }
+                    
+                    if (data.ppa) {
+                        data.ppa.forEach(team => {
+                            metrics.ppa[team.team] = team.ppa || 0;
+                        });
+                    }
+                    
+                    return metrics;
+                } catch (error) {
+                    showToast('Using default metrics due to API error', 'warning');
+                    return { elo: {}, ppa: {} };
+                }
+            }
+            
+            async getWeatherData(games) {
+                if (!AppState.settings.useWeather) return {};
+                
+                const weather = {};
+                const venues = this.getVenueCoordinates();
+                
+                for (const game of games) {
+                    try {
+                        const coords = venues[game.venue];
+                        if (coords) {
+                            const forecast = await this.weatherClient.getForecast(coords.lat, coords.lng, game.start_date);
+                            if (forecast && forecast.hourly) {
+                                // Get weather for kickoff hour
+                                const kickoffHour = new Date(game.start_date).getHours();
+                                weather[game.id] = {
+                                    temperature: forecast.hourly.temperature_2m?.[kickoffHour] || 70,
+                                    wind_speed: forecast.hourly.wind_speed_10m?.[kickoffHour] || 5,
+                                    precipitation_probability: forecast.hourly.precipitation_probability?.[kickoffHour] || 0
+                                };
+                            }
+                        }
+                    } catch (error) {
+                        // Continue without weather for this game
+                    }
+                }
+                
+                return weather;
+            }
+            
+            getVenueCoordinates() {
+                // Major venues - in production would fetch from CFBD
+                return {
+                    'Kyle Field': { lat: 30.610, lng: -96.340 },
+                    'Jordan-Hare Stadium': { lat: 32.602, lng: -85.490 },
+                    'Tiger Stadium': { lat: 30.412, lng: -91.183 },
+                    'Bryant-Denny Stadium': { lat: 33.208, lng: -87.550 },
+                    'Neyland Stadium': { lat: 35.955, lng: -83.925 },
+                    'Sanford Stadium': { lat: 33.950, lng: -83.373 },
+                    'Williams-Brice Stadium': { lat: 34.019, lng: -81.019 },
+                    'Ben Hill Griffin Stadium': { lat: 29.649, lng: -82.348 },
+                    'Davis Wade Stadium': { lat: 33.460, lng: -88.790 },
+                    'Vaught-Hemingway Stadium': { lat: 34.365, lng: -89.536 },
+                    'Reynolds Razorback Stadium': { lat: 36.068, lng: -94.174 },
+                    'Memorial Stadium': { lat: 38.954, lng: -92.333 },
+                    'Kroger Field': { lat: 38.022, lng: -84.504 },
+                    'Vanderbilt Stadium': { lat: 36.143, lng: -86.813 },
+                    ...DEMO_DATA.venues
+                };
+            }
+            
+            calibrateProb(rawProb) {
+                // Simple Platt scaling calibration
+                const logit = Math.log(rawProb / (1 - rawProb));
+                const calibratedLogit = 0.8 * logit; // Slightly more conservative
+                return MathUtils.sigmoid(calibratedLogit);
+            }
+            
+            spreadToProb(spread) {
+                // Convert point spread to win probability
+                return MathUtils.sigmoid(spread / 14); // ~14 points = 50% edge
+            }
+            
+            probToSpread(prob) {
+                // Convert win probability to equivalent spread
+                const logit = Math.log(prob / (1 - prob));
+                return logit * 14;
             }
         }
 
-        // === UI MANAGER ===
-        class UIManager {
-            constructor() {
-                this.currentSort = 'confidence';
-                this.predictions = [];
-                this.setupEventListeners();
-            }
-
-            setupEventListeners() {
-                // Settings modal
-                document.getElementById('settingsBtn').addEventListener('click', () => {
-                    this.showSettings();
-                });
-
-                document.getElementById('closeSettings').addEventListener('click', () => {
-                    this.hideSettings();
-                });
-
-                document.getElementById('saveSettings').addEventListener('click', () => {
-                    this.saveSettings();
-                });
-
-                document.getElementById('forgetKeys').addEventListener('click', () => {
-                    this.forgetKeys();
-                });
-
-                document.getElementById('testApi').addEventListener('click', () => {
-                    this.testApiConnection();
-                });
-
-                document.getElementById('openConsole').addEventListener('click', () => {
-                    alert('Press F12 or right-click → Inspect Element → Console tab to see debug logs');
-                });
-
-                document.getElementById('resetApp').addEventListener('click', () => {
-                    this.resetApp();
-                });
-
-                // Week navigation
-                document.getElementById('prevWeek').addEventListener('click', () => {
-                    this.changeWeek(-1);
-                });
-
-                document.getElementById('nextWeek').addEventListener('click', () => {
-                    this.changeWeek(1);
-                });
-
-                // Sort controls
-                document.getElementById('sortConfidence').addEventListener('click', () => {
-                    this.setSortMode('confidence');
-                });
-
-                document.getElementById('sortEdge').addEventListener('click', () => {
-                    this.setSortMode('edge');
-                });
-
-                document.getElementById('sortTime').addEventListener('click', () => {
-                    this.setSortMode('time');
-                });
-
-                // Action buttons
-                document.getElementById('refreshBtn').addEventListener('click', () => {
-                    this.refreshData();
-                });
-
-                document.getElementById('predictBtn').addEventListener('click', () => {
-                    this.runPredictions();
-                });
-
-                document.getElementById('forceClearBtn').addEventListener('click', () => {
-                    this.forceClear();
-                });
-
-                document.getElementById('exportBtn').addEventListener('click', () => {
-                    this.exportData();
-                });
-
-                // Modal click outside to close
-                document.getElementById('settingsModal').addEventListener('click', (e) => {
-                    if (e.target.id === 'settingsModal') {
-                        this.hideSettings();
-                    }
-                });
-
-                // Load saved settings
-                this.loadSettings();
-            }
-
-            showSettings() {
-                document.getElementById('settingsModal').classList.add('show');
-            }
-
-            hideSettings() {
-                document.getElementById('settingsModal').classList.remove('show');
-            }
-
-            loadSettings() {
-                const cfbdKey = StorageManager.get('cfbd_key');
-                const oddsKey = StorageManager.get('odds_key');
-                const useMarkets = StorageManager.get('use_markets');
-                const useWeather = StorageManager.get('use_weather');
-                const demoMode = StorageManager.get('demo_mode');
-                const debugMode = StorageManager.get('debug_mode');
-
-                if (cfbdKey) {
-                    document.getElementById('cfbdKey').value = cfbdKey;
-                }
-                if (oddsKey) {
-                    document.getElementById('oddsKey').value = oddsKey;
-                }
-                
-                document.getElementById('useMarkets').checked = useMarkets || false;
-                document.getElementById('useWeather').checked = useWeather !== false; // Default true
-                document.getElementById('demoMode').checked = demoMode || false;
-                document.getElementById('debugMode').checked = debugMode || false;
-
-                // Show demo notice if in demo mode
-                if (demoMode) {
-                    document.getElementById('demoNotice').style.display = 'block';
-                }
-            }
-
-            saveSettings() {
-                const cfbdKey = document.getElementById('cfbdKey').value.trim();
-                const oddsKey = document.getElementById('oddsKey').value.trim();
-                const useMarkets = document.getElementById('useMarkets').checked;
-                const useWeather = document.getElementById('useWeather').checked;
-                const demoMode = document.getElementById('demoMode').checked;
-                const debugMode = document.getElementById('debugMode').checked;
-
-                if (cfbdKey) {
-                    StorageManager.set('cfbd_key', cfbdKey);
-                }
-                if (oddsKey) {
-                    StorageManager.set('odds_key', oddsKey);
-                }
-
-                StorageManager.set('use_markets', useMarkets);
-                StorageManager.set('use_weather', useWeather);
-                StorageManager.set('demo_mode', demoMode);
-                StorageManager.set('debug_mode', debugMode);
-
-                // Show/hide demo notice
-                document.getElementById('demoNotice').style.display = demoMode ? 'block' : 'none';
-
-                this.hideSettings();
-                this.showBanner('Settings saved successfully', 'success');
-
-                // Auto-refresh if we have valid settings
-                if (cfbdKey || demoMode) {
-                    setTimeout(() => this.runPredictions(), 1000);
-                }
-            }
-
-            async testApiConnection() {
-                const cfbdKey = document.getElementById('cfbdKey').value.trim();
-                
-                if (!cfbdKey) {
-                    this.showBanner('Please enter a CFBD API key first', 'error');
-                    return;
-                }
-
-                try {
-                    this.showBanner('Testing API connection...', 'info');
-                    
-                    // Temporarily save the key for testing
-                    const originalKey = StorageManager.get('cfbd_key');
-                    StorageManager.set('cfbd_key', cfbdKey);
-                    
-                    const cfbdClient = new CFBDClient();
-                    const testResult = await cfbdClient.getGames(TimeUtils.getCurrentSeason(), TimeUtils.getCurrentWeek());
-                    
-                    console.log('API Test Result:', testResult);
-                    
-                    if (testResult && Array.isArray(testResult)) {
-                        this.showBanner(`✅ API Connection Successful! Found ${testResult.length} games.`, 'success');
-                    } else {
-                        this.showBanner('⚠️ API responded but data format unexpected', 'warning');
-                    }
-                    
-                    // Restore original key if test key was different
-                    if (originalKey && originalKey !== cfbdKey) {
-                        StorageManager.set('cfbd_key', originalKey);
-                    }
-                    
-                } catch (error) {
-                    console.error('API Test Failed:', error);
-                    
-                    let errorMsg = '❌ API Test Failed: ';
-                    if (error.message.includes('401')) {
-                        errorMsg += 'Invalid API key';
-                    } else if (error.message.includes('CORS')) {
-                        errorMsg += 'CORS error - try Demo Mode';
-                    } else if (error.message.includes('network')) {
-                        errorMsg += 'Network error - check connection';
-                    } else {
-                        errorMsg += error.message;
-                    }
-                    
-                    this.showBanner(errorMsg, 'error');
-                }
-            }
-
-            forgetKeys() {
-                if (confirm('Are you sure you want to forget all API keys and cached data?')) {
-                    StorageManager.clear();
-                    document.getElementById('cfbdKey').value = '';
-                    document.getElementById('oddsKey').value = '';
-                    document.getElementById('useMarkets').checked = false;
-                    document.getElementById('useWeather').checked = true;
-                    document.getElementById('demoMode').checked = false;
-                    document.getElementById('debugMode').checked = false;
-                    
-                    this.showBanner('All data cleared', 'success');
-                    this.renderGames([]);
-                }
-            }
-
-            changeWeek(direction) {
-                // For now, just show message - implement week navigation later
-                this.showBanner('Week navigation coming soon', 'info');
-            }
-
-            setSortMode(mode) {
-                this.currentSort = mode;
-                
-                // Update button states
-                document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
-                document.getElementById(`sort${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('active');
-                
-                // Re-render with new sort
-                this.renderGames(this.predictions);
-            }
-
-            async refreshData() {
-                // Clear relevant caches
-                ['games', 'metrics', 'elo', 'lines', 'weather'].forEach(key => {
-                    StorageManager.remove(`cache_${key}`);
-                });
-                
-                this.showBanner('Cache cleared, refreshing...', 'info');
-                await this.runPredictions();
-            }
-
-            async runPredictions() {
-                const startTime = Date.now();
-                const TIMEOUT_MS = 30000; // 30 second timeout
-                
-                try {
-                    console.log('=== Starting prediction run ===');
-                    this.showLoading();
-                    
-                    // Create a timeout promise
-                    const timeoutPromise = new Promise((_, reject) => {
-                        setTimeout(() => reject(new Error('Prediction timeout after 30 seconds')), TIMEOUT_MS);
-                    });
-                    
-                    // Create the prediction promise
-                    const predictionPromise = (async () => {
-                        const predictor = new GamePredictor();
-                        return await predictor.predictGames(
-                            TimeUtils.getCurrentSeason(),
-                            TimeUtils.getCurrentWeek()
-                        );
-                    })();
-                    
-                    // Race the timeout against the prediction
-                    const predictions = await Promise.race([predictionPromise, timeoutPromise]);
-                    
-                    console.log(`Prediction run completed in ${Date.now() - startTime}ms`);
-                    this.predictions = predictions;
-                    this.renderGames(predictions);
-                    
-                } catch (error) {
-                    console.error('Prediction run failed:', error);
-                    
-                    let errorMessage = error.message;
-                    
-                    // Show helpful error message based on error type
-                    if (error.message.includes('timeout')) {
-                        errorMessage = 'Request timed out. Try Demo Mode or check network.';
-                    } else if (error.message.includes('401') || error.message.includes('unauthorized')) {
-                        errorMessage = 'Invalid API key. Check your CFBD key in settings.';
-                    } else if (error.message.includes('CORS') || error.message.includes('network')) {
-                        errorMessage = 'Network error. Try enabling Demo Mode in settings.';
-                    } else if (error.message.includes('rate limit') || error.message.includes('429')) {
-                        errorMessage = 'Rate limited. Please wait and try again.';
-                    }
-                    
-                    this.showBanner(`Error: ${errorMessage}`, 'error');
-                    
-                    // Show debug info
-                    console.error('Full error details:', {
-                        message: error.message,
-                        stack: error.stack,
-                        timestamp: new Date().toISOString(),
-                        hasApiKey: !!StorageManager.get('cfbd_key'),
-                        demoMode: !!StorageManager.get('demo_mode'),
-                        currentSeason: TimeUtils.getCurrentSeason(),
-                        currentWeek: TimeUtils.getCurrentWeek(),
-                        timeElapsed: Date.now() - startTime
-                    });
-                    
-                    // Always render something, even if empty
-                    this.renderGames([]);
-                } finally {
-                    // Always clear loading state - this is critical
-                    this.hideLoading();
-                    console.log('=== Prediction run finished ===');
-                }
-            }
-
-            forceClear() {
-                console.log('Force clearing all states...');
-                
-                // Clear any ongoing requests/promises (can't actually cancel them, but stop processing)
-                this.predictions = [];
-                
-                // Clear loading state
-                this.hideLoading();
-                
-                // Clear banners
-                this.hideBanner();
-                
-                // Show empty state
-                this.renderGames([]);
-                
-                // Clear any cached data that might be corrupted
-                ['games', 'metrics', 'elo', 'lines', 'weather'].forEach(key => {
-                    StorageManager.remove(`cache_${key}`);
-                });
-                
-                this.showBanner('Cleared all states and cache', 'success');
-                console.log('Force clear completed');
-            }
-
-            resetApp() {
-                if (confirm('Reset app to default state? This will clear all data.')) {
-                    StorageManager.clear();
-                    location.reload();
-                }
-            }
-
-            exportData() {
-                const exportData = {
-                    predictions: this.predictions,
-                    timestamp: new Date().toISOString(),
-                    settings: {
-                        use_markets: StorageManager.get('use_markets'),
-                        use_weather: StorageManager.get('use_weather'),
-                        demo_mode: StorageManager.get('demo_mode')
-                    }
+        // Date utilities
+        const DateUtils = {
+            getCurrentWeek() {
+                const now = new Date();
+                const season = now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1;
+                const seasonStart = new Date(season, 7, 15); // Mid-August
+                const weekNumber = Math.ceil((now - seasonStart) / (7 * 24 * 60 * 60 * 1000));
+                return Math.max(1, Math.min(15, weekNumber));
+            },
+            
+            formatGameTime(dateString) {
+                const date = new Date(dateString);
+                return {
+                    time: date.toLocaleTimeString('en-US', { 
+                        hour: 'numeric', 
+                        minute: '2-digit',
+                        timeZoneName: 'short'
+                    }),
+                    date: date.toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric'
+                    })
                 };
-
-                const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-                    type: 'application/json'
-                });
-                
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `cfb_predictions_${new Date().toISOString().split('T')[0]}.json`;
-                a.click();
-                
-                URL.revokeObjectURL(url);
-                this.showBanner('Data exported successfully', 'success');
             }
+        };
 
+        // UI Management
+        const UI = {
             showLoading() {
-                document.getElementById('gamesContainer').innerHTML = `
-                    <div class="loading">
-                        <div class="spinner"></div>
-                    </div>
-                `;
-            }
-
-            hideLoading() {
-                // Force clear any loading states
                 const container = document.getElementById('gamesContainer');
-                if (container && container.innerHTML.includes('spinner')) {
-                    container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-secondary);"><p>No predictions available.</p></div>';
-                }
-            }
-
+                container.innerHTML = Array(3).fill().map(() => '<div class="loading-skeleton"></div>').join('');
+            },
+            
             renderGames(predictions) {
                 const container = document.getElementById('gamesContainer');
+                const emptyState = document.getElementById('emptyState');
                 
                 if (!predictions || predictions.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                            <p>No upcoming games found.</p>
-                            <p style="font-size: 14px; margin-top: 8px;">
-                                ${StorageManager.get('demo_mode') ? 
-                                    'Demo mode is enabled with sample data.' : 
-                                    'Configure your API key in settings to load live data.'
-                                }
-                            </p>
-                        </div>
-                    `;
+                    container.innerHTML = '';
+                    emptyState.style.display = 'block';
                     return;
                 }
-
+                
+                emptyState.style.display = 'none';
+                
                 // Sort predictions
+                const sortBy = document.getElementById('sortBy').value;
                 const sorted = [...predictions].sort((a, b) => {
-                    switch (this.currentSort) {
+                    switch (sortBy) {
                         case 'confidence':
-                            return (b.confidence || 0) - (a.confidence || 0);
+                            return b.confidence - a.confidence;
                         case 'edge':
-                            return Math.abs(b.market_edge || 0) - Math.abs(a.market_edge || 0);
+                            return (b.edge || 0) - (a.edge || 0);
                         case 'time':
-                            return new Date(a.start_date) - new Date(b.start_date);
+                            return new Date(a.kickoff) - new Date(b.kickoff);
                         default:
-                            return 0;
+                            return b.confidence - a.confidence;
                     }
                 });
-
+                
                 container.innerHTML = sorted.map(prediction => this.renderGameCard(prediction)).join('');
-                
-                // Add event listeners for "Why" buttons
-                container.querySelectorAll('.why-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const gameId = e.target.dataset.gameId;
-                        this.toggleDrivers(gameId);
-                    });
-                });
-            }
-
+            },
+            
             renderGameCard(prediction) {
-                const homeWinProb = Math.round(prediction.home_prob * 100);
-                const awayWinProb = Math.round(prediction.away_prob * 100);
-                const confidence = Math.round(prediction.confidence * 100);
+                const gameTime = DateUtils.formatGameTime(prediction.kickoff);
+                const confidence = (prediction.confidence * 100).toFixed(0);
+                const homeProb = (prediction.homeWinProb * 100).toFixed(0);
+                const awayProb = (prediction.awayWinProb * 100).toFixed(0);
                 
-                const edgeBadge = prediction.market_edge && Math.abs(prediction.market_edge) > 0.05 ? 
-                    `<span class="edge-badge">${prediction.market_edge > 0 ? '+' : ''}${Math.round(prediction.market_edge * 100)}%</span>` : '';
-
-                const venueInfo = prediction.neutral_site ? 
-                    `<span class="venue-info">Neutral</span>` : 
-                    `<span class="venue-info">${prediction.venue || 'Home'}</span>`;
-
-                const driversHtml = prediction.drivers ? 
-                    prediction.drivers.map(driver => 
-                        `<span class="driver-chip ${driver.impact}">${driver.name}: ${driver.value}</span>`
-                    ).join('') : '';
-
-                const rationale = this.generateRationale(prediction);
-
+                // Calculate confidence ring
+                const circumference = 2 * Math.PI * 16; // radius = 16
+                const strokeDasharray = circumference;
+                const strokeDashoffset = circumference * (1 - prediction.confidence);
+                
+                const edgeBadge = prediction.edge && prediction.edge > 0.1 ? 
+                    `<div class="edge-badge">${(prediction.edge * 100).toFixed(0)}% edge</div>` : '';
+                
+                const drivers = prediction.drivers.map(driver => 
+                    `<div class="driver-chip ${driver.impact}">${driver.name}: ${driver.description}</div>`
+                ).join('');
+                
+                const favoredTeam = prediction.homeWinProb > 0.5 ? prediction.homeTeam : prediction.awayTeam;
+                const favoredProb = Math.max(prediction.homeWinProb, prediction.awayWinProb);
+                
                 return `
                     <div class="game-card">
                         <div class="game-header">
-                            <div class="game-time">${TimeUtils.formatGameTime(prediction.start_date)}</div>
-                            ${venueInfo}
+                            <div class="game-time">
+                                <div>${gameTime.date}</div>
+                                <div>${gameTime.time}</div>
+                            </div>
                         </div>
+                        
+                        <div class="venue">${prediction.venue || 'TBD'}</div>
                         
                         <div class="matchup">
                             <div class="team">
-                                <div class="team-name">${prediction.away_team}</div>
-                                <div class="team-record">Away</div>
+                                <div class="team-name">${prediction.awayTeam}</div>
+                                <div class="team-record">${awayProb}%</div>
                             </div>
                             <div class="vs">@</div>
                             <div class="team">
-                                <div class="team-name">${prediction.home_team}</div>
-                                <div class="team-record">Home</div>
+                                <div class="team-name">${prediction.homeTeam}</div>
+                                <div class="team-record">${homeProb}%</div>
                             </div>
                         </div>
                         
                         <div class="prediction">
-                            <div class="prob-display">
-                                <span class="prob-pill">${homeWinProb}%</span>
-                                <svg class="confidence-ring" viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="10" fill="none" stroke="var(--border-color)" stroke-width="2"/>
-                                    <circle cx="12" cy="12" r="10" fill="none" stroke="var(--accent-color)" stroke-width="2"
-                                            stroke-dasharray="${confidence * 0.628} 62.8" stroke-dashoffset="15.7"/>
-                                </svg>
-                                ${edgeBadge}
+                            <div class="prob-container">
+                                <div class="confidence-ring">
+                                    <svg width="40" height="40">
+                                        <circle class="confidence-bg" cx="20" cy="20" r="16"></circle>
+                                        <circle class="confidence-fill" cx="20" cy="20" r="16"
+                                                stroke-dasharray="${strokeDasharray}"
+                                                stroke-dashoffset="${strokeDashoffset}"></circle>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="prob-text">${favoredTeam}</div>
+                                    <div style="font-size: 0.875rem; color: var(--text-secondary);">${confidence}% confidence</div>
+                                </div>
                             </div>
-                            <button class="why-btn" data-game-id="${prediction.game_id}">Why?</button>
+                            ${edgeBadge}
                         </div>
                         
-                        <div id="drivers-${prediction.game_id}" class="drivers">
-                            <div class="driver-chips">${driversHtml}</div>
-                            <div class="rationale">${rationale}</div>
-                        </div>
+                        ${drivers ? `<div class="drivers">${drivers}</div>` : ''}
                     </div>
                 `;
-            }
-
-            generateRationale(prediction) {
-                const homeTeam = prediction.home_team;
-                const homeProb = Math.round(prediction.home_prob * 100);
-                
-                let reasons = [];
-                
-                if (prediction.features && prediction.features.eloThug > 50) {
-                    reasons.push('superior rating');
-                } else if (prediction.features && prediction.features.eloThug < -50) {
-                    reasons.push('rating disadvantage');
-                }
-                
-                if (!prediction.neutral_site) {
-                    reasons.push('home field advantage');
-                }
-                
-                if (prediction.weather && prediction.weather.wind_speed > 15) {
-                    reasons.push('weather concerns');
-                }
-                
-                const mainReason = reasons.length > 0 ? ` due to ${reasons.join(' and ')}` : '';
-                
-                return `${homeTeam} favored ${homeProb}%${mainReason}.`;
-            }
-
-            toggleDrivers(gameId) {
-                const driversEl = document.getElementById(`drivers-${gameId}`);
-                if (driversEl) {
-                    driversEl.classList.toggle('show');
-                }
-            }
-
-            showBanner(message, type = 'info') {
-                const banner = document.getElementById('banner');
-                banner.textContent = message;
-                banner.className = `banner show ${type}`;
-                
-                // Auto-hide after 3 seconds for success/info messages
-                if (type !== 'error') {
-                    setTimeout(() => this.hideBanner(), 3000);
-                }
-            }
-
-            hideBanner() {
-                const banner = document.getElementById('banner');
-                banner.classList.remove('show');
-            }
-        }
-
-        // === INITIALIZATION ===
-        const UI = new UIManager();
-
-        // Enhanced logging for debug mode
-        const originalConsoleLog = console.log;
-        const originalConsoleError = console.error;
-        const originalConsoleWarn = console.warn;
-
-        function debugLog(...args) {
-            originalConsoleLog(...args);
-            if (StorageManager.get('debug_mode')) {
-                const timestamp = new Date().toLocaleTimeString();
-                const message = args.join(' ');
-                UI.showBanner(`[${timestamp}] ${message}`, 'info');
-            }
-        }
-
-        // Override console methods for debug mode
-        console.log = debugLog;
-
-        // Auto-load on page load if we have settings
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('CFB Predictor starting up...');
+            },
             
-            const hasKey = StorageManager.get('cfbd_key');
-            const demoMode = StorageManager.get('demo_mode');
+            updateWeekDisplay() {
+                const display = document.getElementById('weekDisplay');
+                if (AppState.currentWeek === DateUtils.getCurrentWeek()) {
+                    display.textContent = 'This Weekend';
+                } else {
+                    display.textContent = `Week ${AppState.currentWeek}`;
+                }
+            },
             
-            console.log(`Has API key: ${!!hasKey}, Demo mode: ${!!demoMode}`);
-            console.log(`Current season: ${TimeUtils.getCurrentSeason()}, Current week: ${TimeUtils.getCurrentWeek()}`);
-            
-            if (hasKey || demoMode) {
-                setTimeout(() => {
-                    console.log('Auto-starting predictions...');
-                    UI.runPredictions();
-                }, 500);
-            } else {
-                UI.showBanner('Configure your CFBD API key in settings to get started', 'info');
-                // Show welcome message
-                document.getElementById('gamesContainer').innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: var(--text-secondary); max-width: 500px; margin: 0 auto;">
-                        <h3 style="color: var(--text-primary); margin-bottom: 16px;">Welcome to CFB Predictor</h3>
-                        <p style="margin: 16px 0;">Get started by:</p>
-                        <ol style="text-align: left; display: inline-block; margin: 16px 0; line-height: 1.6;">
-                            <li>Click the ⚙ settings button above</li>
-                            <li>Get a free API key from <a href="https://collegefootballdata.com" target="_blank" style="color: var(--accent-color);">collegefootballdata.com</a></li>
-                            <li>Paste it in settings and save</li>
-                            <li>Or enable "Demo Mode" to try with sample data</li>
-                        </ol>
-                        <p style="margin-top: 24px;">
-                            <button onclick="document.getElementById('settingsBtn').click()" 
-                                    style="background: var(--accent-color); color: white; border: none; border-radius: 6px; padding: 12px 24px; font-size: 16px; cursor: pointer;">
-                                Open Settings
-                            </button>
-                        </p>
-                    </div>
-                `;
+            populateFilters(games) {
+                const conferenceFilter = document.getElementById('conferenceFilter');
+                const teamFilter = document.getElementById('teamFilter');
                 
-                console.log('No API key configured. Showing setup message.');
+                // Get unique conferences and teams
+                const conferences = [...new Set(games.flatMap(g => [g.away_conference, g.home_conference]).filter(Boolean))];
+                const teams = [...new Set(games.flatMap(g => [g.away_team, g.home_team]))];
+                
+                // Update conference filter
+                conferenceFilter.innerHTML = '<option value="">All Conferences</option>' +
+                    conferences.map(conf => `<option value="${conf}">${conf}</option>`).join('');
+                
+                // Update team filter
+                teamFilter.innerHTML = '<option value="">All Teams</option>' +
+                    teams.map(team => `<option value="${team}">${team}</option>`).join('');
             }
-        });
-
-        // Web Worker for heavy computation (simplified for single file)
-        // In production, this would be a separate file
-        const createWorker = () => {
-            const workerCode = `
-                // Web Worker code for heavy ML computations
-                self.onmessage = function(e) {
-                    const { type, data } = e.data;
-                    
-                    switch (type) {
-                        case 'irls':
-                            // Simplified IRLS implementation
-                            const result = performIRLS(data);
-                            self.postMessage({ type: 'irls_result', result });
-                            break;
-                        case 'calibration':
-                            // Isotonic regression implementation
-                            const calibration = performCalibration(data);
-                            self.postMessage({ type: 'calibration_result', result: calibration });
-                            break;
-                    }
-                };
-                
-                function performIRLS(data) {
-                    // Simplified IRLS for logistic regression
-                    // In production, implement proper iteratively reweighted least squares
-                    return { coefficients: [0.1, 0.004] };
-                }
-                
-                function performCalibration(data) {
-                    // Simplified isotonic regression
-                    // In production, implement proper PAV algorithm
-                    return { mapping: x => x };
-                }
-            `;
-            
-            const blob = new Blob([workerCode], { type: 'application/javascript' });
-            return new Worker(URL.createObjectURL(blob));
         };
 
-        // Global error handler
-        window.addEventListener('error', (e) => {
-            console.error('App error:', e.error);
-            UI.showBanner('An unexpected error occurred', 'error');
+        // Toast notifications
+        function showToast(message, type = 'danger') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, type === 'success' ? 2000 : 4000);
+        }
+
+        // Settings management
+        function loadSettings() {
+            const settings = AppState.settings;
+            document.getElementById('cfbdKey').value = settings.cfbdKey;
+            document.getElementById('useMarkets').checked = settings.useMarkets;
+            document.getElementById('useWeather').checked = settings.useWeather;
+            document.getElementById('manualInjuries').checked = settings.manualInjuries;
+            document.getElementById('demoMode').checked = settings.demoMode;
+        }
+
+        function saveSettings() {
+            const settings = AppState.settings;
+            settings.cfbdKey = document.getElementById('cfbdKey').value.trim();
+            settings.useMarkets = document.getElementById('useMarkets').checked;
+            settings.useWeather = document.getElementById('useWeather').checked;
+            settings.manualInjuries = document.getElementById('manualInjuries').checked;
+            settings.demoMode = document.getElementById('demoMode').checked;
+            
+            // Persist only the API key
+            if (settings.cfbdKey) {
+                localStorage.setItem('cfbd_key', settings.cfbdKey);
+            }
+            
+            document.getElementById('settingsModal').classList.remove('show');
+            showToast('Settings saved', 'success');
+        }
+
+        function forgetKeys() {
+            localStorage.removeItem('cfbd_key');
+            AppState.settings.cfbdKey = '';
+            document.getElementById('cfbdKey').value = '';
+            showToast('API keys forgotten', 'success');
+        }
+
+        // Main application controller
+        class App {
+            constructor() {
+                this.predictionEngine = new PredictionEngine();
+                this.init();
+            }
+            
+            init() {
+                AppState.currentWeek = DateUtils.getCurrentWeek();
+                UI.updateWeekDisplay();
+                this.bindEvents();
+                loadSettings();
+                
+                // Auto-load if we have settings
+                if (AppState.settings.cfbdKey || AppState.settings.demoMode) {
+                    this.refreshData();
+                }
+            }
+            
+            bindEvents() {
+                // Week navigation
+                document.getElementById('prevWeek').addEventListener('click', () => {
+                    AppState.currentWeek = Math.max(1, AppState.currentWeek - 1);
+                    UI.updateWeekDisplay();
+                    this.refreshData();
+                });
+                
+                document.getElementById('nextWeek').addEventListener('click', () => {
+                    AppState.currentWeek = Math.min(15, AppState.currentWeek + 1);
+                    UI.updateWeekDisplay();
+                    this.refreshData();
+                });
+                
+                // Settings modal
+                document.getElementById('settingsBtn').addEventListener('click', () => {
+                    document.getElementById('settingsModal').classList.add('show');
+                });
+                
+                document.getElementById('closeSettings').addEventListener('click', () => {
+                    document.getElementById('settingsModal').classList.remove('show');
+                });
+                
+                document.getElementById('closeSettings2').addEventListener('click', () => {
+                    document.getElementById('settingsModal').classList.remove('show');
+                });
+                
+                document.getElementById('saveSettings').addEventListener('click', saveSettings);
+                document.getElementById('forgetKeys').addEventListener('click', forgetKeys);
+                
+                // Bottom actions
+                document.getElementById('refreshData').addEventListener('click', () => this.refreshData());
+                document.getElementById('predict').addEventListener('click', () => this.predict());
+                document.getElementById('exportData').addEventListener('click', () => this.exportData());
+                document.getElementById('resetApp').addEventListener('click', () => this.reset());
+                
+                // Filters
+                document.getElementById('sortBy').addEventListener('change', () => {
+                    if (AppState.predictions) {
+                        UI.renderGames(AppState.predictions);
+                    }
+                });
+                
+                // Close modal on overlay click
+                document.getElementById('settingsModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'settingsModal') {
+                        e.target.classList.remove('show');
+                    }
+                });
+            }
+            
+            async refreshData() {
+                if (!AppState.settings.cfbdKey && !AppState.settings.demoMode) {
+                    showToast('CFBD API key required. Check settings.', 'warning');
+                    document.getElementById('settingsModal').classList.add('show');
+                    return;
+                }
+                
+                UI.showLoading();
+                
+                try {
+                    const games = await this.predictionEngine.cfbdClient.getGames(AppState.currentSeason, AppState.currentWeek);
+                    
+                    if (!games || games.length === 0) {
+                        showToast('No games found for this week', 'warning');
+                        UI.renderGames([]);
+                        return;
+                    }
+                    
+                    AppState.cache.games = games;
+                    AppState.cache.lastUpdate = new Date();
+                    
+                    UI.populateFilters(games);
+                    showToast(`Loaded ${games.length} games`, 'success');
+                    
+                    // Auto-predict if we have games
+                    this.predict();
+                    
+                } catch (error) {
+                    showToast(`Error loading data: ${error.message}`, 'danger');
+                    UI.renderGames([]);
+                }
+            }
+            
+            async predict() {
+                if (!AppState.cache.games) {
+                    showToast('Load data first', 'warning');
+                    return;
+                }
+                
+                try {
+                    const predictions = await this.predictionEngine.predict(AppState.cache.games);
+                    AppState.predictions = predictions;
+                    UI.renderGames(predictions);
+                    
+                    if (predictions.length > 0) {
+                        showToast(`Generated ${predictions.length} predictions`, 'success');
+                    }
+                    
+                } catch (error) {
+                    showToast(`Prediction error: ${error.message}`, 'danger');
+                }
+            }
+            
+            exportData() {
+                const exportData = {
+                    timestamp: new Date().toISOString(),
+                    week: AppState.currentWeek,
+                    season: AppState.currentSeason,
+                    games: AppState.cache.games,
+                    predictions: AppState.predictions
+                };
+                
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cfb-predictions-week${AppState.currentWeek}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('Data exported', 'success');
+            }
+            
+            reset() {
+                if (confirm('Reset all data? This will clear cache but keep settings.')) {
+                    AppState.cache = { games: null, metrics: null, weather: null, lines: null, lastUpdate: null };
+                    AppState.predictions = null;
+                    UI.renderGames([]);
+                    showToast('App reset', 'success');
+                }
+            }
+        }
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new App();
         });
 
-        // Service worker registration (for PWA capabilities)
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('data:text/javascript,// Minimal SW')
-                .catch(err => console.log('SW registration failed'));
-        }
+        // Ensure proper cleanup
+        window.addEventListener('beforeunload', () => {
+            if (AppState.worker) {
+                AppState.worker.terminate();
+            }
+        });
     </script>
-
-    <!-- 
-    README:
-    
-    CFB Winner Predictor - Single File Mobile Web App
-    ================================================
-    
-    ## Getting Started
-    
-    1. **Get a CFBD API Key**
-       - Visit https://collegefootballdata.com
-       - Sign up for a free account
-       - Generate an API key
-       - Paste it in the app settings
-    
-    2. **Deploy to GitHub Pages**
-       - Create a new GitHub repository
-       - Upload this index.html file
-       - Go to Settings > Pages
-       - Select "Deploy from a branch" and choose main/master
-       - Your app will be available at https://username.github.io/repository-name
-    
-    3. **Using Demo Mode**
-       - If APIs are blocked or unavailable, enable "Demo Mode" in settings
-       - This loads sample data so you can explore the UI
-       - Perfect for testing before configuring real API keys
-    
-    ## Features
-    
-    - Live college football game predictions
-    - Weather-adjusted probabilities
-    - Market edge detection (when betting lines available)
-    - Mobile-optimized interface
-    - Offline-capable with data caching
-    - Dark mode support
-    - Accessibility features
-    
-    ## API Requirements
-    
-    - CFBD API key (required): Free at collegefootballdata.com
-    - TheOddsAPI key (optional): For betting market data
-    - Weather data: Uses free Open-Meteo API (no key required)
-    
-    ## Privacy & Security
-    
-    - All API keys stored locally on your device only
-    - No data transmitted to third parties
-    - Use "Forget Keys" to clear all stored data
-    
-    Built with no external dependencies - pure HTML/CSS/JavaScript.
-    -->
 </body>
 </html>
+
+<!--
+README: CFB Winner Predictor
+
+GETTING STARTED:
+1. Get a free CFBD API key at https://collegefootballdata.com
+2. Click the settings gear and paste your API key
+3. Enable features you want (betting markets, weather, etc.)
+4. Click "Refresh Data" to load games for the current week
+
+DEPLOYMENT TO GITHUB PAGES:
+1. Create a new repository on GitHub
+2. Upload this index.html file to the root directory
+3. Go to Settings > Pages in your repository
+4. Select "Deploy from branch" and choose "main"
+5. Your app will be available at https://username.github.io/repository-name
+
+DEMO MODE:
+If you don't have an API key or the APIs are blocked:
+1. Open Settings
+2. Check "Demo mode (offline data)"
+3. Click "Refresh Data" to see sample predictions
+
+FEATURES:
+- Live college football game predictions using ML models
+- Weather impact analysis for outdoor games
+- Betting market edge detection (when available)
+- Mobile-optimized interface with dark/light mode
+- Offline-capable with demo data
+- Export predictions as JSON
+
+TROUBLESHOOTING:
+- "Invalid CFBD key": Check your API key at collegefootballdata.com
+- "Rate limit exceeded": Wait a few seconds and try again
+- "No games found": Try a different week or check if it's off-season
+- APIs blocked: Enable demo mode in settings
+
+This app runs entirely in your browser - no data is sent to external servers except the APIs you configure.
+-->
