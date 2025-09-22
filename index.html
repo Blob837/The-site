@@ -1,2105 +1,2053 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>UR NEWS - Terminal Intelligence</title>
-<meta name="theme-color" content="#000000">
-<meta name="description" content="Real-time intelligence terminal for breaking news and political analysis">
-<style>
-  :root {
-    /* CRT Terminal Color Scheme */
-    --bg: #0a0a0a;
-    --panel: #111111;
-    --text: #00ff41;
-    --text-dim: #00cc33;
-    --text-muted: #007722;
-    --accent: #00ffff;
-    --warning: #ffaa00;
-    --error: #ff4444;
-    --border: #00ff4133;
-    --border-bright: #00ff4166;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="description" content="College Football Winner Predictor with live data and calibrated probabilities">
+    <title>CFB Winner Predictor</title>
     
-    /* Layout Constants */
-    --header-h: 60px;
-    --nav-h: 70px;
-    --gap: 16px;
-    --radius: 3px;
-    --touch-min: 44px;
-    
-    /* Safe Areas */
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-  }
-
-  * {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow-x: hidden;
-  }
-
-  body {
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-    font-size: 13px;
-    line-height: 1.4;
-    color: var(--text);
-    background: var(--bg);
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
-
-  /* CRT Effects - Subtle */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      linear-gradient(transparent 50%, rgba(0, 255, 65, 0.03) 50%),
-      radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.4) 100%);
-    background-size: 100% 2px, 100% 100%;
-    pointer-events: none;
-    z-index: 1000;
-    animation: scanlines 0.1s linear infinite;
-  }
-
-  @keyframes scanlines {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(2px); }
-  }
-
-  /* Header */
-  .app-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    background: rgba(10, 10, 10, 0.95);
-    border-bottom: 1px solid var(--border);
-    padding-top: var(--safe-top);
-    backdrop-filter: blur(10px);
-  }
-
-  .header-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: var(--header-h);
-    padding: 0 var(--gap);
-  }
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .cursor {
-    width: 10px;
-    height: 10px;
-    background: var(--text);
-    animation: blink 1s infinite;
-  }
-
-  @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0.3; }
-  }
-
-  .brand-text {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-shadow: 0 0 10px currentColor;
-  }
-
-  .status {
-    display: flex;
-    align-items: center;
-    gap: var(--gap);
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .status-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .status-led {
-    width: 6px;
-    height: 6px;
-    background: var(--text);
-    border-radius: 50%;
-    box-shadow: 0 0 4px currentColor;
-  }
-
-  .status-led.warn { 
-    background: var(--warning); 
-    color: var(--warning);
-  }
-  
-  .status-led.err { 
-    background: var(--error); 
-    color: var(--error);
-  }
-
-  /* Main Content */
-  .main-content {
-    padding: calc(var(--header-h) + var(--safe-top) + var(--gap)) var(--gap) calc(var(--nav-h) + var(--safe-bottom) + var(--gap));
-    min-height: 100vh;
-  }
-
-  /* Pull to Refresh */
-  .pull-indicator {
-    position: fixed;
-    top: calc(var(--header-h) + var(--safe-top) + var(--gap));
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 8px 16px;
-    background: rgba(10, 10, 10, 0.9);
-    border: 1px solid var(--border);
-    color: var(--text-muted);
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-radius: var(--radius);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 90;
-  }
-
-  .pull-indicator[data-state="ready"] {
-    background: rgba(0, 255, 65, 0.1);
-    border-color: var(--border-bright);
-    color: var(--text);
-  }
-
-  .pull-indicator[data-state="loading"] {
-    opacity: 1;
-    color: var(--accent);
-  }
-
-  /* News Feed */
-  .news-feed {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap);
-  }
-
-  .news-item {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: var(--gap);
-    position: relative;
-    transition: all 0.2s ease;
-  }
-
-  .news-item:hover {
-    border-color: var(--border-bright);
-    background: #141414;
-  }
-
-  .news-item.expanded {
-    border-color: var(--text-dim);
-    background: rgba(0, 255, 65, 0.05);
-  }
-
-  .news-item.breaking::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--error);
-    border-radius: var(--radius) var(--radius) 0 0;
-  }
-
-  .item-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    cursor: pointer;
-    min-height: var(--touch-min);
-    padding: 4px 0;
-  }
-
-  .item-header:focus {
-    outline: 2px solid var(--text-dim);
-    outline-offset: 2px;
-    border-radius: var(--radius);
-  }
-
-  .source-icon {
-    width: 24px;
-    height: 24px;
-    background: var(--text-dim);
-    color: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    border-radius: var(--radius);
-    flex-shrink: 0;
-  }
-
-  .item-content {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .item-title {
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.3;
-    margin: 0 0 8px 0;
-    word-wrap: break-word;
-  }
-
-  .breaking-tag {
-    display: inline-block;
-    margin-left: 8px;
-    padding: 2px 6px;
-    background: var(--error);
-    color: white;
-    font-size: 8px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    border-radius: 2px;
-    vertical-align: middle;
-    animation: pulse 1s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-  }
-
-  .item-meta {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    font-size: 10px;
-    color: var(--text-muted);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .meta-time.fresh {
-    color: var(--accent);
-  }
-
-  .meta-badge {
-    padding: 2px 6px;
-    border: 1px solid var(--border);
-    font-size: 8px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 2px;
-    letter-spacing: 0.5px;
-  }
-
-  .meta-badge.sentiment-very-positive,
-  .meta-badge.sentiment-positive {
-    border-color: var(--text-dim);
-    color: var(--text-dim);
-  }
-
-  .meta-badge.sentiment-negative,
-  .meta-badge.sentiment-very-negative {
-    border-color: var(--error);
-    color: var(--error);
-  }
-
-  .meta-badge.sentiment-neutral {
-    border-color: var(--warning);
-    color: var(--warning);
-  }
-
-  .meta-badge.trending {
-    border-color: var(--warning);
-    color: var(--warning);
-    animation: glow 2s ease-in-out infinite;
-  }
-
-  @keyframes glow {
-    0%, 100% { box-shadow: 0 0 5px currentColor; }
-    50% { box-shadow: 0 0 10px currentColor; }
-  }
-
-  .item-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-left: auto;
-    flex-shrink: 0;
-  }
-
-  .progress-bar {
-    width: 40px;
-    height: 2px;
-    background: rgba(0, 255, 65, 0.2);
-    border-radius: 1px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--text);
-    transform-origin: left;
-    transform: scaleX(var(--progress, 0));
-    transition: transform 0.3s ease;
-  }
-
-  .expand-btn {
-    min-height: var(--touch-min);
-    min-width: var(--touch-min);
-    padding: 8px 12px;
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid var(--border);
-    color: var(--text-muted);
-    font-size: 9px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
-    border-radius: var(--radius);
-  }
-
-  .expand-btn:hover,
-  .expand-btn:focus {
-    background: rgba(0, 255, 65, 0.1);
-    border-color: var(--border-bright);
-    color: var(--text);
-  }
-
-  .expand-btn:focus {
-    outline: 2px solid var(--text-dim);
-    outline-offset: 2px;
-  }
-
-  .item-body {
-    margin-top: var(--gap);
-    padding-top: var(--gap);
-    border-top: 1px solid var(--border);
-  }
-
-  .item-summary {
-    font-size: 12px;
-    line-height: 1.5;
-    color: var(--text-dim);
-    margin-bottom: var(--gap);
-  }
-
-  .item-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: var(--touch-min);
-    padding: 12px 20px;
-    background: rgba(0, 255, 255, 0.1);
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    font-family: inherit;
-    border-radius: var(--radius);
-  }
-
-  .item-link:hover,
-  .item-link:focus {
-    background: rgba(0, 255, 255, 0.2);
-    transform: translateY(-1px);
-  }
-
-  /* Empty State */
-  .empty-state {
-    padding: 60px 24px;
-    text-align: center;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    margin-top: 40px;
-    border-radius: var(--radius);
-  }
-
-  .empty-state h3 {
-    margin: 0 0 12px;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--warning);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .empty-state p {
-    margin: 0;
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-
-  /* Loading States */
-  .loading-item {
-    padding: var(--gap);
-    background: var(--panel);
-    border: 1px solid var(--border);
-    margin-bottom: var(--gap);
-    border-radius: var(--radius);
-    animation: loading-pulse 1.5s ease-in-out infinite;
-  }
-
-  @keyframes loading-pulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 0.8; }
-  }
-
-  .loading-title,
-  .loading-meta {
-    height: 12px;
-    background: rgba(0, 255, 65, 0.1);
-    margin-bottom: 8px;
-    border-radius: var(--radius);
-    animation: loading-shimmer 2s ease-in-out infinite;
-  }
-
-  @keyframes loading-shimmer {
-    0% { opacity: 0.3; }
-    50% { opacity: 0.6; }
-    100% { opacity: 0.3; }
-  }
-
-  .loading-title {
-    height: 16px;
-    width: 85%;
-  }
-
-  .loading-meta {
-    height: 10px;
-    width: 60%;
-  }
-
-  /* Toast Messages */
-  .toast {
-    position: fixed;
-    bottom: calc(var(--nav-h) + var(--safe-bottom) + 20px);
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 12px 20px;
-    background: rgba(10, 10, 10, 0.95);
-    border: 1px solid var(--border-bright);
-    color: var(--text);
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    z-index: 200;
-    border-radius: var(--radius);
-    max-width: calc(100vw - 32px);
-    animation: toast-enter 0.3s ease;
-  }
-
-  @keyframes toast-enter {
-    from { 
-      transform: translateX(-50%) translateY(100%); 
-      opacity: 0;
-    }
-    to { 
-      transform: translateX(-50%) translateY(0); 
-      opacity: 1;
-    }
-  }
-
-  .toast.success {
-    border-color: var(--text-dim);
-    color: var(--text-dim);
-  }
-
-  .toast.error {
-    border-color: var(--error);
-    color: var(--error);
-  }
-
-  /* Bottom Navigation - FIXED */
-  .app-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: calc(var(--nav-h) + var(--safe-bottom));
-    background: rgba(10, 10, 10, 0.98);
-    border-top: 1px solid var(--border);
-    backdrop-filter: blur(10px);
-    z-index: 100;
-    padding-bottom: var(--safe-bottom);
-  }
-
-  .nav-container {
-    height: var(--nav-h);
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    padding: 0 8px;
-  }
-
-  .nav-btn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    min-height: var(--touch-min);
-    padding: 8px 4px;
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
-    text-transform: uppercase;
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    border-radius: var(--radius);
-  }
-
-  .nav-btn:focus {
-    outline: 2px solid var(--text-dim);
-    outline-offset: 2px;
-  }
-
-  .nav-btn.active {
-    color: var(--text);
-    background: rgba(0, 255, 65, 0.1);
-  }
-
-  .nav-btn.active::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 2px;
-    background: var(--text);
-    border-radius: 1px;
-  }
-
-  .nav-icon {
-    font-size: 14px;
-    line-height: 1;
-  }
-
-  /* Sheets/Modals */
-  .sheet {
-    position: fixed;
-    inset: 0;
-    z-index: 300;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .sheet.visible {
-    pointer-events: auto;
-    opacity: 1;
-  }
-
-  .sheet-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(4px);
-  }
-
-  .sheet-panel {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--bg);
-    border-top: 2px solid var(--text-dim);
-    transform: translateY(100%);
-    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    max-height: 80vh;
-    overflow: hidden;
-    padding-bottom: var(--safe-bottom);
-    border-radius: var(--radius) var(--radius) 0 0;
-  }
-
-  .sheet.visible .sheet-panel {
-    transform: translateY(0);
-  }
-
-  .sheet-handle {
-    width: 40px;
-    height: 3px;
-    background: var(--border-bright);
-    margin: 12px auto;
-    border-radius: 2px;
-  }
-
-  .sheet-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--gap) 20px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .sheet-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .sheet-close {
-    background: none;
-    border: none;
-    color: var(--accent);
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    padding: 8px 12px;
-    font-family: inherit;
-    min-height: var(--touch-min);
-    border-radius: var(--radius);
-  }
-
-  .sheet-close:focus {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-
-  .sheet-content {
-    padding: 20px;
-    overflow-y: auto;
-    max-height: 60vh;
-  }
-
-  /* Filter Controls */
-  .filter-section {
-    margin-bottom: 24px;
-  }
-
-  .filter-title {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 12px;
-  }
-
-  .filter-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .filter-chip {
-    padding: 8px 12px;
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid var(--border);
-    color: var(--text-muted);
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
-    border-radius: var(--radius);
-    min-height: var(--touch-min);
-  }
-
-  .filter-chip:focus {
-    outline: 2px solid var(--text-dim);
-    outline-offset: 2px;
-  }
-
-  .filter-chip.active {
-    background: rgba(0, 255, 65, 0.2);
-    border-color: var(--border-bright);
-    color: var(--text);
-  }
-
-  /* Source Selector */
-  .source-selector {
-    width: 100%;
-    padding: var(--gap);
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: left;
-    font-family: inherit;
-    border-radius: var(--radius);
-    min-height: var(--touch-min);
-  }
-
-  .source-selector:hover,
-  .source-selector:focus {
-    border-color: var(--border-bright);
-    background: rgba(0, 255, 65, 0.1);
-    outline: 2px solid var(--text-dim);
-    outline-offset: 2px;
-  }
-
-  .selector-label {
-    display: block;
-    font-size: 9px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-  }
-
-  .selector-value {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--accent);
-  }
-
-  .selector-hint {
-    display: block;
-    font-size: 10px;
-    color: var(--text-muted);
-    margin-top: 4px;
-  }
-
-  .source-option {
-    padding: 14px;
-    margin-bottom: 8px;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid var(--border);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-family: inherit;
-    width: 100%;
-    text-align: left;
-    border-radius: var(--radius);
-    min-height: var(--touch-min);
-  }
-
-  .source-option:focus {
-    outline: 2px solid var(--text-dim);
-    outline-offset: 2px;
-  }
-
-  .source-option[aria-selected="true"] {
-    background: rgba(0, 255, 65, 0.1);
-    border-color: var(--border-bright);
-  }
-
-  .option-name {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-
-  .option-meta {
-    display: flex;
-    gap: 12px;
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .option-check {
-    float: right;
-    color: var(--accent);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    font-size: 12px;
-  }
-
-  .source-option[aria-selected="true"] .option-check {
-    opacity: 1;
-  }
-
-  /* Action Buttons */
-  .action-group {
-    margin-bottom: var(--gap);
-  }
-
-  .action-btn {
-    width: 100%;
-    padding: 14px;
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-size: 12px;
-    font-weight: 600;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-bottom: 8px;
-    font-family: inherit;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-radius: var(--radius);
-    min-height: var(--touch-min);
-  }
-
-  .action-btn:focus {
-    outline: 2px solid var(--text-dim);
-    outline-offset: 2px;
-  }
-
-  .action-btn:hover,
-  .action-btn:focus {
-    background: rgba(0, 255, 65, 0.1);
-    border-color: var(--border-bright);
-  }
-
-  .action-btn.danger {
-    background: rgba(255, 68, 68, 0.1);
-    border-color: rgba(255, 68, 68, 0.3);
-    color: var(--error);
-  }
-
-  .action-btn.danger:hover,
-  .action-btn.danger:focus {
-    background: rgba(255, 68, 68, 0.2);
-    border-color: var(--error);
-  }
-
-  /* Responsive Design */
-  @media (min-width: 768px) {
-    .news-item {
-      max-width: 600px;
-      margin: 0 auto var(--gap);
-    }
-    
-    .main-content {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-  }
-
-  /* Reduced Motion */
-  @media (prefers-reduced-motion: reduce) {
-    * {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-
-    body::before {
-      animation: none !important;
-    }
-  }
-
-  /* Utility Classes */
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  .touch-target {
-    min-height: var(--touch-min);
-    min-width: var(--touch-min);
-  }
-</style>
+    <style>
+        :root {
+            --primary-bg: #ffffff;
+            --secondary-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #666666;
+            --accent: #0066cc;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --border: #e0e0e0;
+            --shadow: rgba(0,0,0,0.1);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-bg: #1a1a1a;
+                --secondary-bg: #2a2a2a;
+                --card-bg: #333333;
+                --text-primary: #ffffff;
+                --text-secondary: #cccccc;
+                --accent: #4da6ff;
+                --border: #444444;
+                --shadow: rgba(0,0,0,0.3);
+            }
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.4;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        .header {
+            background: var(--secondary-bg);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .week-picker {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            min-height: 44px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        
+        .btn:hover:not(:disabled) {
+            opacity: 0.8;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 12px;
+            min-height: 36px;
+            min-width: 36px;
+        }
+        
+        .btn-secondary {
+            background: var(--secondary-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        
+        .week-display {
+            font-size: 16px;
+            font-weight: 500;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        
+        .game-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .teams {
+            flex: 1;
+        }
+        
+        .team-line {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .team-away {
+            color: var(--text-secondary);
+        }
+        
+        .probability-pill {
+            background: var(--accent);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .venue-tags {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .tag {
+            background: var(--secondary-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+        
+        .drivers {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .driver-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .chip {
+            background: var(--secondary-bg);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .chip-positive {
+            background: var(--success);
+            color: white;
+        }
+        
+        .chip-negative {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--secondary-bg);
+            border-top: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            margin: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            min-height: 44px;
+            min-width: 44px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-top: 2px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-banner {
+            background: var(--danger);
+            color: white;
+            padding: 12px 16px;
+            margin: 16px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, var(--border) 25%, transparent 50%, var(--border) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .skeleton-card {
+            height: 120px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .demo-banner {
+            background: var(--warning);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
-  <header class="app-header" role="banner">
-    <div class="header-content">
-      <div class="brand">
-        <div class="cursor" aria-label="System active"></div>
-        <div class="brand-text">UR_NEWS.exe</div>
-      </div>
-      <div class="status">
-        <div class="status-item">
-          <div class="status-led" id="connectionLed"></div>
-          <span id="lastSync">SYNC</span>
+    <div id="demo-banner" class="demo-banner" style="display: none;">
+        DEMO MODE - Using sample data. Configure API keys in Settings for live data.
+    </div>
+    
+    <header class="header">
+        <div class="header-row">
+            <div class="title">CFB Predictor</div>
+            <div class="week-picker">
+                <button class="btn btn-sm btn-secondary" id="prev-week">‹</button>
+                <div class="week-display" id="week-display">This Week</div>
+                <button class="btn btn-sm btn-secondary" id="next-week">›</button>
+                <button class="btn btn-sm" id="settings-btn">⚙</button>
+            </div>
         </div>
-        <div class="status-item">
-          <div class="status-led warn" id="moodLed"></div>
-          <span id="moodStatus">CALM</span>
+    </header>
+    
+    <div class="container">
+        <div id="error-container"></div>
+        <div id="games-container">
+            <div class="loading">
+                <div class="spinner"></div>
+                Loading games...
+            </div>
         </div>
-      </div>
     </div>
-  </header>
-
-  <main class="main-content" role="main">
-    <div class="pull-indicator" id="pullIndicator" role="status" aria-live="polite">Pull to refresh</div>
-    <section class="news-feed" id="newsFeed" aria-live="polite" aria-label="News articles"></section>
-    <div class="empty-state" id="emptyState" style="display:none;" role="status">
-      <h3>NO_SIGNAL_DETECTED</h3>
-      <p>Adjust filters or check back shortly.</p>
+    
+    <div class="bottom-bar">
+        <button class="btn btn-sm" id="refresh-btn">Refresh Data</button>
+        <button class="btn btn-sm" id="predict-btn">Predict</button>
+        <button class="btn btn-sm btn-secondary" id="export-btn">Export</button>
     </div>
-  </main>
-
-  <nav class="app-nav" role="tablist" aria-label="Primary navigation">
-    <div class="nav-container">
-      <button type="button" class="nav-btn active touch-target" data-view-target="all" role="tab" aria-selected="true" aria-label="All news">
-        <span class="nav-icon" aria-hidden="true">◉</span>
-        <span class="nav-label">ALL</span>
-      </button>
-      <button type="button" class="nav-btn touch-target" data-view-target="popular" role="tab" aria-selected="false" aria-label="Popular news">
-        <span class="nav-icon" aria-hidden="true">★</span>
-        <span class="nav-label">HOT</span>
-      </button>
-      <button type="button" class="nav-btn touch-target" data-view-target="breaking" role="tab" aria-selected="false" aria-label="Breaking news">
-        <span class="nav-icon" aria-hidden="true">!</span>
-        <span class="nav-label">ALERT</span>
-      </button>
-      <button type="button" class="nav-btn touch-target" id="filterBtn" data-filter-trigger role="tab" aria-selected="false" aria-haspopup="dialog" aria-expanded="false" aria-label="Filter options">
-        <span class="nav-icon" aria-hidden="true">▢</span>
-        <span class="nav-label">FILTER</span>
-      </button>
-      <button type="button" class="nav-btn touch-target" id="moreBtn" data-sheet-trigger="true" role="tab" aria-selected="false" aria-haspopup="dialog" aria-expanded="false" aria-label="System options">
-        <span class="nav-icon" aria-hidden="true">≡</span>
-        <span class="nav-label">SYS</span>
-      </button>
-    </div>
-  </nav>
-
-  <div class="sheet" id="filterSheet" role="dialog" aria-modal="true" aria-labelledby="filter-title" hidden>
-    <div class="sheet-overlay" data-filter-close></div>
-    <div class="sheet-panel" role="document">
-      <div class="sheet-handle" aria-hidden="true"></div>
-      <header class="sheet-header">
-        <h2 class="sheet-title" id="filter-title">FEED_CONTROLS</h2>
-        <button type="button" class="sheet-close touch-target" data-filter-close aria-label="Close filters">CLOSE</button>
-      </header>
-      <div class="sheet-content">
-        <section class="filter-section">
-          <h3 class="filter-title">VIEW_MODE</h3>
-          <div class="filter-chips" id="filterChips" role="tablist" aria-label="Content filters">
-            <button class="filter-chip active touch-target" data-view="all" role="tab" aria-selected="true">ALL</button>
-            <button class="filter-chip touch-target" data-view="popular" role="tab" aria-selected="false">HOT</button>
-            <button class="filter-chip touch-target" data-view="by-source" role="tab" aria-selected="false">BY_SOURCE</button>
-            <button class="filter-chip touch-target" data-view="conservative" role="tab" aria-selected="false">CONSERVATIVE</button>
-            <button class="filter-chip touch-target" data-view="populist" role="tab" aria-selected="false">POPULIST</button>
-            <button class="filter-chip touch-target" data-view="breaking" role="tab" aria-selected="false">BREAKING</button>
-          </div>
-        </section>
-        <section class="filter-section">
-          <h3 class="filter-title">SOURCE_SELECT</h3>
-          <button type="button" class="source-selector touch-target" id="sourceSelector" aria-haspopup="dialog" aria-expanded="false">
-            <span class="selector-label">CURRENT_SOURCE</span>
-            <span class="selector-value" id="sourceValue">ALL_SOURCES</span>
-            <span class="selector-hint">Tap to focus on single outlet</span>
-          </button>
-        </section>
-      </div>
-    </div>
-  </div>
-
-  <div class="sheet" id="sourceSheet" role="dialog" aria-modal="true" aria-labelledby="source-title" hidden>
-    <div class="sheet-overlay" data-source-close></div>
-    <div class="sheet-panel" role="document">
-      <div class="sheet-handle" aria-hidden="true"></div>
-      <header class="sheet-header">
-        <button type="button" class="sheet-close touch-target" data-source-close aria-label="Cancel source selection">CANCEL</button>
-        <h2 class="sheet-title" id="source-title">SELECT_SOURCE</h2>
-        <button type="button" class="sheet-close touch-target" id="clearSource" aria-label="Clear source filter">ALL</button>
-      </header>
-      <div class="sheet-content" id="sourceList" role="listbox" aria-label="News sources"></div>
-    </div>
-  </div>
-
-  <div class="sheet" id="actionSheet" role="dialog" aria-modal="true" aria-labelledby="action-title" hidden>
-    <div class="sheet-overlay" data-sheet-close></div>
-    <div class="sheet-panel" role="document">
-      <div class="sheet-handle" aria-hidden="true"></div>
-      <header class="sheet-header">
-        <h2 class="sheet-title visually-hidden" id="action-title">System Actions</h2>
-      </header>
-      <div class="sheet-content">
-        <div class="action-group">
-          <button type="button" class="action-btn touch-target" data-sheet-action="refresh">REFRESH_FEED</button>
-          <button type="button" class="action-btn touch-target" data-sheet-action="mark-read">MARK_ALL_READ</button>
+    
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Settings</div>
+                <button class="close" id="settings-close">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="label" for="cfbd-key">CFBD API Key</label>
+                <input type="password" class="input" id="cfbd-key" placeholder="Enter your CFBD API key">
+                <small style="color: var(--text-secondary); font-size: 12px;">
+                    Get your free key at <a href="https://collegefootballdata.com/" target="_blank" style="color: var(--accent);">collegefootballdata.com</a>
+                </small>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" id="use-markets" checked>
+                    <label class="label" for="use-markets">Use betting markets (optional)</label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" id="use-weather" checked>
+                    <label class="label" for="use-weather">Use weather forecasts</label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" class="checkbox" id="demo-mode">
+                    <label class="label" for="demo-mode">Demo mode (use sample data)</label>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button class="btn btn-secondary" id="forget-keys">Forget Keys</button>
+                <button class="btn" id="save-settings">Save Settings</button>
+            </div>
         </div>
-        <div class="action-group">
-          <button type="button" class="action-btn danger touch-target" data-sheet-action="reset">RESET_SYSTEM</button>
-        </div>
-        <div class="action-group">
-          <button type="button" class="action-btn touch-target" data-sheet-close>CANCEL</button>
-        </div>
-      </div>
     </div>
-  </div>
-
-<script>
-// App state and configuration
-const SOURCES = [
-  { id: 'breitbart', name: 'BREITBART', url: 'https://www.breitbart.com/feed/', lane: 'populist', bias: 7.5 },
-  { id: 'federalist', name: 'FEDERALIST', url: 'https://thefederalist.com/feed/', lane: 'conservative', bias: 6.2 },
-  { id: 'dailywire', name: 'DAILY_WIRE', url: 'https://www.dailywire.com/feeds/rss.xml', lane: 'conservative', bias: 6.8 },
-  { id: 'gateway', name: 'GATEWAY_PUNDIT', url: 'https://www.thegatewaypundit.com/feed/', lane: 'populist', bias: 8.4 },
-  { id: 'infowars', name: 'INFOWARS', url: 'https://www.infowars.com/rss.xml', lane: 'populist', bias: 9 },
-  { id: 'revolver', name: 'REVOLVER_NEWS', url: 'https://www.revolver.news/feed/', lane: 'populist', bias: 7.8 },
-  { id: 'natfile', name: 'NATIONAL_FILE', url: 'https://nationalfile.com/feed/', lane: 'populist', bias: 8.2 },
-  { id: 'tplvoice', name: 'PEOPLES_VOICE', url: 'https://thepeoplesvoice.tv/feed/', lane: 'populist', bias: 8.8 },
-  { id: 'libertydaily', name: 'LIBERTY_DAILY', url: 'https://thelibertydaily.com/rss.xml', lane: 'populist', bias: 7.6 },
-  { id: 'naturalnews', name: 'NATURAL_NEWS', url: 'https://www.naturalnews.com/rss.xml', lane: 'populist', bias: 8.5 },
-  { id: 'dailycaller', name: 'DAILY_CALLER', url: 'https://dailycaller.com/feed/', lane: 'conservative', bias: 5.2 },
-  { id: 'redstate', name: 'REDSTATE', url: 'https://redstate.com/feed/', lane: 'conservative', bias: 6.4 },
-  { id: 'amgreat', name: 'AM_GREATNESS', url: 'https://amgreatness.com/feed/', lane: 'conservative', bias: 6.9 },
-  { id: 'pjm', name: 'PJ_MEDIA', url: 'https://pjmedia.com/feeds/latest', lane: 'conservative', bias: 5.8 },
-  { id: 'nypost', name: 'NY_POST', url: 'https://nypost.com/feed/', lane: 'populist', bias: 3.2 },
-  { id: 'townhall', name: 'TOWNHALL', url: 'https://townhall.com/rss', lane: 'conservative', bias: 5.6 },
-  { id: 'foxnews', name: 'FOX_NEWS', url: 'https://feeds.foxnews.com/foxnews/latest', lane: 'conservative', bias: 4.2 },
-  { id: 'washexam', name: 'WASH_EXAMINER', url: 'https://www.washingtonexaminer.com/feed', lane: 'conservative', bias: 3.8 },
-  { id: 'theblaze', name: 'THE_BLAZE', url: 'https://www.theblaze.com/feeds/latest.rss', lane: 'conservative', bias: 6.5 },
-  { id: 'nbcnews', name: 'NBC_NEWS', url: 'https://feeds.nbcnews.com/nbcnews/public/news', lane: 'mainstream', bias: -3 },
-  { id: 'abcnews', name: 'ABC_NEWS', url: 'https://abcnews.go.com/abcnews/topstories', lane: 'mainstream', bias: -2.2 },
-  { id: 'cnn', name: 'CNN', url: 'https://rss.cnn.com/rss/cnn_topstories.rss', lane: 'mainstream', bias: -4 }
-];
-
-const persistedState = loadPersistedState();
-
-const TERMINAL_STATE = {
-  items: [],
-  view: persistedState.view || 'all',
-  loading: false,
-  lastFetch: 0,
-  cache: new Map(),
-  expandedCards: new Set(persistedState.expanded || []),
-  trendingKeywords: new Map(),
-  sourceFilter: persistedState.sourceFilter || null,
-  readProgress: new Map(
-    Object.entries(persistedState.progress || {}).map(([key, value]) => [key, Number(value) || 0])
-  )
-};
-
-const CACHE_TTL = 120000;
-const FETCH_TIMEOUT = 4000;
-
-const SENTIMENT_LEXICON = new Map([
-  ['victory', 4.5], ['victories', 4.5], ['landslide', 5], ['triumph', 4], ['triumphant', 4],
-  ['win', 3.5], ['wins', 3.5], ['won', 3.5], ['winning', 3.2], ['record', 3], ['records', 3],
-  ['breakthrough', 4], ['surge', 2.6], ['surging', 2.6], ['surged', 2.6], ['boom', 3.1],
-  ['booming', 3.4], ['boon', 2.5], ['resilient', 2.2], ['resilience', 2.2], ['relief', 2.4],
-  ['stability', 2.1], ['stabilize', 2.1], ['stabilized', 2.1], ['improves', 2.2], ['improved', 2.2],
-  ['improving', 2.2], ['progress', 2.5], ['peace', 2.6], ['peaceful', 2.6], ['secure', 2.1],
-  ['secured', 2.1], ['support', 2], ['supports', 2], ['praise', 2.5], ['praised', 2.5],
-  ['optimism', 2.5], ['optimistic', 2.5], ['growth', 2.3], ['grows', 2.3], ['growing', 2.3],
-  ['rebound', 2.6], ['rebounds', 2.6], ['rebounded', 2.6], ['strength', 2.4], ['strengthen', 2.4],
-  ['strengthens', 2.4], ['strengthened', 2.4],
-  ['crisis', -3.5], ['crises', -3.5], ['catastrophe', -5.5], ['disaster', -5], ['collapse', -4.5],
-  ['collapsed', -4.5], ['collapsing', -4.5], ['chaos', -3.5], ['chaotic', -3], ['shooting', -5],
-  ['shootings', -5], ['attack', -3.5], ['attacks', -3.5], ['assault', -3], ['massacre', -6],
-  ['tragedy', -5], ['fatal', -4], ['deadly', -4.5], ['murder', -5], ['murdered', -5],
-  ['violence', -4], ['violent', -4], ['threat', -3], ['threats', -3], ['warning', -2.5],
-  ['warnings', -2.5], ['fear', -2.5], ['fears', -2.5], ['panic', -4], ['emergency', -3.5],
-  ['fraud', -3], ['scandal', -3.5], ['scandals', -3.5], ['corruption', -3.5], ['corrupt', -3],
-  ['indicted', -4], ['indictment', -4], ['charged', -3], ['charges', -3], ['arrested', -3.5],
-  ['arrests', -3.5], ['lawsuit', -2.5], ['lawsuits', -2.5], ['investigation', -2.2],
-  ['investigations', -2.2], ['probe', -2.2], ['probes', -2.2], ['meltdown', -5],
-  ['shortage', -2.5], ['shortages', -2.5], ['decline', -2.5], ['declines', -2.5],
-  ['plunge', -3.5], ['plunges', -3.5], ['slump', -3], ['slumps', -3], ['sanction', -2.5],
-  ['sanctions', -2.5], ['ban', -2.5], ['banned', -2.5], ['outage', -2], ['outages', -2],
-  ['breach', -3], ['breaches', -3]
-]);
-
-const POSITIVE_WORDS = new Set([
-  'good', 'great', 'positive', 'upbeat', 'hope', 'hopes', 'hopeful', 'advance', 'advances',
-  'advancing', 'strong', 'stronger', 'sturdy', 'rescue', 'rescued', 'rescues', 'ally', 'allies',
-  'agreement', 'agreements', 'calm', 'steady', 'supportive', 'boost', 'boosts', 'benefit',
-  'benefits', 'recover', 'recovery', 'recovered', 'healing', 'relief', 'relieved', 'progressive',
-  'peaceful', 'stable', 'stability', 'balanced', 'constructive', 'diplomatic', 'unity', 'unite',
-  'unites', 'secured', 'security', 'resilient', 'cooperate', 'cooperation', 'truce', 'win-win'
-]);
-
-const NEGATIVE_WORDS = new Set([
-  'loss', 'losses', 'lost', 'defeat', 'defeated', 'risk', 'risks', 'concern', 'concerns', 'doubt',
-  'doubts', 'fear', 'fears', 'worry', 'worries', 'worried', 'drop', 'drops', 'fall', 'falls',
-  'fallen', 'negative', 'bad', 'threat', 'threaten', 'threatened', 'danger', 'dangerous', 'fraud',
-  'crash', 'crashes', 'collapsed', 'collapse', 'lawsuit', 'lawsuits', 'probe', 'probes', 'charge',
-  'charges', 'investigation', 'chaos', 'violent', 'violence', 'crime', 'crimes', 'criminal',
-  'riot', 'riots', 'riotous', 'storm', 'storms', 'hurricane', 'earthquake', 'wildfire', 'fire',
-  'fires', 'shooting', 'shootings', 'attack', 'attacks', 'murder', 'murdered', 'extremist',
-  'extremism', 'terror', 'terrorism', 'terrorist', 'scandal', 'panic', 'shortage', 'shortages',
-  'decline', 'declines', 'slump', 'slumps', 'collapse', 'opposition', 'backlash', 'controversy'
-]);
-
-const BOOSTER_WORDS = new Set(['very', 'extremely', 'highly', 'truly', 'deeply', 'major', 'massive', 'hugely', 'seriously', 'significantly']);
-const DAMPENER_WORDS = new Set(['slightly', 'barely', 'somewhat', 'mildly', 'modestly', 'partially']);
-const NEGATION_WORDS = new Set(['no', 'not', 'never', 'without', 'hardly', 'rarely', 'scarcely', 'neither']);
-
-// Utility functions
-function clamp(value, min, max) {
-  return Math.min(Math.max(value, min), max);
-}
-
-function loadPersistedState() {
-  try {
-    const expanded = JSON.parse(localStorage.getItem('terminal.expanded'));
-    const storedSource = localStorage.getItem('terminal.sourceFilter');
-    const progressRaw = localStorage.getItem('terminal.progress');
-    const viewPreference = localStorage.getItem('terminal.view');
-    let progress = {};
-
-    if (progressRaw) {
-      try {
-        const parsed = JSON.parse(progressRaw);
-        if (parsed && typeof parsed === 'object') progress = parsed;
-      } catch (error) {
-        progress = {};
-      }
-    }
-
-    return {
-      expanded: Array.isArray(expanded) ? expanded : null,
-      sourceFilter: storedSource || null,
-      progress,
-      view: viewPreference || 'all'
-    };
-  } catch (error) {
-    return { expanded: null, sourceFilter: null, progress: {}, view: 'all' };
-  }
-}
-
-function persistState() {
-  try {
-    localStorage.setItem('terminal.expanded', JSON.stringify([...TERMINAL_STATE.expandedCards]));
-    localStorage.setItem('terminal.view', TERMINAL_STATE.view);
-    localStorage.setItem('terminal.progress', JSON.stringify(Object.fromEntries(TERMINAL_STATE.readProgress)));
-    if (TERMINAL_STATE.sourceFilter) {
-      localStorage.setItem('terminal.sourceFilter', TERMINAL_STATE.sourceFilter);
-    } else {
-      localStorage.removeItem('terminal.sourceFilter');
-    }
-  } catch (error) {
-    console.warn('Storage failed:', error);
-  }
-}
-
-function getCached(url) {
-  const cached = TERMINAL_STATE.cache.get(url);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data;
-  return null;
-}
-
-function setCached(url, data) {
-  TERMINAL_STATE.cache.set(url, { data, timestamp: Date.now() });
-}
-
-async function fetchFast(url) {
-  const cached = getCached(url);
-  if (cached) return cached;
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
-
-  try {
-    const targets = [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-      `https://corsproxy.io/?${encodeURIComponent(url)}`
-    ];
-
-    const promises = targets.map(target => 
-      fetch(target, { signal: controller.signal })
-        .then(response => {
-          if (!response.ok) throw new Error('Bad response');
-          return response.text();
-        })
-    );
-
-    const text = await Promise.any(promises);
-    clearTimeout(timer);
     
-    if (!text || text.length < 100) throw new Error('Empty feed');
-    setCached(url, text);
-    return text;
-  } catch (error) {
-    clearTimeout(timer);
-    throw error;
-  }
-}
-
-function calculateTrending(items) {
-  const keywords = new Map();
-  const now = Date.now();
-
-  items.forEach(item => {
-    const ageHours = (now - new Date(item.pubDate)) / (1000 * 60 * 60);
-    if (ageHours > 24) return;
-
-    const text = `${item.title} ${item.desc}`.toLowerCase();
-    const words = text.match(/\b[a-z]{4,}\b/g) || [];
-
-    words.forEach(word => {
-      if (!/^(with|that|this|from|have|were|been|their|about|would|could|should)$/.test(word)) {
-        const current = keywords.get(word) || 0;
-        keywords.set(word, current + (1 / Math.max(1, ageHours / 6)));
-      }
-    });
-  });
-
-  TERMINAL_STATE.trendingKeywords = keywords;
-
-  items.forEach(item => {
-    const text = `${item.title} ${item.desc}`.toLowerCase();
-    let score = 0;
-    keywords.forEach((weight, word) => {
-      if (text.includes(word)) score += weight;
-    });
-    item.trendingScore = score;
-  });
-}
-
-function scoreTokens(tokens, scale = 1) {
-  let total = 0;
-
-  for (let i = 0; i < tokens.length; i += 1) {
-    const word = tokens[i];
-    let weight = 0;
-
-    if (SENTIMENT_LEXICON.has(word)) {
-      weight = SENTIMENT_LEXICON.get(word);
-    } else if (POSITIVE_WORDS.has(word)) {
-      weight = 1;
-    } else if (NEGATIVE_WORDS.has(word)) {
-      weight = -1;
-    }
-
-    if (weight !== 0) {
-      const previous = tokens[i - 1];
-      if (previous && NEGATION_WORDS.has(previous)) weight *= -1;
-      if (previous && BOOSTER_WORDS.has(previous)) {
-        weight *= 1.4;
-      } else if (previous && DAMPENER_WORDS.has(previous)) {
-        weight *= 0.5;
-      }
-      total += weight * scale;
-    }
-  }
-
-  return total;
-}
-
-function describeSentiment(score) {
-  if (score >= 6) return { label: 'ELECTRIC', tone: 'very-positive' };
-  if (score >= 3) return { label: 'OPTIMISTIC', tone: 'positive' };
-  if (score > -2) return { label: 'STEADY', tone: 'neutral' };
-  if (score > -5) return { label: 'WARY', tone: 'negative' };
-  return { label: 'ALARMED', tone: 'very-negative' };
-}
-
-function analyzeSentiment(item) {
-  const titleTokens = (item.title || '').toLowerCase().match(/\b[a-z'-]+\b/g) || [];
-  const descTokens = (item.desc || '').toLowerCase().match(/\b[a-z'-]+\b/g) || [];
-
-  let score = 0;
-  score += scoreTokens(titleTokens, 1.4);
-  score += scoreTokens(descTokens, 0.8);
-
-  const exclamations = (item.title.match(/!/g) || []).length;
-  if (exclamations > 1) score -= (exclamations - 1) * 0.6;
-
-  score = Math.max(-12, Math.min(12, score));
-  const descriptor = describeSentiment(score);
-
-  return { label: descriptor.label, tone: descriptor.tone, score };
-}
-
-function parseRSS(xmlString, source) {
-  const doc = new DOMParser().parseFromString(xmlString, 'text/xml');
-  if (doc.getElementsByTagName('parsererror')[0]) return [];
-
-  return Array.from(doc.querySelectorAll('item, entry'))
-    .slice(0, 15)
-    .map(entry => {
-      const title = (entry.querySelector('title')?.textContent || '').trim();
-      const link = (entry.querySelector('link')?.getAttribute('href') || entry.querySelector('link')?.textContent || '').trim();
-      const pubDate = (entry.querySelector('pubDate, updated, published')?.textContent || '').trim();
-      const desc = (entry.querySelector('description, summary')?.textContent || '').trim();
-
-      return {
-        title,
-        link,
-        pubDate: pubDate || new Date().toISOString(),
-        source: source.name,
-        lane: source.lane,
-        id: source.id,
-        desc: stripHTML(desc).slice(0, 250),
-        isBreaking: /breaking|urgent|just in|developing|exclusive/i.test(title),
-        trendingScore: 0
-      };
-    })
-    .filter(item => item.title && item.link && item.title.length > 15);
-}
-
-function stripHTML(html) {
-  const temp = document.createElement('div');
-  temp.innerHTML = html;
-  return temp.textContent.replace(/\s+/g, ' ').trim();
-}
-
-function isLikelyNews(item) {
-  const title = (item.title || '').trim();
-  if (!title) return false;
-
-  const description = (item.desc || '').trim();
-  const combined = `${title} ${description}`.toLowerCase();
-
-  if (/\?{2,}/.test(title) || /!{2,}/.test(title)) return false;
-
-  const clickbaitPatterns = [
-    /you won't believe/i, /jaw[-\s]?dropping/i, /what happens next/i,
-    /this is why/i, /must see/i, /goes viral/i, /shocking/i, /insane/i,
-    /crazy/i, /unbelievable/i, /bombshell/i, /mic drop/i
-  ];
-
-  if (clickbaitPatterns.some(pattern => pattern.test(combined))) return false;
-
-  const nonNewsPatterns = [
-    /^watch:/i, /^video:/i, /\bopinion\b/i, /\bcommentary\b/i, /\bpodcast\b/i,
-    /\bsports?\b/i, /\bentertainment\b/i, /\bsubscribe\b/i, /click here/i
-  ];
-
-  if (nonNewsPatterns.some(pattern => pattern.test(title)) || 
-      nonNewsPatterns.some(pattern => pattern.test(description))) return false;
-
-  const exclamationCount = (title.match(/!/g) || []).length;
-  if (exclamationCount > 2) return false;
-
-  return true;
-}
-
-function createCardId(link) {
-  let hash = 0;
-  for (let i = 0; i < link.length; i += 1) {
-    hash = (hash << 5) - hash + link.charCodeAt(i);
-    hash |= 0;
-  }
-  return `card-${Math.abs(hash)}`;
-}
-
-function getReadProgress(cardId) {
-  return TERMINAL_STATE.readProgress.get(cardId) || 0;
-}
-
-function setReadProgress(cardId, progress) {
-  const clamped = clamp(progress, 0, 100);
-  TERMINAL_STATE.readProgress.set(cardId, clamped);
-  persistState();
-  return clamped;
-}
-
-function formatTerminalTime(timestamp) {
-  const diff = Date.now() - new Date(timestamp);
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-  
-  if (seconds < 60) return 'NOW';
-  if (minutes < 60) return `${minutes}M`;
-  if (hours < 24) return `${hours}H`;
-  return `${days}D`;
-}
-
-function escapeHTML(str = '') {
-  if (typeof str !== 'string') str = String(str || '');
-  const escapeMap = {
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  };
-  return str.replace(/[&<>"']/g, char => escapeMap[char]);
-}
-
-function createTerminalCard(item, index = 0) {
-  const cardId = createCardId(item.link);
-  const isExpanded = TERMINAL_STATE.expandedCards.has(cardId);
-  const isFresh = (Date.now() - new Date(item.pubDate)) < 1200000; // 20 min
-  const isBreaking = /breaking|urgent|just in|developing|exclusive/i.test(item.title);
-  const progressValue = getReadProgress(cardId);
-  
-  const article = document.createElement('article');
-  article.className = `news-item ${isExpanded ? 'expanded' : ''} ${isFresh ? 'fresh' : ''} ${isBreaking ? 'breaking' : ''}`;
-  article.dataset.cardId = cardId;
-  
-  const sourceInitials = item.source.split('_').map(word => word.charAt(0)).join('').slice(0, 2);
-  const timeStr = formatTerminalTime(item.pubDate);
-  const sentiment = analyzeSentiment(item);
-  
-  article.innerHTML = `
-    <div class="item-header" tabindex="0" role="button" aria-expanded="${isExpanded}" aria-label="Toggle article details for ${escapeHTML(item.title)}">
-      <div class="source-icon" aria-hidden="true">${sourceInitials}</div>
-      <div class="item-content">
-        <h2 class="item-title">
-          ${escapeHTML(item.title)}
-          ${isBreaking ? '<span class="breaking-tag" aria-label="Breaking news">BREAKING</span>' : ''}
-        </h2>
-        <div class="item-meta">
-          <span>${item.source}</span>
-          <time class="meta-time${isFresh ? ' fresh' : ''}" datetime="${item.pubDate}">${timeStr}</time>
-          ${sentiment.score !== 0 ? `<span class="meta-badge sentiment-${sentiment.tone}">${sentiment.label}</span>` : ''}
-          ${item.trendingScore > 5 ? '<span class="meta-badge trending">HOT</span>' : ''}
-        </div>
-      </div>
-      <div class="item-actions">
-        <div class="progress-bar" role="progressbar" aria-valuenow="${progressValue}" aria-valuemin="0" aria-valuemax="100" aria-label="Reading progress">
-          <div class="progress-fill" style="--progress: ${(progressValue / 100).toFixed(2)}"></div>
-        </div>
-        <button type="button" class="expand-btn touch-target" aria-label="${isExpanded ? 'Hide' : 'Show'} article details">${isExpanded ? 'HIDE' : 'OPEN'}</button>
-      </div>
-    </div>
-    <div class="item-body"${isExpanded ? '' : ' hidden'}>
-      <p class="item-summary">${escapeHTML(item.desc || 'No summary available.')}</p>
-      <a href="${escapeHTML(item.link)}" target="_blank" rel="noopener" class="item-link touch-target">
-        ACCESS_ARTICLE
-      </a>
-    </div>
-  `;
-  
-  const header = article.querySelector('.item-header');
-  const expandBtn = article.querySelector('.expand-btn');
-  const itemLink = article.querySelector('.item-link');
-  
-  const toggleExpand = () => {
-    const expanded = !TERMINAL_STATE.expandedCards.has(cardId);
-    if (expanded) {
-      TERMINAL_STATE.expandedCards.add(cardId);
-      article.classList.add('expanded');
-      article.querySelector('.item-body').hidden = false;
-      expandBtn.textContent = 'HIDE';
-      expandBtn.setAttribute('aria-label', 'Hide article details');
-      setReadProgress(cardId, Math.max(40, progressValue));
-    } else {
-      TERMINAL_STATE.expandedCards.delete(cardId);
-      article.classList.remove('expanded');
-      article.querySelector('.item-body').hidden = true;
-      expandBtn.textContent = 'OPEN';
-      expandBtn.setAttribute('aria-label', 'Show article details');
-    }
-    header.setAttribute('aria-expanded', expanded);
-    persistState();
-  };
-  
-  header.addEventListener('click', toggleExpand);
-  header.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      toggleExpand();
-    }
-  });
-  
-  expandBtn.addEventListener('click', e => {
-    e.stopPropagation();
-    toggleExpand();
-  });
-  
-  itemLink.addEventListener('click', () => {
-    setReadProgress(cardId, 100);
-    const progressFill = article.querySelector('.progress-fill');
-    progressFill.style.setProperty('--progress', '1');
-  });
-  
-  return article;
-}
-
-function showTerminalLoading() {
-  const feed = document.getElementById('newsFeed');
-  feed.innerHTML = '';
-  
-  for (let i = 0; i < 6; i++) {
-    const skeleton = document.createElement('div');
-    skeleton.className = 'loading-item';
-    skeleton.setAttribute('aria-label', 'Loading news item');
-    skeleton.innerHTML = `
-      <div class="loading-title" aria-hidden="true"></div>
-      <div class="loading-meta" aria-hidden="true"></div>
-    `;
-    feed.appendChild(skeleton);
-  }
-}
-
-function updateTerminalStatus(items = []) {
-  const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-  document.getElementById('lastSync').textContent = timestamp;
-  
-  if (items.length === 0) {
-    document.getElementById('moodStatus').textContent = 'QUIET';
-    document.getElementById('moodLed').className = 'status-led';
-    return;
-  }
-  
-  const avgSentiment = items.reduce((sum, item) => sum + (item.sentimentScore || 0), 0) / items.length;
-  let mood = 'CALM';
-  let ledClass = 'status-led warn';
-  
-  if (avgSentiment > 3) {
-    mood = 'POSITIVE';
-    ledClass = 'status-led';
-  } else if (avgSentiment < -3) {
-    mood = 'CRITICAL';
-    ledClass = 'status-led err';
-  }
-  
-  document.getElementById('moodStatus').textContent = mood;
-  document.getElementById('moodLed').className = ledClass;
-}
-
-function showTerminalToast(message, type = 'success') {
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.setAttribute('role', 'status');
-  toast.setAttribute('aria-live', 'polite');
-  toast.textContent = message.toUpperCase().replace(/ /g, '_');
-  document.body.appendChild(toast);
-  
-  setTimeout(() => {
-    if (toast.parentNode) toast.remove();
-  }, 2500);
-}
-
-function renderFeed() {
-  const feed = document.getElementById('newsFeed');
-  const empty = document.getElementById('emptyState');
-  
-  feed.innerHTML = '';
-  let filtered = TERMINAL_STATE.items.slice();
-  
-  if (TERMINAL_STATE.sourceFilter) {
-    filtered = filtered.filter(item => item.id === TERMINAL_STATE.sourceFilter);
-  }
-  
-  let viewItems;
-  
-  switch (TERMINAL_STATE.view) {
-    case 'popular':
-      viewItems = filtered
-        .slice()
-        .sort((a, b) => b.trendingScore - a.trendingScore)
-        .slice(0, 30);
-      break;
-    case 'conservative':
-      viewItems = filtered.filter(item => item.lane === 'conservative');
-      break;
-    case 'populist':
-      viewItems = filtered.filter(item => item.lane === 'populist');
-      break;
-    case 'breaking':
-      viewItems = filtered.filter(item => item.isBreaking);
-      break;
-    case 'by-source':
-      viewItems = filtered.slice();
-      break;
-    default:
-      viewItems = filtered.slice(0, 60);
-  }
-  
-  if (viewItems.length === 0) {
-    empty.style.display = 'block';
-    feed.setAttribute('aria-live', 'off');
-    return;
-  }
-  
-  empty.style.display = 'none';
-  feed.setAttribute('aria-live', 'polite');
-  
-  const fragment = document.createDocumentFragment();
-  viewItems.forEach((item, idx) => {
-    fragment.appendChild(createTerminalCard(item, idx));
-  });
-  
-  feed.appendChild(fragment);
-  updateTerminalStatus(viewItems);
-}
-
-async function loadFeeds() {
-  if (TERMINAL_STATE.loading) return;
-  
-  TERMINAL_STATE.loading = true;
-  showTerminalLoading();
-  
-  const indicator = document.getElementById('pullIndicator');
-  if (indicator && (indicator.dataset.state === 'ready' || indicator.dataset.state === 'loading')) {
-    indicator.dataset.state = 'loading';
-    indicator.textContent = 'UPDATING...';
-    indicator.style.opacity = '1';
-  }
-  
-  try {
-    const fetches = SOURCES.map(source =>
-      fetchFast(source.url)
-        .then(text => parseRSS(text, source))
-        .catch(error => {
-          console.warn('Feed failed:', source.name, error);
-          return [];
-        })
-    );
-    
-    const results = await Promise.all(fetches);
-    const allItems = results.flat();
-    
-    const deduped = [];
-    const seen = new Set();
-    
-    allItems
-      .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
-      .forEach(item => {
-        if (!seen.has(item.link)) {
-          seen.add(item.link);
-          deduped.push(item);
-        }
-      });
-    
-    const curated = deduped.filter(isLikelyNews);
-    TERMINAL_STATE.items = curated.slice(0, 100);
-    calculateTrending(TERMINAL_STATE.items);
-    
-    TERMINAL_STATE.items.forEach(item => {
-      const sentiment = analyzeSentiment(item);
-      item.sentimentScore = Number(sentiment.score.toFixed(2));
-      item.sentimentLabel = sentiment.label;
-      item.sentimentTone = sentiment.tone;
-    });
-    
-    TERMINAL_STATE.lastFetch = Date.now();
-    renderFeed();
-    
-    const reportMessage = TERMINAL_STATE.items.length ? `${TERMINAL_STATE.items.length}_REPORTS_LOADED` : 'FEED_REFRESHED';
-    showTerminalToast(reportMessage, 'success');
-    
-    if (indicator && indicator.dataset.state === 'loading') {
-      indicator.dataset.state = 'updated';
-      indicator.textContent = 'UPDATED';
-      setTimeout(() => {
-        indicator.style.opacity = '0';
-        indicator.textContent = 'PULL_TO_REFRESH';
-      }, 1400);
-    }
-  } catch (error) {
-    console.error('Failed:', error);
-    document.getElementById('lastSync').textContent = 'ERROR';
-    showTerminalToast('LOADING_FAILED', 'error');
-    
-    if (indicator && indicator.dataset.state === 'loading') {
-      indicator.dataset.state = 'updated';
-      indicator.textContent = 'REFRESH_FAILED';
-      setTimeout(() => {
-        indicator.style.opacity = '0';
-        indicator.textContent = 'PULL_TO_REFRESH';
-      }, 1400);
-    }
-  } finally {
-    TERMINAL_STATE.loading = false;
-  }
-}
-
-function changeView(view) {
-  if (!view || view === TERMINAL_STATE.view) {
-    syncActiveNav();
-    return;
-  }
-  
-  TERMINAL_STATE.view = view;
-  persistState();
-  renderFeed();
-  syncActiveNav();
-}
-
-function syncActiveNav() {
-  const currentView = TERMINAL_STATE.view;
-  
-  document.querySelectorAll('.filter-chip').forEach(chip => {
-    const active = chip.dataset.view === currentView;
-    chip.classList.toggle('active', active);
-    chip.setAttribute('aria-selected', String(active));
-  });
-  
-  document.querySelectorAll('.nav-btn').forEach(button => {
-    const view = button.dataset.viewTarget;
-    const active = Boolean(view && view === currentView);
-    if (view) {
-      button.classList.toggle('active', active);
-      button.setAttribute('aria-selected', String(active));
-    }
-  });
-}
-
-function setupPullToRefresh() {
-  const indicator = document.getElementById('pullIndicator');
-  if (!indicator) return;
-  
-  let startY = 0;
-  let pulling = false;
-  let ready = false;
-  let pullActive = false;
-  
-  const resetPull = () => {
-    pulling = false;
-    ready = false;
-    pullActive = false;
-    indicator.dataset.state = 'idle';
-    indicator.style.opacity = 0;
-  };
-  
-  window.addEventListener('touchstart', event => {
-    if (TERMINAL_STATE.loading || window.scrollY > 0) return;
-    startY = event.touches[0].clientY;
-    pulling = true;
-    ready = false;
-    pullActive = false;
-  }, { passive: true });
-  
-  window.addEventListener('touchmove', event => {
-    if (!pulling) return;
-    if (window.scrollY > 0) {
-      resetPull();
-      return;
-    }
-    
-    const delta = event.touches[0].clientY - startY;
-    if (delta <= 0) {
-      resetPull();
-      return;
-    }
-    
-    if (!pullActive && delta < 32) return;
-    
-    if (!pullActive) pullActive = true;
-    
-    event.preventDefault();
-    const limited = Math.min(220, delta);
-    const eased = Math.pow(limited / 220, 0.85) * 220;
-    indicator.style.opacity = Math.min(1, eased / 120);
-    
-    if (eased > 140) {
-      indicator.dataset.state = 'ready';
-      indicator.textContent = 'RELEASE_TO_REFRESH';
-      ready = true;
-    } else {
-      indicator.dataset.state = 'idle';
-      indicator.textContent = 'PULL_TO_REFRESH';
-      ready = false;
-    }
-  }, { passive: false });
-  
-  const endPull = () => {
-    if (!pulling) return;
-    
-    indicator.style.opacity = 0;
-    
-    if (ready && pullActive && !TERMINAL_STATE.loading) {
-      indicator.dataset.state = 'loading';
-      indicator.textContent = 'UPDATING...';
-      loadFeeds();
-    } else {
-      indicator.dataset.state = 'idle';
-    }
-    
-    pulling = false;
-    ready = false;
-    pullActive = false;
-  };
-  
-  window.addEventListener('touchend', endPull, { passive: true });
-  window.addEventListener('touchcancel', endPull, { passive: true });
-}
-
-function setupSheets() {
-  let activeSheet = null;
-  
-  function openSheet(sheetId, trigger) {
-    if (activeSheet && activeSheet !== sheetId) closeSheet(activeSheet);
-    
-    const sheet = document.getElementById(sheetId);
-    if (!sheet) return;
-    
-    sheet.hidden = false;
-    sheet.classList.add('visible');
-    activeSheet = sheetId;
-    
-    const firstFocusable = sheet.querySelector('button, [tabindex]:not([tabindex="-1"])');
-    if (firstFocusable) {
-      setTimeout(() => firstFocusable.focus(), 100);
-    }
-    
-    if (trigger) {
-      trigger.setAttribute('aria-expanded', 'true');
-    }
-  }
-  
-  function closeSheet(sheetId) {
-    const sheet = document.getElementById(sheetId);
-    if (!sheet) return;
-    
-    sheet.classList.remove('visible');
-    
-    const trigger = document.querySelector(`[aria-expanded="true"][data-sheet-trigger], [aria-expanded="true"][data-filter-trigger]`);
-    if (trigger) {
-      trigger.setAttribute('aria-expanded', 'false');
-      trigger.focus();
-    }
-    
-    setTimeout(() => {
-      sheet.hidden = true;
-    }, 300);
-    
-    if (activeSheet === sheetId) {
-      activeSheet = null;
-    }
-  }
-  
-  // Filter sheet
-  const filterBtn = document.getElementById('filterBtn');
-  if (filterBtn) {
-    filterBtn.addEventListener('click', () => {
-      openSheet('filterSheet', filterBtn);
-    });
-  }
-  
-  document.querySelectorAll('[data-filter-close]').forEach(btn => {
-    btn.addEventListener('click', () => closeSheet('filterSheet'));
-  });
-  
-  // Source sheet
-  const sourceSelector = document.getElementById('sourceSelector');
-  if (sourceSelector) {
-    sourceSelector.addEventListener('click', () => {
-      buildSourceList();
-      openSheet('sourceSheet', sourceSelector);
-    });
-  }
-  
-  document.querySelectorAll('[data-source-close]').forEach(btn => {
-    btn.addEventListener('click', () => closeSheet('sourceSheet'));
-  });
-  
-  const clearSource = document.getElementById('clearSource');
-  if (clearSource) {
-    clearSource.addEventListener('click', () => {
-      TERMINAL_STATE.sourceFilter = null;
-      persistState();
-      updateSourceDisplay();
-      renderFeed();
-      closeSheet('sourceSheet');
-    });
-  }
-  
-  // Action sheet
-  const moreBtn = document.getElementById('moreBtn');
-  if (moreBtn) {
-    moreBtn.addEventListener('click', () => {
-      openSheet('actionSheet', moreBtn);
-    });
-  }
-  
-  document.querySelectorAll('[data-sheet-close]').forEach(btn => {
-    btn.addEventListener('click', () => closeSheet('actionSheet'));
-  });
-  
-  document.querySelectorAll('[data-sheet-action]').forEach(btn => {
-    btn.addEventListener('click', e => {
-      const action = e.target.dataset.sheetAction;
-      
-      switch (action) {
-        case 'refresh':
-          loadFeeds();
-          break;
-        case 'mark-read':
-          markAllRead();
-          break;
-        case 'reset':
-          if (confirm('Reset all settings and data?')) {
-            try {
-              localStorage.clear();
-            } catch (error) {
-              console.warn('Failed to clear storage:', error);
+    <script>
+        // === CONFIGURATION ===
+        const CONFIG = {
+            CFBD_BASE_URL: 'https://api.collegefootballdata.com',
+            WEATHER_BASE_URL: 'https://api.open-meteo.com/v1/forecast',
+            CACHE_TTL: {
+                METRICS: 24 * 60 * 60 * 1000, // 24 hours
+                WEATHER: 6 * 60 * 60 * 1000,  // 6 hours  
+                LINES: 2 * 60 * 60 * 1000,    // 2 hours
+                GAMES: 12 * 60 * 60 * 1000    // 12 hours
+            },
+            RATE_LIMIT: {
+                TOKENS: 10,
+                REFILL_RATE: 1000, // 1 per second
+                MAX_RETRIES: 3
             }
-            location.reload();
-          }
-          break;
-      }
-      
-      closeSheet('actionSheet');
-    });
-  });
-  
-  // Close on overlay click
-  document.querySelectorAll('.sheet-overlay').forEach(overlay => {
-    overlay.addEventListener('click', () => {
-      if (activeSheet) closeSheet(activeSheet);
-    });
-  });
-  
-  // Close on escape
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && activeSheet) {
-      closeSheet(activeSheet);
-    }
-  });
-}
-
-function buildSourceList() {
-  const container = document.getElementById('sourceList');
-  if (!container) return;
-  
-  container.innerHTML = '';
-  
-  const allOption = document.createElement('button');
-  allOption.className = 'source-option touch-target';
-  allOption.setAttribute('role', 'option');
-  allOption.setAttribute('aria-selected', !TERMINAL_STATE.sourceFilter);
-  allOption.innerHTML = `
-    <span class="option-name">ALL_SOURCES</span>
-    <span class="option-meta">
-      <span>ALL_OUTLETS</span>
-    </span>
-    <span class="option-check" aria-hidden="true">✓</span>
-  `;
-  
-  allOption.addEventListener('click', () => {
-    TERMINAL_STATE.sourceFilter = null;
-    persistState();
-    updateSourceDisplay();
-    renderFeed();
-    buildSourceList();
-  });
-  
-  container.appendChild(allOption);
-  
-  SOURCES.forEach(source => {
-    const isActive = TERMINAL_STATE.sourceFilter === source.id;
-    const button = document.createElement('button');
-    button.className = 'source-option touch-target';
-    button.setAttribute('role', 'option');
-    button.setAttribute('aria-selected', isActive);
-    
-    const laneLabel = source.lane ? source.lane.toUpperCase() : 'GENERAL';
-    const biasLabel = Number.isFinite(source.bias) 
-      ? `BIAS_${source.bias >= 0 ? '+' : ''}${source.bias.toFixed(1)}`
-      : 'BIAS_N/A';
-    
-    button.innerHTML = `
-      <span class="option-name">${source.name}</span>
-      <span class="option-meta">
-        <span>${laneLabel}</span>
-        <span>${biasLabel}</span>
-      </span>
-      <span class="option-check" aria-hidden="true">✓</span>
-    `;
-    
-    button.addEventListener('click', () => {
-      TERMINAL_STATE.sourceFilter = source.id;
-      persistState();
-      updateSourceDisplay();
-      renderFeed();
-      buildSourceList();
-    });
-    
-    container.appendChild(button);
-  });
-}
-
-function updateSourceDisplay() {
-  const valueEl = document.getElementById('sourceValue');
-  const selection = SOURCES.find(source => source.id === TERMINAL_STATE.sourceFilter);
-  
-  if (valueEl) {
-    valueEl.textContent = selection ? selection.name : 'ALL_SOURCES';
-  }
-}
-
-function markAllRead() {
-  TERMINAL_STATE.items.forEach(item => {
-    const cardId = createCardId(item.link);
-    setReadProgress(cardId, 100);
-  });
-  
-  document.querySelectorAll('.progress-fill').forEach(fill => {
-    fill.style.setProperty('--progress', '1');
-  });
-  
-  showTerminalToast('MARKED_ALL_READ', 'success');
-}
-
-// Initialize app
-document.addEventListener('DOMContentLoaded', () => {
-  updateSourceDisplay();
-  syncActiveNav();
-  setupSheets();
-  setupPullToRefresh();
-  
-  // Navigation
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const view = btn.dataset.viewTarget;
-      if (view) changeView(view);
-    });
-  });
-  
-  // Filter chips
-  document.querySelectorAll('.filter-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const view = chip.dataset.view;
-      if (view) {
-        changeView(view);
-        setTimeout(() => {
-          const sheet = document.getElementById('filterSheet');
-          if (sheet && !sheet.hidden) {
-            sheet.classList.remove('visible');
-            setTimeout(() => sheet.hidden = true, 300);
-          }
-        }, 100);
-      }
-    });
-  });
-  
-  // Auto refresh
-  setInterval(() => {
-    if (!TERMINAL_STATE.loading && Date.now() - TERMINAL_STATE.lastFetch > 120000) {
-      loadFeeds();
-    }
-  }, 30000);
-  
-  // Initial load
-  loadFeeds();
-});
-</script>
+        };
+        
+        // === UTILITY FUNCTIONS ===
+        
+        // Simple date utilities
+        const DateUtils = {
+            now: () => new Date(),
+            
+            getWeekStart: (date) => {
+                const d = new Date(date);
+                const day = d.getDay();
+                const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
+                return new Date(d.setDate(diff));
+            },
+            
+            getWeekend: (date) => {
+                const start = DateUtils.getWeekStart(date);
+                const friday = new Date(start);
+                friday.setDate(start.getDate() + 4);
+                const sunday = new Date(start);
+                sunday.setDate(start.getDate() + 6);
+                return { friday, sunday };
+            },
+            
+            addWeeks: (date, weeks) => {
+                const d = new Date(date);
+                d.setDate(d.getDate() + weeks * 7);
+                return d;
+            },
+            
+            formatDate: (date) => {
+                return date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+            },
+            
+            formatTime: (date) => {
+                return date.toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+            }
+        };
+        
+        // Math utilities
+        const MathUtils = {
+            sigmoid: (x) => 1 / (1 + Math.exp(-x)),
+            
+            logit: (p) => Math.log(p / (1 - p)),
+            
+            clamp: (value, min, max) => Math.max(min, Math.min(max, value)),
+            
+            mean: (arr) => arr.length ? arr.reduce((a, b) => a + b) / arr.length : 0,
+            
+            standardDev: (arr) => {
+                const mean = MathUtils.mean(arr);
+                const variance = MathUtils.mean(arr.map(x => (x - mean) ** 2));
+                return Math.sqrt(variance);
+            }
+        };
+        
+        // Seeded random number generator
+        class SeededRandom {
+            constructor(seed = 12345) {
+                this.seed = seed;
+            }
+            
+            next() {
+                this.seed = (this.seed * 9301 + 49297) % 233280;
+                return this.seed / 233280;
+            }
+            
+            shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(this.next() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+        }
+        
+        // Rate limiter
+        class RateLimiter {
+            constructor(tokens, refillRate) {
+                this.tokens = tokens;
+                this.maxTokens = tokens;
+                this.refillRate = refillRate;
+                this.lastRefill = Date.now();
+            }
+            
+            async acquire() {
+                const now = Date.now();
+                const timePassed = now - this.lastRefill;
+                const tokensToAdd = Math.floor(timePassed / this.refillRate);
+                
+                this.tokens = Math.min(this.maxTokens, this.tokens + tokensToAdd);
+                this.lastRefill = now;
+                
+                if (this.tokens > 0) {
+                    this.tokens--;
+                    return;
+                }
+                
+                // Wait for next token
+                await new Promise(resolve => setTimeout(resolve, this.refillRate));
+                return this.acquire();
+            }
+        }
+        
+        // === CACHE LAYER ===
+        
+        class Cache {
+            static get(key) {
+                try {
+                    const item = localStorage.getItem(`cfb_${key}`);
+                    if (!item) return null;
+                    
+                    const parsed = JSON.parse(item);
+                    if (Date.now() > parsed.expires) {
+                        localStorage.removeItem(`cfb_${key}`);
+                        return null;
+                    }
+                    
+                    return parsed.data;
+                } catch (e) {
+                    return null;
+                }
+            }
+            
+            static set(key, data, ttl) {
+                try {
+                    const item = {
+                        data,
+                        expires: Date.now() + ttl
+                    };
+                    localStorage.setItem(`cfb_${key}`, JSON.stringify(item));
+                } catch (e) {
+                    console.warn('Cache write failed:', e);
+                }
+            }
+            
+            static clear() {
+                const keys = Object.keys(localStorage);
+                keys.filter(k => k.startsWith('cfb_')).forEach(k => {
+                    localStorage.removeItem(k);
+                });
+            }
+        }
+        
+        // === API CLIENTS ===
+        
+        class CFBDClient {
+            constructor() {
+                this.baseUrl = CONFIG.CFBD_BASE_URL;
+                this.rateLimiter = new RateLimiter(CONFIG.RATE_LIMIT.TOKENS, CONFIG.RATE_LIMIT.REFILL_RATE);
+            }
+            
+            async request(endpoint, params = {}) {
+                await this.rateLimiter.acquire();
+                
+                const apiKey = AppState.getApiKey();
+                if (!apiKey && !AppState.isDemoMode()) {
+                    throw new Error('CFBD API key required');
+                }
+                
+                const url = new URL(endpoint, this.baseUrl);
+                Object.keys(params).forEach(key => {
+                    if (params[key] != null) {
+                        url.searchParams.append(key, params[key]);
+                    }
+                });
+                
+                const headers = {};
+                if (apiKey) {
+                    headers['Authorization'] = `Bearer ${apiKey}`;
+                }
+                
+                let retries = 0;
+                while (retries < CONFIG.RATE_LIMIT.MAX_RETRIES) {
+                    try {
+                        const response = await fetch(url, { headers });
+                        
+                        if (response.status === 401) {
+                            throw new Error('CFBD 401: Invalid API key');
+                        }
+                        
+                        if (response.status === 429) {
+                            const delay = Math.pow(2, retries) * 1000 + Math.random() * 1000;
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            retries++;
+                            continue;
+                        }
+                        
+                        if (!response.ok) {
+                            throw new Error(`CFBD ${response.status}: ${response.statusText}`);
+                        }
+                        
+                        return await response.json();
+                    } catch (error) {
+                        if (retries === CONFIG.RATE_LIMIT.MAX_RETRIES - 1) {
+                            throw error;
+                        }
+                        retries++;
+                        await new Promise(resolve => setTimeout(resolve, 1000 * retries));
+                    }
+                }
+            }
+            
+            async getGames(year, week) {
+                const cacheKey = `games_${year}_${week}`;
+                let games = Cache.get(cacheKey);
+                
+                if (!games) {
+                    games = await this.request('/games', { year, week, seasonType: 'regular' });
+                    Cache.set(cacheKey, games, CONFIG.CACHE_TTL.GAMES);
+                }
+                
+                return games;
+            }
+            
+            async getTeamMetrics(year) {
+                const cacheKey = `metrics_${year}`;
+                let metrics = Cache.get(cacheKey);
+                
+                if (!metrics) {
+                    const [ppa, elo] = await Promise.all([
+                        this.request('/ppa/teams', { year }).catch(() => []),
+                        this.request('/ratings/elo', { year }).catch(() => [])
+                    ]);
+                    
+                    metrics = { ppa, elo };
+                    Cache.set(cacheKey, metrics, CONFIG.CACHE_TTL.METRICS);
+                }
+                
+                return metrics;
+            }
+            
+            async getLines(year, week) {
+                if (!AppState.getSettings().useMarkets) return [];
+                
+                const cacheKey = `lines_${year}_${week}`;
+                let lines = Cache.get(cacheKey);
+                
+                if (!lines) {
+                    lines = await this.request('/lines', { year, week }).catch(() => []);
+                    Cache.set(cacheKey, lines, CONFIG.CACHE_TTL.LINES);
+                }
+                
+                return lines;
+            }
+            
+            async getVenues() {
+                const cacheKey = 'venues';
+                let venues = Cache.get(cacheKey);
+                
+                if (!venues) {
+                    venues = await this.request('/venues').catch(() => []);
+                    Cache.set(cacheKey, venues, CONFIG.CACHE_TTL.METRICS);
+                }
+                
+                return venues;
+            }
+        }
+        
+        class WeatherClient {
+            constructor() {
+                this.baseUrl = CONFIG.WEATHER_BASE_URL;
+            }
+            
+            async getForecast(lat, lon, datetime) {
+                if (!AppState.getSettings().useWeather) return null;
+                
+                const date = new Date(datetime);
+                const dateStr = date.toISOString().split('T')[0];
+                const hour = date.getHours();
+                
+                const cacheKey = `weather_${lat}_${lon}_${dateStr}_${hour}`;
+                let forecast = Cache.get(cacheKey);
+                
+                if (!forecast) {
+                    try {
+                        const params = {
+                            latitude: lat,
+                            longitude: lon,
+                            hourly: 'temperature_2m,precipitation,wind_speed_10m,wind_gusts_10m,precipitation_probability',
+                            start_date: dateStr,
+                            end_date: dateStr,
+                            timezone: 'auto'
+                        };
+                        
+                        const url = new URL(this.baseUrl);
+                        Object.keys(params).forEach(key => {
+                            url.searchParams.append(key, params[key]);
+                        });
+                        
+                        const response = await fetch(url);
+                        if (!response.ok) {
+                            throw new Error(`Weather API ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        
+                        // Find closest hour
+                        const hourly = data.hourly;
+                        let closestIndex = 0;
+                        let minDiff = Infinity;
+                        
+                        hourly.time.forEach((time, index) => {
+                            const forecastHour = new Date(time).getHours();
+                            const diff = Math.abs(forecastHour - hour);
+                            if (diff < minDiff) {
+                                minDiff = diff;
+                                closestIndex = index;
+                            }
+                        });
+                        
+                        forecast = {
+                            temperature: hourly.temperature_2m[closestIndex] || 20,
+                            precipitation: hourly.precipitation[closestIndex] || 0,
+                            wind_speed: hourly.wind_speed_10m[closestIndex] || 0,
+                            wind_gusts: hourly.wind_gusts_10m[closestIndex] || 0,
+                            precipitation_probability: hourly.precipitation_probability[closestIndex] || 0
+                        };
+                        
+                        Cache.set(cacheKey, forecast, CONFIG.CACHE_TTL.WEATHER);
+                    } catch (error) {
+                        console.warn('Weather fetch failed:', error);
+                        forecast = null;
+                    }
+                }
+                
+                return forecast;
+            }
+        }
+        
+        // === DATA MODELS ===
+        
+        class FeatureEngineering {
+            static buildGameFeatures(game, homeMetrics, awayMetrics, weather = null, lines = null) {
+                const features = {
+                    game_id: game.id,
+                    home_team: game.home_team,
+                    away_team: game.away_team,
+                    date: game.start_date,
+                    neutral_site: game.neutral_site
+                };
+                
+                // ELO differential
+                const homeElo = homeMetrics?.elo || 1200;
+                const awayElo = awayMetrics?.elo || 1200;
+                const homeAdvantage = game.neutral_site ? 0 : 45;
+                features.elo_diff = homeElo + homeAdvantage - awayElo;
+                
+                // PPA features
+                const homePPA = homeMetrics?.ppa || { offense: 0, defense: 0 };
+                const awayPPA = awayMetrics?.ppa || { offense: 0, defense: 0 };
+                features.net_ppa_off = homePPA.offense - awayPPA.defense;
+                features.net_ppa_def = homePPA.defense - awayPPA.offense;
+                
+                // Weather adjustments
+                if (weather) {
+                    features.weather_wind = weather.wind_speed || 0;
+                    features.weather_precip = weather.precipitation_probability > 50 ? 1 : 0;
+                } else {
+                    features.weather_wind = 0;
+                    features.weather_precip = 0;
+                }
+                
+                // Market features
+                if (lines && lines.length > 0) {
+                    const line = lines[0];
+                    features.market_spread = line.spread || 0;
+                } else {
+                    features.market_spread = 0;
+                }
+                
+                return features;
+            }
+            
+            static applyWeatherAdjustments(features) {
+                const windMph = features.weather_wind || 0;
+                const hasPrecip = features.weather_precip || 0;
+                
+                // Reduce passing efficiency in wind/rain
+                const windPenalty = -0.01 * Math.max(0, windMph - 12);
+                const precipPenalty = -0.05 * hasPrecip;
+                
+                features.weather_adjustment = windPenalty + precipPenalty;
+                return features;
+            }
+        }
+        
+        // Simple logistic regression
+        class LogisticRegression {
+            constructor(alpha = 0.01) {
+                this.alpha = alpha; // L2 regularization
+                this.weights = null;
+                this.intercept = 0;
+            }
+            
+            fit(X, y, maxIter = 100) {
+                if (X.length === 0) return this;
+                
+                const nFeatures = X[0].length;
+                this.weights = new Array(nFeatures).fill(0);
+                this.intercept = 0;
+                
+                const learningRate = 0.01;
+                
+                for (let iter = 0; iter < maxIter; iter++) {
+                    let gradWeights = new Array(nFeatures).fill(0);
+                    let gradIntercept = 0;
+                    
+                    for (let i = 0; i < X.length; i++) {
+                        const prediction = this.predictProba([X[i]])[0];
+                        const error = prediction - y[i];
+                        
+                        for (let j = 0; j < nFeatures; j++) {
+                            gradWeights[j] += error * X[i][j] + this.alpha * this.weights[j];
+                        }
+                        gradIntercept += error;
+                    }
+                    
+                    // Update weights
+                    for (let j = 0; j < nFeatures; j++) {
+                        this.weights[j] -= learningRate * gradWeights[j] / X.length;
+                    }
+                    this.intercept -= learningRate * gradIntercept / X.length;
+                }
+                
+                return this;
+            }
+            
+            predictProba(X) {
+                if (!this.weights) return X.map(() => 0.5);
+                
+                return X.map(row => {
+                    let logit = this.intercept;
+                    for (let i = 0; i < row.length; i++) {
+                        logit += this.weights[i] * row[i];
+                    }
+                    return MathUtils.sigmoid(logit);
+                });
+            }
+        }
+        
+        // Simple calibration using Platt scaling
+        class PlattCalibration {
+            constructor() {
+                this.a = 1;
+                this.b = 0;
+            }
+            
+            fit(predictions, trueLabels) {
+                if (predictions.length < 3) return this;
+                
+                // Simple optimization for Platt scaling parameters
+                let bestA = 1, bestB = 0, bestLoss = Infinity;
+                
+                for (let a = 0.1; a <= 3; a += 0.1) {
+                    for (let b = -2; b <= 2; b += 0.1) {
+                        let loss = 0;
+                        for (let i = 0; i < predictions.length; i++) {
+                            const calibrated = MathUtils.sigmoid(a * MathUtils.logit(predictions[i]) + b);
+                            const clampedCalibrated = MathUtils.clamp(calibrated, 0.001, 0.999);
+                            loss -= trueLabels[i] * Math.log(clampedCalibrated) + 
+                                   (1 - trueLabels[i]) * Math.log(1 - clampedCalibrated);
+                        }
+                        
+                        if (loss < bestLoss) {
+                            bestLoss = loss;
+                            bestA = a;
+                            bestB = b;
+                        }
+                    }
+                }
+                
+                this.a = bestA;
+                this.b = bestB;
+                return this;
+            }
+            
+            transform(predictions) {
+                return predictions.map(p => {
+                    const clampedP = MathUtils.clamp(p, 0.001, 0.999);
+                    return MathUtils.sigmoid(this.a * MathUtils.logit(clampedP) + this.b);
+                });
+            }
+        }
+        
+        // === PREDICTION MODEL ===
+        
+        class CFBPredictor {
+            constructor() {
+                this.eloModel = new LogisticRegression(0.001);
+                this.advancedModel = new LogisticRegression(0.01);
+                this.metaModel = new LogisticRegression(0.001);
+                this.calibrator = new PlattCalibration();
+                this.isFitted = false;
+                this.featureNames = ['elo_diff', 'net_ppa_off', 'net_ppa_def', 'weather_adjustment', 'market_spread'];
+            }
+            
+            async fit(historicalGames, metrics, weather = []) {
+                if (historicalGames.length < 10) {
+                    console.warn('Insufficient training data');
+                    return this;
+                }
+                
+                // Build training features
+                const features = [];
+                const labels = [];
+                
+                for (const game of historicalGames) {
+                    if (!game.home_points != null || !game.away_points != null) continue;
+                    
+                    const homeWon = game.home_points > game.away_points ? 1 : 0;
+                    const homeMetrics = metrics.find(m => m.team === game.home_team);
+                    const awayMetrics = metrics.find(m => m.team === game.away_team);
+                    
+                    if (!homeMetrics || !awayMetrics) continue;
+                    
+                    const gameFeatures = FeatureEngineering.buildGameFeatures(
+                        game, homeMetrics, awayMetrics, null, null
+                    );
+                    
+                    features.push([
+                        gameFeatures.elo_diff,
+                        gameFeatures.net_ppa_off,
+                        gameFeatures.net_ppa_def,
+                        gameFeatures.weather_adjustment || 0,
+                        gameFeatures.market_spread || 0
+                    ]);
+                    labels.push(homeWon);
+                }
+                
+                if (features.length < 5) {
+                    console.warn('Insufficient valid training samples');
+                    return this;
+                }
+                
+                // Fit models
+                this.eloModel.fit(features.map(f => [f[0]]), labels);
+                this.advancedModel.fit(features, labels);
+                
+                // Meta-model: stack predictions
+                const eloPreds = this.eloModel.predictProba(features.map(f => [f[0]]));
+                const advPreds = this.advancedModel.predictProba(features);
+                const metaFeatures = features.map((_, i) => [eloPreds[i], advPreds[i]]);
+                
+                this.metaModel.fit(metaFeatures, labels);
+                
+                // Calibration
+                const metaPreds = this.metaModel.predictProba(metaFeatures);
+                this.calibrator.fit(metaPreds, labels);
+                
+                this.isFitted = true;
+                return this;
+            }
+            
+            predict(gameFeatures) {
+                if (!this.isFitted) {
+                    return { probability: 0.5, confidence: 0, drivers: [] };
+                }
+                
+                const features = [
+                    gameFeatures.elo_diff || 0,
+                    gameFeatures.net_ppa_off || 0,
+                    gameFeatures.net_ppa_def || 0,
+                    gameFeatures.weather_adjustment || 0,
+                    gameFeatures.market_spread || 0
+                ];
+                
+                const eloProb = this.eloModel.predictProba([features.slice(0, 1)])[0];
+                const advProb = this.advancedModel.predictProba([features])[0];
+                const metaProb = this.metaModel.predictProba([[eloProb, advProb]])[0];
+                const calibratedProb = this.calibrator.transform([metaProb])[0];
+                
+                // Calculate drivers
+                const drivers = this.calculateDrivers(features, gameFeatures);
+                
+                // Confidence based on distance from 0.5
+                const confidence = Math.abs(calibratedProb - 0.5) * 2;
+                
+                return {
+                    probability: MathUtils.clamp(calibratedProb, 0.01, 0.99),
+                    confidence: MathUtils.clamp(confidence, 0, 1),
+                    drivers
+                };
+            }
+            
+            calculateDrivers(features, gameFeatures) {
+                const drivers = [];
+                
+                if (Math.abs(features[0]) > 50) {
+                    drivers.push({
+                        name: 'ELO',
+                        impact: features[0] > 0 ? 'positive' : 'negative',
+                        strength: Math.min(Math.abs(features[0]) / 100, 1)
+                    });
+                }
+                
+                if (Math.abs(features[1]) > 0.1) {
+                    drivers.push({
+                        name: 'Offense',
+                        impact: features[1] > 0 ? 'positive' : 'negative',
+                        strength: Math.min(Math.abs(features[1]) * 2, 1)
+                    });
+                }
+                
+                if (Math.abs(features[2]) > 0.1) {
+                    drivers.push({
+                        name: 'Defense',
+                        impact: features[2] > 0 ? 'positive' : 'negative',
+                        strength: Math.min(Math.abs(features[2]) * 2, 1)
+                    });
+                }
+                
+                if (features[3] < -0.02) {
+                    drivers.push({
+                        name: 'Weather',
+                        impact: 'negative',
+                        strength: Math.min(Math.abs(features[3]) * 10, 1)
+                    });
+                }
+                
+                return drivers.slice(0, 3); // Top 3 drivers
+            }
+        }
+        
+        // === APPLICATION STATE ===
+        
+        class AppState {
+            static state = {
+                currentWeek: DateUtils.now(),
+                games: [],
+                predictions: [],
+                isLoading: false,
+                error: null,
+                settings: {
+                    cfbdKey: '',
+                    useMarkets: true,
+                    useWeather: true,
+                    demoMode: false
+                }
+            };
+            
+            static listeners = [];
+            
+            static subscribe(listener) {
+                this.listeners.push(listener);
+                return () => {
+                    this.listeners = this.listeners.filter(l => l !== listener);
+                };
+            }
+            
+            static notify() {
+                this.listeners.forEach(listener => listener(this.state));
+            }
+            
+            static setState(updates) {
+                this.state = { ...this.state, ...updates };
+                this.notify();
+            }
+            
+            static loadSettings() {
+                try {
+                    const stored = localStorage.getItem('cfb_settings');
+                    if (stored) {
+                        this.state.settings = { ...this.state.settings, ...JSON.parse(stored) };
+                    }
+                } catch (e) {
+                    console.warn('Failed to load settings:', e);
+                }
+            }
+            
+            static saveSettings(settings) {
+                this.state.settings = { ...this.state.settings, ...settings };
+                try {
+                    localStorage.setItem('cfb_settings', JSON.stringify(this.state.settings));
+                } catch (e) {
+                    console.warn('Failed to save settings:', e);
+                }
+                this.notify();
+            }
+            
+            static getSettings() {
+                return this.state.settings;
+            }
+            
+            static getApiKey() {
+                return this.state.settings.cfbdKey;
+            }
+            
+            static isDemoMode() {
+                return this.state.settings.demoMode;
+            }
+            
+            static clearKeys() {
+                this.saveSettings({ cfbdKey: '' });
+                Cache.clear();
+            }
+        }
+        
+        // === DATA SERVICE ===
+        
+        class DataService {
+            constructor() {
+                this.cfbdClient = new CFBDClient();
+                this.weatherClient = new WeatherClient();
+                this.predictor = new CFBPredictor();
+                this.venues = new Map();
+            }
+            
+            async initialize() {
+                try {
+                    if (!AppState.isDemoMode()) {
+                        const venueData = await this.cfbdClient.getVenues();
+                        venueData.forEach(venue => {
+                            this.venues.set(venue.name, {
+                                lat: venue.latitude,
+                                lon: venue.longitude,
+                                dome: venue.dome,
+                                grass: venue.grass
+                            });
+                        });
+                    }
+                } catch (error) {
+                    console.warn('Failed to load venues:', error);
+                }
+            }
+            
+            async loadWeekGames(date) {
+                if (AppState.isDemoMode()) {
+                    return this.getDemoGames();
+                }
+                
+                const year = date.getFullYear();
+                const week = this.getCollegeWeek(date);
+                
+                try {
+                    const games = await this.cfbdClient.getGames(year, week);
+                    return games.filter(game => {
+                        const gameDate = new Date(game.start_date);
+                        return gameDate > DateUtils.now();
+                    });
+                } catch (error) {
+                    throw new Error(`Failed to load games: ${error.message}`);
+                }
+            }
+            
+            async loadTeamMetrics(year) {
+                if (AppState.isDemoMode()) {
+                    return this.getDemoMetrics();
+                }
+                
+                try {
+                    const metrics = await this.cfbdClient.getTeamMetrics(year);
+                    
+                    // Combine PPA and ELO data
+                    const combined = new Map();
+                    
+                    metrics.ppa.forEach(team => {
+                        combined.set(team.team, {
+                            team: team.team,
+                            ppa: {
+                                offense: team.offense?.overall || 0,
+                                defense: team.defense?.overall || 0
+                            }
+                        });
+                    });
+                    
+                    metrics.elo.forEach(rating => {
+                        const existing = combined.get(rating.team) || { team: rating.team, ppa: { offense: 0, defense: 0 } };
+                        existing.elo = rating.elo;
+                        combined.set(rating.team, existing);
+                    });
+                    
+                    return Array.from(combined.values());
+                } catch (error) {
+                    throw new Error(`Failed to load team metrics: ${error.message}`);
+                }
+            }
+            
+            async predictGames(games) {
+                AppState.setState({ isLoading: true, error: null });
+                
+                try {
+                    const year = new Date().getFullYear();
+                    
+                    // Load training data and metrics
+                    const [metrics, historicalGames] = await Promise.all([
+                        this.loadTeamMetrics(year),
+                        this.loadHistoricalGames(year)
+                    ]);
+                    
+                    // Train the model
+                    await this.predictor.fit(historicalGames, metrics);
+                    
+                    // Generate predictions
+                    const predictions = [];
+                    
+                    for (const game of games) {
+                        const homeMetrics = metrics.find(m => m.team === game.home_team);
+                        const awayMetrics = metrics.find(m => m.team === game.away_team);
+                        
+                        if (!homeMetrics || !awayMetrics) {
+                            predictions.push({
+                                game_id: game.id,
+                                probability: 0.5,
+                                confidence: 0,
+                                drivers: [],
+                                error: 'Missing team metrics'
+                            });
+                            continue;
+                        }
+                        
+                        // Get weather if enabled
+                        let weather = null;
+                        if (AppState.getSettings().useWeather && game.venue) {
+                            const venue = this.venues.get(game.venue);
+                            if (venue && !venue.dome) {
+                                try {
+                                    weather = await this.weatherClient.getForecast(
+                                        venue.lat, venue.lon, game.start_date
+                                    );
+                                } catch (e) {
+                                    console.warn('Weather fetch failed for', game.venue);
+                                }
+                            }
+                        }
+                        
+                        // Build features
+                        const features = FeatureEngineering.buildGameFeatures(
+                            game, homeMetrics, awayMetrics, weather
+                        );
+                        FeatureEngineering.applyWeatherAdjustments(features);
+                        
+                        // Predict
+                        const prediction = this.predictor.predict(features);
+                        
+                        predictions.push({
+                            game_id: game.id,
+                            game,
+                            probability: prediction.probability,
+                            confidence: prediction.confidence,
+                            drivers: prediction.drivers,
+                            features
+                        });
+                    }
+                    
+                    AppState.setState({ predictions, isLoading: false });
+                    return predictions;
+                    
+                } catch (error) {
+                    AppState.setState({ isLoading: false, error: error.message });
+                    throw error;
+                }
+            }
+            
+            async loadHistoricalGames(year) {
+                if (AppState.isDemoMode()) {
+                    return this.getDemoHistoricalGames();
+                }
+                
+                try {
+                    // Load completed games from current season
+                    const allGames = [];
+                    const currentWeek = this.getCollegeWeek(DateUtils.now());
+                    
+                    for (let week = 1; week < currentWeek; week++) {
+                        try {
+                            const weekGames = await this.cfbdClient.getGames(year, week);
+                            const completedGames = weekGames.filter(g => 
+                                g.home_points != null && g.away_points != null
+                            );
+                            allGames.push(...completedGames);
+                            
+                            if (allGames.length > 500) break; // Limit for performance
+                        } catch (e) {
+                            console.warn(`Failed to load week ${week}:`, e);
+                        }
+                    }
+                    
+                    return allGames;
+                } catch (error) {
+                    console.warn('Failed to load historical games:', error);
+                    return [];
+                }
+            }
+            
+            getCollegeWeek(date) {
+                // Simple approximation - week 1 typically starts around Aug 26
+                const seasonStart = new Date(date.getFullYear(), 7, 26); // Aug 26
+                const diffTime = date - seasonStart;
+                const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+                return Math.max(1, diffWeeks);
+            }
+            
+            // Demo data for when APIs are unavailable
+            getDemoGames() {
+                return [
+                    {
+                        id: 1,
+                        home_team: 'Georgia',
+                        away_team: 'Alabama',
+                        start_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+                        venue: 'Sanford Stadium',
+                        neutral_site: false
+                    },
+                    {
+                        id: 2,
+                        home_team: 'Ohio State',
+                        away_team: 'Michigan',
+                        start_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+                        venue: 'Ohio Stadium',
+                        neutral_site: false
+                    },
+                    {
+                        id: 3,
+                        home_team: 'Texas',
+                        away_team: 'Oklahoma',
+                        start_date: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString(),
+                        venue: 'Cotton Bowl',
+                        neutral_site: true
+                    }
+                ];
+            }
+            
+            getDemoMetrics() {
+                return [
+                    { team: 'Georgia', ppa: { offense: 0.25, defense: -0.18 }, elo: 1650 },
+                    { team: 'Alabama', ppa: { offense: 0.22, defense: -0.15 }, elo: 1645 },
+                    { team: 'Ohio State', ppa: { offense: 0.28, defense: -0.20 }, elo: 1660 },
+                    { team: 'Michigan', ppa: { offense: 0.15, defense: -0.12 }, elo: 1580 },
+                    { team: 'Texas', ppa: { offense: 0.20, defense: -0.16 }, elo: 1620 },
+                    { team: 'Oklahoma', ppa: { offense: 0.18, defense: -0.10 }, elo: 1590 }
+                ];
+            }
+            
+            getDemoHistoricalGames() {
+                return [
+                    { home_team: 'Georgia', away_team: 'Auburn', home_points: 31, away_points: 13 },
+                    { home_team: 'Alabama', away_team: 'LSU', home_points: 42, away_points: 21 },
+                    { home_team: 'Ohio State', away_team: 'Penn State', home_points: 28, away_points: 17 }
+                ];
+            }
+        }
+        
+        // === UI CONTROLLER ===
+        
+        class UIController {
+            constructor() {
+                this.dataService = new DataService();
+                this.initializeElements();
+                this.attachEventListeners();
+                this.loadInitialData();
+            }
+            
+            initializeElements() {
+                this.elements = {
+                    weekDisplay: document.getElementById('week-display'),
+                    prevWeekBtn: document.getElementById('prev-week'),
+                    nextWeekBtn: document.getElementById('next-week'),
+                    settingsBtn: document.getElementById('settings-btn'),
+                    settingsModal: document.getElementById('settings-modal'),
+                    settingsClose: document.getElementById('settings-close'),
+                    gamesContainer: document.getElementById('games-container'),
+                    errorContainer: document.getElementById('error-container'),
+                    refreshBtn: document.getElementById('refresh-btn'),
+                    predictBtn: document.getElementById('predict-btn'),
+                    exportBtn: document.getElementById('export-btn'),
+                    cfbdKeyInput: document.getElementById('cfbd-key'),
+                    useMarketsCheck: document.getElementById('use-markets'),
+                    useWeatherCheck: document.getElementById('use-weather'),
+                    demoModeCheck: document.getElementById('demo-mode'),
+                    saveSettingsBtn: document.getElementById('save-settings'),
+                    forgetKeysBtn: document.getElementById('forget-keys'),
+                    demoBanner: document.getElementById('demo-banner')
+                };
+            }
+            
+            attachEventListeners() {
+                // Week navigation
+                this.elements.prevWeekBtn.addEventListener('click', () => this.changeWeek(-1));
+                this.elements.nextWeekBtn.addEventListener('click', () => this.changeWeek(1));
+                
+                // Settings modal
+                this.elements.settingsBtn.addEventListener('click', () => this.showSettings());
+                this.elements.settingsClose.addEventListener('click', () => this.hideSettings());
+                this.elements.settingsModal.addEventListener('click', (e) => {
+                    if (e.target === this.elements.settingsModal) this.hideSettings();
+                });
+                
+                // Settings actions
+                this.elements.saveSettingsBtn.addEventListener('click', () => this.saveSettings());
+                this.elements.forgetKeysBtn.addEventListener('click', () => this.forgetKeys());
+                
+                // Bottom bar actions
+                this.elements.refreshBtn.addEventListener('click', () => this.refreshData());
+                this.elements.predictBtn.addEventListener('click', () => this.runPredictions());
+                this.elements.exportBtn.addEventListener('click', () => this.exportData());
+                
+                // State changes
+                AppState.subscribe((state) => this.updateUI(state));
+            }
+            
+            async loadInitialData() {
+                AppState.loadSettings();
+                await this.dataService.initialize();
+                this.updateWeekDisplay();
+                this.updateSettingsUI();
+                await this.loadCurrentWeekGames();
+            }
+            
+            updateUI(state) {
+                this.updateWeekDisplay();
+                this.renderGames(state.games, state.predictions);
+                this.renderErrors(state.error);
+                this.updateLoadingState(state.isLoading);
+                this.updateDemoBanner(state.settings.demoMode);
+            }
+            
+            updateWeekDisplay() {
+                const { friday, sunday } = DateUtils.getWeekend(AppState.state.currentWeek);
+                this.elements.weekDisplay.textContent = 
+                    `${DateUtils.formatDate(friday)} - ${DateUtils.formatDate(sunday)}`;
+            }
+            
+            updateDemoBanner(demoMode) {
+                this.elements.demoBanner.style.display = demoMode ? 'block' : 'none';
+            }
+            
+            async changeWeek(direction) {
+                const newWeek = DateUtils.addWeeks(AppState.state.currentWeek, direction);
+                AppState.setState({ currentWeek: newWeek, predictions: [] });
+                await this.loadCurrentWeekGames();
+            }
+            
+            async loadCurrentWeekGames() {
+                AppState.setState({ isLoading: true, error: null });
+                
+                try {
+                    const games = await this.dataService.loadWeekGames(AppState.state.currentWeek);
+                    AppState.setState({ games, isLoading: false });
+                } catch (error) {
+                    AppState.setState({ isLoading: false, error: error.message });
+                }
+            }
+            
+            async runPredictions() {
+                if (AppState.state.games.length === 0) {
+                    AppState.setState({ error: 'No games loaded' });
+                    return;
+                }
+                
+                try {
+                    await this.dataService.predictGames(AppState.state.games);
+                } catch (error) {
+                    AppState.setState({ error: error.message });
+                }
+            }
+            
+            async refreshData() {
+                Cache.clear();
+                await this.loadCurrentWeekGames();
+            }
+            
+            renderGames(games, predictions) {
+                if (!games || games.length === 0) {
+                    this.elements.gamesContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div style="font-size: 48px; margin-bottom: 16px;">🏈</div>
+                            <div style="font-size: 18px; margin-bottom: 8px;">No games this week</div>
+                            <div style="font-size: 14px;">Try selecting a different week</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const html = games.map(game => {
+                    const prediction = predictions.find(p => p.game_id === game.id);
+                    return this.renderGameCard(game, prediction);
+                }).join('');
+                
+                this.elements.gamesContainer.innerHTML = html;
+            }
+            
+            renderGameCard(game, prediction) {
+                const gameDate = new Date(game.start_date);
+                const homeProb = prediction ? Math.round(prediction.probability * 100) : 50;
+                const awayProb = 100 - homeProb;
+                
+                const driversHtml = prediction && prediction.drivers ? 
+                    prediction.drivers.map(driver => 
+                        `<span class="chip ${driver.impact === 'positive' ? 'chip-positive' : 'chip-negative'}">
+                            ${driver.name}
+                        </span>`
+                    ).join('') : '';
+                
+                const venueTagsHtml = this.renderVenueTags(game);
+                
+                return `
+                    <div class="game-card">
+                        <div class="game-header">
+                            <div class="teams">
+                                <div class="team-line team-away">
+                                    ${game.away_team} <span style="font-size: 12px; color: var(--text-secondary);">(${awayProb}%)</span>
+                                </div>
+                                <div class="team-line" style="font-weight: 600;">
+                                    @ ${game.home_team}
+                                </div>
+                            </div>
+                            <div class="probability-pill">
+                                ${homeProb}%
+                            </div>
+                        </div>
+                        <div class="game-info">
+                            <div>
+                                ${DateUtils.formatTime(gameDate)}<br>
+                                <span style="font-size: 12px;">${game.venue || 'TBD'}</span>
+                            </div>
+                            <div class="venue-tags">
+                                ${venueTagsHtml}
+                            </div>
+                        </div>
+                        ${driversHtml ? `
+                            <div class="drivers">
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">
+                                    Key factors:
+                                </div>
+                                <div class="driver-chips">
+                                    ${driversHtml}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            
+            renderVenueTags(game) {
+                const tags = [];
+                
+                if (game.neutral_site) {
+                    tags.push('<span class="tag">NEUTRAL</span>');
+                }
+                
+                const venue = this.dataService.venues.get(game.venue);
+                if (venue) {
+                    if (venue.dome) {
+                        tags.push('<span class="tag">DOME</span>');
+                    }
+                    if (!venue.grass) {
+                        tags.push('<span class="tag">TURF</span>');
+                    }
+                }
+                
+                return tags.join('');
+            }
+            
+            renderErrors(error) {
+                if (error) {
+                    this.elements.errorContainer.innerHTML = `
+                        <div class="error-banner">
+                            ${error}
+                        </div>
+                    `;
+                } else {
+                    this.elements.errorContainer.innerHTML = '';
+                }
+            }
+            
+            updateLoadingState(isLoading) {
+                if (isLoading) {
+                    this.elements.gamesContainer.innerHTML = `
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Processing predictions...
+                        </div>
+                    `;
+                }
+                
+                this.elements.refreshBtn.disabled = isLoading;
+                this.elements.predictBtn.disabled = isLoading;
+            }
+            
+            showSettings() {
+                this.updateSettingsUI();
+                this.elements.settingsModal.classList.add('show');
+            }
+            
+            hideSettings() {
+                this.elements.settingsModal.classList.remove('show');
+            }
+            
+            updateSettingsUI() {
+                const settings = AppState.getSettings();
+                this.elements.cfbdKeyInput.value = settings.cfbdKey || '';
+                this.elements.useMarketsCheck.checked = settings.useMarkets;
+                this.elements.useWeatherCheck.checked = settings.useWeather;
+                this.elements.demoModeCheck.checked = settings.demoMode;
+            }
+            
+            saveSettings() {
+                const settings = {
+                    cfbdKey: this.elements.cfbdKeyInput.value.trim(),
+                    useMarkets: this.elements.useMarketsCheck.checked,
+                    useWeather: this.elements.useWeatherCheck.checked,
+                    demoMode: this.elements.demoModeCheck.checked
+                };
+                
+                AppState.saveSettings(settings);
+                this.hideSettings();
+                
+                // Reload data if demo mode changed
+                if (settings.demoMode !== AppState.state.settings.demoMode) {
+                    this.loadCurrentWeekGames();
+                }
+            }
+            
+            forgetKeys() {
+                if (confirm('This will clear all stored API keys and cached data. Continue?')) {
+                    AppState.clearKeys();
+                    this.updateSettingsUI();
+                    this.hideSettings();
+                }
+            }
+            
+            exportData() {
+                const exportData = {
+                    timestamp: new Date().toISOString(),
+                    week: AppState.state.currentWeek,
+                    games: AppState.state.games,
+                    predictions: AppState.state.predictions,
+                    settings: { ...AppState.getSettings(), cfbdKey: '' } // Don't export API key
+                };
+                
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+                    type: 'application/json'
+                });
+                
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cfb-predictions-${DateUtils.formatDate(AppState.state.currentWeek)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+        
+        // === INITIALIZATION ===
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize the application
+            window.cfbApp = new UIController();
+        });
+        
+        // === WEB WORKER FOR HEAVY COMPUTATION ===
+        
+        // Create worker as blob URL for self-contained deployment
+        const workerCode = `
+            // Worker thread for heavy ML computations
+            self.onmessage = function(e) {
+                const { type, data } = e.data;
+                
+                try {
+                    switch (type) {
+                        case 'TRAIN_MODEL':
+                            const result = trainModel(data);
+                            self.postMessage({ type: 'TRAIN_COMPLETE', result });
+                            break;
+                            
+                        case 'BATCH_PREDICT':
+                            const predictions = batchPredict(data);
+                            self.postMessage({ type: 'PREDICT_COMPLETE', predictions });
+                            break;
+                            
+                        default:
+                            throw new Error('Unknown worker task: ' + type);
+                    }
+                } catch (error) {
+                    self.postMessage({ type: 'ERROR', error: error.message });
+                }
+            };
+            
+            function trainModel(data) {
+                // Simplified training in worker
+                const { features, labels } = data;
+                
+                if (features.length === 0) {
+                    return { weights: [0, 0, 0, 0, 0], intercept: 0 };
+                }
+                
+                // Simple gradient descent
+                let weights = new Array(features[0].length).fill(0);
+                let intercept = 0;
+                const learningRate = 0.01;
+                const iterations = 50;
+                
+                for (let iter = 0; iter < iterations; iter++) {
+                    let gradWeights = new Array(weights.length).fill(0);
+                    let gradIntercept = 0;
+                    
+                    for (let i = 0; i < features.length; i++) {
+                        let prediction = intercept;
+                        for (let j = 0; j < weights.length; j++) {
+                            prediction += weights[j] * features[i][j];
+                        }
+                        prediction = 1 / (1 + Math.exp(-prediction));
+                        
+                        const error = prediction - labels[i];
+                        
+                        for (let j = 0; j < weights.length; j++) {
+                            gradWeights[j] += error * features[i][j];
+                        }
+                        gradIntercept += error;
+                    }
+                    
+                    for (let j = 0; j < weights.length; j++) {
+                        weights[j] -= learningRate * gradWeights[j] / features.length;
+                    }
+                    intercept -= learningRate * gradIntercept / features.length;
+                }
+                
+                return { weights, intercept };
+            }
+            
+            function batchPredict(data) {
+                const { features, model } = data;
+                const predictions = [];
+                
+                for (const feature of features) {
+                    let logit = model.intercept;
+                    for (let i = 0; i < feature.length; i++) {
+                        logit += model.weights[i] * feature[i];
+                    }
+                    const probability = 1 / (1 + Math.exp(-logit));
+                    predictions.push(Math.max(0.01, Math.min(0.99, probability)));
+                }
+                
+                return predictions;
+            }
+        `;
+        
+        // Create worker
+        const workerBlob = new Blob([workerCode], { type: 'application/javascript' });
+        const workerUrl = URL.createObjectURL(workerBlob);
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            URL.revokeObjectURL(workerUrl);
+        });
+        
+        // === SERVICE WORKER FOR OFFLINE SUPPORT ===
+        
+        if ('serviceWorker' in navigator) {
+            // Register minimal service worker for offline HTML cache
+            const swCode = `
+                const CACHE_NAME = 'cfb-predictor-v1';
+                const urlsToCache = ['/'];
+                
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.addAll(urlsToCache))
+                    );
+                });
+                
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(response => response || fetch(event.request))
+                    );
+                });
+            `;
+            
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(swBlob);
+            
+            navigator.serviceWorker.register(swUrl).catch(err => {
+                console.warn('ServiceWorker registration failed:', err);
+            });
+        }
+        
+        // === DEMO DATA CONSTANT ===
+        
+        const DEMO_DATASET = {
+            games: [
+                {
+                    id: 401547420,
+                    season: 2024,
+                    week: 6,
+                    home_team: "Georgia",
+                    away_team: "Alabama", 
+                    start_date: "2024-09-28T19:30:00.000Z",
+                    venue: "Sanford Stadium",
+                    neutral_site: false,
+                    conference_game: true
+                },
+                {
+                    id: 401547421,
+                    season: 2024,
+                    week: 6,
+                    home_team: "Ohio State",
+                    away_team: "Michigan",
+                    start_date: "2024-09-28T16:00:00.000Z", 
+                    venue: "Ohio Stadium",
+                    neutral_site: false,
+                    conference_game: true
+                },
+                {
+                    id: 401547422,
+                    season: 2024,
+                    week: 6,
+                    home_team: "Texas",
+                    away_team: "Oklahoma",
+                    start_date: "2024-09-28T15:30:00.000Z",
+                    venue: "Cotton Bowl Stadium",
+                    neutral_site: true,
+                    conference_game: false
+                },
+                {
+                    id: 401547423,
+                    season: 2024,
+                    week: 6,
+                    home_team: "Oregon",
+                    away_team: "Washington",
+                    start_date: "2024-09-28T22:00:00.000Z",
+                    venue: "Autzen Stadium", 
+                    neutral_site: false,
+                    conference_game: true
+                },
+                {
+                    id: 401547424,
+                    season: 2024,
+                    week: 6,
+                    home_team: "Clemson",
+                    away_team: "Florida State",
+                    start_date: "2024-09-28T20:00:00.000Z",
+                    venue: "Memorial Stadium",
+                    neutral_site: false,
+                    conference_game: true
+                }
+            ],
+            metrics: {
+                ppa: [
+                    { team: "Georgia", offense: { overall: 0.285 }, defense: { overall: -0.195 } },
+                    { team: "Alabama", offense: { overall: 0.265 }, defense: { overall: -0.175 } },
+                    { team: "Ohio State", offense: { overall: 0.315 }, defense: { overall: -0.225 } },
+                    { team: "Michigan", offense: { overall: 0.185 }, defense: { overall: -0.155 } },
+                    { team: "Texas", offense: { overall: 0.245 }, defense: { overall: -0.185 } },
+                    { team: "Oklahoma", offense: { overall: 0.205 }, defense: { overall: -0.125 } },
+                    { team: "Oregon", offense: { overall: 0.275 }, defense: { overall: -0.165 } },
+                    { team: "Washington", offense: { overall: 0.165 }, defense: { overall: -0.105 } },
+                    { team: "Clemson", offense: { overall: 0.195 }, defense: { overall: -0.145 } },
+                    { team: "Florida State", offense: { overall: 0.155 }, defense: { overall: -0.095 } }
+                ],
+                elo: [
+                    { team: "Georgia", elo: 1685 },
+                    { team: "Alabama", elo: 1675 },
+                    { team: "Ohio State", elo: 1695 },
+                    { team: "Michigan", elo: 1615 },
+                    { team: "Texas", elo: 1655 },
+                    { team: "Oklahoma", elo: 1625 },
+                    { team: "Oregon", elo: 1665 },
+                    { team: "Washington", elo: 1585 },
+                    { team: "Clemson", elo: 1635 },
+                    { team: "Florida State", elo: 1595 }
+                ]
+            },
+            historicalGames: [
+                { home_team: "Georgia", away_team: "Auburn", home_points: 31, away_points: 13, week: 4 },
+                { home_team: "Alabama", away_team: "LSU", home_points: 42, away_points: 21, week: 4 },
+                { home_team: "Ohio State", away_team: "Penn State", home_points: 28, away_points: 17, week: 4 },
+                { home_team: "Michigan", away_team: "Iowa", home_points: 24, away_points: 14, week: 4 },
+                { home_team: "Texas", away_team: "TCU", home_points: 35, away_points: 28, week: 4 },
+                { home_team: "Oklahoma", away_team: "Kansas", home_points: 38, away_points: 17, week: 4 },
+                { home_team: "Oregon", away_team: "Stanford", home_points: 45, away_points: 21, week: 4 },
+                { home_team: "Washington", away_team: "Arizona", home_points: 31, away_points: 24, week: 4 },
+                { home_team: "Clemson", away_team: "NC State", home_points: 28, away_points: 21, week: 4 },
+                { home_team: "Florida State", away_team: "Wake Forest", home_points: 35, away_points: 14, week: 4 }
+            ],
+            venues: [
+                { name: "Sanford Stadium", latitude: 33.9496, longitude: -83.3732, dome: false, grass: true },
+                { name: "Ohio Stadium", latitude: 40.0017, longitude: -83.0197, dome: false, grass: true },
+                { name: "Cotton Bowl Stadium", latitude: 32.7828, longitude: -96.7594, dome: false, grass: true },
+                { name: "Autzen Stadium", latitude: 44.0684, longitude: -123.0708, dome: false, grass: false },
+                { name: "Memorial Stadium", latitude: 34.6776, longitude: -82.8374, dome: false, grass: true }
+            ]
+        };
+        
+        // Make demo data globally available
+        window.DEMO_DATASET = DEMO_DATASET;
+    </script>
 </body>
 </html>
+
+<!--
+README
+
+# CFB Winner Predictor
+
+A single-file mobile web app for predicting college football game winners using live data and machine learning.
+
+## Features
+
+- Mobile-first responsive design with dark mode support
+- Live data from College Football Data API and weather services
+- Machine learning predictions with ELO ratings, PPA metrics, and weather adjustments
+- Offline-capable with localStorage caching
+- Export predictions to JSON
+- Demo mode for testing without API keys
+
+## Getting Started
+
+### 1. Get a CFBD API Key
+
+1. Visit https://collegefootballdata.com/
+2. Sign up for a free account
+3. Generate an API key from your dashboard
+4. Paste the key into the app's Settings panel
+
+### 2. Deploy to GitHub Pages
+
+1. Create a new GitHub repository
+2. Upload this `index.html` file to the repository
+3. Go to repository Settings > Pages
+4. Set source to "Deploy from a branch" and select "main" branch
+5. Your app will be available at `https://yourusername.github.io/repository-name`
+
+### 3. Using Demo Mode
+
+If you don't have API keys or want to test the interface:
+
+1. Open Settings (gear icon)
+2. Check "Demo mode (use sample data)"
+3. Click "Save Settings"
+
+The app will use built-in sample data to demonstrate all features.
+
+## Usage
+
+1. **Week Navigation**: Use arrow buttons to browse different weeks
+2. **Settings**: Configure API keys and feature toggles
+3. **Refresh Data**: Clear cache and reload fresh data  
+4. **Predict**: Run machine learning predictions on loaded games
+5. **Export**: Download predictions as JSON file
+
+## Technical Details
+
+- Pure vanilla JavaScript, HTML, and CSS
+- No external dependencies or frameworks
+- Web Workers for heavy ML computations
+- Rate limiting and error handling for API calls
+- Responsive design optimized for mobile devices
+- Supports both light and dark themes
+
+## Troubleshooting
+
+- **401 Error**: Check your CFBD API key is correct
+- **No Games**: Try a different week or check if it's off-season
+- **Slow Performance**: Enable demo mode or clear browser cache
+- **CORS Errors**: Use a different browser or enable demo mode
+
+Built tough for production use. This thing won't break when the wind shifts.
+-->
