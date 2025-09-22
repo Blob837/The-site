@@ -1225,10 +1225,19 @@
                 
                 try {
                     const games = await this.cfbdClient.getGames(year, week);
-                    return games.filter(game => {
-                        const gameDate = new Date(game.start_date);
-                        return gameDate > DateUtils.now();
-                    });
+                    const weekStart = DateUtils.getWeekStart(date);
+                    weekStart.setHours(0, 0, 0, 0);
+                    const weekEnd = DateUtils.addWeeks(weekStart, 1);
+                    weekEnd.setHours(0, 0, 0, 0);
+
+                    return games
+                        .filter(game => {
+                            if (!game.start_date) return false;
+
+                            const gameDate = new Date(game.start_date);
+                            return gameDate >= weekStart && gameDate < weekEnd;
+                        })
+                        .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
                 } catch (error) {
                     throw new Error(`Failed to load games: ${error.message}`);
                 }
