@@ -686,10 +686,14 @@
             ]
         };
 
+        function getDefaultSeason(date = new Date()) {
+            return date.getMonth() >= 7 ? date.getFullYear() : date.getFullYear() - 1;
+        }
+
         // Application state
         const AppState = {
             currentWeek: null,
-            currentSeason: 2024,
+            currentSeason: getDefaultSeason(),
             settings: {
                 cfbdKey: localStorage.getItem('cfbd_key') || '',
                 useMarkets: true,
@@ -791,11 +795,11 @@
             }
 
             async getGames(season, week) {
-                return this.fetch('/games', { 
-                    year: season, 
-                    week, 
-                    season_type: 'regular',
-                    classification: 'fbs' 
+                return this.fetch('/games', {
+                    year: season,
+                    week,
+                    seasonType: 'regular',
+                    classification: 'FBS'
                 });
             }
 
@@ -808,10 +812,10 @@
             }
 
             async getLines(season, week) {
-                return this.fetch('/lines', { 
-                    year: season, 
-                    week, 
-                    season_type: 'regular' 
+                return this.fetch('/lines', {
+                    year: season,
+                    week,
+                    seasonType: 'regular'
                 });
             }
         }
@@ -1016,11 +1020,15 @@
 
         // Date utilities
         const DateUtils = {
-            getCurrentWeek() {
-                const now = new Date();
-                const season = now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1;
+            getCurrentSeason(date = new Date()) {
+                return getDefaultSeason(date);
+            },
+
+            getCurrentWeek(date = new Date()) {
+                const season = this.getCurrentSeason(date);
                 const seasonStart = new Date(season, 7, 15);
-                const weekNumber = Math.ceil((now - seasonStart) / (7 * 24 * 60 * 60 * 1000));
+                const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
+                const weekNumber = Math.ceil((date - seasonStart) / millisecondsPerWeek);
                 return Math.max(1, Math.min(15, weekNumber));
             },
             
@@ -1146,10 +1154,13 @@
             
             updateWeekDisplay() {
                 const display = document.getElementById('weekDisplay');
-                if (AppState.currentWeek === DateUtils.getCurrentWeek()) {
+                const isCurrentSeason = AppState.currentSeason === DateUtils.getCurrentSeason();
+                const isCurrentWeek = AppState.currentWeek === DateUtils.getCurrentWeek();
+
+                if (isCurrentSeason && isCurrentWeek) {
                     display.textContent = 'This Weekend';
                 } else {
-                    display.textContent = `Week ${AppState.currentWeek}`;
+                    display.textContent = `Week ${AppState.currentWeek} • ${AppState.currentSeason}`;
                 }
             },
             
@@ -1218,8 +1229,9 @@
                 this.predictionEngine = new PredictionEngine();
                 this.init();
             }
-            
+
             init() {
+                AppState.currentSeason = DateUtils.getCurrentSeason();
                 AppState.currentWeek = DateUtils.getCurrentWeek();
                 UI.updateWeekDisplay();
                 this.bindEvents();
@@ -1377,10 +1389,10 @@
 
 <!--
 CFBD API Endpoints Used:
-- /games?year={year}&week={week}&season_type=regular&classification=fbs
+- /games?year={year}&week={week}&seasonType=regular&classification=FBS
 - /ratings/elo?year={year}&week={week}
 - /metrics/ppa/teams?year={year}&week={week}
-- /lines?year={year}&week={week}&season_type=regular
+- /lines?year={year}&week={week}&seasonType=regular
 
 Response Structures Expected:
 - Games: { id, season, week, home_team, away_team, start_date, venue, neutral_site, etc. }
