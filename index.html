@@ -46,7 +46,7 @@
             background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.6;
-            padding-bottom: 80px; /* Space for sticky footer */
+            padding-bottom: 80px;
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -57,7 +57,6 @@
             }
         }
 
-        /* Header */
         .header {
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border-primary);
@@ -127,7 +126,6 @@
             justify-content: center;
         }
 
-        /* Main Content */
         .main-content {
             max-width: 1200px;
             margin: 0 auto;
@@ -148,7 +146,6 @@
             100% { background-position: -200% 0; }
         }
 
-        /* Game Cards */
         .games-container {
             display: grid;
             gap: 1rem;
@@ -301,7 +298,6 @@
             color: var(--text-primary);
         }
 
-        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -432,7 +428,6 @@
             background: #dc2626;
         }
 
-        /* Bottom Bar */
         .bottom-bar {
             position: fixed;
             bottom: 0;
@@ -458,7 +453,6 @@
             min-width: 120px;
         }
 
-        /* Toast */
         .toast {
             position: fixed;
             top: 80px;
@@ -487,7 +481,6 @@
             color: var(--bg-primary);
         }
 
-        /* Filters */
         .filters {
             display: flex;
             gap: 0.75rem;
@@ -508,7 +501,6 @@
             margin-left: auto;
         }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 3rem 1rem;
@@ -522,7 +514,6 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <div class="header-content">
             <div class="logo">CFB Predictor</div>
@@ -535,9 +526,7 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="main-content">
-        <!-- Filters -->
         <div class="filters">
             <select class="filter-select" id="conferenceFilter">
                 <option value="">All Conferences</option>
@@ -552,15 +541,12 @@
             </select>
         </div>
 
-        <!-- Games Container -->
         <div class="games-container" id="gamesContainer">
-            <!-- Loading skeletons -->
             <div class="loading-skeleton"></div>
             <div class="loading-skeleton"></div>
             <div class="loading-skeleton"></div>
         </div>
 
-        <!-- Empty State -->
         <div class="empty-state" id="emptyState" style="display: none;">
             <div class="empty-icon">🏈</div>
             <h3>No games found</h3>
@@ -568,7 +554,6 @@
         </div>
     </main>
 
-    <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal">
             <div class="modal-header">
@@ -612,7 +597,6 @@
         </div>
     </div>
 
-    <!-- Bottom Action Bar -->
     <div class="bottom-bar">
         <div class="bottom-actions">
             <button class="button" id="refreshData">Refresh Data</button>
@@ -622,43 +606,43 @@
         </div>
     </div>
 
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script>
-        /**
-         * CFB Winner Predictor - Single File Application
-         * Built like an oil rig: robust, fail-safe, and idiot-proof
-         */
-
-        // Demo data embedded for when APIs are unavailable
+        // Demo data that matches actual CFBD API structure
         const DEMO_DATA = {
             games: [
                 {
-                    id: 1,
+                    id: 401628492,
                     season: 2024,
                     week: 12,
-                    away_team: "Texas",
-                    home_team: "Texas A&M", 
+                    season_type: "regular",
                     start_date: "2024-11-30T19:30:00.000Z",
-                    venue: "Kyle Field",
-                    away_conference: "SEC",
-                    home_conference: "SEC",
                     neutral_site: false,
-                    completed: false
+                    conference_game: true,
+                    home_team: "Texas A&M",
+                    home_conference: "SEC",
+                    home_points: null,
+                    away_team: "Texas",
+                    away_conference: "SEC", 
+                    away_points: null,
+                    venue: "Kyle Field"
                 },
                 {
-                    id: 2,
+                    id: 401628493,
                     season: 2024,
                     week: 12,
-                    away_team: "Alabama",
-                    home_team: "Auburn",
-                    start_date: "2024-11-30T20:00:00.000Z", 
-                    venue: "Jordan-Hare Stadium",
-                    away_conference: "SEC",
-                    home_conference: "SEC",
+                    season_type: "regular",
+                    start_date: "2024-11-30T20:00:00.000Z",
                     neutral_site: false,
-                    completed: false
+                    conference_game: true,
+                    home_team: "Auburn",
+                    home_conference: "SEC",
+                    home_points: null,
+                    away_team: "Alabama", 
+                    away_conference: "SEC",
+                    away_points: null,
+                    venue: "Jordan-Hare Stadium"
                 }
             ],
             elo: [
@@ -668,22 +652,41 @@
                 { team: "Auburn", elo: 1520 }
             ],
             ppa: [
-                { team: "Texas", offense_ppa: 0.15, defense_ppa: -0.08 },
-                { team: "Texas A&M", offense_ppa: 0.08, defense_ppa: -0.05 },
-                { team: "Alabama", offense_ppa: 0.12, defense_ppa: -0.06 },
-                { team: "Auburn", offense_ppa: 0.02, defense_ppa: 0.03 }
+                { team: "Texas", overall: { ppa: 0.15 }, passing: { ppa: 0.12 }, rushing: { ppa: 0.08 } },
+                { team: "Texas A&M", overall: { ppa: 0.08 }, passing: { ppa: 0.06 }, rushing: { ppa: 0.04 } },
+                { team: "Alabama", overall: { ppa: 0.12 }, passing: { ppa: 0.10 }, rushing: { ppa: 0.06 } },
+                { team: "Auburn", overall: { ppa: 0.02 }, passing: { ppa: 0.01 }, rushing: { ppa: 0.02 } }
             ],
             lines: [
-                { 
-                    id: 1, 
-                    homeTeam: "Texas A&M", 
-                    awayTeam: "Texas",
-                    lines: [{ provider: "consensus", spread: -7.5, overUnder: 48.5 }]
+                {
+                    id: 401628492,
+                    season: 2024,
+                    week: 12,
+                    season_type: "regular",
+                    start_date: "2024-11-30T19:30:00.000Z",
+                    home_team: "Texas A&M",
+                    away_team: "Texas",
+                    home_conference: "SEC",
+                    away_conference: "SEC",
+                    home_score: null,
+                    away_score: null,
+                    lines: [
+                        {
+                            provider: "consensus",
+                            spread: -7.5,
+                            formatted_spread: "Texas A&M -7.5",
+                            spread_open: -6.5,
+                            over_under: 48.5,
+                            over_under_open: 47.5,
+                            home_moneyline: -280,
+                            away_moneyline: 240
+                        }
+                    ]
                 }
             ]
         };
 
-        // Application state - everything in memory, no browser storage leaks
+        // Application state
         const AppState = {
             currentWeek: null,
             currentSeason: 2024,
@@ -701,11 +704,10 @@
                 lines: null,
                 lastUpdate: null
             },
-            predictions: null,
-            worker: null
+            predictions: null
         };
 
-        // Rate limiter - simple token bucket
+        // Rate limiter
         class RateLimiter {
             constructor(tokensPerSecond = 2, maxTokens = 5) {
                 this.tokensPerSecond = tokensPerSecond;
@@ -731,7 +733,7 @@
             }
         }
 
-        // API client with proper error handling
+        // CFBD API client
         class CFBDClient {
             constructor() {
                 this.baseURL = 'https://api.collegefootballdata.com';
@@ -777,6 +779,7 @@
             }
 
             getDemoData(endpoint) {
+                console.log('Demo mode - endpoint:', endpoint);
                 if (endpoint.includes('/games')) {
                     if (endpoint.includes('/weather')) return [];
                     return DEMO_DATA.games;
@@ -784,7 +787,6 @@
                 if (endpoint.includes('/ratings/elo')) return DEMO_DATA.elo;
                 if (endpoint.includes('/metrics/ppa')) return DEMO_DATA.ppa;
                 if (endpoint.includes('/lines')) return DEMO_DATA.lines;
-                if (endpoint.includes('/teams')) return DEMO_DATA.games.map(g => ({ school: g.home_team, conference: g.home_conference }));
                 return [];
             }
 
@@ -797,12 +799,12 @@
                 });
             }
 
-            async getMetrics(season, week) {
-                const [elo, ppa] = await Promise.all([
-                    this.fetch('/ratings/elo', { year: season, week }).catch(() => []),
-                    this.fetch('/metrics/ppa/teams', { year: season, week }).catch(() => [])
-                ]);
-                return { elo, ppa };
+            async getEloRatings(season, week) {
+                return this.fetch('/ratings/elo', { year: season, week });
+            }
+
+            async getPPAData(season, week) {
+                return this.fetch('/metrics/ppa/teams', { year: season, week });
             }
 
             async getLines(season, week) {
@@ -810,88 +812,45 @@
                     year: season, 
                     week, 
                     season_type: 'regular' 
-                }).catch(() => []);
-            }
-
-            async getWeather(season, week) {
-                return this.fetch('/games/weather', { 
-                    year: season, 
-                    week, 
-                    season_type: 'regular' 
-                }).catch(() => []);
-            }
-
-            async getTeams() {
-                return this.fetch('/teams').catch(() => []);
+                });
             }
         }
 
         // Math utilities
         const MathUtils = {
             sigmoid: (x) => 1 / (1 + Math.exp(-x)),
-            dot: (a, b) => a.reduce((sum, val, i) => sum + val * b[i], 0),
-            seededRandom: (() => {
-                let seed = 12345; // Fixed seed for reproducibility
-                return () => {
-                    const x = Math.sin(seed++) * 10000;
-                    return x - Math.floor(x);
-                };
-            })(),
             
-            // Iteratively Reweighted Least Squares for logistic regression
-            irls: (X, y, maxIter = 25, tolerance = 1e-6) => {
-                const n = X.length;
-                const p = X[0].length;
-                let beta = new Array(p).fill(0);
-                
-                for (let iter = 0; iter < maxIter; iter++) {
-                    const eta = X.map(row => MathUtils.dot(row, beta));
-                    const mu = eta.map(MathUtils.sigmoid);
-                    const weights = mu.map(m => m * (1 - m) + 1e-8); // Add small constant for stability
-                    
-                    // Newton-Raphson step
-                    const gradient = new Array(p).fill(0);
-                    const hessian = Array.from({ length: p }, () => new Array(p).fill(0));
-                    
-                    for (let i = 0; i < n; i++) {
-                        const residual = y[i] - mu[i];
-                        for (let j = 0; j < p; j++) {
-                            gradient[j] += X[i][j] * residual;
-                            for (let k = 0; k < p; k++) {
-                                hessian[j][k] += X[i][j] * X[i][k] * weights[i];
-                            }
-                        }
-                    }
-                    
-                    // Simple diagonal approximation for numerical stability
-                    const deltaBeta = gradient.map((g, i) => g / (hessian[i][i] + 1e-8));
-                    const stepSize = 0.1; // Conservative step size
-                    
-                    let maxChange = 0;
-                    for (let i = 0; i < p; i++) {
-                        const change = stepSize * deltaBeta[i];
-                        beta[i] += change;
-                        maxChange = Math.max(maxChange, Math.abs(change));
-                    }
-                    
-                    if (maxChange < tolerance) break;
-                }
-                
-                return beta;
+            calibrateProb: (rawProb) => {
+                // Simple Platt scaling calibration
+                const logit = Math.log(rawProb / (1 - rawProb));
+                const calibratedLogit = 0.8 * logit;
+                return 1 / (1 + Math.exp(-calibratedLogit));
+            },
+            
+            spreadToProb: (spread) => {
+                // Convert point spread to win probability
+                return 1 / (1 + Math.exp(-spread / 14));
+            },
+            
+            probToSpread: (prob) => {
+                // Convert win probability to equivalent spread
+                const logit = Math.log(prob / (1 - prob));
+                return logit * 14;
             }
         };
 
-        // Feature engineering - leak-safe and robust
+        // Feature engineering
         class FeatureEngine {
-            static engineerFeatures(game, metrics, weather, lines) {
+            static engineerFeatures(game, eloData, ppaData, lines, weather) {
                 const features = [];
                 const featureNames = [];
                 
-                // Base features
-                const homeElo = metrics.elo?.[game.home_team] || 1500;
-                const awayElo = metrics.elo?.[game.away_team] || 1500;
-                const homePPA = metrics.ppa?.[game.home_team] || 0;
-                const awayPPA = metrics.ppa?.[game.away_team] || 0;
+                // Get team metrics
+                const homeElo = eloData.find(t => t.team === game.home_team)?.elo || 1500;
+                const awayElo = eloData.find(t => t.team === game.away_team)?.elo || 1500;
+                
+                const homePPA = ppaData.find(t => t.team === game.home_team)?.overall?.ppa || 0;
+                const awayPPA = ppaData.find(t => t.team === game.away_team)?.overall?.ppa || 0;
                 
                 // Elo differential with home field advantage
                 const homeAdvantage = game.neutral_site ? 0 : 65;
@@ -910,23 +869,19 @@
                 features.push(game.neutral_site ? 1 : 0);
                 featureNames.push('neutral_flag');
                 
-                // Weather adjustments
-                if (weather && AppState.settings.useWeather) {
-                    const windPenalty = Math.max(0, (weather.wind_speed || 0) - 12) * -0.01;
-                    const precipPenalty = (weather.precipitation_probability || 0) > 50 ? -0.05 : 0;
-                    features.push(windPenalty);
-                    features.push(precipPenalty);
-                    featureNames.push('wind_penalty');
-                    featureNames.push('precip_penalty');
-                } else {
-                    features.push(0, 0);
-                    featureNames.push('wind_penalty');
-                    featureNames.push('precip_penalty');
-                }
+                // Weather adjustments (placeholder)
+                features.push(0); // wind penalty
+                features.push(0); // precip penalty
+                featureNames.push('wind_penalty');
+                featureNames.push('precip_penalty');
                 
                 // Market features if available
-                if (lines && lines.lines && lines.lines.length > 0 && AppState.settings.useMarkets) {
-                    const line = lines.lines[0]; // Use first available line
+                const gameLines = lines.find(l => 
+                    l.home_team === game.home_team && l.away_team === game.away_team
+                );
+                
+                if (gameLines && gameLines.lines && gameLines.lines.length > 0 && AppState.settings.useMarkets) {
+                    const line = gameLines.lines[0];
                     const spread = line.spread || 0;
                     features.push(spread);
                     featureNames.push('market_spread');
@@ -941,8 +896,9 @@
             static getGameDrivers(game, prediction, features, featureNames) {
                 const drivers = [];
                 
-                // Simplified driver analysis
-                const eloDiff = features[featureNames.indexOf('elo_diff')] || 0;
+                // Elo difference driver
+                const eloDiffIndex = featureNames.indexOf('elo_diff');
+                const eloDiff = features[eloDiffIndex] || 0;
                 if (Math.abs(eloDiff) > 50) {
                     drivers.push({
                         name: 'Elo Rating',
@@ -951,7 +907,9 @@
                     });
                 }
                 
-                const ppaDiff = features[featureNames.indexOf('ppa_diff')] || 0;
+                // PPA difference driver
+                const ppaDiffIndex = featureNames.indexOf('ppa_diff');
+                const ppaDiff = features[ppaDiffIndex] || 0;
                 if (Math.abs(ppaDiff) > 0.05) {
                     drivers.push({
                         name: 'PPA Efficiency',
@@ -969,8 +927,7 @@
             constructor() {
                 this.cfbdClient = new CFBDClient();
                 this.models = {
-                    elo: { a: -0.001, b: 0.025 }, // Default calibration
-                    glm: null
+                    elo: { a: -0.001, b: 0.025 }
                 };
             }
             
@@ -980,36 +937,50 @@
                 showToast('Generating predictions...', 'success');
                 
                 try {
-                    // Get metrics and supplementary data
-                    const metrics = await this.getMetrics();
-                    const weather = await this.getWeatherData(games);
-                    const lines = AppState.settings.useMarkets ? await this.cfbdClient.getLines(AppState.currentSeason, AppState.currentWeek) : [];
+                    // Get all the data we need
+                    const [eloData, ppaData, lines] = await Promise.all([
+                        this.cfbdClient.getEloRatings(AppState.currentSeason, AppState.currentWeek).catch(() => []),
+                        this.cfbdClient.getPPAData(AppState.currentSeason, AppState.currentWeek).catch(() => []),
+                        AppState.settings.useMarkets ? 
+                            this.cfbdClient.getLines(AppState.currentSeason, AppState.currentWeek).catch(() => []) : 
+                            []
+                    ]);
+
+                    console.log('Data loaded:', { 
+                        games: games.length, 
+                        elo: eloData.length, 
+                        ppa: ppaData.length, 
+                        lines: lines.length 
+                    });
                     
                     const predictions = [];
                     
                     for (const game of games) {
-                        const gameWeather = weather[game.id];
-                        const gameLines = lines.find(l => 
-                            (l.homeTeam === game.home_team && l.awayTeam === game.away_team) ||
-                            (l.home_team === game.home_team && l.away_team === game.away_team)
-                        );
+                        // Skip completed games
+                        if (game.home_points !== null || game.away_points !== null) continue;
                         
                         // Engineer features
-                        const { features, featureNames } = FeatureEngine.engineerFeatures(game, metrics, gameWeather, gameLines);
+                        const { features, featureNames } = FeatureEngine.engineerFeatures(
+                            game, eloData, ppaData, lines, null
+                        );
                         
                         // Elo-based prediction
                         const eloDiff = features[0];
                         const probElo = MathUtils.sigmoid(this.models.elo.a + this.models.elo.b * eloDiff);
                         
-                        // Simple ensemble (in production, would use trained GLM)
-                        const probFinal = this.calibrateProb(probElo);
+                        // Calibrated final prediction
+                        const probFinal = MathUtils.calibrateProb(probElo);
                         
                         // Calculate edge vs market if available
                         let edge = null;
+                        const gameLines = lines.find(l => 
+                            l.home_team === game.home_team && l.away_team === game.away_team
+                        );
+                        
                         if (gameLines && gameLines.lines && gameLines.lines.length > 0) {
-                            const line = gameLines.lines[0]; // Use first available line
+                            const line = gameLines.lines[0];
                             if (line.spread !== undefined) {
-                                const impliedProb = this.spreadToProb(-line.spread); // Negative because spread is from home perspective
+                                const impliedProb = MathUtils.spreadToProb(-line.spread);
                                 edge = Math.abs(probFinal - impliedProb);
                             }
                         }
@@ -1026,96 +997,20 @@
                             confidence: Math.abs(probFinal - 0.5) * 2,
                             edge: edge,
                             drivers: drivers,
-                            spreadEquiv: this.probToSpread(probFinal),
+                            spreadEquiv: MathUtils.probToSpread(probFinal),
                             kickoff: game.start_date,
                             venue: game.venue
                         });
                     }
                     
+                    console.log('Generated predictions:', predictions.length);
                     return predictions;
                     
                 } catch (error) {
+                    console.error('Prediction error:', error);
                     showToast(`Prediction error: ${error.message}`, 'danger');
                     return [];
                 }
-            }
-            
-            async getMetrics() {
-                try {
-                    const data = await this.cfbdClient.getMetrics(AppState.currentSeason, AppState.currentWeek);
-                    
-                    const metrics = { elo: {}, ppa: {} };
-                    
-                    // Process ELO ratings
-                    if (data.elo && Array.isArray(data.elo)) {
-                        data.elo.forEach(team => {
-                            if (team.team && team.elo) {
-                                metrics.elo[team.team] = team.elo;
-                            }
-                        });
-                    }
-                    
-                    // Process PPA data
-                    if (data.ppa && Array.isArray(data.ppa)) {
-                        data.ppa.forEach(team => {
-                            if (team.team) {
-                                // Calculate net PPA from offense and defense
-                                const offensePPA = team.offense_ppa || team.overall_ppa || 0;
-                                const defensePPA = team.defense_ppa || 0;
-                                metrics.ppa[team.team] = offensePPA - defensePPA;
-                            }
-                        });
-                    }
-                    
-                    return metrics;
-                } catch (error) {
-                    showToast('Using default metrics due to API error', 'warning');
-                    return { elo: {}, ppa: {} };
-                }
-            }
-            
-            async getWeatherData(games) {
-                if (!AppState.settings.useWeather) return {};
-                
-                try {
-                    // Use CFBD weather endpoint instead of external API
-                    const weatherData = await this.cfbdClient.getWeather(AppState.currentSeason, AppState.currentWeek);
-                    const weather = {};
-                    
-                    for (const game of games) {
-                        const gameWeather = weatherData.find(w => w.game_id === game.id);
-                        if (gameWeather) {
-                            weather[game.id] = {
-                                temperature: gameWeather.temperature || 70,
-                                wind_speed: gameWeather.wind_speed || 5,
-                                precipitation_probability: gameWeather.precipitation ? 75 : 0
-                            };
-                        }
-                    }
-                    
-                    return weather;
-                } catch (error) {
-                    showToast('Weather data unavailable', 'warning');
-                    return {};
-                }
-            }
-            
-            calibrateProb(rawProb) {
-                // Simple Platt scaling calibration
-                const logit = Math.log(rawProb / (1 - rawProb));
-                const calibratedLogit = 0.8 * logit; // Slightly more conservative
-                return MathUtils.sigmoid(calibratedLogit);
-            }
-            
-            spreadToProb(spread) {
-                // Convert point spread to win probability
-                return MathUtils.sigmoid(spread / 14); // ~14 points = 50% edge
-            }
-            
-            probToSpread(prob) {
-                // Convert win probability to equivalent spread
-                const logit = Math.log(prob / (1 - prob));
-                return logit * 14;
             }
         }
 
@@ -1124,7 +1019,7 @@
             getCurrentWeek() {
                 const now = new Date();
                 const season = now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1;
-                const seasonStart = new Date(season, 7, 15); // Mid-August
+                const seasonStart = new Date(season, 7, 15);
                 const weekNumber = Math.ceil((now - seasonStart) / (7 * 24 * 60 * 60 * 1000));
                 return Math.max(1, Math.min(15, weekNumber));
             },
@@ -1190,7 +1085,7 @@
                 const awayProb = (prediction.awayWinProb * 100).toFixed(0);
                 
                 // Calculate confidence ring
-                const circumference = 2 * Math.PI * 16; // radius = 16
+                const circumference = 2 * Math.PI * 16;
                 const strokeDasharray = circumference;
                 const strokeDashoffset = circumference * (1 - prediction.confidence);
                 
@@ -1202,7 +1097,6 @@
                 ).join('');
                 
                 const favoredTeam = prediction.homeWinProb > 0.5 ? prediction.homeTeam : prediction.awayTeam;
-                const favoredProb = Math.max(prediction.homeWinProb, prediction.awayWinProb);
                 
                 return `
                     <div class="game-card">
@@ -1263,15 +1157,12 @@
                 const conferenceFilter = document.getElementById('conferenceFilter');
                 const teamFilter = document.getElementById('teamFilter');
                 
-                // Get unique conferences and teams
                 const conferences = [...new Set(games.flatMap(g => [g.away_conference, g.home_conference]).filter(Boolean))];
                 const teams = [...new Set(games.flatMap(g => [g.away_team, g.home_team]))];
                 
-                // Update conference filter
                 conferenceFilter.innerHTML = '<option value="">All Conferences</option>' +
                     conferences.map(conf => `<option value="${conf}">${conf}</option>`).join('');
                 
-                // Update team filter
                 teamFilter.innerHTML = '<option value="">All Teams</option>' +
                     teams.map(team => `<option value="${team}">${team}</option>`).join('');
             }
@@ -1306,7 +1197,6 @@
             settings.manualInjuries = document.getElementById('manualInjuries').checked;
             settings.demoMode = document.getElementById('demoMode').checked;
             
-            // Persist only the API key
             if (settings.cfbdKey) {
                 localStorage.setItem('cfbd_key', settings.cfbdKey);
             }
@@ -1335,14 +1225,12 @@
                 this.bindEvents();
                 loadSettings();
                 
-                // Auto-load if we have settings
                 if (AppState.settings.cfbdKey || AppState.settings.demoMode) {
                     this.refreshData();
                 }
             }
             
             bindEvents() {
-                // Week navigation
                 document.getElementById('prevWeek').addEventListener('click', () => {
                     AppState.currentWeek = Math.max(1, AppState.currentWeek - 1);
                     UI.updateWeekDisplay();
@@ -1355,7 +1243,6 @@
                     this.refreshData();
                 });
                 
-                // Settings modal
                 document.getElementById('settingsBtn').addEventListener('click', () => {
                     document.getElementById('settingsModal').classList.add('show');
                 });
@@ -1371,20 +1258,17 @@
                 document.getElementById('saveSettings').addEventListener('click', saveSettings);
                 document.getElementById('forgetKeys').addEventListener('click', forgetKeys);
                 
-                // Bottom actions
                 document.getElementById('refreshData').addEventListener('click', () => this.refreshData());
                 document.getElementById('predict').addEventListener('click', () => this.predict());
                 document.getElementById('exportData').addEventListener('click', () => this.exportData());
                 document.getElementById('resetApp').addEventListener('click', () => this.reset());
                 
-                // Filters
                 document.getElementById('sortBy').addEventListener('change', () => {
                     if (AppState.predictions) {
                         UI.renderGames(AppState.predictions);
                     }
                 });
                 
-                // Close modal on overlay click
                 document.getElementById('settingsModal').addEventListener('click', (e) => {
                     if (e.target.id === 'settingsModal') {
                         e.target.classList.remove('show');
@@ -1402,7 +1286,12 @@
                 UI.showLoading();
                 
                 try {
-                    const games = await this.predictionEngine.cfbdClient.getGames(AppState.currentSeason, AppState.currentWeek);
+                    const games = await this.predictionEngine.cfbdClient.getGames(
+                        AppState.currentSeason, 
+                        AppState.currentWeek
+                    );
+                    
+                    console.log('Games loaded:', games);
                     
                     if (!games || games.length === 0) {
                         showToast('No games found for this week', 'warning');
@@ -1416,10 +1305,10 @@
                     UI.populateFilters(games);
                     showToast(`Loaded ${games.length} games`, 'success');
                     
-                    // Auto-predict if we have games
                     this.predict();
                     
                 } catch (error) {
+                    console.error('Error loading data:', error);
                     showToast(`Error loading data: ${error.message}`, 'danger');
                     UI.renderGames([]);
                 }
@@ -1441,6 +1330,7 @@
                     }
                     
                 } catch (error) {
+                    console.error('Prediction error:', error);
                     showToast(`Prediction error: ${error.message}`, 'danger');
                 }
             }
@@ -1481,59 +1371,20 @@
         document.addEventListener('DOMContentLoaded', () => {
             new App();
         });
-
-        // Ensure proper cleanup
-        window.addEventListener('beforeunload', () => {
-            if (AppState.worker) {
-                AppState.worker.terminate();
-            }
-        });
     </script>
 </body>
 </html>
 
 <!--
-README: CFB Winner Predictor
+CFBD API Endpoints Used:
+- /games?year={year}&week={week}&season_type=regular&classification=fbs
+- /ratings/elo?year={year}&week={week}
+- /metrics/ppa/teams?year={year}&week={week}
+- /lines?year={year}&week={week}&season_type=regular
 
-GETTING STARTED:
-1. Get a free CFBD API key at https://collegefootballdata.com
-2. Click the settings gear and paste your API key
-3. Enable features you want (betting markets, weather, etc.)
-4. Click "Refresh Data" to load games for the current week
-
-DEPLOYMENT TO GITHUB PAGES:
-1. Create a new repository on GitHub
-2. Upload this index.html file to the root directory
-3. Go to Settings > Pages in your repository
-4. Select "Deploy from branch" and choose "main"
-5. Your app will be available at https://username.github.io/repository-name
-
-DEMO MODE:
-If you don't have an API key or the APIs are blocked:
-1. Open Settings
-2. Check "Demo mode (offline data)"
-3. Click "Refresh Data" to see sample predictions
-
-FEATURES:
-- Live college football game predictions using ML models
-- Weather impact analysis using CFBD weather data
-- Betting market edge detection (when available)
-- Mobile-optimized interface with dark/light mode
-- Offline-capable with demo data
-- Export predictions as JSON
-
-API ENDPOINTS USED:
-- /games - Game schedules and results
-- /ratings/elo - Team Elo ratings
-- /metrics/ppa/teams - Predicted Points Added metrics
-- /lines - Betting lines and odds
-- /games/weather - Weather conditions for games
-
-TROUBLESHOOTING:
-- "Invalid CFBD key": Check your API key at collegefootballdata.com
-- "Rate limit exceeded": Wait a few seconds and try again
-- "No games found": Try a different week or check if it's off-season
-- APIs blocked: Enable demo mode in settings
-
-This app runs entirely in your browser - no data is sent to external servers except the APIs you configure.
+Response Structures Expected:
+- Games: { id, season, week, home_team, away_team, start_date, venue, neutral_site, etc. }
+- ELO: [{ team, elo }]
+- PPA: [{ team, overall: { ppa }, passing: { ppa }, rushing: { ppa } }]
+- Lines: [{ home_team, away_team, lines: [{ provider, spread, over_under }] }]
 -->
