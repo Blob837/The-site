@@ -645,6 +645,22 @@
                     venue: "Jordan-Hare Stadium"
                 }
             ],
+            calendar: [
+                {
+                    season: 2024,
+                    season_type: "regular",
+                    week: 12,
+                    start_date: "2024-11-25T00:00:00.000Z",
+                    end_date: "2024-12-01T23:59:59.000Z"
+                },
+                {
+                    season: 2024,
+                    season_type: "postseason",
+                    week: 1,
+                    start_date: "2024-12-02T00:00:00.000Z",
+                    end_date: "2024-12-09T23:59:59.000Z"
+                }
+            ],
             elo: [
                 { team: "Texas", elo: 1650 },
                 { team: "Texas A&M", elo: 1580 },
@@ -694,6 +710,9 @@
         const AppState = {
             currentWeek: null,
             currentSeason: getDefaultSeason(),
+            currentSeasonType: 'regular',
+            currentCalendarIndex: null,
+            activeCalendarIndex: null,
             settings: {
                 cfbdKey: localStorage.getItem('cfbd_key') || '',
                 useMarkets: true,
@@ -706,6 +725,7 @@
                 metrics: null,
                 weather: null,
                 lines: null,
+                calendar: null,
                 lastUpdate: null
             },
             predictions: null
@@ -742,6 +762,27 @@
             constructor() {
                 this.baseURL = 'https://api.collegefootballdata.com';
                 this.rateLimiter = new RateLimiter(2, 5);
+            }
+
+            normalizeSeasonType(seasonType = 'regular') {
+                if (!seasonType) return 'regular';
+                const normalized = String(seasonType).toLowerCase();
+                if (['regular', 'regular_season'].includes(normalized)) {
+                    return 'regular';
+                }
+                if (['postseason', 'post_season'].includes(normalized)) {
+                    return 'postseason';
+                }
+                if (normalized === 'both') {
+                    return 'both';
+                }
+                if (normalized.includes('champ')) {
+                    return 'postseason';
+                }
+                if (normalized.includes('bowl') || normalized.includes('playoff')) {
+                    return 'postseason';
+                }
+                return 'regular';
             }
 
             async fetch(endpoint, params = {}) {
@@ -815,35 +856,58 @@
                     if (endpoint.includes('/weather')) return [];
                     return DEMO_DATA.games;
                 }
+                if (endpoint.includes('/calendar')) return DEMO_DATA.calendar;
                 if (endpoint.includes('/ratings/elo')) return DEMO_DATA.elo;
                 if (endpoint.includes('/metrics/ppa')) return DEMO_DATA.ppa;
                 if (endpoint.includes('/lines')) return DEMO_DATA.lines;
                 return [];
             }
 
-            async getGames(season, week) {
-                const baseParams = {
-                    year: season,
-                    week,
-                    seasonType: 'regular'
-                };
+            async getCalendar(season) {
+                const data = await this.fetch('/calendar', { year: season });
+                return Array.isArray(data) ? data : [];
+            }
 
-                try {
-                    const games = await this.fetch('/games', {
-                        ...baseParams,
-                        division: 'fbs'
-                    });
+            async getGames(season, week, seasonType = 'regular') {
+                const normalizedType = this.normalizeSeasonType(seasonType);
+                const baseParams = { year: season, week };
+                const seasonTypesToTry = normalizedType === 'both' ? ['both'] : [normalizedType, 'both'];
 
-                    return Array.isArray(games) ? games : [];
-                } catch (error) {
-                    if (error.message.includes('CFBD API error: 400')) {
-                        console.warn('Games request failed with division filter, retrying without it.', error);
-                        const fallbackGames = await this.fetch('/games', baseParams);
-                        return Array.isArray(fallbackGames) ? fallbackGames : [];
+                for (const type of seasonTypesToTry) {
+                    const paramsWithType = { ...baseParams, seasonType: type };
+                    try {
+                        let games = await this.fetch('/games', {
+                            ...paramsWithType,
+                            division: 'fbs'
+                        });
+
+                        if (!Array.isArray(games) || games.length === 0) {
+                            games = await this.fetch('/games', paramsWithType);
+                        }
+
+                        if (Array.isArray(games) && games.length > 0) {
+                            return games;
+                        }
+                    } catch (error) {
+                        if (error.message.includes('CFBD API error: 400')) {
+                            console.warn('Games request failed with division filter, retrying without it.', error);
+                            const fallbackGames = await this.fetch('/games', paramsWithType);
+                            if (Array.isArray(fallbackGames) && fallbackGames.length > 0) {
+                                return fallbackGames;
+                            }
+                            continue;
+                        }
+
+                        if (error.message.includes('CFBD API error: 404')) {
+                            console.warn(`No games found for ${JSON.stringify(paramsWithType)}, trying next season type.`, error);
+                            continue;
+                        }
+
+                        throw error;
                     }
-
-                    throw error;
                 }
+
+                return [];
             }
 
             async getEloRatings(season, week) {
@@ -856,13 +920,26 @@
                 return Array.isArray(data) ? data : [];
             }
 
-            async getLines(season, week) {
-                const data = await this.fetch('/lines', {
-                    year: season,
-                    week,
-                    seasonType: 'regular'
-                });
-                return Array.isArray(data) ? data : [];
+            async getLines(season, week, seasonType = 'regular') {
+                const normalizedType = this.normalizeSeasonType(seasonType);
+                const params = { year: season, week, seasonType: normalizedType };
+
+                try {
+                    let data = await this.fetch('/lines', params);
+
+                    if ((!Array.isArray(data) || data.length === 0) && normalizedType !== 'both') {
+                        data = await this.fetch('/lines', { ...params, seasonType: 'both' });
+                    }
+
+                    return Array.isArray(data) ? data : [];
+                } catch (error) {
+                    if (error.message.includes('CFBD API error: 404') && normalizedType !== 'both') {
+                        const fallback = await this.fetch('/lines', { ...params, seasonType: 'both' });
+                        return Array.isArray(fallback) ? fallback : [];
+                    }
+
+                    throw error;
+                }
             }
         }
 
@@ -983,16 +1060,17 @@
             
             async predict(games) {
                 if (!games || games.length === 0) return [];
-                
+
                 showToast('Generating predictions...', 'success');
-                
+
                 try {
+                    const seasonType = this.cfbdClient.normalizeSeasonType(AppState.currentSeasonType);
                     // Get all the data we need
                     const [eloData, ppaData, lines] = await Promise.all([
                         this.cfbdClient.getEloRatings(AppState.currentSeason, AppState.currentWeek).catch(() => []),
                         this.cfbdClient.getPPAData(AppState.currentSeason, AppState.currentWeek).catch(() => []),
-                        AppState.settings.useMarkets ? 
-                            this.cfbdClient.getLines(AppState.currentSeason, AppState.currentWeek).catch(() => []) : 
+                        AppState.settings.useMarkets ?
+                            this.cfbdClient.getLines(AppState.currentSeason, AppState.currentWeek, seasonType).catch(() => []) :
                             []
                     ]);
 
@@ -1202,9 +1280,58 @@
                     </div>
                 `;
             },
-            
+
+            getWeekLabel(entry) {
+                const rawWeek = entry.week ?? AppState.currentWeek;
+                const weekNumber = rawWeek !== undefined && rawWeek !== null ? rawWeek : '';
+                const seasonType = String(entry.season_type || entry.seasonType || 'regular').toLowerCase();
+                const normalizedType = seasonType.replace(/[\s_-]/g, '');
+
+                if (normalizedType === 'regular' || normalizedType === 'regularseason') {
+                    return weekNumber !== '' ? `Week ${weekNumber}` : 'Week';
+                }
+
+                if (seasonType.includes('champ')) {
+                    return 'Conference Championships';
+                }
+
+                if (seasonType.includes('bowl')) {
+                    return weekNumber !== '' ? `Bowl Week ${weekNumber}` : 'Bowl Week';
+                }
+
+                if (normalizedType === 'postseason') {
+                    return weekNumber !== '' ? `Postseason Week ${weekNumber}` : 'Postseason Week';
+                }
+
+                return weekNumber !== '' ? `Week ${weekNumber}` : 'Week';
+            },
+
             updateWeekDisplay() {
                 const display = document.getElementById('weekDisplay');
+                if (!display) return;
+
+                const calendar = AppState.cache.calendar;
+                const currentIndex = AppState.currentCalendarIndex;
+
+                if (calendar && calendar.length > 0 && currentIndex !== null && calendar[currentIndex]) {
+                    const entry = calendar[currentIndex];
+                    const isActiveSelection = AppState.activeCalendarIndex !== null && currentIndex === AppState.activeCalendarIndex;
+
+                    if (isActiveSelection) {
+                        display.textContent = 'This Weekend';
+                        return;
+                    }
+
+                    const label = this.getWeekLabel(entry);
+                    const seasonLabel = entry.season ?? AppState.currentSeason;
+                    const parts = [label];
+                    if (seasonLabel !== undefined && seasonLabel !== null && seasonLabel !== '') {
+                        parts.push(seasonLabel);
+                    }
+                    display.textContent = parts.join(' • ');
+                    return;
+                }
+
                 const isCurrentSeason = AppState.currentSeason === DateUtils.getCurrentSeason();
                 const isCurrentWeek = AppState.currentWeek === DateUtils.getCurrentWeek();
 
@@ -1295,15 +1422,26 @@
             
             bindEvents() {
                 document.getElementById('prevWeek').addEventListener('click', () => {
-                    AppState.currentWeek = Math.max(1, AppState.currentWeek - 1);
-                    UI.updateWeekDisplay();
-                    this.refreshData();
+                    if (!AppState.cache.calendar || !AppState.cache.calendar.length) {
+                        this.refreshData();
+                        return;
+                    }
+
+                    const newIndex = AppState.currentCalendarIndex === null ? 0 : Math.max(0, AppState.currentCalendarIndex - 1);
+                    this.setCalendarIndex(newIndex);
+                    this.refreshData({ maintainSelection: true });
                 });
-                
+
                 document.getElementById('nextWeek').addEventListener('click', () => {
-                    AppState.currentWeek = Math.min(15, AppState.currentWeek + 1);
-                    UI.updateWeekDisplay();
-                    this.refreshData();
+                    if (!AppState.cache.calendar || !AppState.cache.calendar.length) {
+                        this.refreshData();
+                        return;
+                    }
+
+                    const calendarLength = AppState.cache.calendar.length;
+                    const newIndex = AppState.currentCalendarIndex === null ? 0 : Math.min(calendarLength - 1, AppState.currentCalendarIndex + 1);
+                    this.setCalendarIndex(newIndex);
+                    this.refreshData({ maintainSelection: true });
                 });
                 
                 document.getElementById('settingsBtn').addEventListener('click', () => {
@@ -1321,7 +1459,7 @@
                 document.getElementById('saveSettings').addEventListener('click', saveSettings);
                 document.getElementById('forgetKeys').addEventListener('click', forgetKeys);
                 
-                document.getElementById('refreshData').addEventListener('click', () => this.refreshData());
+                document.getElementById('refreshData').addEventListener('click', () => this.refreshData({ maintainSelection: true }));
                 document.getElementById('predict').addEventListener('click', () => this.predict());
                 document.getElementById('exportData').addEventListener('click', () => this.exportData());
                 document.getElementById('resetApp').addEventListener('click', () => this.reset());
@@ -1338,41 +1476,245 @@
                     }
                 });
             }
-            
-            async refreshData() {
+
+            async ensureCalendarLoaded() {
+                if (AppState.cache.calendar && AppState.cache.calendar.length > 0) {
+                    return AppState.cache.calendar;
+                }
+
+                const calendar = await this.predictionEngine.cfbdClient.getCalendar(AppState.currentSeason);
+
+                if (!Array.isArray(calendar) || calendar.length === 0) {
+                    throw new Error('Unable to load season calendar');
+                }
+
+                const sorted = [...calendar].sort((a, b) => {
+                    const startA = this.getCalendarDate(a, ['first_game_start', 'firstGameStart', 'start_date', 'startDate']);
+                    const startB = this.getCalendarDate(b, ['first_game_start', 'firstGameStart', 'start_date', 'startDate']);
+                    const timeA = startA ? startA.getTime() : 0;
+                    const timeB = startB ? startB.getTime() : 0;
+                    return timeA - timeB;
+                });
+
+                AppState.cache.calendar = sorted;
+                return sorted;
+            }
+
+            getCalendarDate(entry, keys) {
+                for (const key of keys) {
+                    const value = entry[key];
+                    if (!value) continue;
+                    const parsed = new Date(value);
+                    if (!Number.isNaN(parsed.getTime())) {
+                        return parsed;
+                    }
+                }
+                return null;
+            }
+
+            determineActiveCalendarIndex() {
+                const calendar = AppState.cache.calendar;
+                if (!calendar || calendar.length === 0) return null;
+
+                const now = new Date();
+
+                const activeIndex = calendar.findIndex((entry) => {
+                    const start = this.getCalendarDate(entry, ['first_game_start', 'firstGameStart', 'start_date', 'startDate']);
+                    const end = this.getCalendarDate(entry, ['last_game_start', 'lastGameStart', 'end_date', 'endDate']);
+                    const effectiveEnd = end || (start ? new Date(start.getTime() + 6 * 24 * 60 * 60 * 1000) : null);
+
+                    if (start && effectiveEnd) {
+                        return start <= now && now <= effectiveEnd;
+                    }
+
+                    return false;
+                });
+
+                if (activeIndex !== -1) {
+                    return activeIndex;
+                }
+
+                const upcomingIndex = calendar.findIndex((entry) => {
+                    const start = this.getCalendarDate(entry, ['first_game_start', 'firstGameStart', 'start_date', 'startDate']);
+                    return start && start > now;
+                });
+
+                if (upcomingIndex !== -1) {
+                    return upcomingIndex;
+                }
+
+                return calendar.length - 1;
+            }
+
+            setCalendarIndex(index) {
+                const calendar = AppState.cache.calendar;
+                if (!calendar || calendar.length === 0) {
+                    return null;
+                }
+
+                const normalizedIndex = Math.max(0, Math.min(index, calendar.length - 1));
+                AppState.currentCalendarIndex = normalizedIndex;
+
+                const entry = calendar[normalizedIndex];
+                if (entry) {
+                    const seasonValue = entry.season ?? AppState.currentSeason;
+                    const parsedSeason = Number(seasonValue);
+                    AppState.currentSeason = Number.isFinite(parsedSeason) ? parsedSeason : seasonValue;
+
+                    const weekValue = entry.week ?? AppState.currentWeek;
+                    const parsedWeek = Number(weekValue);
+                    AppState.currentWeek = Number.isFinite(parsedWeek) ? parsedWeek : AppState.currentWeek;
+
+                    AppState.currentSeasonType = String(entry.season_type || entry.seasonType || 'regular').toLowerCase();
+                }
+
+                UI.updateWeekDisplay();
+                return entry;
+            }
+
+            syncCalendarSelection({ maintainSelection = false } = {}) {
+                const calendar = AppState.cache.calendar;
+                if (!calendar || calendar.length === 0) {
+                    AppState.activeCalendarIndex = null;
+                    AppState.currentCalendarIndex = null;
+                    AppState.currentSeasonType = 'regular';
+                    return;
+                }
+
+                const activeIndex = this.determineActiveCalendarIndex();
+                AppState.activeCalendarIndex = activeIndex;
+
+                if (maintainSelection && AppState.currentCalendarIndex !== null) {
+                    const preservedIndex = Math.max(0, Math.min(AppState.currentCalendarIndex, calendar.length - 1));
+                    this.setCalendarIndex(preservedIndex);
+                    return;
+                }
+
+                if (activeIndex !== null) {
+                    this.setCalendarIndex(activeIndex);
+                    return;
+                }
+
+                this.setCalendarIndex(0);
+            }
+
+            async findNextWeekWithGames(startIndex) {
+                const calendar = AppState.cache.calendar;
+                if (!calendar || calendar.length === 0) {
+                    return null;
+                }
+
+                const baselineSeason = AppState.currentSeason;
+                const baselineWeek = AppState.currentWeek;
+                const baselineSeasonType = AppState.currentSeasonType || 'regular';
+
+                const maxLookahead = 6;
+                let attempts = 0;
+
+                for (let index = Math.max(startIndex + 1, 0); index < calendar.length; index++) {
+                    if (attempts >= maxLookahead) break;
+                    attempts += 1;
+
+                    const entry = calendar[index];
+                    if (!entry) continue;
+
+                    const seasonValue = entry.season ?? baselineSeason;
+                    const parsedSeason = Number(seasonValue);
+                    const season = Number.isFinite(parsedSeason) ? parsedSeason : seasonValue;
+
+                    const weekValue = entry.week ?? baselineWeek;
+                    const parsedWeek = Number(weekValue);
+                    const week = Number.isFinite(parsedWeek) ? parsedWeek : baselineWeek;
+
+                    const rawSeasonType = entry.season_type || entry.seasonType || baselineSeasonType;
+                    const normalizedSeasonType = this.predictionEngine.cfbdClient.normalizeSeasonType(rawSeasonType);
+
+                    try {
+                        const games = await this.predictionEngine.cfbdClient.getGames(season, week, normalizedSeasonType);
+                        if (Array.isArray(games) && games.length > 0) {
+                            return {
+                                index,
+                                games,
+                                season,
+                                week,
+                                seasonType: rawSeasonType
+                            };
+                        }
+                    } catch (error) {
+                        console.warn('Error while probing calendar entry for games', entry, error);
+                    }
+                }
+
+                return null;
+            }
+
+            async refreshData(options = {}) {
+                const { maintainSelection = false } = options;
+
                 if (!AppState.settings.cfbdKey && !AppState.settings.demoMode) {
                     showToast('CFBD API key required. Check settings.', 'warning');
                     document.getElementById('settingsModal').classList.add('show');
                     return;
                 }
-                
+
                 UI.showLoading();
-                
+
                 try {
+                    await this.ensureCalendarLoaded();
+                    this.syncCalendarSelection({ maintainSelection });
+
+                    const seasonType = this.predictionEngine.cfbdClient.normalizeSeasonType(AppState.currentSeasonType);
+
                     const games = await this.predictionEngine.cfbdClient.getGames(
-                        AppState.currentSeason, 
-                        AppState.currentWeek
+                        AppState.currentSeason,
+                        AppState.currentWeek,
+                        seasonType
                     );
-                    
+
                     console.log('Games loaded:', games);
-                    
-                    if (!games || games.length === 0) {
-                        showToast('No games found for this week', 'warning');
-                        UI.renderGames([]);
-                        return;
+
+                    let resolvedGames = games;
+
+                    if (!resolvedGames || resolvedGames.length === 0) {
+                        if (!maintainSelection) {
+                            const fallback = await this.findNextWeekWithGames(AppState.currentCalendarIndex ?? -1);
+
+                            if (fallback && fallback.games && fallback.games.length > 0) {
+                                console.info('Auto-selected next available week with games', fallback);
+                                this.setCalendarIndex(fallback.index);
+                                AppState.activeCalendarIndex = fallback.index;
+                                UI.updateWeekDisplay();
+                                resolvedGames = fallback.games;
+                                showToast('No games for selected week. Showing next available slate.', 'warning');
+                            } else {
+                                AppState.cache.games = [];
+                                AppState.predictions = null;
+                                showToast('No games found for this week', 'warning');
+                                UI.renderGames([]);
+                                return;
+                            }
+                        } else {
+                            AppState.cache.games = [];
+                            AppState.predictions = null;
+                            showToast('No games found for this week', 'warning');
+                            UI.renderGames([]);
+                            return;
+                        }
                     }
-                    
-                    AppState.cache.games = games;
+
+                    AppState.cache.games = resolvedGames;
                     AppState.cache.lastUpdate = new Date();
-                    
-                    UI.populateFilters(games);
-                    showToast(`Loaded ${games.length} games`, 'success');
-                    
+
+                    UI.populateFilters(resolvedGames);
+                    showToast(`Loaded ${resolvedGames.length} games`, 'success');
+
                     this.predict();
-                    
+
                 } catch (error) {
                     console.error('Error loading data:', error);
                     showToast(`Error loading data: ${error.message}`, 'danger');
+                    AppState.cache.games = [];
+                    AppState.predictions = null;
                     UI.renderGames([]);
                 }
             }
@@ -1403,6 +1745,7 @@
                     timestamp: new Date().toISOString(),
                     week: AppState.currentWeek,
                     season: AppState.currentSeason,
+                    seasonType: AppState.currentSeasonType,
                     games: AppState.cache.games,
                     predictions: AppState.predictions
                 };
@@ -1422,8 +1765,25 @@
             
             reset() {
                 if (confirm('Reset all data? This will clear cache but keep settings.')) {
-                    AppState.cache = { games: null, metrics: null, weather: null, lines: null, lastUpdate: null };
+                    const preservedCalendar = AppState.cache.calendar;
+                    AppState.cache = {
+                        games: null,
+                        metrics: null,
+                        weather: null,
+                        lines: null,
+                        calendar: preservedCalendar,
+                        lastUpdate: null
+                    };
                     AppState.predictions = null;
+                    AppState.currentCalendarIndex = AppState.activeCalendarIndex;
+
+                    if (AppState.currentCalendarIndex !== null && preservedCalendar && preservedCalendar.length > 0) {
+                        this.setCalendarIndex(AppState.currentCalendarIndex);
+                    } else {
+                        AppState.currentSeasonType = 'regular';
+                        UI.updateWeekDisplay();
+                    }
+
                     UI.renderGames([]);
                     showToast('App reset', 'success');
                 }
