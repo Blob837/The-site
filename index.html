@@ -555,6 +555,15 @@
             </div>
 
             <div class="form-group">
+                <div class="form-checkbox">
+                    <input type="checkbox" id="debugMode" class="checkbox">
+                    <label for="debugMode">Debug Mode (show console logs)</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button id="testApi" class="action-btn secondary" style="width: 100%; margin-bottom: 8px;">Test API Connection</button>
+                <button id="openConsole" class="action-btn secondary" style="width: 100%; margin-bottom: 8px;">Open Browser Console (F12)</button>
                 <button id="forgetKeys" class="action-btn secondary" style="width: 100%;">Forget All Keys</button>
             </div>
 
@@ -757,6 +766,8 @@
                     }
                 });
 
+                console.log(`CFBD Request: ${url.toString()}`);
+
                 const response = await fetch(url, {
                     headers: {
                         'Authorization': `Bearer ${apiKey}`,
@@ -764,11 +775,17 @@
                     }
                 });
 
+                console.log(`CFBD Response: ${response.status} ${response.statusText}`);
+
                 if (!response.ok) {
-                    throw new Error(`CFBD ${response.status}: ${response.statusText}`);
+                    const errorText = await response.text();
+                    console.error(`CFBD Error: ${response.status} - ${errorText}`);
+                    throw new Error(`CFBD API Error ${response.status}: ${response.statusText}${errorText ? ' - ' + errorText : ''}`);
                 }
 
-                return response.json();
+                const data = await response.json();
+                console.log(`CFBD Data received:`, data?.length || 'N/A', 'items');
+                return data;
             }
 
             async getGames(season, week, seasonType = 'regular') {
@@ -1022,21 +1039,54 @@
                 try {
                     // Check for demo mode
                     if (StorageManager.get('demo_mode')) {
+                        console.log('Using demo mode');
                         return this.getDemoData();
                     }
 
+                    console.log(`Starting predictions for season ${season}, week ${week}`);
                     UI.showBanner('Loading game data...', 'info');
 
-                    // Fetch all required data
-                    const [games, teams, metrics, eloData, linesData] = await Promise.all([
-                        this.getCachedOrFetch('games', () => this.cfbdClient.getGames(season, week)),
-                        this.getCachedOrFetch('teams', () => this.cfbdClient.getTeams(season)),
-                        this.getCachedOrFetch('metrics', () => this.cfbdClient.getMetrics(season, 'ppa')),
-                        this.getCachedOrFetch('elo', () => this.cfbdClient.getElo(season)),
-                        StorageManager.get('use_markets') ? 
-                            this.getCachedOrFetch('lines', () => this.cfbdClient.getLines(season, week)) : 
-                            Promise.resolve([])
-                    ]);
+                    // Test API connectivity first
+                    try {
+                        console.log('Testing CFBD API connectivity...');
+                        const testGames = await this.cfbdClient.getGames(season, week);
+                        console.log(`API test successful: found ${testGames?.length || 0} games`);
+                    } catch (apiError) {
+                        console.error('API connectivity test failed:', apiError);
+                        throw new Error(`API Connection Failed: ${apiError.message}. Check your API key and network connection.`);
+                    }
+
+                    // Fetch all required data with individual error handling
+                    console.log('Fetching game data...');
+                    const games = await this.getCachedOrFetch('games', () => this.cfbdClient.getGames(season, week));
+                    console.log(`Games loaded: ${games?.length || 0}`);
+
+                    console.log('Fetching team data...');
+                    const teams = await this.getCachedOrFetch('teams', () => this.cfbdClient.getTeams(season));
+                    console.log(`Teams loaded: ${teams?.length || 0}`);
+
+                    console.log('Fetching metrics...');
+                    const metrics = await this.getCachedOrFetch('metrics', () => this.cfbdClient.getMetrics(season, 'ppa'));
+                    console.log(`Metrics loaded: ${metrics?.length || 0}`);
+
+                    console.log('Fetching ELO data...');
+                    const eloData = await this.getCachedOrFetch('elo', () => this.cfbdClient.getElo(season));
+                    console.log(`ELO data loaded: ${eloData?.length || 0}`);
+
+                    let linesData = [];
+                    if (StorageManager.get('use_markets')) {
+                        try {
+                            console.log('Fetching betting lines...');
+                            linesData = await this.getCachedOrFetch('lines', () => this.cfbdClient.getLines(season, week));
+                            console.log(`Lines loaded: ${linesData?.length || 0}`);
+                        } catch (error) {
+                            console.warn('Lines data unavailable:', error.message);
+                        }
+                    }
+
+                    if (!games || games.length === 0) {
+                        throw new Error('No games found for this week. Check if the season/week parameters are correct.');
+                    }
 
                     UI.showBanner('Generating predictions...', 'info');
 
@@ -1045,10 +1095,18 @@
                         !game.completed && new Date(game.start_date) > new Date()
                     );
 
+                    console.log(`Found ${upcomingGames.length} upcoming games`);
+
+                    if (upcomingGames.length === 0) {
+                        UI.hideBanner();
+                        return []; // No upcoming games
+                    }
+
                     const predictions = [];
 
                     for (const game of upcomingGames) {
                         try {
+                            console.log(`Predicting: ${game.away_team} @ ${game.home_team}`);
                             const prediction = await this.predictGame(game, metrics, eloData, linesData);
                             predictions.push(prediction);
                         } catch (error) {
@@ -1056,11 +1114,13 @@
                         }
                     }
 
+                    console.log(`Generated ${predictions.length} predictions`);
                     UI.hideBanner();
                     return predictions;
 
                 } catch (error) {
-                    UI.showBanner(`Error loading data: ${error.message}`, 'error');
+                    console.error('Prediction error:', error);
+                    UI.showBanner(`Error: ${error.message}`, 'error');
                     throw error;
                 }
             }
@@ -1250,6 +1310,14 @@
                     this.forgetKeys();
                 });
 
+                document.getElementById('testApi').addEventListener('click', () => {
+                    this.testApiConnection();
+                });
+
+                document.getElementById('openConsole').addEventListener('click', () => {
+                    alert('Press F12 or right-click → Inspect Element → Console tab to see debug logs');
+                });
+
                 // Week navigation
                 document.getElementById('prevWeek').addEventListener('click', () => {
                     this.changeWeek(-1);
@@ -1314,6 +1382,7 @@
                 const useMarkets = StorageManager.get('use_markets');
                 const useWeather = StorageManager.get('use_weather');
                 const demoMode = StorageManager.get('demo_mode');
+                const debugMode = StorageManager.get('debug_mode');
 
                 if (cfbdKey) {
                     document.getElementById('cfbdKey').value = cfbdKey;
@@ -1325,6 +1394,7 @@
                 document.getElementById('useMarkets').checked = useMarkets || false;
                 document.getElementById('useWeather').checked = useWeather !== false; // Default true
                 document.getElementById('demoMode').checked = demoMode || false;
+                document.getElementById('debugMode').checked = debugMode || false;
 
                 // Show demo notice if in demo mode
                 if (demoMode) {
@@ -1338,6 +1408,7 @@
                 const useMarkets = document.getElementById('useMarkets').checked;
                 const useWeather = document.getElementById('useWeather').checked;
                 const demoMode = document.getElementById('demoMode').checked;
+                const debugMode = document.getElementById('debugMode').checked;
 
                 if (cfbdKey) {
                     StorageManager.set('cfbd_key', cfbdKey);
@@ -1349,6 +1420,7 @@
                 StorageManager.set('use_markets', useMarkets);
                 StorageManager.set('use_weather', useWeather);
                 StorageManager.set('demo_mode', demoMode);
+                StorageManager.set('debug_mode', debugMode);
 
                 // Show/hide demo notice
                 document.getElementById('demoNotice').style.display = demoMode ? 'block' : 'none';
@@ -1362,6 +1434,55 @@
                 }
             }
 
+            async testApiConnection() {
+                const cfbdKey = document.getElementById('cfbdKey').value.trim();
+                
+                if (!cfbdKey) {
+                    this.showBanner('Please enter a CFBD API key first', 'error');
+                    return;
+                }
+
+                try {
+                    this.showBanner('Testing API connection...', 'info');
+                    
+                    // Temporarily save the key for testing
+                    const originalKey = StorageManager.get('cfbd_key');
+                    StorageManager.set('cfbd_key', cfbdKey);
+                    
+                    const cfbdClient = new CFBDClient();
+                    const testResult = await cfbdClient.getGames(TimeUtils.getCurrentSeason(), TimeUtils.getCurrentWeek());
+                    
+                    console.log('API Test Result:', testResult);
+                    
+                    if (testResult && Array.isArray(testResult)) {
+                        this.showBanner(`✅ API Connection Successful! Found ${testResult.length} games.`, 'success');
+                    } else {
+                        this.showBanner('⚠️ API responded but data format unexpected', 'warning');
+                    }
+                    
+                    // Restore original key if test key was different
+                    if (originalKey && originalKey !== cfbdKey) {
+                        StorageManager.set('cfbd_key', originalKey);
+                    }
+                    
+                } catch (error) {
+                    console.error('API Test Failed:', error);
+                    
+                    let errorMsg = '❌ API Test Failed: ';
+                    if (error.message.includes('401')) {
+                        errorMsg += 'Invalid API key';
+                    } else if (error.message.includes('CORS')) {
+                        errorMsg += 'CORS error - try Demo Mode';
+                    } else if (error.message.includes('network')) {
+                        errorMsg += 'Network error - check connection';
+                    } else {
+                        errorMsg += error.message;
+                    }
+                    
+                    this.showBanner(errorMsg, 'error');
+                }
+            }
+
             forgetKeys() {
                 if (confirm('Are you sure you want to forget all API keys and cached data?')) {
                     StorageManager.clear();
@@ -1370,6 +1491,7 @@
                     document.getElementById('useMarkets').checked = false;
                     document.getElementById('useWeather').checked = true;
                     document.getElementById('demoMode').checked = false;
+                    document.getElementById('debugMode').checked = false;
                     
                     this.showBanner('All data cleared', 'success');
                     this.renderGames([]);
@@ -1403,7 +1525,10 @@
             }
 
             async runPredictions() {
+                const startTime = Date.now();
+                
                 try {
+                    console.log('=== Starting prediction run ===');
                     this.showLoading();
                     
                     const predictor = new GamePredictor();
@@ -1412,12 +1537,39 @@
                         TimeUtils.getCurrentWeek()
                     );
                     
+                    console.log(`Prediction run completed in ${Date.now() - startTime}ms`);
                     this.predictions = predictions;
                     this.renderGames(predictions);
                     
                 } catch (error) {
+                    console.error('Prediction run failed:', error);
                     this.showBanner(`Prediction failed: ${error.message}`, 'error');
-                    this.hideLoading();
+                    
+                    // Show helpful error message based on error type
+                    if (error.message.includes('401') || error.message.includes('unauthorized')) {
+                        this.showBanner('Invalid API key. Check your CFBD key in settings.', 'error');
+                    } else if (error.message.includes('CORS') || error.message.includes('network')) {
+                        this.showBanner('Network error. Try enabling Demo Mode in settings.', 'error');
+                    } else if (error.message.includes('rate limit') || error.message.includes('429')) {
+                        this.showBanner('Rate limited. Please wait and try again.', 'error');
+                    }
+                    
+                    // Show debug info
+                    console.error('Full error details:', {
+                        message: error.message,
+                        stack: error.stack,
+                        timestamp: new Date().toISOString(),
+                        hasApiKey: !!StorageManager.get('cfbd_key'),
+                        demoMode: !!StorageManager.get('demo_mode'),
+                        currentSeason: TimeUtils.getCurrentSeason(),
+                        currentWeek: TimeUtils.getCurrentWeek()
+                    });
+                    
+                    // Always render something, even if empty
+                    this.renderGames([]);
+                } finally {
+                    // Always clear loading state
+                    console.log('=== Prediction run finished ===');
                 }
             }
 
@@ -1619,13 +1771,37 @@
         // === INITIALIZATION ===
         const UI = new UIManager();
 
+        // Enhanced logging for debug mode
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const originalConsoleWarn = console.warn;
+
+        function debugLog(...args) {
+            originalConsoleLog(...args);
+            if (StorageManager.get('debug_mode')) {
+                const timestamp = new Date().toLocaleTimeString();
+                const message = args.join(' ');
+                UI.showBanner(`[${timestamp}] ${message}`, 'info');
+            }
+        }
+
+        // Override console methods for debug mode
+        console.log = debugLog;
+
         // Auto-load on page load if we have settings
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('CFB Predictor starting up...');
+            
             const hasKey = StorageManager.get('cfbd_key');
             const demoMode = StorageManager.get('demo_mode');
             
+            console.log(`Has API key: ${!!hasKey}, Demo mode: ${!!demoMode}`);
+            
             if (hasKey || demoMode) {
-                setTimeout(() => UI.runPredictions(), 500);
+                setTimeout(() => {
+                    console.log('Auto-starting predictions...');
+                    UI.runPredictions();
+                }, 500);
             } else {
                 UI.showBanner('Configure your CFBD API key in settings to get started', 'info');
                 // Show some skeleton cards
@@ -1634,6 +1810,8 @@
                     <div class="skeleton skeleton-card"></div>
                     <div class="skeleton skeleton-card"></div>
                 `.replace(/skeleton-card/g, 'skeleton-card');
+                
+                console.log('No API key configured. Showing setup message.');
             }
         });
 
