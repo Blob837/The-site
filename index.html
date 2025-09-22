@@ -769,6 +769,17 @@
                     }
                 });
 
+                const rawText = await response.text();
+                let data = null;
+
+                if (rawText) {
+                    try {
+                        data = JSON.parse(rawText);
+                    } catch (parseError) {
+                        data = rawText;
+                    }
+                }
+
                 if (response.status === 401) {
                     throw new Error('Invalid CFBD API key');
                 }
@@ -776,10 +787,26 @@
                     throw new Error('Rate limit exceeded, retrying...');
                 }
                 if (!response.ok) {
-                    throw new Error(`CFBD API error: ${response.status}`);
+                    let detail = '';
+                    if (data && typeof data === 'object') {
+                        detail = data.message || data.detail || JSON.stringify(data);
+                    } else if (typeof data === 'string') {
+                        detail = data;
+                    }
+
+                    if (detail.length > 200) {
+                        detail = `${detail.slice(0, 200)}...`;
+                    }
+
+                    const suffix = detail ? ` - ${detail}` : '';
+                    throw new Error(`CFBD API error: ${response.status}${suffix}`);
                 }
 
-                return response.json();
+                if (data === null) {
+                    return [];
+                }
+
+                return data;
             }
 
             getDemoData(endpoint) {
@@ -795,28 +822,47 @@
             }
 
             async getGames(season, week) {
-                return this.fetch('/games', {
+                const baseParams = {
                     year: season,
                     week,
-                    seasonType: 'regular',
-                    classification: 'FBS'
-                });
+                    seasonType: 'regular'
+                };
+
+                try {
+                    const games = await this.fetch('/games', {
+                        ...baseParams,
+                        division: 'fbs'
+                    });
+
+                    return Array.isArray(games) ? games : [];
+                } catch (error) {
+                    if (error.message.includes('CFBD API error: 400')) {
+                        console.warn('Games request failed with division filter, retrying without it.', error);
+                        const fallbackGames = await this.fetch('/games', baseParams);
+                        return Array.isArray(fallbackGames) ? fallbackGames : [];
+                    }
+
+                    throw error;
+                }
             }
 
             async getEloRatings(season, week) {
-                return this.fetch('/ratings/elo', { year: season, week });
+                const data = await this.fetch('/ratings/elo', { year: season, week });
+                return Array.isArray(data) ? data : [];
             }
 
             async getPPAData(season, week) {
-                return this.fetch('/metrics/ppa/teams', { year: season, week });
+                const data = await this.fetch('/metrics/ppa/teams', { year: season, week });
+                return Array.isArray(data) ? data : [];
             }
 
             async getLines(season, week) {
-                return this.fetch('/lines', {
+                const data = await this.fetch('/lines', {
                     year: season,
                     week,
                     seasonType: 'regular'
                 });
+                return Array.isArray(data) ? data : [];
             }
         }
 
@@ -1053,6 +1099,11 @@
         const UI = {
             showLoading() {
                 const container = document.getElementById('gamesContainer');
+                const emptyState = document.getElementById('emptyState');
+                if (emptyState) {
+                    emptyState.style.display = 'none';
+                }
+
                 container.innerHTML = Array(3).fill().map(() => '<div class="loading-skeleton"></div>').join('');
             },
             
@@ -1389,7 +1440,7 @@
 
 <!--
 CFBD API Endpoints Used:
-- /games?year={year}&week={week}&seasonType=regular&classification=FBS
+- /games?year={year}&week={week}&seasonType=regular&division=fbs
 - /ratings/elo?year={year}&week={week}
 - /metrics/ppa/teams?year={year}&week={week}
 - /lines?year={year}&week={week}&seasonType=regular
