@@ -256,10 +256,28 @@
     }
 
     .scores-view {
+      position: relative;
       display: flex;
       flex-direction: column;
       height: 100%;
       gap: 12px;
+    }
+
+    .scores-view.updating::after {
+      content: 'Refreshing scores…';
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(12, 18, 24, 0.9);
+      border: 1px solid rgba(76, 194, 255, 0.35);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+      pointer-events: none;
     }
 
     .scores-scroll {
@@ -1961,6 +1979,10 @@
       function renderScores({ background } = {}) {
         if (!state.apiKey) {
           applyKeylessState();
+          const existingScroll = viewRoot.querySelector('.scores-scroll');
+          if (existingScroll) {
+            cleanupVirtualList(existingScroll);
+          }
           viewRoot.innerHTML = `
             <div class="view-scroll">
               <div class="empty-state">
@@ -1970,29 +1992,77 @@
                 <button class="btn" id="settings-shortcut">Open settings</button>
               </div>
             </div>`;
-          viewRoot.querySelector('#settings-shortcut').addEventListener('click', () => navigate('#/settings'));
+          const shortcut = viewRoot.querySelector('#settings-shortcut');
+          if (shortcut) {
+            shortcut.addEventListener('click', () => navigate('#/settings'));
+          }
           stopPolling();
           return;
         }
+
         applyKeylessState();
-        if (!state.week) {
-          viewRoot.innerHTML = renderSkeletonCards();
+        if (background && state.route.view !== 'scores') {
+          return;
         }
-        const container = document.createElement('div');
-        container.className = 'scores-view';
-        const scroll = document.createElement('div');
-        scroll.className = 'scores-scroll';
-        container.appendChild(scroll);
-        if (!background) {
-          viewRoot.innerHTML = '';
-          viewRoot.appendChild(container);
+        let container = viewRoot.querySelector('.scores-view');
+        let scroll = container?.querySelector('.scores-scroll');
+
+        if (background && (!container || !scroll)) {
+          background = false;
         }
 
-        Promise.all([teamStore.ensure(), loadWeekBundle(state.week)]).then(([teams, bundle]) => {
-          const rankingMap = computeRankingsMap(bundle.rankings?.find?.(r => r.week === state.week)?.polls || bundle.rankings?.polls || bundle.rankings || []);
+        if (!background && scroll) {
+          cleanupVirtualList(scroll);
+        }
+
+        const requestedWeek = state.week;
+
+        if (!requestedWeek) {
+          if (!background) {
+            viewRoot.innerHTML = renderSkeletonCards();
+          }
+          if (container?.isConnected) {
+            container.classList.remove('updating');
+          }
+          stopPolling();
+          return;
+        }
+
+        if (!background) {
+          container = document.createElement('div');
+          container.className = 'scores-view';
+          scroll = document.createElement('div');
+          scroll.className = 'scores-scroll';
+          container.appendChild(scroll);
+          viewRoot.innerHTML = '';
+          viewRoot.appendChild(container);
+        } else if (container) {
+          container.classList.add('updating');
+        }
+
+        const targetContainer = container;
+        const targetScroll = scroll;
+        const expectedView = state.route.view;
+
+        Promise.all([teamStore.ensure(), loadWeekBundle(requestedWeek)]).then(([teams, bundle]) => {
+          if (!targetContainer?.isConnected || targetScroll !== targetContainer.querySelector('.scores-scroll')) {
+            return;
+          }
+          if (!targetScroll) {
+            return;
+          }
+          if (state.route.view !== 'scores' || expectedView !== 'scores') {
+            return;
+          }
+          const rankingMap = computeRankingsMap(
+            bundle.rankings?.find?.(r => r.week === requestedWeek)?.polls ||
+            bundle.rankings?.polls ||
+            bundle.rankings || []
+          );
           const games = composeGames(bundle, rankingMap);
           const filtered = filterGames(games);
           if (!filtered.length) {
+            cleanupVirtualList(targetScroll);
             viewRoot.innerHTML = `
               <div class="view-scroll">
                 <div class="empty-state">
@@ -2004,11 +2074,15 @@
             stopPolling();
             return;
           }
-          renderVirtualList(scroll, filtered, game => createGameCard(game, rankingMap));
+          renderVirtualList(targetScroll, filtered, game => createGameCard(game, rankingMap));
           const anyLive = filtered.some(game => game.isLive);
           maybeSchedulePolling(anyLive);
         }).catch(err => {
           console.error(err);
+          if (state.route.view !== 'scores') {
+            return;
+          }
+          cleanupVirtualList(targetScroll);
           stopPolling();
           viewRoot.innerHTML = `
             <div class="view-scroll">
@@ -2018,12 +2092,31 @@
                 <p>${escapeHtml(err.message || 'Unknown error')}</p>
               </div>
             </div>`;
+        }).finally(() => {
+          if (targetContainer?.isConnected) {
+            targetContainer.classList.remove('updating');
+          }
         });
       }
 
+      function cleanupVirtualList(container) {
+        if (container && typeof container.__virtualCleanup === 'function') {
+          container.__virtualCleanup();
+        }
+      }
+
       function renderVirtualList(container, items, renderItem, itemHeight = 200, overscan = 3) {
+        if (!container) return;
+        const previousScrollTop = container.scrollTop;
+        cleanupVirtualList(container);
         container.innerHTML = '';
         container.style.position = 'relative';
+        const raf = typeof requestAnimationFrame === 'function'
+          ? requestAnimationFrame
+          : (cb => setTimeout(cb, 16));
+        const caf = typeof cancelAnimationFrame === 'function'
+          ? cancelAnimationFrame
+          : clearTimeout;
         const spacer = document.createElement('div');
         spacer.style.height = `${items.length * itemHeight}px`;
         spacer.style.pointerEvents = 'none';
@@ -2032,7 +2125,9 @@
         container.appendChild(spacer);
         container.appendChild(region);
 
+        let frame = null;
         function draw() {
+          frame = null;
           const scrollTop = container.scrollTop;
           const height = container.clientHeight;
           const start = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);
@@ -2045,10 +2140,37 @@
           region.replaceChildren(fragment);
         }
 
-        container.addEventListener('scroll', draw, { passive: true });
-        const resizeObserver = new ResizeObserver(() => draw());
-        resizeObserver.observe(container);
-        draw();
+        function scheduleDraw() {
+          if (frame !== null) return;
+          frame = raf(draw);
+        }
+
+        const onScroll = () => scheduleDraw();
+        container.addEventListener('scroll', onScroll, { passive: true });
+
+        const resizeObserver = typeof ResizeObserver === 'function'
+          ? new ResizeObserver(() => scheduleDraw())
+          : null;
+        if (resizeObserver) {
+          resizeObserver.observe(container);
+        }
+
+        container.__virtualCleanup = () => {
+          container.removeEventListener('scroll', onScroll);
+          if (resizeObserver) {
+            resizeObserver.disconnect();
+          }
+          if (frame !== null) {
+            caf(frame);
+            frame = null;
+          }
+          container.__virtualCleanup = null;
+        };
+
+        scheduleDraw();
+        const maxScroll = Math.max(0, container.scrollHeight - container.clientHeight);
+        container.scrollTop = Math.min(previousScrollTop, maxScroll);
+        scheduleDraw();
       }
 
       function renderTeams() {
