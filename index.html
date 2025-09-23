@@ -65,6 +65,37 @@
             flex-wrap: wrap;
         }
 
+        .season-controls {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.75rem;
+        }
+
+        .season-control {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            min-width: 120px;
+        }
+
+        .season-select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            min-height: 40px;
+        }
+
+        .season-select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
         .week-btn {
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
@@ -408,6 +439,16 @@
             <button class="week-btn" data-offset="1">Next →</button>
             <button class="settings-btn" id="settingsBtn">⚙️</button>
         </div>
+        <div class="season-controls" aria-label="Season filters">
+            <label class="season-control">
+                <span>Season Year</span>
+                <select id="yearSelect" class="season-select" aria-label="Select season year"></select>
+            </label>
+            <label class="season-control">
+                <span>Week</span>
+                <select id="weekSelect" class="season-select" aria-label="Select week"></select>
+            </label>
+        </div>
     </div>
 
     <!-- Settings Modal -->
@@ -507,6 +548,8 @@
                 demoMode: false
             },
             currentWeek: 0, // offset from "this week"
+            selectedYear: new Date().getFullYear(),
+            selectedWeek: null,
             games: [],
             predictions: [],
             cache: {}
@@ -642,7 +685,37 @@
 
                 return { start, end, targetSaturday };
             },
-            
+
+            getSeasonWeekBounds(year, week) {
+                const numericYear = Number(year);
+                const numericWeek = Number(week);
+
+                if (!numericYear || !numericWeek) {
+                    return null;
+                }
+
+                // Anchor the season to the Saturday on or after August 31st
+                const aug31 = new Date(numericYear, 7, 31);
+                const dayOfWeek = aug31.getDay();
+                const offsetToSaturday = (6 - dayOfWeek + 7) % 7;
+                const firstSaturday = new Date(aug31);
+                firstSaturday.setDate(aug31.getDate() + offsetToSaturday);
+                firstSaturday.setHours(0, 0, 0, 0);
+
+                const targetSaturday = new Date(firstSaturday);
+                targetSaturday.setDate(firstSaturday.getDate() + (numericWeek - 1) * 7);
+
+                const start = new Date(targetSaturday);
+                start.setDate(targetSaturday.getDate() - 4);
+                start.setHours(0, 0, 0, 0);
+
+                const end = new Date(targetSaturday);
+                end.setDate(targetSaturday.getDate() + 3);
+                end.setHours(23, 59, 59, 999);
+
+                return { start, end, targetSaturday };
+            },
+
             exponentialDecay(value, weeks, lambda = 0.7) {
                 return value * Math.pow(lambda, weeks);
             },
@@ -1068,11 +1141,64 @@
                 form.useWeather.checked = state.settings.useWeather;
                 form.manualInjuries.checked = state.settings.manualInjuries;
                 form.demoMode.checked = state.settings.demoMode;
-                
+
+                this.initializeSeasonControls();
+
                 // Show/hide sort controls based on data
                 this.updateSortControls();
             }
-            
+
+            initializeSeasonControls() {
+                const yearSelect = document.getElementById('yearSelect');
+                const weekSelect = document.getElementById('weekSelect');
+
+                if (!yearSelect || !weekSelect) {
+                    return;
+                }
+
+                const currentYear = new Date().getFullYear();
+                const startYear = currentYear - 1;
+                const endYear = currentYear + 2;
+                const selectedYear = Number(state.selectedYear) || currentYear;
+
+                yearSelect.innerHTML = '';
+                for (let year = startYear; year <= endYear; year++) {
+                    const option = document.createElement('option');
+                    option.value = year.toString();
+                    option.textContent = year.toString();
+                    yearSelect.appendChild(option);
+                }
+
+                if (![...yearSelect.options].some(opt => Number(opt.value) === selectedYear)) {
+                    const customOption = document.createElement('option');
+                    customOption.value = selectedYear.toString();
+                    customOption.textContent = selectedYear.toString();
+                    yearSelect.appendChild(customOption);
+                }
+
+                yearSelect.value = selectedYear.toString();
+                state.selectedYear = selectedYear;
+
+                weekSelect.innerHTML = '';
+                const autoOption = document.createElement('option');
+                autoOption.value = '';
+                autoOption.textContent = 'Auto (This Week)';
+                weekSelect.appendChild(autoOption);
+
+                for (let week = 1; week <= 17; week++) {
+                    const option = document.createElement('option');
+                    option.value = week.toString();
+                    option.textContent = `Week ${week}`;
+                    weekSelect.appendChild(option);
+                }
+
+                if (state.selectedWeek) {
+                    weekSelect.value = state.selectedWeek.toString();
+                } else {
+                    weekSelect.value = '';
+                }
+            }
+
             bindEvents() {
                 // Settings modal
                 document.getElementById('settingsBtn').addEventListener('click', () => {
@@ -1098,7 +1224,37 @@
                         this.changeWeek(offset);
                     });
                 });
-                
+
+                const yearSelect = document.getElementById('yearSelect');
+                if (yearSelect) {
+                    yearSelect.addEventListener('change', (e) => {
+                        const parsedYear = parseInt(e.target.value, 10);
+                        if (!Number.isNaN(parsedYear)) {
+                            state.selectedYear = parsedYear;
+                            this.refreshData();
+                        }
+                    });
+                }
+
+                const weekSelect = document.getElementById('weekSelect');
+                if (weekSelect) {
+                    weekSelect.addEventListener('change', (e) => {
+                        const value = e.target.value;
+                        state.selectedWeek = value ? parseInt(value, 10) : null;
+
+                        state.currentWeek = 0;
+                        if (value) {
+                            document.querySelectorAll('.week-btn').forEach(btn => btn.classList.remove('active'));
+                        } else {
+                            document.querySelectorAll('.week-btn').forEach(btn => {
+                                btn.classList.toggle('active', parseInt(btn.dataset.offset, 10) === 0);
+                            });
+                        }
+
+                        this.refreshData();
+                    });
+                }
+
                 // Bottom bar actions
                 document.getElementById('refreshBtn').addEventListener('click', () => {
                     this.refreshData();
@@ -1168,7 +1324,13 @@
             
             changeWeek(offset) {
                 state.currentWeek = offset;
-                
+                state.selectedWeek = null;
+
+                const weekSelect = document.getElementById('weekSelect');
+                if (weekSelect) {
+                    weekSelect.value = '';
+                }
+
                 // Update active button
                 document.querySelectorAll('.week-btn').forEach(btn => {
                     btn.classList.remove('active');
@@ -1208,21 +1370,47 @@
                 if (!this.cfbdClient) {
                     this.cfbdClient = new CFBDClient(state.settings.cfbdKey);
                 }
-                
-                const { start, end, targetSaturday } = utils.getWeekBounds(state.currentWeek);
-                const year = targetSaturday.getFullYear();
-                const week = this.getWeekNumber(targetSaturday);
+
+                let year = Number(state.selectedYear) || null;
+                let week = state.selectedWeek != null ? Number(state.selectedWeek) : null;
+                let bounds = null;
+
+                if (year && week) {
+                    bounds = utils.getSeasonWeekBounds(year, week);
+                }
+
+                if (!bounds) {
+                    const fallbackBounds = utils.getWeekBounds(state.currentWeek);
+                    const fallbackWeek = this.getWeekNumber(fallbackBounds.targetSaturday);
+
+                    if (!week) {
+                        week = fallbackWeek;
+                    }
+                    if (!year) {
+                        year = fallbackBounds.targetSaturday.getFullYear();
+                    }
+
+                    if (year && week && !bounds) {
+                        bounds = utils.getSeasonWeekBounds(year, week);
+                    }
+
+                    if (!bounds) {
+                        bounds = fallbackBounds;
+                    }
+                }
+
+                const { start, end, targetSaturday } = bounds;
                 const classification = 'fbs';
 
-                const cacheKey = `games_${year}_week_${week}_${classification}`;
+                const cacheKey = `games_${year}_week_${week ?? 'all'}_${classification}`;
                 let games = this.cache.get(cacheKey);
                 if (!Array.isArray(games)) {
                     games = null;
                 }
 
                 if (!games) {
-                    console.log(`Fetching games from API for ${year} week ${week} (${targetSaturday.toDateString()})...`);
-                    const apiGames = await this.cfbdClient.getGames(year, week, classification);
+                    console.log(`Fetching games from API for ${year} week ${week ?? 'all'} (${targetSaturday.toDateString()})...`);
+                    const apiGames = await this.cfbdClient.getGames(year, week ?? undefined, classification);
                     console.log('Got games:', apiGames?.length || 0);
                     if (Array.isArray(apiGames) && apiGames.length > 0) {
                         console.log('Sample game structure:', JSON.stringify(apiGames[0], null, 2));
