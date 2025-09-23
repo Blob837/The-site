@@ -1,1049 +1,1204 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#1a365d">
-  <title>CFB Predictor 2025</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --secondary: #64748b;
-      --success: #059669;
-      --warning: #d97706;
-      --danger: #dc2626;
-      --background: #0f172a;
-      --surface: #1e293b;
-      --surface-hover: #334155;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --border: #334155;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-      --radius: 8px;
-      --transition: all 0.15s ease;
-    }
-
-    body {
-      background: var(--background);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      line-height: 1.5;
-      overflow-x: hidden;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 16px;
-    }
-
-    /* Header */
-    .header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      backdrop-filter: blur(8px);
-    }
-
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 0;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    /* Controls */
-    .controls {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 0;
-    }
-
-    .controls-grid {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 12px;
-      align-items: center;
-    }
-
-    /* Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 16px;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      text-decoration: none;
-      cursor: pointer;
-      transition: var(--transition);
-      font-size: 14px;
-      font-weight: 500;
-      min-height: 44px;
-      white-space: nowrap;
-    }
-
-    .btn:hover {
-      background: var(--surface-hover);
-      transform: translateY(-1px);
-    }
-
-    .btn:active {
-      transform: translateY(0);
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-hover);
-      border-color: var(--primary-hover);
-    }
-
-    .btn-success {
-      background: var(--success);
-      border-color: var(--success);
-      color: white;
-    }
-
-    .btn-warning {
-      background: var(--warning);
-      border-color: var(--warning);
-      color: white;
-    }
-
-    .btn-danger {
-      background: var(--danger);
-      border-color: var(--danger);
-      color: white;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* Form Elements */
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .form-label {
-      font-weight: 500;
-      color: var(--text-muted);
-    }
-
-    .form-control {
-      padding: 12px;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: var(--background);
-      color: var(--text);
-      font-size: 14px;
-      transition: var(--transition);
-      min-height: 44px;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
-    }
-
-    /* Loading State */
-    .loading {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 23, 42, 0.9);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      backdrop-filter: blur(4px);
-    }
-
-    .loading.active {
-      display: flex;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid var(--border);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Main Content */
-    .main {
-      padding: 24px 0;
-      min-height: 60vh;
-    }
-
-    .predictions-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-    }
-
-    /* Game Cards */
-    .game-card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      padding: 20px;
-      transition: var(--transition);
-      box-shadow: var(--shadow);
-    }
-
-    .game-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.4);
-    }
-
-    .game-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 16px;
-    }
-
-    .team-info {
-      flex: 1;
-    }
-
-    .team {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
-      font-weight: 600;
-    }
-
-    .team.winner {
-      color: var(--primary);
-    }
-
-    .confidence {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-left: 16px;
-    }
-
-    .confidence-circle {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 3px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      position: relative;
-    }
-
-    .confidence-circle.high {
-      border-color: var(--success);
-      color: var(--success);
-    }
-
-    .confidence-circle.medium {
-      border-color: var(--warning);
-      color: var(--warning);
-    }
-
-    .confidence-circle.low {
-      border-color: var(--danger);
-      color: var(--danger);
-    }
-
-    .game-meta {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 12px;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-    }
-
-    .meta-item {
-      text-align: center;
-    }
-
-    .meta-label {
-      font-size: 12px;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      font-weight: 500;
-    }
-
-    .meta-value {
-      font-size: 14px;
-      font-weight: 600;
-      margin-top: 4px;
-    }
-
-    /* Modal */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 23, 42, 0.9);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      padding: 16px;
-      backdrop-filter: blur(4px);
-    }
-
-    .modal.active {
-      display: flex;
-    }
-
-    .modal-content {
-      background: var(--surface);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      max-width: 500px;
-      width: 100%;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .modal-header {
-      padding: 20px 20px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .modal-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
-
-    .modal-body {
-      padding: 20px;
-    }
-
-    .modal-footer {
-      padding: 0 20px 20px;
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-    }
-
-    /* Toast */
-    .toast-container {
-      position: fixed;
-      top: 80px;
-      right: 16px;
-      z-index: 3000;
-      max-width: 400px;
-    }
-
-    .toast {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: var(--shadow);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      animation: slideIn 0.3s ease;
-    }
-
-    .toast.success {
-      border-left: 4px solid var(--success);
-    }
-
-    .toast.warning {
-      border-left: 4px solid var(--warning);
-    }
-
-    .toast.error {
-      border-left: 4px solid var(--danger);
-    }
-
-    @keyframes slideIn {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-muted);
-    }
-
-    .empty-icon {
-      font-size: 3rem;
-      margin-bottom: 16px;
-      opacity: 0.5;
-    }
-
-    .empty-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-      .container {
-        padding: 0 12px;
-      }
-
-      .header-content {
-        padding: 12px 0;
-      }
-
-      .logo {
-        font-size: 1.25rem;
-      }
-
-      .controls-grid {
-        grid-template-columns: 1fr;
-        gap: 8px;
-      }
-
-      .predictions-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      .game-header {
-        flex-direction: column;
-        gap: 12px;
-      }
-
-      .confidence {
-        align-self: flex-end;
-        margin-left: 0;
-      }
-
-      .toast-container {
-        left: 12px;
-        right: 12px;
-        max-width: none;
-      }
-
-      .btn {
-        padding: 10px 14px;
-        font-size: 13px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .main {
-        padding: 16px 0;
-      }
-
-      .game-card {
-        padding: 16px;
-      }
-
-      .modal-content {
-        margin: 16px;
-        max-width: none;
-      }
-
-      .game-meta {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>CFB Dashboard</title>
+    <style>
+        /* ===================
+         * CSS VARIABLES & RESET
+         * =================== */
+        :root {
+            --bg: #0b0f14;
+            --panel: #10161b;
+            --text: #e6edf3;
+            --muted: #93a1a1;
+            --accent: #4cc2ff;
+            --ok: #3bd671;
+            --warn: #f5c451;
+            --err: #ff6b6b;
+            --border: #1f2a33;
+            --safe-area-top: env(safe-area-inset-top, 0px);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-size: 14px;
+            line-height: 1.4;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        /* ===================
+         * LAYOUT & STRUCTURE
+         * =================== */
+        .app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-top: var(--safe-area-top);
+            padding-bottom: var(--safe-area-bottom);
+        }
+
+        .header {
+            position: sticky;
+            top: var(--safe-area-top);
+            z-index: 100;
+            background: var(--panel);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-scrollbar: { display: none; }
+        }
+
+        .nav-tab {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 120ms ease;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-tab.active {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .week-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .week-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .week-btn {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            min-height: 32px;
+            transition: all 120ms ease;
+        }
+
+        .week-btn:active {
+            background: var(--border);
+        }
+
+        .week-info {
+            font-size: 12px;
+            color: var(--muted);
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .content {
+            flex: 1;
+            padding: 0 16px 16px;
+            overflow-y: auto;
+        }
+
+        /* ===================
+         * GAME CARDS
+         * =================== */
+        .games-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .game-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 120ms ease;
+        }
+
+        .game-card:active {
+            transform: scale(0.98);
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .game-time {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .game-status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .status-pre { background: var(--muted); color: var(--bg); }
+        .status-live { background: var(--err); color: white; }
+        .status-final { background: var(--ok); color: white; }
+
+        .matchup {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .team {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .team-logo {
+            width: 24px;
+            height: 24px;
+            background: var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .team-name {
+            font-weight: 600;
+        }
+
+        .score {
+            font-size: 18px;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .game-details {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .game-details.expanded {
+            display: block;
+        }
+
+        /* ===================
+         * TEAM VIEW
+         * =================== */
+        .teams-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .team-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .team-info {
+            flex: 1;
+        }
+
+        .team-record {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* ===================
+         * RANKINGS
+         * =================== */
+        .rankings-list {
+            margin-top: 16px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            gap: 12px;
+        }
+
+        .rank-number {
+            font-weight: bold;
+            font-size: 16px;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* ===================
+         * SETTINGS
+         * =================== */
+        .settings-section {
+            margin: 16px 0;
+            padding: 16px;
+            background: var(--panel);
+            border-radius: 8px;
+        }
+
+        .settings-label {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .settings-input {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .settings-button {
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        /* ===================
+         * UTILITIES
+         * =================== */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+
+        .error {
+            background: var(--err);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 16px 0;
+            font-size: 12px;
+        }
+
+        .hidden { display: none !important; }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--border) 25%, var(--panel) 50%, var(--border) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ===================
+         * SEARCH
+         * =================== */
+        .search-input {
+            width: 100%;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            color: var(--text);
+            font-size: 14px;
+            margin: 16px 0;
+        }
+
+        /* ===================
+         * DIAGNOSTICS
+         * =================== */
+        .diagnostics {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            background: var(--bg);
+            color: var(--muted);
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 12px;
+            white-space: pre-wrap;
+        }
+    </style>
 </head>
 <body>
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-  </div>
+    <!-- SVG Icon Sprite -->
+    <svg style="display: none;">
+        <defs>
+            <symbol id="icon-clock" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+                <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2"/>
+            </symbol>
+            <symbol id="icon-live" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="4" fill="currentColor"/>
+            </symbol>
+            <symbol id="icon-settings" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+                <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24" stroke="currentColor" stroke-width="2"/>
+            </symbol>
+            <symbol id="icon-search" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+                <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2"/>
+            </symbol>
+            <symbol id="icon-refresh" viewBox="0 0 24 24">
+                <polyline points="23,4 23,10 17,10" stroke="currentColor" stroke-width="2" fill="none"/>
+                <polyline points="1,20 1,14 7,14" stroke="currentColor" stroke-width="2" fill="none"/>
+                <path d="M20.49,9A9,9,0,0,0,5.64,5.64L1,10m22,4-4.64,4.36A9,9,0,0,1,3.51,15" stroke="currentColor" stroke-width="2" fill="none"/>
+            </symbol>
+        </defs>
+    </svg>
 
-  <header class="header">
-    <div class="container">
-      <div class="header-content">
-        <div class="logo">CFB Predictor 2025</div>
-        <div class="header-actions">
-          <button class="btn" id="settingsBtn">⚙️ Settings</button>
-          <button class="btn" id="aboutBtn">ℹ️ About</button>
-        </div>
-      </div>
+    <div class="app">
+        <header class="header">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-view="scores">Scores</button>
+                <button class="nav-tab" data-view="teams">Teams</button>
+                <button class="nav-tab" data-view="rankings">Rankings</button>
+                <button class="nav-tab" data-view="stats">Stats</button>
+                <button class="nav-tab" data-view="search">Search</button>
+                <button class="nav-tab" data-view="settings">Settings</button>
+            </div>
+            <div class="week-controls">
+                <div class="week-nav">
+                    <button class="week-btn" id="prev-week">&lt;</button>
+                    <div class="week-info" id="week-display">Week 1</div>
+                    <button class="week-btn" id="next-week">&gt;</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="content">
+            <!-- Scores View -->
+            <div id="scores-view" class="view">
+                <div id="games-container">
+                    <div class="loading">Loading games...</div>
+                </div>
+            </div>
+
+            <!-- Teams View -->
+            <div id="teams-view" class="view hidden">
+                <input type="text" class="search-input" id="team-search" placeholder="Search teams...">
+                <div id="teams-container">
+                    <div class="loading">Loading teams...</div>
+                </div>
+            </div>
+
+            <!-- Rankings View -->
+            <div id="rankings-view" class="view hidden">
+                <div id="rankings-container">
+                    <div class="loading">Loading rankings...</div>
+                </div>
+            </div>
+
+            <!-- Stats View -->
+            <div id="stats-view" class="view hidden">
+                <div id="stats-container">
+                    <div class="loading">Loading stats...</div>
+                </div>
+            </div>
+
+            <!-- Search View -->
+            <div id="search-view" class="view hidden">
+                <input type="text" class="search-input" id="global-search" placeholder="Search teams and games...">
+                <div id="search-results"></div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="settings-view" class="view hidden">
+                <div class="settings-section">
+                    <label class="settings-label">CFBD API Key</label>
+                    <input type="password" class="settings-input" id="api-key" placeholder="Enter API key...">
+                    <button class="settings-button" onclick="app.saveSettings()">Save Key</button>
+                </div>
+                <div class="settings-section">
+                    <label class="settings-label">Season Year</label>
+                    <input type="number" class="settings-input" id="season-year" value="2024">
+                </div>
+                <div class="settings-section">
+                    <label class="settings-label">Polling Interval (seconds)</label>
+                    <input type="number" class="settings-input" id="polling-interval" value="30" min="15" max="300">
+                </div>
+                <div class="settings-section">
+                    <button class="settings-button" onclick="app.clearCache()">Clear Cache</button>
+                    <div class="diagnostics" id="diagnostics">
+                        No diagnostic data yet...
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-  </header>
 
-  <section class="controls">
-    <div class="container">
-      <div class="controls-grid">
-        <div class="form-group">
-          <select class="form-control" id="weekSelect">
-            <option value="">Select Week</option>
-          </select>
-        </div>
-        <button class="btn btn-success" id="predictBtn">🔮 Predict</button>
-        <button class="btn btn-primary" id="refreshBtn">🔄 Refresh</button>
-      </div>
-    </div>
-  </section>
-
-  <main class="main">
-    <div class="container">
-      <div id="predictions" class="predictions-grid"></div>
-      <div id="emptyState" class="empty-state" style="display: none;">
-        <div class="empty-icon">🏈</div>
-        <div class="empty-title">No Predictions Yet</div>
-        <p>Configure your API key in settings, select a week, and click Predict to get started.</p>
-      </div>
-    </div>
-  </main>
-
-  <!-- Settings Modal -->
-  <div class="modal" id="settingsModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Settings</h3>
-        <button class="btn" id="closeSettingsBtn">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">CFBD API Key</label>
-          <input type="password" class="form-control" id="apiKeyInput" placeholder="Enter your CFBD API key">
-          <small style="color: var(--text-muted); margin-top: 4px;">
-            Get your key from <a href="https://collegefootballdata.com/key" target="_blank" style="color: var(--primary);">collegefootballdata.com</a>
-          </small>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" id="cancelSettingsBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveSettingsBtn">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- About Modal -->
-  <div class="modal" id="aboutModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">About CFB Predictor</h3>
-        <button class="btn" id="closeAboutBtn">✕</button>
-      </div>
-      <div class="modal-body">
-        <p>Professional college football prediction tool for the 2025 season.</p>
-        <p><strong>Features:</strong></p>
-        <ul style="margin: 12px 0; padding-left: 20px;">
-          <li>Live game predictions using advanced metrics</li>
-          <li>Mobile-optimized interface</li>
-          <li>Real-time data from CFBD API v2</li>
-          <li>Confidence scoring and win probabilities</li>
-        </ul>
-        <p style="margin-top: 16px; color: var(--text-muted); font-size: 14px;">
-          Built with professional-grade architecture for reliable performance.
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary" id="closeAbout2Btn">Got it</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="toast-container" id="toastContainer"></div>
-
-  <script>
-    class CFBPredictor {
-      constructor() {
-        this.apiKey = localStorage.getItem('cfb_api_key') || '';
-        this.baseUrl = 'https://apinext.collegefootballdata.com';
-        this.currentYear = 2025;
-        this.currentWeek = null;
-        this.weeks = [];
-        this.predictions = [];
-        this.games = [];
-        
-        this.init();
-      }
-
-      init() {
-        this.bindEvents();
-        this.loadApiKey();
-        this.loadWeeks();
-      }
-
-      bindEvents() {
-        document.getElementById('settingsBtn').addEventListener('click', () => this.openSettings());
-        document.getElementById('aboutBtn').addEventListener('click', () => this.openAbout());
-        document.getElementById('closeSettingsBtn').addEventListener('click', () => this.closeSettings());
-        document.getElementById('closeAboutBtn').addEventListener('click', () => this.closeAbout());
-        document.getElementById('closeAbout2Btn').addEventListener('click', () => this.closeAbout());
-        document.getElementById('cancelSettingsBtn').addEventListener('click', () => this.closeSettings());
-        document.getElementById('saveSettingsBtn').addEventListener('click', () => this.saveSettings());
-        document.getElementById('predictBtn').addEventListener('click', () => this.predict());
-        document.getElementById('refreshBtn').addEventListener('click', () => this.refresh());
-        document.getElementById('weekSelect').addEventListener('change', (e) => {
-          this.currentWeek = parseInt(e.target.value);
-        });
-
-        // Close modals on backdrop click
-        document.getElementById('settingsModal').addEventListener('click', (e) => {
-          if (e.target.classList.contains('modal')) {
-            this.closeSettings();
-          }
-        });
-        
-        document.getElementById('aboutModal').addEventListener('click', (e) => {
-          if (e.target.classList.contains('modal')) {
-            this.closeAbout();
-          }
-        });
-      }
-
-      loadApiKey() {
-        const input = document.getElementById('apiKeyInput');
-        input.value = this.apiKey;
-      }
-
-      async loadWeeks() {
-        if (!this.apiKey) {
-          this.showToast('Please set your API key in settings first', 'warning');
-          this.openSettings();
-          return;
-        }
-
-        try {
-          this.showLoading(true);
-          const response = await this.apiCall('/calendar', {
-            year: this.currentYear,
-            seasonType: 'regular'
-          });
-
-          this.weeks = response || [];
-          this.populateWeekSelect();
-          
-          // Set current week based on date
-          const now = new Date();
-          const currentWeekData = this.weeks.find(week => {
-            const weekStart = new Date(week.firstGameStart);
-            const weekEnd = new Date(week.lastGameStart);
-            return now >= weekStart && now <= weekEnd;
-          });
-          
-          if (currentWeekData) {
-            this.currentWeek = currentWeekData.week;
-            document.getElementById('weekSelect').value = this.currentWeek;
-          } else if (this.weeks.length > 0) {
-            // Default to first available week
-            this.currentWeek = this.weeks[0].week;
-            document.getElementById('weekSelect').value = this.currentWeek;
-          }
-
-        } catch (error) {
-          console.error('Error loading weeks:', error);
-          this.showToast('Failed to load season calendar. Check your API key.', 'error');
-          this.openSettings();
-        } finally {
-          this.showLoading(false);
-        }
-      }
-
-      populateWeekSelect() {
-        const select = document.getElementById('weekSelect');
-        select.innerHTML = '<option value="">Select Week</option>';
-        
-        this.weeks.forEach(week => {
-          const option = document.createElement('option');
-          option.value = week.week;
-          
-          const startDate = new Date(week.firstGameStart);
-          const formattedDate = startDate.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric' 
-          });
-          
-          option.textContent = `Week ${week.week} - ${formattedDate}`;
-          select.appendChild(option);
-        });
-      }
-
-      async predict() {
-        if (!this.apiKey) {
-          this.showToast('Please set your API key first', 'warning');
-          this.openSettings();
-          return;
-        }
-
-        if (!this.currentWeek) {
-          this.showToast('Please select a week', 'warning');
-          return;
-        }
-
-        try {
-          this.showLoading(true);
-          
-          // Load games for selected week
-          const games = await this.apiCall('/games', {
-            year: this.currentYear,
-            week: this.currentWeek,
-            seasonType: 'regular'
-          });
-
-          if (!games || games.length === 0) {
-            this.showToast('No games found for selected week', 'warning');
-            this.showEmptyState();
-            return;
-          }
-
-          // Load additional data for predictions
-          const [teams, rankings] = await Promise.all([
-            this.apiCall('/teams/fbs', { year: this.currentYear }),
-            this.apiCall('/rankings', { 
-              year: this.currentYear, 
-              week: this.currentWeek, 
-              seasonType: 'regular' 
-            }).catch(() => []) // Rankings might not be available
-          ]);
-
-          // Generate predictions
-          this.games = games;
-          this.predictions = this.generatePredictions(games, teams, rankings);
-          this.renderPredictions();
-          
-          this.showToast(`Generated ${this.predictions.length} predictions`, 'success');
-
-        } catch (error) {
-          console.error('Prediction error:', error);
-          this.showToast('Failed to generate predictions. Check console for details.', 'error');
-        } finally {
-          this.showLoading(false);
-        }
-      }
-
-      generatePredictions(games, teams = [], rankings = []) {
-        const teamMap = new Map();
-        teams.forEach(team => {
-          teamMap.set(team.school, team);
-        });
-
-        const rankingMap = new Map();
-        rankings.forEach(poll => {
-          if (poll.poll === 'AP Top 25' && poll.ranks) {
-            poll.ranks.forEach(rank => {
-              rankingMap.set(rank.school, rank.rank);
-            });
-          }
-        });
-
-        return games.map(game => {
-          const homeTeam = teamMap.get(game.home_team) || { school: game.home_team };
-          const awayTeam = teamMap.get(game.away_team) || { school: game.away_team };
-          
-          const homeRank = rankingMap.get(game.home_team);
-          const awayRank = rankingMap.get(game.away_team);
-
-          // Simple prediction algorithm based on available data
-          let homeProbability = 0.5; // Base 50/50
-          
-          // Home field advantage
-          if (!game.neutral_site) {
-            homeProbability += 0.05;
-          }
-
-          // Ranking advantage (if available)
-          if (homeRank && !awayRank) {
-            homeProbability += 0.15;
-          } else if (!homeRank && awayRank) {
-            homeProbability -= 0.15;
-          } else if (homeRank && awayRank) {
-            const rankDiff = (awayRank - homeRank) / 25;
-            homeProbability += rankDiff * 0.2;
-          }
-
-          // Conference strength (simplified)
-          const p5Conferences = ['SEC', 'Big Ten', 'Big 12', 'ACC', 'Pac-12'];
-          const homeP5 = p5Conferences.includes(game.home_conference);
-          const awayP5 = p5Conferences.includes(game.away_conference);
-          
-          if (homeP5 && !awayP5) {
-            homeProbability += 0.1;
-          } else if (!homeP5 && awayP5) {
-            homeProbability -= 0.1;
-          }
-
-          // Clamp probability between 0.1 and 0.9
-          homeProbability = Math.max(0.1, Math.min(0.9, homeProbability));
-
-          const winner = homeProbability > 0.5 ? 'home' : 'away';
-          const winnerTeam = winner === 'home' ? game.home_team : game.away_team;
-          const winnerProbability = winner === 'home' ? homeProbability : (1 - homeProbability);
-
-          return {
-            id: game.id,
-            homeTeam: game.home_team,
-            awayTeam: game.away_team,
-            homeRank: homeRank || null,
-            awayRank: awayRank || null,
-            venue: game.venue,
-            startTime: new Date(game.start_date),
-            homeProbability,
-            awayProbability: 1 - homeProbability,
-            winner,
-            winnerTeam,
-            winnerProbability,
-            confidence: this.getConfidenceLevel(winnerProbability),
-            spread: this.probabilityToSpread(homeProbability)
-          };
-        });
-      }
-
-      getConfidenceLevel(probability) {
-        if (probability >= 0.7) return 'high';
-        if (probability >= 0.6) return 'medium';
-        return 'low';
-      }
-
-      probabilityToSpread(homeProbability) {
-        // Simple conversion from probability to point spread
-        if (homeProbability === 0.5) return 0;
-        
-        const logOdds = Math.log(homeProbability / (1 - homeProbability));
-        return Math.round(logOdds * 3.5 * 10) / 10; // Rough conversion
-      }
-
-      renderPredictions() {
-        const container = document.getElementById('predictions');
-        const emptyState = document.getElementById('emptyState');
-        
-        if (this.predictions.length === 0) {
-          this.showEmptyState();
-          return;
-        }
-
-        emptyState.style.display = 'none';
-        container.innerHTML = '';
-
-        this.predictions.forEach(prediction => {
-          const card = this.createPredictionCard(prediction);
-          container.appendChild(card);
-        });
-      }
-
-      createPredictionCard(prediction) {
-        const card = document.createElement('div');
-        card.className = 'game-card';
-
-        const formatTime = prediction.startTime.toLocaleString('en-US', {
-          weekday: 'short',
-          month: 'short',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit'
-        });
-
-        const formatTeamName = (team, rank) => {
-          return rank ? `#${rank} ${team}` : team;
+    <script>
+        // ===================
+        // APP STATE & CORE
+        // ===================
+        window.app = {
+            state: {
+                apiKey: '',
+                seasonYear: 2024,
+                week: 1,
+                seasonType: 'regular',
+                division: 'fbs',
+                pollingMs: 30000,
+                currentView: 'scores',
+                tzOffset: new Date().getTimezoneOffset()
+            },
+            cache: {
+                gamesByWeek: {},
+                teamIndex: {},
+                teamStats: {},
+                rankingsByWeek: {},
+                linesByWeek: {},
+                boxscoresByGameId: {}
+            },
+            diagnostics: {
+                requests: [],
+                errors: [],
+                cacheHits: 0,
+                cacheMisses: 0
+            },
+            
+            init() {
+                this.loadSettings();
+                this.setupEventListeners();
+                this.setupRouter();
+                
+                if (!this.state.apiKey) {
+                    this.showView('settings');
+                    this.showError('API key required. Enter your CollegeFootballData.com API key in Settings.');
+                    return;
+                }
+                
+                this.detectCurrentWeek()
+                    .then(() => this.loadScores())
+                    .catch(err => this.handleError(err));
+            },
+            
+            loadSettings() {
+                try {
+                    const saved = localStorage.getItem('cfb-dashboard-settings');
+                    if (saved) {
+                        const settings = JSON.parse(saved);
+                        Object.assign(this.state, settings);
+                        
+                        // Update UI inputs
+                        const apiKeyInput = document.getElementById('api-key');
+                        const yearInput = document.getElementById('season-year');
+                        const pollInput = document.getElementById('polling-interval');
+                        
+                        if (apiKeyInput) apiKeyInput.value = this.state.apiKey;
+                        if (yearInput) yearInput.value = this.state.seasonYear;
+                        if (pollInput) pollInput.value = this.state.pollingMs / 1000;
+                    }
+                } catch (err) {
+                    console.error('Failed to load settings:', err);
+                }
+            },
+            
+            saveSettings() {
+                const apiKeyInput = document.getElementById('api-key');
+                const yearInput = document.getElementById('season-year');
+                const pollInput = document.getElementById('polling-interval');
+                
+                if (apiKeyInput) this.state.apiKey = apiKeyInput.value.trim();
+                if (yearInput) this.state.seasonYear = parseInt(yearInput.value) || 2024;
+                if (pollInput) this.state.pollingMs = (parseInt(pollInput.value) || 30) * 1000;
+                
+                try {
+                    localStorage.setItem('cfb-dashboard-settings', JSON.stringify(this.state));
+                    this.showError('Settings saved successfully!', 'ok');
+                    
+                    if (this.state.apiKey && this.state.currentView === 'settings') {
+                        this.showView('scores');
+                        this.loadScores();
+                    }
+                } catch (err) {
+                    this.handleError(err);
+                }
+            },
+            
+            clearCache() {
+                localStorage.removeItem('cfb-dashboard-cache');
+                this.cache = {
+                    gamesByWeek: {},
+                    teamIndex: {},
+                    teamStats: {},
+                    rankingsByWeek: {},
+                    linesByWeek: {},
+                    boxscoresByGameId: {}
+                };
+                this.diagnostics = {
+                    requests: [],
+                    errors: [],
+                    cacheHits: 0,
+                    cacheMisses: 0
+                };
+                this.showError('Cache cleared!', 'ok');
+                this.updateDiagnostics();
+            },
+            
+            setupEventListeners() {
+                // Navigation tabs
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        const view = e.target.dataset.view;
+                        this.showView(view);
+                    });
+                });
+                
+                // Week navigation
+                document.getElementById('prev-week').addEventListener('click', () => {
+                    this.state.week = Math.max(1, this.state.week - 1);
+                    this.updateWeekDisplay();
+                    this.loadScores();
+                });
+                
+                document.getElementById('next-week').addEventListener('click', () => {
+                    this.state.week = Math.min(17, this.state.week + 1);
+                    this.updateWeekDisplay();
+                    this.loadScores();
+                });
+                
+                // Search functionality
+                const teamSearch = document.getElementById('team-search');
+                if (teamSearch) {
+                    teamSearch.addEventListener('input', (e) => {
+                        this.filterTeams(e.target.value);
+                    });
+                }
+                
+                const globalSearch = document.getElementById('global-search');
+                if (globalSearch) {
+                    globalSearch.addEventListener('input', (e) => {
+                        this.performGlobalSearch(e.target.value);
+                    });
+                }
+            },
+            
+            setupRouter() {
+                window.addEventListener('hashchange', () => {
+                    const view = location.hash.slice(1) || 'scores';
+                    this.showView(view);
+                });
+                
+                // Handle initial route
+                const initialView = location.hash.slice(1) || 'scores';
+                if (initialView !== 'scores') {
+                    this.showView(initialView);
+                }
+            },
+            
+            showView(viewName) {
+                // Update navigation
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.view === viewName);
+                });
+                
+                // Update content
+                document.querySelectorAll('.view').forEach(view => {
+                    view.classList.add('hidden');
+                });
+                
+                const targetView = document.getElementById(`${viewName}-view`);
+                if (targetView) {
+                    targetView.classList.remove('hidden');
+                    this.state.currentView = viewName;
+                    location.hash = viewName;
+                    
+                    // Load data for view
+                    switch (viewName) {
+                        case 'scores':
+                            this.loadScores();
+                            break;
+                        case 'teams':
+                            this.loadTeams();
+                            break;
+                        case 'rankings':
+                            this.loadRankings();
+                            break;
+                        case 'stats':
+                            this.loadStats();
+                            break;
+                    }
+                }
+            }
         };
 
-        card.innerHTML = `
-          <div class="game-header">
-            <div class="team-info">
-              <div class="team ${prediction.winner === 'away' ? 'winner' : ''}">
-                <span>${formatTeamName(prediction.awayTeam, prediction.awayRank)}</span>
-                <span>${(prediction.awayProbability * 100).toFixed(1)}%</span>
-              </div>
-              <div class="team ${prediction.winner === 'home' ? 'winner' : ''}">
-                <span>${formatTeamName(prediction.homeTeam, prediction.homeRank)}</span>
-                <span>${(prediction.homeProbability * 100).toFixed(1)}%</span>
-              </div>
-            </div>
-            <div class="confidence">
-              <div class="confidence-circle ${prediction.confidence}">
-                ${(prediction.winnerProbability * 100).toFixed(0)}%
-              </div>
-            </div>
-          </div>
-          <div class="game-meta">
-            <div class="meta-item">
-              <div class="meta-label">Predicted Winner</div>
-              <div class="meta-value">${prediction.winnerTeam}</div>
-            </div>
-            <div class="meta-item">
-              <div class="meta-label">Confidence</div>
-              <div class="meta-value">${prediction.confidence.toUpperCase()}</div>
-            </div>
-            <div class="meta-item">
-              <div class="meta-label">Spread</div>
-              <div class="meta-value">${prediction.spread > 0 ? '+' : ''}${prediction.spread}</div>
-            </div>
-            <div class="meta-item">
-              <div class="meta-label">Kickoff</div>
-              <div class="meta-value">${formatTime}</div>
-            </div>
-          </div>
-        `;
-
-        return card;
-      }
-
-      showEmptyState() {
-        document.getElementById('predictions').innerHTML = '';
-        document.getElementById('emptyState').style.display = 'block';
-      }
-
-      async refresh() {
-        if (this.currentWeek) {
-          await this.predict();
-        } else {
-          await this.loadWeeks();
-        }
-      }
-
-      async apiCall(endpoint, params = {}) {
-        const url = new URL(this.baseUrl + endpoint);
+        // ===================
+        // API & DATA LAYER
+        // ===================
+        app.fetchJSON = async function(endpoint, params = {}) {
+            const startTime = Date.now();
+            
+            if (!this.state.apiKey) {
+                throw new Error('API key not configured');
+            }
+            
+            // Build URL
+            const baseUrl = 'https://apinext.collegefootballdata.com';
+            const url = new URL(endpoint, baseUrl);
+            Object.keys(params).forEach(key => {
+                if (params[key] !== undefined && params[key] !== null) {
+                    url.searchParams.append(key, params[key]);
+                }
+            });
+            
+            const cacheKey = url.toString();
+            const cached = this.getCachedData(cacheKey);
+            
+            if (cached && !this.isCacheExpired(cached)) {
+                this.diagnostics.cacheHits++;
+                this.updateDiagnostics();
+                return { data: cached.data, fromCache: true, ms: 0 };
+            }
+            
+            try {
+                const response = await fetch(url.toString(), {
+                    headers: {
+                        'Authorization': `Bearer ${this.state.apiKey}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const ms = Date.now() - startTime;
+                
+                if (!response.ok) {
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('Invalid API key. Check your settings.');
+                    }
+                    if (response.status === 429) {
+                        throw new Error('Rate limit exceeded. Slowing down requests...');
+                    }
+                    throw new Error(`API error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Cache the response
+                this.setCachedData(cacheKey, data);
+                this.diagnostics.cacheMisses++;
+                this.diagnostics.requests.push({
+                    method: 'GET',
+                    path: endpoint,
+                    ms: ms,
+                    status: response.status,
+                    cached: false
+                });
+                
+                this.updateDiagnostics();
+                
+                return { data, fromCache: false, ms };
+                
+            } catch (error) {
+                this.diagnostics.errors.push({
+                    endpoint,
+                    error: error.message,
+                    timestamp: new Date().toISOString()
+                });
+                this.updateDiagnostics();
+                throw error;
+            }
+        };
         
-        Object.keys(params).forEach(key => {
-          if (params[key] !== null && params[key] !== undefined) {
-            url.searchParams.append(key, params[key]);
-          }
+        app.getCachedData = function(key) {
+            try {
+                const cache = localStorage.getItem('cfb-dashboard-cache');
+                if (!cache) return null;
+                
+                const parsed = JSON.parse(cache);
+                return parsed[key] || null;
+            } catch {
+                return null;
+            }
+        };
+        
+        app.setCachedData = function(key, data) {
+            try {
+                let cache = {};
+                const existing = localStorage.getItem('cfb-dashboard-cache');
+                if (existing) {
+                    cache = JSON.parse(existing);
+                }
+                
+                cache[key] = {
+                    data,
+                    timestamp: Date.now(),
+                    ttl: this.getCacheTTL(key)
+                };
+                
+                localStorage.setItem('cfb-dashboard-cache', JSON.stringify(cache));
+            } catch (err) {
+                console.warn('Failed to cache data:', err);
+            }
+        };
+        
+        app.getCacheTTL = function(key) {
+            if (key.includes('/teams')) return 7 * 24 * 60 * 60 * 1000; // 7 days
+            if (key.includes('/rankings')) return 60 * 60 * 1000; // 1 hour
+            if (key.includes('/games')) return 10 * 60 * 1000; // 10 minutes
+            if (key.includes('/lines')) return 15 * 60 * 1000; // 15 minutes
+            return 30 * 60 * 1000; // 30 minutes default
+        };
+        
+        app.isCacheExpired = function(cached) {
+            return Date.now() - cached.timestamp > cached.ttl;
+        };
+
+        // ===================
+        // CORE DATA LOADING
+        // ===================
+        app.detectCurrentWeek = async function() {
+            try {
+                const result = await this.fetchJSON('/calendar', {
+                    year: this.state.seasonYear
+                });
+                
+                const now = new Date();
+                let currentWeek = 1;
+                
+                if (result.data && result.data.length > 0) {
+                    // Find current week based on dates
+                    for (const week of result.data) {
+                        if (week.seasonType === 'regular') {
+                            const weekStart = new Date(week.firstGameStart);
+                            const weekEnd = new Date(week.lastGameStart);
+                            weekEnd.setDate(weekEnd.getDate() + 7);
+                            
+                            if (now >= weekStart && now <= weekEnd) {
+                                currentWeek = week.week;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                this.state.week = currentWeek;
+                this.updateWeekDisplay();
+                
+            } catch (err) {
+                console.warn('Could not detect current week, using week 1');
+                this.state.week = 1;
+                this.updateWeekDisplay();
+            }
+        };
+        
+        app.loadScores = async function() {
+            if (!this.state.apiKey) return;
+            
+            try {
+                const container = document.getElementById('games-container');
+                container.innerHTML = '<div class="loading">Loading games...</div>';
+                
+                const result = await this.fetchJSON('/games', {
+                    year: this.state.seasonYear,
+                    week: this.state.week,
+                    seasonType: this.state.seasonType,
+                    division: this.state.division
+                });
+                
+                this.renderGames(result.data || []);
+                this.startLivePolling();
+                
+            } catch (err) {
+                this.handleError(err);
+            }
+        };
+        
+        app.loadTeams = async function() {
+            if (!this.state.apiKey) return;
+            
+            try {
+                const container = document.getElementById('teams-container');
+                container.innerHTML = '<div class="loading">Loading teams...</div>';
+                
+                const result = await this.fetchJSON('/teams', {
+                    division: this.state.division
+                });
+                
+                this.renderTeams(result.data || []);
+                
+            } catch (err) {
+                this.handleError(err);
+            }
+        };
+        
+        app.loadRankings = async function() {
+            if (!this.state.apiKey) return;
+            
+            try {
+                const container = document.getElementById('rankings-container');
+                container.innerHTML = '<div class="loading">Loading rankings...</div>';
+                
+                const result = await this.fetchJSON('/rankings', {
+                    year: this.state.seasonYear,
+                    week: this.state.week,
+                    seasonType: this.state.seasonType
+                });
+                
+                this.renderRankings(result.data || []);
+                
+            } catch (err) {
+                this.handleError(err);
+            }
+        };
+        
+        app.loadStats = async function() {
+            const container = document.getElementById('stats-container');
+            container.innerHTML = '<div class="loading">Loading stats...</div>';
+            
+            // Placeholder for stats - would need team efficiency/advanced stats
+            setTimeout(() => {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--muted);">Stats view coming soon...</div>';
+            }, 500);
+        };
+
+        // ===================
+        // RENDERING FUNCTIONS
+        // ===================
+        app.renderGames = function(games) {
+            const container = document.getElementById('games-container');
+            
+            if (!games.length) {
+                container.innerHTML = '<div class="loading">No games found for this week.</div>';
+                return;
+            }
+            
+            const gamesHtml = games.map(game => {
+                const homeTeam = game.home_team || 'HOME';
+                const awayTeam = game.away_team || 'AWAY';
+                const homeScore = game.home_points || 0;
+                const awayScore = game.away_points || 0;
+                
+                const gameTime = this.formatGameTime(game.start_date);
+                const status = this.getGameStatus(game);
+                
+                return `
+                    <div class="game-card" onclick="app.toggleGameDetails(${game.id || Math.random()})">
+                        <div class="game-header">
+                            <div class="game-time">${gameTime}</div>
+                            <div class="game-status status-${status.type}">${status.text}</div>
+                        </div>
+                        <div class="matchup">
+                            <div class="team">
+                                <div class="team-logo">${awayTeam.substring(0, 2)}</div>
+                                <div class="team-name">${awayTeam}</div>
+                            </div>
+                            <div class="score">${awayScore}</div>
+                        </div>
+                        <div class="matchup">
+                            <div class="team">
+                                <div class="team-logo">${homeTeam.substring(0, 2)}</div>
+                                <div class="team-name">${homeTeam}</div>
+                            </div>
+                            <div class="score">${homeScore}</div>
+                        </div>
+                        <div class="game-details" id="details-${game.id || Math.random()}">
+                            <div style="color: var(--muted); font-size: 12px;">
+                                ${game.venue || 'Venue TBD'} • ${game.notes || ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = `<div class="games-list">${gamesHtml}</div>`;
+        };
+        
+        app.renderTeams = function(teams) {
+            const container = document.getElementById('teams-container');
+            
+            if (!teams.length) {
+                container.innerHTML = '<div class="loading">No teams found.</div>';
+                return;
+            }
+            
+            const teamsHtml = teams.map(team => `
+                <div class="team-card">
+                    <div class="team-logo">${(team.abbreviation || team.school || 'T').substring(0, 2)}</div>
+                    <div class="team-info">
+                        <div class="team-name">${team.school || team.team || 'Unknown Team'}</div>
+                        <div class="team-record">${team.conference || 'Independent'}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = `<div class="teams-list">${teamsHtml}</div>`;
+        };
+        
+        app.renderRankings = function(rankings) {
+            const container = document.getElementById('rankings-container');
+            
+            if (!rankings.length) {
+                container.innerHTML = '<div class="loading">No rankings found for this week.</div>';
+                return;
+            }
+            
+            // Group by poll type
+            const pollTypes = [...new Set(rankings.map(r => r.poll))];
+            
+            let html = '';
+            pollTypes.forEach(pollType => {
+                const pollRankings = rankings.filter(r => r.poll === pollType);
+                
+                html += `
+                    <div class="settings-section">
+                        <h3 style="margin: 0 0 12px 0; color: var(--text);">${pollType} Poll</h3>
+                        <div class="rankings-list">
+                `;
+                
+                pollRankings.forEach(ranking => {
+                    html += `
+                        <div class="ranking-item">
+                            <div class="rank-number">${ranking.rank}</div>
+                            <div class="team">
+                                <div class="team-logo">${(ranking.team || 'T').substring(0, 2)}</div>
+                                <div class="team-info">
+                                    <div class="team-name">${ranking.school || ranking.team}</div>
+                                    <div class="team-record">${ranking.firstPlaceVotes || 0} first place votes</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        };
+
+        // ===================
+        // UTILITY FUNCTIONS
+        // ===================
+        app.formatGameTime = function(dateString) {
+            if (!dateString) return 'TBD';
+            
+            const date = new Date(dateString);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const gameDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            
+            const timeStr = date.toLocaleTimeString([], {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+            
+            if (gameDate.getTime() === today.getTime()) {
+                return `Today ${timeStr}`;
+            } else if (gameDate.getTime() === today.getTime() + 86400000) {
+                return `Tomorrow ${timeStr}`;
+            } else {
+                return `${date.getMonth() + 1}/${date.getDate()} ${timeStr}`;
+            }
+        };
+        
+        app.getGameStatus = function(game) {
+            if (!game.completed) {
+                if (game.start_date && new Date(game.start_date) > new Date()) {
+                    return { type: 'pre', text: 'Scheduled' };
+                } else {
+                    return { type: 'live', text: 'Live' };
+                }
+            } else {
+                return { type: 'final', text: 'Final' };
+            }
+        };
+        
+        app.updateWeekDisplay = function() {
+            const display = document.getElementById('week-display');
+            if (display) {
+                display.textContent = `Week ${this.state.week}`;
+            }
+        };
+        
+        app.toggleGameDetails = function(gameId) {
+            const details = document.getElementById(`details-${gameId}`);
+            if (details) {
+                details.classList.toggle('expanded');
+            }
+        };
+        
+        app.startLivePolling = function() {
+            // Clear existing polling
+            if (this.pollInterval) {
+                clearInterval(this.pollInterval);
+            }
+            
+            // Only poll if there are live games
+            this.pollInterval = setInterval(() => {
+                if (this.state.currentView === 'scores' && !document.hidden) {
+                    this.loadScores();
+                }
+            }, this.state.pollingMs);
+        };
+        
+        app.filterTeams = function(query) {
+            const teams = document.querySelectorAll('.team-card');
+            const searchTerm = query.toLowerCase();
+            
+            teams.forEach(team => {
+                const teamName = team.querySelector('.team-name').textContent.toLowerCase();
+                const visible = teamName.includes(searchTerm);
+                team.style.display = visible ? 'flex' : 'none';
+            });
+        };
+        
+        app.performGlobalSearch = function(query) {
+            const container = document.getElementById('search-results');
+            
+            if (!query.trim()) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            // Placeholder for global search functionality
+            container.innerHTML = `
+                <div style="padding: 20px; text-align: center; color: var(--muted);">
+                    Search results for "${query}" would appear here...
+                </div>
+            `;
+        };
+        
+        app.handleError = function(error) {
+            console.error('App error:', error);
+            this.showError(error.message || 'An unexpected error occurred');
+        };
+        
+        app.showError = function(message, type = 'err') {
+            const existing = document.querySelector('.error');
+            if (existing) existing.remove();
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.style.background = `var(--${type})`;
+            errorDiv.textContent = message;
+            
+            const content = document.querySelector('.content');
+            content.insertBefore(errorDiv, content.firstChild);
+            
+            // Auto-remove success messages
+            if (type === 'ok') {
+                setTimeout(() => errorDiv.remove(), 3000);
+            }
+        };
+        
+        app.updateDiagnostics = function() {
+            const diagnostics = document.getElementById('diagnostics');
+            if (!diagnostics) return;
+            
+            const stats = {
+                'Cache Hits': this.diagnostics.cacheHits,
+                'Cache Misses': this.diagnostics.cacheMisses,
+                'Total Requests': this.diagnostics.requests.length,
+                'Errors': this.diagnostics.errors.length
+            };
+            
+            const recentRequests = this.diagnostics.requests.slice(-5);
+            const recentErrors = this.diagnostics.errors.slice(-3);
+            
+            let output = 'DIAGNOSTICS\n' + '='.repeat(30) + '\n';
+            Object.entries(stats).forEach(([key, value]) => {
+                output += `${key}: ${value}\n`;
+            });
+            
+            if (recentRequests.length) {
+                output += '\nRECENT REQUESTS:\n';
+                recentRequests.forEach(req => {
+                    output += `${req.method} ${req.path} - ${req.ms}ms (${req.status})\n`;
+                });
+            }
+            
+            if (recentErrors.length) {
+                output += '\nRECENT ERRORS:\n';
+                recentErrors.forEach(err => {
+                    output += `${err.endpoint}: ${err.error}\n`;
+                });
+            }
+            
+            diagnostics.textContent = output;
+        };
+
+        // ===================
+        // INITIALIZATION
+        // ===================
+        document.addEventListener('DOMContentLoaded', function() {
+            app.init();
         });
-
-        const response = await fetch(url, {
-          headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Accept': 'application/json'
-          }
+        
+        // Page visibility handling for polling
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && app.pollInterval) {
+                clearInterval(app.pollInterval);
+            } else if (!document.hidden && app.state.currentView === 'scores') {
+                app.startLivePolling();
+            }
         });
-
-        if (!response.ok) {
-          if (response.status === 401) {
-            throw new Error('Invalid API key');
-          } else if (response.status === 429) {
-            throw new Error('Rate limit exceeded');
-          } else {
-            throw new Error(`API call failed: ${response.status} ${response.statusText}`);
-          }
-        }
-
-        return await response.json();
-      }
-
-      openSettings() {
-        document.getElementById('settingsModal').classList.add('active');
-        document.getElementById('apiKeyInput').focus();
-      }
-
-      closeSettings() {
-        document.getElementById('settingsModal').classList.remove('active');
-      }
-
-      openAbout() {
-        document.getElementById('aboutModal').classList.add('active');
-      }
-
-      closeAbout() {
-        document.getElementById('aboutModal').classList.remove('active');
-      }
-
-      saveSettings() {
-        const apiKey = document.getElementById('apiKeyInput').value.trim();
-        
-        if (!apiKey) {
-          this.showToast('Please enter an API key', 'warning');
-          return;
-        }
-
-        this.apiKey = apiKey;
-        localStorage.setItem('cfb_api_key', apiKey);
-        
-        this.closeSettings();
-        this.showToast('Settings saved successfully', 'success');
-        
-        // Reload weeks with new API key
-        this.loadWeeks();
-      }
-
-      showLoading(show) {
-        const loading = document.getElementById('loading');
-        if (show) {
-          loading.classList.add('active');
-        } else {
-          loading.classList.remove('active');
-        }
-      }
-
-      showToast(message, type = 'info') {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        
-        toast.innerHTML = `
-          <span>${message}</span>
-          <button onclick="this.parentElement.remove()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0; margin-left: auto;">✕</button>
-        `;
-
-        container.appendChild(toast);
-
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-          if (toast.parentElement) {
-            toast.remove();
-          }
-        }, 5000);
-      }
-    }
-
-    // Initialize app when DOM is loaded
-    document.addEventListener('DOMContentLoaded', () => {
-      new CFBPredictor();
-    });
-  </script>
+    </script>
 </body>
 </html>
