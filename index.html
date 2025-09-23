@@ -401,7 +401,7 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>CFB Wizard v6</h1>
+        <h1>CFB Wizard v8</h1>
         <div class="week-selector">
             <button class="week-btn" data-offset="-1">← Prev</button>
             <button class="week-btn active" data-offset="0">This Week</button>
@@ -740,11 +740,19 @@
             
             async getGames(year = 2025, week = null, classification = 'fbs') {
                 const params = new URLSearchParams({ 
-                    year: year.toString(),
-                    seasonType: 'regular',
-                    classification 
+                    year: year.toString()
                 });
-                if (week) params.set('week', week.toString());
+                
+                // Add seasonType as string, not object
+                params.set('seasonType', 'regular');
+                
+                if (classification) {
+                    params.set('classification', classification);
+                }
+                
+                if (week) {
+                    params.set('week', week.toString());
+                }
                 
                 const url = `${this.baseURL}/games?${params}`;
                 return this.fetchWithRetry(url, {
@@ -753,7 +761,12 @@
             }
             
             async getTeamStats(year = 2025) {
-                const url = `${this.baseURL}/stats/season?year=${year}&seasonType=regular`;
+                const params = new URLSearchParams({ 
+                    year: year.toString()
+                });
+                params.set('seasonType', 'regular');
+                
+                const url = `${this.baseURL}/stats/season?${params}`;
                 return this.fetchWithRetry(url, {
                     headers: { 'Authorization': `Bearer ${this.apiKey}` }
                 });
@@ -761,10 +774,13 @@
             
             async getPregameWP(year = 2025, week = null) {
                 const params = new URLSearchParams({ 
-                    year: year.toString(),
-                    seasonType: 'regular' 
+                    year: year.toString()
                 });
-                if (week) params.set('week', week.toString());
+                params.set('seasonType', 'regular');
+                
+                if (week) {
+                    params.set('week', week.toString());
+                }
                 
                 const url = `${this.baseURL}/metrics/wp/pregame?${params}`;
                 return this.fetchWithRetry(url, {
@@ -774,10 +790,13 @@
             
             async getLines(year = 2025, week = null) {
                 const params = new URLSearchParams({ 
-                    year: year.toString(),
-                    seasonType: 'regular' 
+                    year: year.toString()
                 });
-                if (week) params.set('week', week.toString());
+                params.set('seasonType', 'regular');
+                
+                if (week) {
+                    params.set('week', week.toString());
+                }
                 
                 const url = `${this.baseURL}/lines?${params}`;
                 return this.fetchWithRetry(url, {
