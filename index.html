@@ -1969,6 +1969,7 @@
         state.apiKey = key;
         elements.apiKeyInput.value = key;
         const client = ensureCfbdClient();
+        const previouslyValid = state.apiKeyValid;
         try {
           await client.validateKey(force);
           state.apiKeyValid = true;
@@ -1976,7 +1977,15 @@
             showToast('CFBD key validated.', 'success');
           }
         } catch (err) {
-          state.apiKeyValid = false;
+          const status = err?.metadata?.status;
+          if (status === 401 || status === 403 || !previouslyValid) {
+            state.apiKeyValid = false;
+            if (typeof client.invalidateCachedKey === 'function') {
+              client.invalidateCachedKey();
+            }
+          } else {
+            state.apiKeyValid = previouslyValid;
+          }
           throw err;
         }
       }
@@ -2928,6 +2937,10 @@
           return sanitizeApiKey(this.getKeyFn() || '');
         }
 
+        invalidateCachedKey() {
+          this.validatedKey = null;
+        }
+
         async validateKey(force = false) {
           const key = this.getKey();
           if (!key) {
@@ -3239,6 +3252,14 @@
         const meta = err && err.metadata ? err.metadata : {};
         const type = meta.type || fallbackType || 'metrics';
         const message = meta.toast || err.message || 'Unexpected error';
+        const status = typeof meta.status === 'number' ? meta.status : null;
+        if ((status === 402 || status === 429) && type !== 'weather') {
+          if (meta.entryId) {
+            toggleDiagnosticsPanel(true);
+          }
+          showToast(message, 'warning');
+          return;
+        }
         if (meta.entryId) {
           toggleDiagnosticsPanel(true);
         }
