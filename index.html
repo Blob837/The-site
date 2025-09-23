@@ -600,7 +600,7 @@
             
             getWeekBounds(offset = 0) {
                 const now = new Date();
-                
+
                 // Get the current week's Saturday (game day)
                 const today = new Date(now);
                 const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
@@ -639,8 +639,8 @@
                     start: start.toISOString(),
                     end: end.toISOString()
                 });
-                
-                return { start, end };
+
+                return { start, end, targetSaturday };
             },
             
             exponentialDecay(value, weeks, lambda = 0.7) {
@@ -1209,28 +1209,42 @@
                     this.cfbdClient = new CFBDClient(state.settings.cfbdKey);
                 }
                 
-                // KISS principle - just get 2024 games for now
-                const year = 2024; // Use 2024 since 2025 season might not be available
-                
-                // Check cache first
-                const cacheKey = `games_${year}`;
+                const { start, end, targetSaturday } = utils.getWeekBounds(state.currentWeek);
+                const year = targetSaturday.getFullYear();
+                const week = this.getWeekNumber(targetSaturday);
+                const classification = 'fbs';
+
+                const cacheKey = `games_${year}_week_${week}_${classification}`;
                 let games = this.cache.get(cacheKey);
-                
+                if (!Array.isArray(games)) {
+                    games = null;
+                }
+
                 if (!games) {
-                    console.log('Fetching games from API...');
-                    games = await this.cfbdClient.getGames(year, null, 'fbs');
-                    console.log('Got games:', games?.length || 0);
-                    if (games && games.length > 0) {
-                        console.log('Sample game structure:', JSON.stringify(games[0], null, 2));
-                        console.log('All keys in first game:', Object.keys(games[0]));
+                    console.log(`Fetching games from API for ${year} week ${week} (${targetSaturday.toDateString()})...`);
+                    const apiGames = await this.cfbdClient.getGames(year, week, classification);
+                    console.log('Got games:', apiGames?.length || 0);
+                    if (Array.isArray(apiGames) && apiGames.length > 0) {
+                        console.log('Sample game structure:', JSON.stringify(apiGames[0], null, 2));
+                        console.log('All keys in first game:', Object.keys(apiGames[0]));
                     }
+                    games = Array.isArray(apiGames) ? apiGames : [];
                     this.cache.set(cacheKey, games, 120); // 2 hour TTL
                 }
-                
-                // Just take the games as-is for now - no date filtering
-                state.games = games || [];
-                
-                console.log(`Final game count: ${state.games.length}`);
+
+                const filteredGames = games.filter(game => {
+                    const dateStr = game.startDate || game.start_date || game.date;
+                    if (!dateStr) return true;
+
+                    const gameDate = new Date(dateStr);
+                    if (Number.isNaN(gameDate.getTime())) return true;
+
+                    return gameDate >= start && gameDate <= end;
+                });
+
+                state.games = filteredGames;
+
+                console.log(`Final game count for week ${week}: ${state.games.length}`);
                 this.renderGames();
             }
             
