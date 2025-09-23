@@ -833,278 +833,6 @@
         align-items: flex-start;
       }
 
-      function toggleDiagnosticsPanel(force) {
-        const panel = elements.diagnosticsPanel;
-        const toggle = elements.diagnosticsToggle;
-        if (!panel || !toggle) return;
-        const isOpen = force === undefined ? !panel.classList.contains('active') : Boolean(force);
-        panel.classList.toggle('active', isOpen);
-        panel.setAttribute('aria-hidden', String(!isOpen));
-        toggle.setAttribute('aria-expanded', String(isOpen));
-      }
-
-      function renderDiagnosticsPanel(snapshot) {
-        const { entries = [], tests = [] } = snapshot || {};
-        if (!elements.diagnosticsLog) return;
-        elements.diagnosticsLog.innerHTML = '';
-        if (!entries.length) {
-          elements.diagnosticsEmpty.style.display = 'block';
-          elements.copyDiagnostics.disabled = true;
-        } else {
-          elements.diagnosticsEmpty.style.display = 'none';
-          elements.copyDiagnostics.disabled = false;
-          for (const entry of entries) {
-            const card = document.createElement('article');
-            const endpoint = `${entry.path || ''}${entry.query || ''}`;
-            const statusCode = entry.statusCode ?? '—';
-            const cardStatus = entry.ok ? 'success' : (statusCode === 429 ? 'rate-limit' : 'error');
-            card.className = `diagnostics-entry ${cardStatus}`;
-
-            const header = document.createElement('div');
-            header.className = 'diagnostics-entry-header';
-            const title = document.createElement('h4');
-            title.textContent = endpoint || entry.label || 'Request';
-            header.appendChild(title);
-            if (entry.label) {
-              const badge = document.createElement('span');
-              badge.className = 'badge';
-              badge.textContent = entry.label;
-              header.appendChild(badge);
-            }
-            card.appendChild(header);
-
-            const meta = document.createElement('div');
-            meta.className = 'diagnostics-meta';
-            const statusSpan = document.createElement('span');
-            statusSpan.textContent = `Status ${statusCode}`;
-            meta.appendChild(statusSpan);
-            const retriesSpan = document.createElement('span');
-            retriesSpan.textContent = `Retries ${entry.retries ?? 0}`;
-            meta.appendChild(retriesSpan);
-            if (entry.timestamp) {
-              const tsSpan = document.createElement('span');
-              try {
-                tsSpan.textContent = new Date(entry.timestamp).toLocaleTimeString();
-              } catch (err) {
-                tsSpan.textContent = entry.timestamp;
-              }
-              meta.appendChild(tsSpan);
-            }
-            card.appendChild(meta);
-
-            if (entry.message) {
-              const message = document.createElement('div');
-              message.className = 'diagnostics-message';
-              message.textContent = entry.message;
-              card.appendChild(message);
-            }
-
-            if (entry.sample) {
-              const sample = document.createElement('pre');
-              sample.className = 'diagnostics-sample';
-              sample.textContent = entry.sample;
-              card.appendChild(sample);
-            }
-
-            elements.diagnosticsLog.appendChild(card);
-          }
-        }
-
-        elements.diagnosticsTestList.innerHTML = '';
-        if (!tests.length) {
-          const li = document.createElement('li');
-          li.className = 'diagnostics-test pending';
-          li.innerHTML = '<span>Awaiting test run</span><span class="status">—</span>';
-          elements.diagnosticsTestList.appendChild(li);
-        } else {
-          for (const test of tests) {
-            const li = document.createElement('li');
-            li.className = `diagnostics-test ${test.status || 'pending'}`;
-            const label = document.createElement('span');
-            label.textContent = test.label;
-            const status = document.createElement('span');
-            status.className = 'status';
-            status.textContent = formatTestStatus(test);
-            if (test.message) {
-              status.title = test.message;
-            }
-            li.appendChild(label);
-            li.appendChild(status);
-            elements.diagnosticsTestList.appendChild(li);
-          }
-        }
-      }
-
-      function primeDiagnosticsTests() {
-        diagnosticsStore.initializeTests(API_TESTS.map((test) => ({
-          key: test.key,
-          label: test.label,
-          status: 'pending',
-          code: null,
-          message: 'Not run'
-        })));
-      }
-
-      function formatTestStatus(test) {
-        if (!test) return '—';
-        if (test.status === 'pass') {
-          return `✅ ${test.code ?? 200}`;
-        }
-        if (test.status === 'fail') {
-          return `❌ ${test.code ?? 'ERR'}`;
-        }
-        if (test.status === 'running') {
-          return '⟳ Running…';
-        }
-        return '—';
-      }
-
-      async function copyDiagnostics() {
-        if (!navigator.clipboard) {
-          showToast('Clipboard unavailable in this browser.', 'warning');
-          return;
-        }
-        try {
-          const snapshot = diagnosticsStore.getSnapshot();
-          const payload = {
-            exportedAt: new Date().toISOString(),
-            entries: snapshot.entries,
-            tests: snapshot.tests
-          };
-          await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
-          showToast('Diagnostics copied to clipboard.', 'success');
-        } catch (err) {
-          showToast('Unable to copy diagnostics.', 'danger');
-        }
-      }
-
-      async function runApiTests(forceRefresh = false) {
-        if (state.settings.demoMode) {
-          showToast('Disable demo mode to run live API tests.', 'warning');
-          return;
-        }
-        if (!state.apiKey) {
-          showToast('Add your API key in Settings first.', 'danger');
-          toggleSettings(true);
-          return;
-        }
-        try {
-          await validateApiKey({ force: forceRefresh, showSuccess: false });
-        } catch (err) {
-          handleError(err, err.metadata?.type || 'auth');
-          return;
-        }
-        let context;
-        try {
-          context = await resolveSeasonContext({ forceRefresh });
-        } catch (err) {
-          handleError(err, err.metadata?.type || 'schedule');
-          return;
-        }
-        toggleDiagnosticsPanel(true);
-        diagnosticsStore.initializeTests(API_TESTS.map((test) => ({
-          key: test.key,
-          label: test.label,
-          status: 'pending',
-          code: null,
-          message: 'Pending'
-        })));
-        const client = ensureCfbdClient();
-        for (const test of API_TESTS) {
-          diagnosticsStore.updateTest(test.key, { status: 'running', code: '…', message: 'Running…' });
-          const params = typeof test.params === 'function' ? test.params(context) : (test.params || {});
-          try {
-            await client.request(test.path, params, { label: test.label, type: 'metrics' });
-            diagnosticsStore.updateTest(test.key, { status: 'pass', code: 200, message: 'OK' });
-          } catch (err) {
-            const status = err.metadata?.status || 'ERR';
-            diagnosticsStore.updateTest(test.key, { status: 'fail', code: status, message: err.metadata?.toast || err.message });
-            handleError(err, err.metadata?.type || 'metrics');
-            if (status === 401) {
-              break;
-            }
-          }
-        }
-        showToast('API diagnostics complete.', 'success');
-      }
-
-      function createDiagnosticsStore() {
-        let entries = [];
-        let tests = [];
-        let runId = 0;
-        let counter = 0;
-        const subscribers = new Set();
-
-        function snapshot() {
-          return {
-            entries: entries.map((entry) => ({ ...entry })),
-            tests: tests.map((test) => ({ ...test })),
-            runId
-          };
-        }
-
-        function notify() {
-          const data = snapshot();
-          subscribers.forEach((callback) => {
-            try {
-              callback(data);
-            } catch (err) {
-              // Diagnostics rendering should not interrupt execution
-            }
-          });
-        }
-
-        return {
-          reset() {
-            entries = [];
-            runId += 1;
-            notify();
-          },
-          add(entry) {
-            const record = {
-              id: `diag-${Date.now()}-${counter++}`,
-              path: entry.path,
-              params: entry.params || {},
-              query: entry.query || '',
-              label: entry.label || null,
-              status: 'pending',
-              statusCode: null,
-              retries: 0,
-              message: 'Pending',
-              sample: '',
-              timestamp: new Date().toISOString(),
-              ok: false
-            };
-            entries.push(record);
-            notify();
-            return record;
-          },
-          update(id, updates = {}) {
-            const index = entries.findIndex((item) => item.id === id);
-            if (index === -1) return;
-            entries[index] = { ...entries[index], ...updates };
-            notify();
-          },
-          initializeTests(initial = []) {
-            tests = initial.map((test) => ({ ...test }));
-            notify();
-          },
-          updateTest(key, updates = {}) {
-            const index = tests.findIndex((item) => item.key === key);
-            if (index === -1) return;
-            tests[index] = { ...tests[index], ...updates };
-            notify();
-          },
-          getSnapshot: snapshot,
-          subscribe(callback) {
-            if (typeof callback !== 'function') return () => {};
-            subscribers.add(callback);
-            callback(snapshot());
-            return () => subscribers.delete(callback);
-          }
-        };
-      }
-
       .diagnostics-actions {
         width: 100%;
         justify-content: flex-start;
@@ -1463,6 +1191,278 @@
         lastDataset: null,
         calibratorCache: null
       };
+
+      function createDiagnosticsStore() {
+        let entries = [];
+        let tests = [];
+        let runId = 0;
+        let counter = 0;
+        const subscribers = new Set();
+
+        function snapshot() {
+          return {
+            entries: entries.map((entry) => ({ ...entry })),
+            tests: tests.map((test) => ({ ...test })),
+            runId
+          };
+        }
+
+        function notify() {
+          const data = snapshot();
+          subscribers.forEach((callback) => {
+            try {
+              callback(data);
+            } catch (err) {
+              // Diagnostics rendering should not interrupt execution
+            }
+          });
+        }
+
+        return {
+          reset() {
+            entries = [];
+            runId += 1;
+            notify();
+          },
+          add(entry) {
+            const record = {
+              id: `diag-${Date.now()}-${counter++}`,
+              path: entry.path,
+              params: entry.params || {},
+              query: entry.query || '',
+              label: entry.label || null,
+              status: 'pending',
+              statusCode: null,
+              retries: 0,
+              message: 'Pending',
+              sample: '',
+              timestamp: new Date().toISOString(),
+              ok: false
+            };
+            entries.push(record);
+            notify();
+            return record;
+          },
+          update(id, updates = {}) {
+            const index = entries.findIndex((item) => item.id === id);
+            if (index === -1) return;
+            entries[index] = { ...entries[index], ...updates };
+            notify();
+          },
+          initializeTests(initial = []) {
+            tests = initial.map((test) => ({ ...test }));
+            notify();
+          },
+          updateTest(key, updates = {}) {
+            const index = tests.findIndex((item) => item.key === key);
+            if (index === -1) return;
+            tests[index] = { ...tests[index], ...updates };
+            notify();
+          },
+          getSnapshot: snapshot,
+          subscribe(callback) {
+            if (typeof callback !== 'function') return () => {};
+            subscribers.add(callback);
+            callback(snapshot());
+            return () => subscribers.delete(callback);
+          }
+        };
+      }
+
+      function toggleDiagnosticsPanel(force) {
+        const panel = elements.diagnosticsPanel;
+        const toggle = elements.diagnosticsToggle;
+        if (!panel || !toggle) return;
+        const isOpen = force === undefined ? !panel.classList.contains('active') : Boolean(force);
+        panel.classList.toggle('active', isOpen);
+        panel.setAttribute('aria-hidden', String(!isOpen));
+        toggle.setAttribute('aria-expanded', String(isOpen));
+      }
+
+      function renderDiagnosticsPanel(snapshot) {
+        const { entries = [], tests = [] } = snapshot || {};
+        if (!elements.diagnosticsLog) return;
+        elements.diagnosticsLog.innerHTML = '';
+        if (!entries.length) {
+          elements.diagnosticsEmpty.style.display = 'block';
+          elements.copyDiagnostics.disabled = true;
+        } else {
+          elements.diagnosticsEmpty.style.display = 'none';
+          elements.copyDiagnostics.disabled = false;
+          for (const entry of entries) {
+            const card = document.createElement('article');
+            const endpoint = `${entry.path || ''}${entry.query || ''}`;
+            const statusCode = entry.statusCode ?? '—';
+            const cardStatus = entry.ok ? 'success' : (statusCode === 429 ? 'rate-limit' : 'error');
+            card.className = `diagnostics-entry ${cardStatus}`;
+
+            const header = document.createElement('div');
+            header.className = 'diagnostics-entry-header';
+            const title = document.createElement('h4');
+            title.textContent = endpoint || entry.label || 'Request';
+            header.appendChild(title);
+            if (entry.label) {
+              const badge = document.createElement('span');
+              badge.className = 'badge';
+              badge.textContent = entry.label;
+              header.appendChild(badge);
+            }
+            card.appendChild(header);
+
+            const meta = document.createElement('div');
+            meta.className = 'diagnostics-meta';
+            const statusSpan = document.createElement('span');
+            statusSpan.textContent = `Status ${statusCode}`;
+            meta.appendChild(statusSpan);
+            const retriesSpan = document.createElement('span');
+            retriesSpan.textContent = `Retries ${entry.retries ?? 0}`;
+            meta.appendChild(retriesSpan);
+            if (entry.timestamp) {
+              const tsSpan = document.createElement('span');
+              try {
+                tsSpan.textContent = new Date(entry.timestamp).toLocaleTimeString();
+              } catch (err) {
+                tsSpan.textContent = entry.timestamp;
+              }
+              meta.appendChild(tsSpan);
+            }
+            card.appendChild(meta);
+
+            if (entry.message) {
+              const message = document.createElement('div');
+              message.className = 'diagnostics-message';
+              message.textContent = entry.message;
+              card.appendChild(message);
+            }
+
+            if (entry.sample) {
+              const sample = document.createElement('pre');
+              sample.className = 'diagnostics-sample';
+              sample.textContent = entry.sample;
+              card.appendChild(sample);
+            }
+
+            elements.diagnosticsLog.appendChild(card);
+          }
+        }
+
+        elements.diagnosticsTestList.innerHTML = '';
+        if (!tests.length) {
+          const li = document.createElement('li');
+          li.className = 'diagnostics-test pending';
+          li.innerHTML = '<span>Awaiting test run</span><span class="status">—</span>';
+          elements.diagnosticsTestList.appendChild(li);
+        } else {
+          for (const test of tests) {
+            const li = document.createElement('li');
+            li.className = `diagnostics-test ${test.status || 'pending'}`;
+            const label = document.createElement('span');
+            label.textContent = test.label;
+            const status = document.createElement('span');
+            status.className = 'status';
+            status.textContent = formatTestStatus(test);
+            if (test.message) {
+              status.title = test.message;
+            }
+            li.appendChild(label);
+            li.appendChild(status);
+            elements.diagnosticsTestList.appendChild(li);
+          }
+        }
+      }
+
+      function primeDiagnosticsTests() {
+        diagnosticsStore.initializeTests(API_TESTS.map((test) => ({
+          key: test.key,
+          label: test.label,
+          status: 'pending',
+          code: null,
+          message: 'Not run'
+        })));
+      }
+
+      function formatTestStatus(test) {
+        if (!test) return '—';
+        if (test.status === 'pass') {
+          return `✅ ${test.code ?? 200}`;
+        }
+        if (test.status === 'fail') {
+          return `❌ ${test.code ?? 'ERR'}`;
+        }
+        if (test.status === 'running') {
+          return '⟳ Running…';
+        }
+        return '—';
+      }
+
+      async function copyDiagnostics() {
+        if (!navigator.clipboard) {
+          showToast('Clipboard unavailable in this browser.', 'warning');
+          return;
+        }
+        try {
+          const snapshot = diagnosticsStore.getSnapshot();
+          const payload = {
+            exportedAt: new Date().toISOString(),
+            entries: snapshot.entries,
+            tests: snapshot.tests
+          };
+          await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+          showToast('Diagnostics copied to clipboard.', 'success');
+        } catch (err) {
+          showToast('Unable to copy diagnostics.', 'danger');
+        }
+      }
+
+      async function runApiTests(forceRefresh = false) {
+        if (state.settings.demoMode) {
+          showToast('Disable demo mode to run live API tests.', 'warning');
+          return;
+        }
+        if (!state.apiKey) {
+          showToast('Add your API key in Settings first.', 'danger');
+          toggleSettings(true);
+          return;
+        }
+        try {
+          await validateApiKey({ force: forceRefresh, showSuccess: false });
+        } catch (err) {
+          handleError(err, err.metadata?.type || 'auth');
+          return;
+        }
+        let context;
+        try {
+          context = await resolveSeasonContext({ forceRefresh });
+        } catch (err) {
+          handleError(err, err.metadata?.type || 'schedule');
+          return;
+        }
+        toggleDiagnosticsPanel(true);
+        diagnosticsStore.initializeTests(API_TESTS.map((test) => ({
+          key: test.key,
+          label: test.label,
+          status: 'pending',
+          code: null,
+          message: 'Pending'
+        })));
+        const client = ensureCfbdClient();
+        for (const test of API_TESTS) {
+          diagnosticsStore.updateTest(test.key, { status: 'running', code: '…', message: 'Running…' });
+          const params = typeof test.params === 'function' ? test.params(context) : (test.params || {});
+          try {
+            await client.request(test.path, params, { label: test.label, type: 'metrics' });
+            diagnosticsStore.updateTest(test.key, { status: 'pass', code: 200, message: 'OK' });
+          } catch (err) {
+            const status = err.metadata?.status || 'ERR';
+            diagnosticsStore.updateTest(test.key, { status: 'fail', code: status, message: err.metadata?.toast || err.message });
+            handleError(err, err.metadata?.type || 'metrics');
+            if (status === 401) {
+              break;
+            }
+          }
+        }
+        showToast('API diagnostics complete.', 'success');
+      }
 
       const diagnosticsStore = createDiagnosticsStore();
       let worker;
