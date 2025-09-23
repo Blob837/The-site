@@ -401,7 +401,7 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>CFB Wizard V3</h1>
+        <h1>CFB Wizard v6</h1>
         <div class="week-selector">
             <button class="week-btn" data-offset="-1">← Prev</button>
             <button class="week-btn active" data-offset="0">This Week</button>
@@ -593,27 +593,46 @@
             getWeekBounds(offset = 0) {
                 const now = new Date();
                 
-                // For college football, let's use Tuesday-Monday as our "week"
-                // since games can happen Tuesday through Monday
-                const currentTuesday = new Date(now);
-                const daysFromTuesday = (now.getDay() + 5) % 7; // Convert to days from Tuesday
-                currentTuesday.setDate(now.getDate() - daysFromTuesday);
+                // Get the current week's Saturday (game day)
+                const today = new Date(now);
+                const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
                 
-                // Apply offset
-                const targetTuesday = new Date(currentTuesday);
-                targetTuesday.setDate(currentTuesday.getDate() + (offset * 7));
-                targetTuesday.setHours(0, 0, 0, 0);
+                // Find this week's Saturday (or closest Saturday)  
+                const thisSaturday = new Date(today);
+                const daysToSaturday = (6 - dayOfWeek + 7) % 7; // Days until next Saturday
+                if (daysToSaturday === 0 && today.getHours() < 12) {
+                    // If it's Saturday morning, use today
+                    thisSaturday.setHours(0, 0, 0, 0);
+                } else if (daysToSaturday === 0) {
+                    // If it's Saturday afternoon/evening, use next Saturday
+                    thisSaturday.setDate(today.getDate() + 7);
+                    thisSaturday.setHours(0, 0, 0, 0);
+                } else {
+                    // Use the upcoming Saturday
+                    thisSaturday.setDate(today.getDate() + daysToSaturday);
+                    thisSaturday.setHours(0, 0, 0, 0);
+                }
                 
-                const nextMonday = new Date(targetTuesday);
-                nextMonday.setDate(targetTuesday.getDate() + 6);
-                nextMonday.setHours(23, 59, 59, 999);
+                // Apply week offset
+                const targetSaturday = new Date(thisSaturday);
+                targetSaturday.setDate(thisSaturday.getDate() + (offset * 7));
+                
+                // Week runs Tuesday to Monday (Tuesday before to Monday after)
+                const start = new Date(targetSaturday);
+                start.setDate(targetSaturday.getDate() - 4); // Tuesday before
+                start.setHours(0, 0, 0, 0);
+                
+                const end = new Date(targetSaturday);
+                end.setDate(targetSaturday.getDate() + 3); // Monday after  
+                end.setHours(23, 59, 59, 999);
                 
                 console.log(`Week bounds (offset ${offset}):`, {
-                    start: targetTuesday.toISOString(),
-                    end: nextMonday.toISOString()
+                    targetSaturday: targetSaturday.toDateString(),
+                    start: start.toISOString(),
+                    end: end.toISOString()
                 });
                 
-                return { start: targetTuesday, end: nextMonday };
+                return { start, end };
             },
             
             exponentialDecay(value, weeks, lambda = 0.7) {
@@ -1205,7 +1224,20 @@
                         console.log('Game missing start_date:', game);
                         return false;
                     }
-                    const gameDate = new Date(game.start_date);
+                    
+                    let gameDate;
+                    try {
+                        gameDate = new Date(game.start_date);
+                        // Check if date is valid
+                        if (isNaN(gameDate.getTime())) {
+                            console.error('Invalid date for game:', game.start_date, game);
+                            return false;
+                        }
+                    } catch (error) {
+                        console.error('Error parsing game date:', error, game);
+                        return false;
+                    }
+                    
                     const inRange = gameDate >= start && gameDate <= end;
                     if (!inRange) {
                         console.log('Game outside range:', {
@@ -1231,31 +1263,20 @@
             }
             
             getWeekNumber(date) {
-                // College football season typically starts late August/early September
-                // Week 1 is usually the Saturday closest to September 1st
+                // For 2025 season, approximate week calculation
+                // Week 1 typically starts around August 31st
                 const year = date.getFullYear();
-                const sept1 = new Date(year, 8, 1); // September 1st
+                const aug31 = new Date(year, 7, 31); // August 31st (month 7 = August)
                 
-                // Find the first Saturday of the season (closest to Sept 1)
-                let seasonStart = new Date(sept1);
-                while (seasonStart.getDay() !== 6) { // 6 = Saturday
-                    seasonStart.setDate(seasonStart.getDate() + 1);
-                }
+                const diffTime = date.getTime() - aug31.getTime();
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                const week = Math.floor(diffDays / 7) + 1;
                 
-                // If we're before the season, try previous year
-                if (date < seasonStart) {
-                    seasonStart = new Date(year - 1, 8, 1);
-                    while (seasonStart.getDay() !== 6) {
-                        seasonStart.setDate(seasonStart.getDate() + 1);
-                    }
-                }
+                const calculatedWeek = Math.max(1, Math.min(17, week));
                 
-                const diffTime = date.getTime() - seasonStart.getTime();
-                const diffWeeks = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7)) + 1;
+                console.log(`Week calculation: ${date.toDateString()} -> Week ${calculatedWeek}`);
                 
-                console.log(`Week calculation: ${date.toDateString()} -> Week ${diffWeeks} (season started ${seasonStart.toDateString()})`);
-                
-                return Math.max(1, Math.min(17, diffWeeks)); // CFB season is roughly 17 weeks including playoffs
+                return calculatedWeek;
             }
             
             async runPredictions() {
