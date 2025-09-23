@@ -1,1 +1,2369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0f14">
+  <title>CFB Winner Predictor</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0f14;
+      --bg-elevated: #111823;
+      --bg-muted: #172230;
+      --text: #f1f5f9;
+      --text-muted: #cbd5f5;
+      --accent: #4f9cff;
+      --accent-strong: #7cdfff;
+      --danger: #f87171;
+      --warning: #fbbf24;
+      --success: #34d399;
+      --border: rgba(148, 163, 184, 0.2);
+      --shadow: 0 16px 40px rgba(5, 14, 30, 0.4);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --card-gap: 18px;
+      --font-sans: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      --transition: 180ms ease;
+    }
 
+    @media (prefers-reduced-motion: reduce) {
+      :root {
+        --transition: 1ms;
+      }
+      *, *::before, *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-sans);
+      background: linear-gradient(135deg, #04070d 0%, #101829 100%);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    header {
+      padding: 20px clamp(16px, 5vw, 32px) 12px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(12px);
+      background: rgba(11, 15, 20, 0.85);
+      border-bottom: 1px solid var(--border);
+    }
+
+    header .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(22px, 5vw, 30px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    header .week-controls {
+      margin-top: 16px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    select, input, button {
+      font-family: inherit;
+      font-size: 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-muted);
+      color: var(--text);
+      padding: 12px 16px;
+      min-height: 48px;
+      transition: background var(--transition), border-color var(--transition), transform var(--transition);
+    }
+
+    select:focus, input:focus, button:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(79, 156, 255, 0.25);
+    }
+
+    button {
+      cursor: pointer;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, rgba(79, 156, 255, 0.9), rgba(124, 223, 255, 0.9));
+      color: #020712;
+      border: none;
+    }
+
+    button.primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    button.ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+    }
+
+    button.danger {
+      background: rgba(248, 113, 113, 0.14);
+      border-color: rgba(248, 113, 113, 0.4);
+      color: var(--danger);
+    }
+
+    main {
+      flex: 1;
+      padding: 16px clamp(16px, 5vw, 48px) 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--card-gap);
+    }
+
+    .game-card {
+      background: linear-gradient(160deg, rgba(17, 24, 35, 0.95), rgba(12, 19, 28, 0.95));
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(79, 156, 255, 0.18), transparent 55%);
+      pointer-events: none;
+    }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .team-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .team {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .team span {
+      opacity: 0.84;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .kickoff {
+      font-size: 14px;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-align: right;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(79, 156, 255, 0.15);
+      color: var(--accent-strong);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .edge-badge {
+      background: rgba(124, 223, 255, 0.12);
+      border: 1px solid rgba(124, 223, 255, 0.35);
+      color: var(--accent-strong);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .confidence-ring {
+      width: 84px;
+      height: 84px;
+      position: relative;
+    }
+
+    .confidence-ring svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .confidence-ring circle {
+      fill: none;
+      stroke-width: 10;
+      stroke-linecap: round;
+    }
+
+    .confidence-ring circle.bg {
+      stroke: rgba(148, 163, 184, 0.18);
+    }
+
+    .confidence-ring circle.fg {
+      stroke: url(#probGradient);
+      stroke-dasharray: 264;
+      stroke-dashoffset: 264;
+      transition: stroke-dashoffset var(--transition);
+    }
+
+    .confidence-ring .prob-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .confidence-ring .confidence-band {
+      position: absolute;
+      inset: auto 0 8px 0;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      background: rgba(23, 34, 48, 0.7);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    .metric strong {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .metric span {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    details.why {
+      background: rgba(9, 15, 25, 0.8);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(79, 156, 255, 0.2);
+      padding: 12px 16px;
+    }
+
+    details.why summary {
+      cursor: pointer;
+      list-style: none;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+
+    details.why summary::marker {
+      display: none;
+    }
+
+    details.why .drivers {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .driver-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .driver-row span {
+      font-size: 14px;
+    }
+
+    .driver-bar {
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(79, 156, 255, 0.18);
+      overflow: hidden;
+    }
+
+    .driver-bar div {
+      height: 100%;
+      background: linear-gradient(135deg, rgba(79, 156, 255, 0.9), rgba(124, 223, 255, 0.9));
+      width: 0;
+      transition: width var(--transition);
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--text-muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .sticky-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px clamp(16px, 5vw, 48px) 20px;
+      background: rgba(9, 12, 18, 0.92);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      z-index: 50;
+    }
+
+    .sticky-bar .button-group {
+      display: flex;
+      gap: 12px;
+      flex: 1 1 100%;
+      flex-wrap: wrap;
+    }
+
+    .sticky-bar .button-group button {
+      flex: 1 1 45%;
+      min-width: 120px;
+    }
+
+    @media (min-width: 720px) {
+      .sticky-bar {
+        align-items: center;
+      }
+      .sticky-bar .button-group {
+        flex: none;
+        flex-wrap: nowrap;
+        flex: 1 1 auto;
+      }
+      .sticky-bar .button-group button {
+        flex: 1;
+      }
+    }
+
+    .settings-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .settings-modal.active {
+      display: flex;
+    }
+
+    .settings-modal::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(4, 6, 12, 0.75);
+      backdrop-filter: blur(6px);
+    }
+
+    .settings-panel {
+      position: relative;
+      background: rgba(13, 20, 33, 0.96);
+      border-radius: 18px;
+      width: min(520px, calc(100% - 32px));
+      padding: 28px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+
+    .settings-panel h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+    }
+
+    .settings-panel form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .settings-panel label {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .toggle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      background: rgba(18, 27, 42, 0.9);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      padding: 12px 16px;
+    }
+
+    .toggle span {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .toggle input[type="checkbox"] {
+      width: 46px;
+      height: 26px;
+      border-radius: 999px;
+      appearance: none;
+      background: rgba(79, 156, 255, 0.25);
+      position: relative;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+
+    .toggle input[type="checkbox"]::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: #fff;
+      transform: translateX(0);
+      transition: transform var(--transition);
+    }
+
+    .toggle input[type="checkbox"]:checked {
+      background: linear-gradient(135deg, rgba(79, 156, 255, 0.95), rgba(124, 223, 255, 0.95));
+    }
+
+    .toggle input[type="checkbox"]:checked::after {
+      transform: translateX(18px);
+    }
+
+    .settings-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 110px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 200;
+      width: min(460px, calc(100% - 32px));
+    }
+
+    .toast {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--shadow);
+      font-size: 14px;
+    }
+
+    .toast.danger {
+      border-left-color: var(--danger);
+    }
+
+    .toast.warning {
+      border-left-color: var(--warning);
+    }
+
+    .toast.success {
+      border-left-color: var(--success);
+    }
+
+    .toast button {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0;
+      min-height: unset;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      padding: 40px;
+      border-radius: var(--radius-lg);
+      background: rgba(12, 20, 33, 0.8);
+      border: 1px dashed rgba(148, 163, 184, 0.18);
+      text-align: center;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .availability-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .availability-actions button {
+      flex: 1 1 120px;
+      min-width: 120px;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 10, 18, 0.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 150;
+      backdrop-filter: blur(6px);
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .spinner {
+      width: 72px;
+      height: 72px;
+      border-radius: 999px;
+      border: 6px solid rgba(79, 156, 255, 0.14);
+      border-top-color: rgba(124, 223, 255, 0.9);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title-row">
+        <h1>CFB Winner Predictor</h1>
+        <button id="open-settings" class="ghost" aria-haspopup="dialog">Settings</button>
+      </div>
+      <div class="week-controls" id="week-controls">
+        <label for="week-picker" class="sr-only">Week</label>
+        <select id="week-picker" aria-label="Select week"></select>
+        <div class="pill" id="season-label">Season</div>
+      </div>
+    </header>
+    <main id="results" aria-live="polite"></main>
+    <div class="sticky-bar" role="toolbar" aria-label="Primary actions">
+      <div class="button-group">
+        <button id="refresh-btn" class="ghost" type="button">Refresh</button>
+        <button id="predict-btn" class="primary" type="button">Predict</button>
+        <button id="export-btn" class="ghost" type="button">Export JSON</button>
+        <button id="reset-btn" class="danger" type="button">Reset</button>
+      </div>
+    </div>
+    <div class="settings-modal" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <div class="settings-panel">
+        <div class="title-row">
+          <h2 id="settings-title">Configuration</h2>
+          <button type="button" id="close-settings" class="ghost">Close</button>
+        </div>
+        <form id="settings-form">
+          <label>
+            CFBD API Key
+            <input type="password" id="api-key" placeholder="Paste your CFBD API key" autocomplete="off" spellcheck="false">
+          </label>
+          <div class="toggle">
+            <span>Include betting markets</span>
+            <input type="checkbox" id="toggle-markets" checked>
+          </div>
+          <div class="toggle">
+            <span>Include weather adjustments</span>
+            <input type="checkbox" id="toggle-weather" checked>
+          </div>
+          <div class="toggle">
+            <span>Manual availability adjustments</span>
+            <input type="checkbox" id="toggle-availability">
+          </div>
+          <div class="toggle">
+            <span>Demo mode (offline sample)</span>
+            <input type="checkbox" id="toggle-demo">
+          </div>
+          <label>
+            Import state
+            <input type="file" id="import-state" accept="application/json">
+          </label>
+          <div class="settings-actions">
+            <button type="button" id="forget-key" class="danger">Forget keys</button>
+            <button type="submit" class="primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="loading-overlay" id="loading-overlay" role="alert" aria-live="assertive">
+      <div class="spinner" aria-hidden="true"></div>
+    </div>
+    <div class="toast-container" id="toast-container"></div>
+  </div>
+  <script>
+    (function () {
+      const APP_VERSION = '1.0.0';
+      const STORAGE_PREFIX = 'cfbdPredictor-v1-';
+      const CFBD_BASE = 'https://apinext.collegefootballdata.com';
+      const OPEN_METEO = 'https://api.open-meteo.com/v1/forecast';
+      const DETERMINISTIC_SEED = 9352471;
+      const GLM_FEATURES = [
+        'deltaR',
+        'netPpaOff',
+        'netPpaDef',
+        'tempoDelta',
+        'homeFlag',
+        'neutralFlag',
+        'weatherWind',
+        'weatherPrecip',
+        'availabilityDelta',
+        'marketSpread',
+        'recentFormDelta',
+        'specialTeamsProxy',
+        'penaltyYdsDelta',
+        'passProMismatch'
+      ];
+      const CACHE_TTLS = {
+        metrics: 24,
+        lines: 2,
+        weather: 6,
+        calibration: 168
+      };
+      const STORAGE_KEYS = {
+        apiKey: STORAGE_PREFIX + 'apiKey',
+        settings: STORAGE_PREFIX + 'settings',
+        availability: STORAGE_PREFIX + 'availability',
+        calibration: STORAGE_PREFIX + 'calibration-cache'
+      };
+      const DEMO_DATA = {
+        season: 2024,
+        weeks: [
+          { week: 1, label: 'Week 1 — Aug 24', start: '2024-08-24T16:00:00Z' }
+        ],
+        training: [
+          {
+            features: {
+              deltaR: 0.18,
+              netPpaOff: 0.35,
+              netPpaDef: -0.22,
+              tempoDelta: 0.05,
+              homeFlag: 1,
+              neutralFlag: 0,
+              weatherWind: 5,
+              weatherPrecip: 0,
+              availabilityDelta: 0.1,
+              marketSpread: -6.5,
+              recentFormDelta: 0.24,
+              specialTeamsProxy: 0.08,
+              penaltyYdsDelta: -0.02,
+              passProMismatch: 0.14
+            },
+            target: 1,
+            timestamp: Date.UTC(2023, 10, 11),
+            meta: { gameId: 'demo-1' }
+          },
+          {
+            features: {
+              deltaR: -0.22,
+              netPpaOff: -0.28,
+              netPpaDef: 0.31,
+              tempoDelta: -0.04,
+              homeFlag: 1,
+              neutralFlag: 0,
+              weatherWind: 12,
+              weatherPrecip: 0,
+              availabilityDelta: -0.12,
+              marketSpread: 3.5,
+              recentFormDelta: -0.18,
+              specialTeamsProxy: -0.03,
+              penaltyYdsDelta: 0.01,
+              passProMismatch: -0.15
+            },
+            target: 0,
+            timestamp: Date.UTC(2023, 9, 21),
+            meta: { gameId: 'demo-2' }
+          },
+          {
+            features: {
+              deltaR: 0.05,
+              netPpaOff: 0.12,
+              netPpaDef: -0.08,
+              tempoDelta: 0.02,
+              homeFlag: 0,
+              neutralFlag: 1,
+              weatherWind: 14,
+              weatherPrecip: 0.2,
+              availabilityDelta: 0.0,
+              marketSpread: -2.5,
+              recentFormDelta: 0.03,
+              specialTeamsProxy: 0.01,
+              penaltyYdsDelta: 0,
+              passProMismatch: -0.04
+            },
+            target: 1,
+            timestamp: Date.UTC(2022, 10, 5),
+            meta: { gameId: 'demo-3' }
+          }
+        ],
+        inference: [
+          {
+            features: {
+              deltaR: 0.26,
+              netPpaOff: 0.38,
+              netPpaDef: -0.21,
+              tempoDelta: 0.07,
+              homeFlag: 1,
+              neutralFlag: 0,
+              weatherWind: 8,
+              weatherPrecip: 0,
+              availabilityDelta: 0.15,
+              marketSpread: -9,
+              recentFormDelta: 0.28,
+              specialTeamsProxy: 0.11,
+              penaltyYdsDelta: -0.03,
+              passProMismatch: 0.17
+            },
+            timestamp: Date.UTC(2024, 7, 24, 18, 0, 0),
+            meta: {
+              gameId: 'demo-future-1',
+              homeTeam: 'Georgia',
+              awayTeam: 'Clemson',
+              start: '2024-08-24T18:00:00Z',
+              venue: { name: 'Mercedes-Benz Stadium', neutral: true, roof: 'closed', surface: 'turf', city: 'Atlanta', state: 'GA' },
+              weather: { wind: 8, precip: 0, temp: 75, precipProb: 5 },
+              market: { spread: -9, moneylineHome: -320, moneylineAway: 260 },
+              availability: { home: 0.15, away: 0 },
+              season: 2024,
+              week: 1
+            }
+          },
+          {
+            features: {
+              deltaR: -0.12,
+              netPpaOff: -0.08,
+              netPpaDef: 0.19,
+              tempoDelta: -0.06,
+              homeFlag: 1,
+              neutralFlag: 0,
+              weatherWind: 16,
+              weatherPrecip: 0.1,
+              availabilityDelta: -0.05,
+              marketSpread: 4.5,
+              recentFormDelta: -0.09,
+              specialTeamsProxy: -0.02,
+              penaltyYdsDelta: 0.01,
+              passProMismatch: -0.07
+            },
+            timestamp: Date.UTC(2024, 7, 24, 22, 0, 0),
+            meta: {
+              gameId: 'demo-future-2',
+              homeTeam: 'Utah',
+              awayTeam: 'BYU',
+              start: '2024-08-24T22:00:00Z',
+              venue: { name: 'Rice-Eccles Stadium', neutral: false, roof: 'open', surface: 'grass', city: 'Salt Lake City', state: 'UT' },
+              weather: { wind: 16, precip: 0.1, temp: 68, precipProb: 40 },
+              market: { spread: 4.5, moneylineHome: -155, moneylineAway: 135 },
+              availability: { home: -0.05, away: 0 },
+              season: 2024,
+              week: 1
+            }
+          }
+        ],
+        calibrator: {
+          type: 'isotonic',
+          x: [0.05, 0.3, 0.5, 0.7, 0.95],
+          y: [0.04, 0.32, 0.52, 0.74, 0.93]
+        }
+      };
+
+      const driverLabels = {
+        deltaR: 'Δ Rating (pregame WP)',
+        netPpaOff: 'Offense vs Defense PPA',
+        netPpaDef: 'Defense vs Offense PPA',
+        tempoDelta: 'Tempo Delta',
+        homeFlag: 'Home Field',
+        neutralFlag: 'Neutral Site',
+        weatherWind: 'Weather – Wind',
+        weatherPrecip: 'Weather – Precip',
+        availabilityDelta: 'Availability',
+        marketSpread: 'Market Spread',
+        recentFormDelta: 'Recent Form',
+        specialTeamsProxy: 'Explosiveness Edge',
+        penaltyYdsDelta: 'Penalties Delta',
+        passProMismatch: 'Pass Protection'
+      };
+
+      const elements = {
+        weekPicker: document.getElementById('week-picker'),
+        seasonLabel: document.getElementById('season-label'),
+        results: document.getElementById('results'),
+        predictBtn: document.getElementById('predict-btn'),
+        refreshBtn: document.getElementById('refresh-btn'),
+        exportBtn: document.getElementById('export-btn'),
+        resetBtn: document.getElementById('reset-btn'),
+        settingsModal: document.getElementById('settings-modal'),
+        openSettings: document.getElementById('open-settings'),
+        closeSettings: document.getElementById('close-settings'),
+        settingsForm: document.getElementById('settings-form'),
+        apiKeyInput: document.getElementById('api-key'),
+        toggleMarkets: document.getElementById('toggle-markets'),
+        toggleWeather: document.getElementById('toggle-weather'),
+        toggleAvailability: document.getElementById('toggle-availability'),
+        toggleDemo: document.getElementById('toggle-demo'),
+        forgetKey: document.getElementById('forget-key'),
+        importState: document.getElementById('import-state'),
+        loadingOverlay: document.getElementById('loading-overlay'),
+        toastContainer: document.getElementById('toast-container')
+      };
+
+      const state = {
+        apiKey: null,
+        year: getSeasonYear(),
+        week: null,
+        weeks: [],
+        games: [],
+        predictions: [],
+        availability: {},
+        settings: {
+          includeMarkets: true,
+          includeWeather: true,
+          manualAvailability: false,
+          demoMode: false
+        },
+        lastDataset: null,
+        calibratorCache: null
+      };
+
+      let worker;
+      let cfbdClient;
+      let venueCache = new Map();
+      let teamColors = new Map();
+
+      init();
+
+      function init() {
+        loadStoredState();
+        bindEvents();
+        setupWorker();
+        renderEmptyState('Connect your CFBD API key to begin. Demo mode is available in Settings.');
+        if (state.apiKey && !state.settings.demoMode) {
+          hydrateWeekPicker().catch((err) => handleError(err, 'schedule'));
+        } else if (state.settings.demoMode) {
+          useDemoSchedule();
+        }
+      }
+
+      function bindEvents() {
+        elements.openSettings.addEventListener('click', () => toggleSettings(true));
+        elements.closeSettings.addEventListener('click', () => toggleSettings(false));
+        elements.settingsForm.addEventListener('submit', onSaveSettings);
+        elements.predictBtn.addEventListener('click', () => predict(false));
+        elements.refreshBtn.addEventListener('click', () => predict(true));
+        elements.exportBtn.addEventListener('click', exportState);
+        elements.resetBtn.addEventListener('click', resetAll);
+        elements.forgetKey.addEventListener('click', forgetKeys);
+        elements.weekPicker.addEventListener('change', onWeekChange);
+        elements.toggleDemo.addEventListener('change', () => {
+          state.settings.demoMode = elements.toggleDemo.checked;
+          persistSettings();
+          if (state.settings.demoMode) {
+            showToast('Demo mode enabled. Live calls are paused.', 'warning');
+            useDemoSchedule();
+          } else {
+            if (state.apiKey) {
+              hydrateWeekPicker().catch((err) => handleError(err, 'schedule'));
+            }
+          }
+        });
+        elements.toggleAvailability.addEventListener('change', () => {
+          state.settings.manualAvailability = elements.toggleAvailability.checked;
+          persistSettings();
+          if (!state.settings.manualAvailability) {
+            state.availability = {};
+            persistAvailability();
+            showToast('Manual availability cleared.', 'success');
+          }
+          renderPredictions();
+        });
+        elements.toggleWeather.addEventListener('change', () => {
+          state.settings.includeWeather = elements.toggleWeather.checked;
+          persistSettings();
+        });
+        elements.toggleMarkets.addEventListener('change', () => {
+          state.settings.includeMarkets = elements.toggleMarkets.checked;
+          persistSettings();
+        });
+        elements.importState.addEventListener('change', onImportState);
+        window.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Escape') {
+            toggleSettings(false);
+          }
+        });
+        window.addEventListener('online', () => showToast('Back online.'));
+        window.addEventListener('offline', () => showToast('Offline detected. Demo mode recommended.', 'warning'));
+      }
+      function setupWorker() {
+        const workerSrc = `(() => {
+          const logistic = (x) => 1 / (1 + Math.exp(-x));
+          const logit = (p) => {
+            const clipped = Math.min(Math.max(p, 1e-6), 1 - 1e-6);
+            return Math.log(clipped / (1 - clipped));
+          };
+
+          function buildMatrix(data, features) {
+            return data.map((row) => features.map((key) => Number(row.features[key] ?? 0)));
+          }
+
+          function irls(X, y, lambda = 0.0, maxIter = 50, tol = 1e-6) {
+            const n = X.length;
+            if (!n) {
+              return { beta: [0], converged: true };
+            }
+            const p = X[0].length;
+            const beta = new Array(p + 1).fill(0);
+            const ones = new Array(p + 1).fill(0).map((_, idx) => idx === 0 ? 0 : lambda);
+            for (let iter = 0; iter < maxIter; iter++) {
+              const eta = new Array(n);
+              const mu = new Array(n);
+              const W = new Array(n);
+              for (let i = 0; i < n; i++) {
+                let value = beta[0];
+                for (let j = 0; j < p; j++) {
+                  value += beta[j + 1] * X[i][j];
+                }
+                eta[i] = value;
+                const exp = Math.exp(Math.max(Math.min(value, 20), -20));
+                mu[i] = exp / (1 + exp);
+                W[i] = Math.max(mu[i] * (1 - mu[i]), 1e-5);
+              }
+              const XT_W_X = Array.from({ length: p + 1 }, () => new Array(p + 1).fill(0));
+              const XT_W_z = new Array(p + 1).fill(0);
+              for (let i = 0; i < n; i++) {
+                const wi = W[i];
+                const zi = eta[i] + (y[i] - mu[i]) / wi;
+                const row = new Array(p + 1);
+                row[0] = 1;
+                for (let j = 0; j < p; j++) {
+                  row[j + 1] = X[i][j];
+                }
+                for (let j = 0; j < p + 1; j++) {
+                  XT_W_z[j] += wi * row[j] * zi;
+                  for (let k = j; k < p + 1; k++) {
+                    XT_W_X[j][k] += wi * row[j] * row[k];
+                  }
+                }
+              }
+              for (let j = 1; j < p + 1; j++) {
+                XT_W_X[j][j] += ones[j];
+              }
+              for (let j = 0; j < p + 1; j++) {
+                for (let k = j + 1; k < p + 1; k++) {
+                  XT_W_X[k][j] = XT_W_X[j][k];
+                }
+              }
+              const solved = solveLinearSystem(XT_W_X, XT_W_z);
+              let delta = 0;
+              for (let j = 0; j < beta.length; j++) {
+                delta = Math.max(delta, Math.abs(beta[j] - solved[j]));
+                beta[j] = solved[j];
+              }
+              if (delta < tol) {
+                return { beta, converged: true };
+              }
+            }
+            return { beta, converged: false };
+          }
+
+          function solveLinearSystem(A, b) {
+            const n = A.length;
+            const M = A.map((row, idx) => [...row, b[idx]]);
+            for (let i = 0; i < n; i++) {
+              let maxRow = i;
+              for (let k = i + 1; k < n; k++) {
+                if (Math.abs(M[k][i]) > Math.abs(M[maxRow][i])) {
+                  maxRow = k;
+                }
+              }
+              if (Math.abs(M[maxRow][i]) < 1e-12) {
+                continue;
+              }
+              [M[i], M[maxRow]] = [M[maxRow], M[i]];
+              const pivot = M[i][i];
+              for (let j = i; j <= n; j++) {
+                M[i][j] /= pivot;
+              }
+              for (let k = 0; k < n; k++) {
+                if (k === i) continue;
+                const factor = M[k][i];
+                for (let j = i; j <= n; j++) {
+                  M[k][j] -= factor * M[i][j];
+                }
+              }
+            }
+            const x = new Array(n).fill(0);
+            for (let i = 0; i < n; i++) {
+              x[i] = isFinite(M[i][n]) ? M[i][n] : 0;
+            }
+            return x;
+          }
+
+          function applyModel(beta, row) {
+            let value = beta[0];
+            for (let i = 0; i < row.length; i++) {
+              value += beta[i + 1] * row[i];
+            }
+            return logistic(value);
+          }
+
+          function timeAwareFolds(data, k = 5) {
+            const order = data.map((d, idx) => ({ idx, ts: d.timestamp || idx })).sort((a, b) => a.ts - b.ts);
+            const foldSize = Math.ceil(order.length / k);
+            const folds = Array.from({ length: k }, () => []);
+            for (let i = 0; i < order.length; i++) {
+              const foldIndex = Math.min(k - 1, Math.floor(i / foldSize));
+              folds[foldIndex].push(order[i].idx);
+            }
+            return folds;
+          }
+
+          function stackLogistic(train, predsElo, predsGlm, lambda = 0.01) {
+            const features = train.map((_, idx) => [logit(predsElo[idx]), logit(predsGlm[idx])]);
+            const { beta } = irls(features, train.map((d) => d.target), lambda, 40, 1e-5);
+            return beta;
+          }
+
+          function isotonicFit(preds, actual) {
+            const paired = preds.map((p, idx) => ({ p, y: actual[idx] })).sort((a, b) => a.p - b.p);
+            const blocks = [];
+            for (const item of paired) {
+              blocks.push({ weight: 1, sum: item.y, avg: item.y, min: item.p, max: item.p });
+              while (blocks.length >= 2) {
+                const last = blocks[blocks.length - 1];
+                const prev = blocks[blocks.length - 2];
+                if (prev.avg <= last.avg) break;
+                const totalWeight = prev.weight + last.weight;
+                const totalSum = prev.sum + last.sum;
+                blocks.splice(blocks.length - 2, 2, {
+                  weight: totalWeight,
+                  sum: totalSum,
+                  avg: totalSum / totalWeight,
+                  min: prev.min,
+                  max: last.max
+                });
+              }
+            }
+            const x = [];
+            const y = [];
+            for (const block of blocks) {
+              x.push(block.min, block.max);
+              y.push(block.avg, block.avg);
+            }
+            return { type: 'isotonic', x, y };
+          }
+
+          function applyCalibrator(model, value) {
+            if (!model) return value;
+            const p = Math.min(Math.max(value, 1e-6), 1 - 1e-6);
+            if (model.type === 'isotonic') {
+              if (!model.x || !model.y || !model.x.length) return p;
+              if (p <= model.x[0]) return model.y[0];
+              for (let i = 1; i < model.x.length; i++) {
+                if (p <= model.x[i]) {
+                  const x0 = model.x[i - 1];
+                  const x1 = model.x[i];
+                  const y0 = model.y[i - 1];
+                  const y1 = model.y[i];
+                  if (x1 === x0) return y1;
+                  const t = (p - x0) / (x1 - x0);
+                  return y0 + (y1 - y0) * t;
+                }
+              }
+              return model.y[model.y.length - 1];
+            }
+            if (model.type === 'platt') {
+              const logOdds = model.a + model.b * logit(p);
+              return logistic(logOdds);
+            }
+            return p;
+          }
+
+          function plattFit(preds, actual, lambda = 0.0) {
+            const X = preds.map((p) => [logit(p)]);
+            const { beta } = irls(X, actual, lambda, 30, 1e-6);
+            return { type: 'platt', a: beta[0], b: beta[1] ?? 0 };
+          }
+
+          self.onmessage = (event) => {
+            const { type, payload } = event.data;
+            if (type !== 'trainAndPredict') return;
+            const { training, inference, features, lambda = 0.4, fallbackCalibrator } = payload;
+            const X = buildMatrix(training, features);
+            const y = training.map((d) => Number(d.target));
+            const deltaR = training.map((d) => Number(d.features.deltaR ?? 0));
+            const deltaMatrix = deltaR.map((value) => [value]);
+            const folds = timeAwareFolds(training, 5);
+
+            const eloOut = new Array(training.length).fill(0);
+            const glmOut = new Array(training.length).fill(0);
+            const foldModels = [];
+
+            for (let f = 0; f < folds.length; f++) {
+              const testIdx = new Set(folds[f]);
+              const trainIdx = [];
+              for (let i = 0; i < training.length; i++) {
+                if (!testIdx.has(i)) trainIdx.push(i);
+              }
+              const XTrain = trainIdx.map((idx) => deltaMatrix[idx]);
+              const yTrain = trainIdx.map((idx) => y[idx]);
+              const XGlm = trainIdx.map((idx) => X[idx]);
+              const { beta: eloBeta } = irls(XTrain, yTrain, 0.01, 40, 1e-6);
+              const { beta: glmBeta } = irls(XGlm, yTrain, lambda, 40, 1e-6);
+              for (const idx of folds[f]) {
+                const rowDelta = [deltaMatrix[idx][0]];
+                const rowGlm = X[idx];
+                eloOut[idx] = applyModel(eloBeta, rowDelta);
+                glmOut[idx] = applyModel(glmBeta, rowGlm);
+              }
+              foldModels.push({ eloBeta, glmBeta });
+            }
+
+            const stackBeta = stackLogistic(training, eloOut, glmOut, 0.02);
+            let calibrator;
+            try {
+              calibrator = isotonicFit(training.map((_, idx) => {
+                const stacked = logistic(stackBeta[0] + stackBeta[1] * logit(eloOut[idx]) + stackBeta[2] * logit(glmOut[idx]));
+                return stacked;
+              }), y);
+            } catch (err) {
+              calibrator = null;
+            }
+            if (!calibrator || !calibrator.x || calibrator.x.length < 2) {
+              calibrator = fallbackCalibrator || plattFit(eloOut.map((p, idx) => 0.5 * p + 0.5 * glmOut[idx]), y, 0.01);
+            }
+
+            const { beta: eloBetaFull } = irls(deltaMatrix, y, 0.01, 50, 1e-6);
+            const { beta: glmBetaFull } = irls(X, y, lambda, 60, 1e-6);
+
+            const inferenceMatrix = buildMatrix(inference, features);
+            const deltaInference = inference.map((row) => [Number(row.features.deltaR ?? 0)]);
+            const predictions = [];
+            for (let i = 0; i < inference.length; i++) {
+              const baseElo = applyModel(eloBetaFull, deltaInference[i]);
+              const baseGlm = applyModel(glmBetaFull, inferenceMatrix[i]);
+              const stacked = logistic(stackBeta[0] + stackBeta[1] * logit(baseElo) + stackBeta[2] * logit(baseGlm));
+              const calibrated = applyCalibrator(calibrator, stacked);
+              const foldVals = [];
+              for (const model of foldModels) {
+                const pElo = applyModel(model.eloBeta, deltaInference[i]);
+                const pGlm = applyModel(model.glmBeta, inferenceMatrix[i]);
+                const stackedFold = logistic(stackBeta[0] + stackBeta[1] * logit(pElo) + stackBeta[2] * logit(pGlm));
+                foldVals.push(applyCalibrator(calibrator, stackedFold));
+              }
+              const logits = foldVals.map((p) => logit(p));
+              const mean = logits.reduce((acc, val) => acc + val, 0) / logits.length;
+              const variance = logits.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / Math.max(1, logits.length - 1);
+              const std = Math.sqrt(Math.max(variance, 1e-6));
+              const p5 = logistic(mean - 1.645 * std);
+              const p95 = logistic(mean + 1.645 * std);
+              const contributions = { intercept: glmBetaFull[0] };
+              for (let f = 0; f < features.length; f++) {
+                contributions[features[f]] = glmBetaFull[f + 1] * inferenceMatrix[i][f];
+              }
+              predictions.push({
+                probability: calibrated,
+                elo: baseElo,
+                glm: baseGlm,
+                fold: foldVals,
+                interval: { p5, p95 },
+                contributions,
+                meta: inference[i].meta
+              });
+            }
+
+            self.postMessage({
+              type: 'predictionResult',
+              payload: {
+                predictions,
+                models: {
+                  eloBeta: eloBetaFull,
+                  glmBeta: glmBetaFull,
+                  stackBeta,
+                  calibrator
+                }
+              }
+            });
+          };
+        })();`;
+        worker = new Worker(URL.createObjectURL(new Blob([workerSrc], { type: 'application/javascript' })));
+        worker.addEventListener('message', onWorkerMessage);
+      }
+
+      function onWorkerMessage(event) {
+        const { type, payload } = event.data;
+        if (type !== 'predictionResult') return;
+        hideLoading();
+        state.calibratorCache = payload.models.calibrator;
+        persistCalibrator();
+        const predictions = payload.predictions.map((item) => formatPrediction(item));
+        state.predictions = predictions.sort((a, b) => a.startTime - b.startTime);
+        renderPredictions();
+      }
+
+      function loadStoredState() {
+        const storedKey = localStorage.getItem(STORAGE_KEYS.apiKey);
+        if (storedKey) {
+          state.apiKey = storedKey;
+          elements.apiKeyInput.value = state.apiKey;
+        }
+        const storedSettings = safeParse(localStorage.getItem(STORAGE_KEYS.settings));
+        if (storedSettings) {
+          state.settings = Object.assign(state.settings, storedSettings);
+        }
+        elements.toggleMarkets.checked = state.settings.includeMarkets;
+        elements.toggleWeather.checked = state.settings.includeWeather;
+        elements.toggleAvailability.checked = state.settings.manualAvailability;
+        elements.toggleDemo.checked = state.settings.demoMode;
+        const storedAvailability = safeParse(localStorage.getItem(STORAGE_KEYS.availability));
+        if (storedAvailability) {
+          state.availability = storedAvailability;
+        }
+        const cachedCal = safeParse(localStorage.getItem(STORAGE_KEYS.calibration));
+        if (cachedCal && cachedCal.version === APP_VERSION && Date.now() < cachedCal.expires) {
+          state.calibratorCache = cachedCal.value;
+        }
+      }
+
+      function safeParse(value) {
+        if (!value) return null;
+        try {
+          return JSON.parse(value);
+        } catch (err) {
+          console.warn('Failed to parse storage', err);
+          return null;
+        }
+      }
+
+      function persistSettings() {
+        localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
+      }
+
+      function persistAvailability() {
+        localStorage.setItem(STORAGE_KEYS.availability, JSON.stringify(state.availability));
+      }
+
+      function persistCalibrator() {
+        if (state.calibratorCache) {
+          const payload = { value: state.calibratorCache, expires: Date.now() + CACHE_TTLS.calibration * 3600 * 1000, version: APP_VERSION };
+          localStorage.setItem(STORAGE_KEYS.calibration, JSON.stringify(payload));
+        }
+      }
+
+      function toggleSettings(open) {
+        elements.settingsModal.classList.toggle('active', open);
+        if (open) {
+          elements.apiKeyInput.focus();
+        }
+      }
+
+      function onSaveSettings(event) {
+        event.preventDefault();
+        const newKey = elements.apiKeyInput.value.trim();
+        if (newKey) {
+          state.apiKey = newKey;
+          localStorage.setItem(STORAGE_KEYS.apiKey, state.apiKey);
+          showToast('API key saved.', 'success');
+        }
+        state.settings.includeMarkets = elements.toggleMarkets.checked;
+        state.settings.includeWeather = elements.toggleWeather.checked;
+        state.settings.manualAvailability = elements.toggleAvailability.checked;
+        state.settings.demoMode = elements.toggleDemo.checked;
+        persistSettings();
+        toggleSettings(false);
+        if (state.settings.demoMode) {
+          useDemoSchedule();
+        } else if (state.apiKey) {
+          hydrateWeekPicker().catch((err) => handleError(err, 'schedule'));
+        }
+      }
+
+      function forgetKeys() {
+        localStorage.removeItem(STORAGE_KEYS.apiKey);
+        state.apiKey = null;
+        elements.apiKeyInput.value = '';
+        showToast('API key cleared.', 'success');
+      }
+
+      function onImportState(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            for (const [key, value] of Object.entries(data || {})) {
+              localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+            }
+            showToast('State imported. Reloading...', 'success');
+            setTimeout(() => window.location.reload(), 600);
+          } catch (err) {
+            showToast('Import failed: ' + err.message, 'danger');
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      function exportState() {
+        const exportPayload = {};
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (!key || !key.startsWith(STORAGE_PREFIX)) continue;
+          exportPayload[key] = localStorage.getItem(key);
+        }
+        const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'cfb-predictor-state.json';
+        document.body.appendChild(link);
+        link.click();
+        requestAnimationFrame(() => {
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        });
+        showToast('State exported.', 'success');
+      }
+      async function hydrateWeekPicker() {
+        if (!state.apiKey) {
+          return;
+        }
+        showLoading();
+        const client = ensureCfbdClient();
+        const year = state.year;
+        const calendar = await client.request('/calendar', { year, seasonType: 'regular' }, { cacheKey: `calendar-${year}` });
+        hideLoading();
+        const now = Date.now();
+        const weeks = (calendar || []).map((week) => ({
+          week: week.week,
+          start: week.firstGameStart,
+          end: week.lastGameStart,
+          label: `Week ${week.week}`
+        }));
+        state.weeks = weeks;
+        let currentWeek = weeks.find((w) => {
+          const start = Date.parse(w.start);
+          const end = Date.parse(w.end);
+          return now >= start && now <= end;
+        });
+        if (!currentWeek) {
+          currentWeek = weeks.find((w) => Date.parse(w.start) > now) || weeks[weeks.length - 1];
+        }
+        state.week = currentWeek?.week || weeks[0]?.week || 1;
+        renderWeekPicker();
+      }
+
+      function useDemoSchedule() {
+        state.weeks = DEMO_DATA.weeks;
+        state.year = DEMO_DATA.season;
+        state.week = DEMO_DATA.weeks[0].week;
+        renderWeekPicker();
+        showToast('Demo schedule loaded.', 'info');
+      }
+
+      function renderWeekPicker() {
+        elements.weekPicker.innerHTML = '';
+        state.weeks.forEach((week) => {
+          const option = document.createElement('option');
+          option.value = String(week.week);
+          option.textContent = week.label;
+          if (week.week === state.week) {
+            option.selected = true;
+          }
+          elements.weekPicker.appendChild(option);
+        });
+        elements.seasonLabel.textContent = `${state.year} Season`;
+      }
+
+      function onWeekChange() {
+        const value = Number(elements.weekPicker.value);
+        if (!Number.isNaN(value)) {
+          state.week = value;
+          if (state.settings.demoMode) {
+            predict(false);
+          }
+        }
+      }
+
+      function renderEmptyState(message) {
+        elements.results.innerHTML = '';
+        const div = document.createElement('div');
+        div.className = 'empty-state';
+        div.innerHTML = `<strong>${message}</strong><span>Use the Predict button after configuring settings.</span>`;
+        elements.results.appendChild(div);
+      }
+
+      async function predict(forceRefresh) {
+        if (state.settings.demoMode) {
+          showLoading();
+          setTimeout(() => {
+            const calibrator = DEMO_DATA.calibrator;
+            state.calibratorCache = calibrator;
+            persistCalibrator();
+            worker.postMessage({
+              type: 'trainAndPredict',
+              payload: {
+                training: DEMO_DATA.training,
+                inference: DEMO_DATA.inference,
+                features: GLM_FEATURES,
+                lambda: 0.3,
+                fallbackCalibrator: calibrator
+              }
+            });
+          }, 100);
+          return;
+        }
+        if (!state.apiKey) {
+          showToast('Add your API key in Settings first.', 'danger');
+          toggleSettings(true);
+          return;
+        }
+        try {
+          showLoading();
+          const dataset = await buildDataset(forceRefresh);
+          state.lastDataset = dataset;
+          worker.postMessage({
+            type: 'trainAndPredict',
+            payload: {
+              training: dataset.training,
+              inference: dataset.inference,
+              features: GLM_FEATURES,
+              lambda: 0.35,
+              fallbackCalibrator: state.calibratorCache
+            }
+          });
+        } catch (err) {
+          hideLoading();
+          handleError(err, err.metadata?.type || 'metrics');
+        }
+      }
+      async function buildDataset(forceRefresh = false) {
+        const client = ensureCfbdClient();
+        const targetWeek = state.week;
+        const seasonYear = state.year;
+        const seasons = [seasonYear - 2, seasonYear - 1, seasonYear];
+        const resultsBySeason = {};
+        const scheduleBySeason = {};
+        for (const season of seasons) {
+          const schedule = await fetchScheduleSeason(client, season, forceRefresh);
+          scheduleBySeason[season] = schedule;
+          resultsBySeason[season] = {
+            ppaTeams: await fetchPpaTeams(client, season, forceRefresh),
+            ppaGames: await fetchPpaGames(client, season, forceRefresh),
+            pregame: await fetchPregame(client, season, forceRefresh),
+            lines: state.settings.includeMarkets ? await fetchLines(client, season, forceRefresh) : new Map()
+          };
+        }
+        const teams = await fetchTeams(client, seasonYear, forceRefresh);
+        teamColors = teams.colors;
+        const inferenceGamesRaw = scheduleBySeason[seasonYear].filter((game) => game.week === targetWeek && (!game.status || !game.status.toLowerCase().includes('final')));
+        if (!inferenceGamesRaw.length) {
+          showToast('No games scheduled for the selected week.', 'warning');
+        }
+        const training = [];
+        const inference = [];
+        const teamHistories = buildTeamHistories(scheduleBySeason, resultsBySeason);
+        for (const season of seasons) {
+          const schedule = scheduleBySeason[season];
+          const context = resultsBySeason[season];
+          for (const game of schedule) {
+            const gameTime = Date.parse(game.startDate);
+            if (!Number.isFinite(gameTime)) continue;
+            const featuresBase = buildFeaturesForGame({ game, context, teamHistories });
+            if (!featuresBase) continue;
+            const completed = game.status && game.status.toLowerCase().includes('final');
+            const homePoints = typeof game.homePoints === 'number' ? game.homePoints : null;
+            const awayPoints = typeof game.awayPoints === 'number' ? game.awayPoints : null;
+            if (season === seasonYear && game.week === targetWeek && !completed) {
+              const weather = state.settings.includeWeather ? await resolveWeather(game, forceRefresh) : null;
+              const adjusted = applyWeatherToFeatures(featuresBase, weather);
+              inference.push({
+                features: adjusted.features,
+                timestamp: gameTime,
+                meta: {
+                  gameId: game.id,
+                  homeTeam: game.homeTeam,
+                  awayTeam: game.awayTeam,
+                  start: game.startDate,
+                  season: game.season,
+                  week: game.week,
+                  venue: adjusted.venue,
+                  weather: adjusted.weather,
+                  market: adjusted.market,
+                  availability: adjusted.availability,
+                  neutral: game.neutralSite,
+                  conference: {
+                    home: game.homeConference,
+                    away: game.awayConference
+                  }
+                }
+              });
+            } else if (completed && homePoints !== null && awayPoints !== null && gameTime < Date.now()) {
+              training.push({
+                features: featuresBase.features,
+                target: homePoints > awayPoints ? 1 : 0,
+                timestamp: gameTime,
+                meta: { gameId: game.id }
+              });
+            }
+          }
+        }
+        if (!training.length) {
+          throw createError('Training set is empty. Unable to compute predictions.', 'metrics');
+        }
+        return { training, inference };
+      }
+
+      function buildTeamHistories(scheduleBySeason, resultsBySeason) {
+        const history = new Map();
+        for (const season of Object.keys(scheduleBySeason)) {
+          const games = scheduleBySeason[season];
+          const context = resultsBySeason[season];
+          const gameMap = new Map(games.map((g) => [g.id, g]));
+          for (const entry of context.ppaGames) {
+            const game = gameMap.get(entry.gameId);
+            if (!game) continue;
+            const timestamp = Date.parse(game.startDate);
+            if (!Number.isFinite(timestamp)) continue;
+            const list = history.get(entry.team) || [];
+            list.push({
+              timestamp,
+              season: game.season,
+              week: game.week,
+              offensePpa: Number(entry.offensePpa) || 0,
+              defensePpa: Number(entry.defensePpa) || 0
+            });
+            history.set(entry.team, list);
+          }
+        }
+        for (const arr of history.values()) {
+          arr.sort((a, b) => a.timestamp - b.timestamp);
+        }
+        return history;
+      }
+      function buildFeaturesForGame({ game, context, teamHistories }) {
+        const home = game.homeTeam;
+        const away = game.awayTeam;
+        if (!home || !away) return null;
+        const metricsHome = context.ppaTeams.get(home) || {};
+        const metricsAway = context.ppaTeams.get(away) || {};
+        const offenseHome = metricsHome.offense || {};
+        const offenseAway = metricsAway.offense || {};
+        const defenseHome = metricsHome.defense || {};
+        const defenseAway = metricsAway.defense || {};
+        const netPpaOff = (Number(offenseHome.ppa) || 0) - (Number(defenseAway.ppa) || 0);
+        const netPpaDef = (Number(defenseHome.ppa) || 0) - (Number(offenseAway.ppa) || 0);
+        const tempoHome = (Number(offenseHome.standardDownsPpa) || 0) + (Number(offenseHome.passingDownsPpa) || 0);
+        const tempoAway = (Number(offenseAway.standardDownsPpa) || 0) + (Number(offenseAway.passingDownsPpa) || 0);
+        const tempoDelta = tempoHome - tempoAway;
+        const deltaR = resolveDeltaR(game.id, context);
+        const market = state.settings.includeMarkets ? resolveMarket(game.id, context) : null;
+        const availability = resolveAvailability(home, away);
+        const gameTimestamp = Date.parse(game.startDate);
+        const recentHome = computeRecentForm(teamHistories.get(home) || [], gameTimestamp);
+        const recentAway = computeRecentForm(teamHistories.get(away) || [], gameTimestamp);
+        const passProMismatch = ((Number(offenseHome.passingPpa) || 0) - (Number(defenseAway.passingPpa) || 0));
+        const specialTeamsProxy = ((Number(offenseHome.explosiveness) || 0) - (Number(defenseAway.explosiveness) || 0));
+        const features = {
+          deltaR,
+          netPpaOff,
+          netPpaDef,
+          tempoDelta,
+          homeFlag: game.neutralSite ? 0 : 1,
+          neutralFlag: game.neutralSite ? 1 : 0,
+          weatherWind: 0,
+          weatherPrecip: 0,
+          availabilityDelta: availability.home - availability.away,
+          marketSpread: market?.spread ?? 0,
+          recentFormDelta: recentHome - recentAway,
+          specialTeamsProxy,
+          penaltyYdsDelta: 0,
+          passProMismatch
+        };
+        return {
+          features,
+          venue: {
+            id: game.venue?.id,
+            name: game.venue?.name,
+            city: game.venue?.city,
+            state: game.venue?.state,
+            surface: game.venue?.surface,
+            roof: game.venue?.roof,
+            neutral: game.neutralSite
+          },
+          market,
+          availability
+        };
+      }
+
+      function resolveDeltaR(gameId, context) {
+        const pre = context.pregame.get(gameId);
+        if (pre) {
+          return Number(pre.homeWp || 0) - Number(pre.awayWp || 0);
+        }
+        const market = context.lines.get(gameId);
+        if (market && typeof market.spread === 'number') {
+          const spread = Number(market.spread);
+          const implied = normalCdf(-spread / 13.5);
+          return implied - (1 - implied);
+        }
+        return 0;
+      }
+
+      function resolveMarket(gameId, context) {
+        return context.lines.get(gameId) || null;
+      }
+
+      async function resolveWeather(game, forceRefresh) {
+        const venue = await ensureVenue(game.venue);
+        if (!venue || venue.roof === 'closed' || venue.roof === 'domed') {
+          return { wind: 0, precip: 0, temp: null, precipProb: 0 };
+        }
+        if (!venue.latitude || !venue.longitude) {
+          return null;
+        }
+        const kickoff = Date.parse(game.startDate);
+        if (!Number.isFinite(kickoff)) return null;
+        const cacheKey = `weather-${Number(venue.latitude).toFixed(3)}-${Number(venue.longitude).toFixed(3)}-${game.id}`;
+        if (!forceRefresh) {
+          const cached = getCache('weather', cacheKey);
+          if (cached) {
+            return cached;
+          }
+        }
+        const url = new URL(OPEN_METEO);
+        url.searchParams.set('latitude', venue.latitude);
+        url.searchParams.set('longitude', venue.longitude);
+        url.searchParams.set('hourly', 'temperature_2m,precipitation,precipitation_probability,wind_speed_10m,wind_gusts_10m');
+        url.searchParams.set('timezone', 'auto');
+        const response = await fetchWithBackoff(url.toString());
+        if (!response.ok) {
+          throw createError('Weather fetch failed', 'weather', response.status);
+        }
+        const data = await response.json();
+        const hourly = data.hourly || {};
+        const times = (hourly.time || []).map((t) => Date.parse(t));
+        let closestIdx = -1;
+        let minDiff = Infinity;
+        for (let i = 0; i < times.length; i++) {
+          const diff = Math.abs(times[i] - kickoff);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestIdx = i;
+          }
+        }
+        if (closestIdx === -1) {
+          return null;
+        }
+        const windMps = (hourly.wind_speed_10m?.[closestIdx] ?? 0);
+        const precipMm = (hourly.precipitation?.[closestIdx] ?? 0);
+        const result = {
+          wind: Number((windMps * 2.23694).toFixed(1)),
+          precip: Number(precipMm.toFixed(2)),
+          temp: hourly.temperature_2m?.[closestIdx] ?? null,
+          precipProb: hourly.precipitation_probability?.[closestIdx] ?? null
+        };
+        setCache('weather', cacheKey, result);
+        return result;
+      }
+
+      function applyWeatherToFeatures(base, weather) {
+        const features = Object.assign({}, base.features);
+        const resultWeather = weather || { wind: 0, precip: 0, temp: null, precipProb: null };
+        features.weatherWind = Number(resultWeather.wind || 0);
+        features.weatherPrecip = Number(resultWeather.precip || 0);
+        const passPenalty = -0.01 * Math.max(0, features.weatherWind - 12) - 0.05 * (features.weatherPrecip > 0 ? 1 : 0);
+        const explosivePenalty = -0.002 * Math.max(0, features.weatherWind - 12);
+        features.passProMismatch += passPenalty;
+        features.specialTeamsProxy += explosivePenalty;
+        return {
+          features,
+          weather: resultWeather,
+          venue: base.venue,
+          market: base.market,
+          availability: base.availability
+        };
+      }
+      function computeRecentForm(records, timestamp) {
+        if (!records || !records.length) return 0;
+        let weight = 0;
+        let score = 0;
+        let step = 0;
+        for (let i = records.length - 1; i >= 0; i--) {
+          const rec = records[i];
+          if (rec.timestamp >= timestamp) continue;
+          const decay = Math.pow(0.7, step);
+          const seasonFactor = rec.season === state.year ? 1 : 0.3;
+          const value = rec.offensePpa - rec.defensePpa;
+          score += value * decay * seasonFactor;
+          weight += decay * seasonFactor;
+          step += 1;
+          if (step > 12) break;
+        }
+        if (!weight) return 0;
+        return score / weight;
+      }
+
+      function resolveAvailability(home, away) {
+        return {
+          home: Number(state.availability[home] ?? 0),
+          away: Number(state.availability[away] ?? 0)
+        };
+      }
+
+      function formatPrediction(pred) {
+        const meta = pred.meta || {};
+        const startTime = Date.parse(meta.start);
+        const probability = pred.probability;
+        const edge = computeMarketEdge(meta.market, probability);
+        const drivers = computeDrivers(pred.contributions);
+        const badge = [];
+        if (meta.neutral) badge.push('Neutral Site');
+        if (meta.venue?.roof) badge.push(`${meta.venue.roof} roof`);
+        if (meta.venue?.surface) badge.push(meta.venue.surface);
+        return {
+          gameId: meta.gameId,
+          homeTeam: meta.homeTeam,
+          awayTeam: meta.awayTeam,
+          start: meta.start,
+          startTime,
+          venue: meta.venue,
+          weather: meta.weather,
+          market: meta.market,
+          availability: meta.availability,
+          probability,
+          awayProbability: 1 - probability,
+          edge,
+          interval: pred.interval,
+          drivers,
+          badge,
+          conference: meta.conference || {}
+        };
+      }
+
+      function computeMarketEdge(market, probability) {
+        if (!market) return null;
+        let implied = null;
+        if (typeof market.moneylineHome === 'number' && typeof market.moneylineAway === 'number') {
+          const homeMl = market.moneylineHome;
+          const awayMl = market.moneylineAway;
+          const pHome = moneylineToProbability(homeMl);
+          const pAway = moneylineToProbability(awayMl);
+          if (pHome !== null && pAway !== null) {
+            implied = pHome / (pHome + pAway);
+          }
+        }
+        if (implied === null && typeof market.spread === 'number') {
+          implied = normalCdf(-market.spread / 13.5);
+        }
+        if (implied === null) return null;
+        const diff = probability - implied;
+        return { diff, implied };
+      }
+
+      function computeDrivers(contributions) {
+        const entries = Object.entries(contributions || {}).filter(([key]) => key !== 'intercept');
+        const formatted = entries.map(([key, value]) => ({
+          key,
+          label: driverLabels[key] || key,
+          value
+        })).sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+        return formatted.slice(0, 5);
+      }
+
+      function renderPredictions() {
+        elements.results.innerHTML = '';
+        if (!state.predictions.length) {
+          renderEmptyState('No predictions generated yet.');
+          return;
+        }
+        const fragment = document.createDocumentFragment();
+        state.predictions.forEach((game) => {
+          fragment.appendChild(renderGameCard(game));
+        });
+        elements.results.appendChild(fragment);
+      }
+      function renderGameCard(game) {
+        const card = document.createElement('article');
+        card.className = 'game-card';
+        const kickoff = formatKickoff(game.start);
+        const homeColor = teamColors.get(game.homeTeam)?.primary || '#4f9cff';
+        const awayColor = teamColors.get(game.awayTeam)?.primary || '#f97316';
+        const circumference = 264;
+        const dashOffset = Math.max(0, circumference * (1 - game.probability));
+        const edgeBadge = game.edge && Math.abs(game.edge.diff) >= 0.05 ? `<span class="edge-badge">Edge ${(game.edge.diff * 100).toFixed(1)}%</span>` : '';
+        const weather = game.weather ? `<div class="metric"><strong>Weather</strong><span>${formatWeather(game.weather)}</span></div>` : '';
+        const market = game.market ? `<div class="metric"><strong>Market</strong><span>${formatMarket(game.market)}</span></div>` : '';
+        const availability = game.availability ? `<div class="metric"><strong>Availability</strong><span>${formatAvailability(game.availability)}</span></div>` : '';
+        const badges = game.badge.map((b) => `<span>${b}</span>`).join('');
+        card.innerHTML = `
+          <div class="game-header">
+            <div class="team-stack">
+              <div class="team" style="color:${awayColor}">${game.awayTeam} <span>at</span></div>
+              <div class="team" style="color:${homeColor}">${game.homeTeam}</div>
+              <div class="badge-row">${badges}</div>
+              ${edgeBadge}
+            </div>
+            <div class="kickoff">
+              <span>${kickoff.date}</span>
+              <span>${kickoff.time}</span>
+              <span>${game.conference.away || ''} @ ${game.conference.home || ''}</span>
+            </div>
+          </div>
+          <div class="confidence-ring" data-prob="${game.probability}">
+            <svg viewBox="0 0 100 100">
+              <defs>
+                <linearGradient id="probGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#4f9cff" />
+                  <stop offset="100%" stop-color="#7cdfff" />
+                </linearGradient>
+              </defs>
+              <circle class="bg" cx="50" cy="50" r="42"></circle>
+              <circle class="fg" cx="50" cy="50" r="42" stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}"></circle>
+            </svg>
+            <div class="prob-label">${(game.probability * 100).toFixed(1)}%</div>
+            <div class="confidence-band">${(game.interval.p5 * 100).toFixed(0)}%-${(game.interval.p95 * 100).toFixed(0)}%</div>
+          </div>
+          <div class="metrics-row">
+            ${weather}
+            ${market}
+            ${availability}
+            <div class="metric"><strong>Edge vs Market</strong><span>${formatEdge(game.edge)}</span></div>
+          </div>
+          <details class="why">
+            <summary>Why this prediction</summary>
+            <div class="drivers">
+              ${game.drivers.map((driver) => `
+                <div class="driver-row">
+                  <span>${driver.label}</span>
+                  <span>${driver.value >= 0 ? '+' : ''}${driver.value.toFixed(3)}</span>
+                </div>
+                <div class="driver-bar"><div style="width:${Math.min(100, Math.abs(driver.value) * 180)}%"></div></div>
+              `).join('')}
+            </div>
+          </details>
+          ${state.settings.manualAvailability ? renderAvailabilityControls(game) : ''}
+        `;
+        return card;
+      }
+
+      function renderAvailabilityControls(game) {
+        return `
+          <div class="availability-actions">
+            <button type="button" class="ghost" data-team="${game.homeTeam}">Set ${game.homeTeam} availability</button>
+            <button type="button" class="ghost" data-team="${game.awayTeam}">Set ${game.awayTeam} availability</button>
+          </div>
+        `;
+      }
+
+      elements.results.addEventListener('click', (event) => {
+        const target = event.target;
+        if (target instanceof HTMLElement && target.dataset.team) {
+          const team = target.dataset.team;
+          const current = Number(state.availability[team] ?? 0);
+          const next = prompt(`Set availability adjustment for ${team} (-1 to 1)`, String(current));
+          if (next === null) return;
+          const value = Number(next);
+          if (Number.isNaN(value) || value < -1 || value > 1) {
+            showToast('Value must be between -1 and 1.', 'danger');
+            return;
+          }
+          state.availability[team] = value;
+          persistAvailability();
+          showToast(`Availability for ${team} set to ${value}.`);
+          if (state.lastDataset) {
+            predict(false);
+          }
+        }
+      });
+
+      function formatWeather(weather) {
+        if (!weather) return 'N/A';
+        return `${weather.wind ?? 0} mph wind, ${weather.precip ?? 0} mm precip${weather.temp !== null && weather.temp !== undefined ? `, ${weather.temp}°` : ''}`;
+      }
+
+      function formatMarket(market) {
+        if (!market) return 'n/a';
+        const spread = typeof market.spread === 'number' ? `${market.spread > 0 ? '+' : ''}${market.spread}` : '—';
+        const ml = typeof market.moneylineHome === 'number' ? market.moneylineHome : '—';
+        return `Spread ${spread}, ML ${ml}`;
+      }
+
+      function formatAvailability(availability) {
+        const home = (availability.home ?? 0).toFixed(2);
+        const away = (availability.away ?? 0).toFixed(2);
+        return `${home} vs ${away}`;
+      }
+
+      function formatEdge(edge) {
+        if (!edge) return 'n/a';
+        return `${(edge.diff * 100).toFixed(1)}% vs ${(edge.implied * 100).toFixed(1)}%`;
+      }
+
+      function formatKickoff(value) {
+        const date = new Date(value);
+        if (!(date instanceof Date) || Number.isNaN(date)) {
+          return { date: 'TBD', time: '' };
+        }
+        const dateFormat = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+        const timeFormat = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' });
+        return {
+          date: dateFormat.format(date),
+          time: timeFormat.format(date)
+        };
+      }
+      function ensureCfbdClient() {
+        if (!cfbdClient) {
+          cfbdClient = new CfbdClient(() => state.apiKey);
+        }
+        return cfbdClient;
+      }
+
+      async function fetchScheduleSeason(client, season, forceRefresh) {
+        const cacheKey = `schedule-${season}`;
+        if (!forceRefresh) {
+          const cached = getCache('metrics', cacheKey);
+          if (cached) return cached;
+        }
+        const data = await client.request('/games', { year: season, seasonType: 'regular' }, { cacheKey });
+        setCache('metrics', cacheKey, data);
+        return data || [];
+      }
+
+      async function fetchPpaTeams(client, season, forceRefresh) {
+        const cacheKey = `ppaTeams-${season}`;
+        if (!forceRefresh) {
+          const cached = getCache('metrics', cacheKey);
+          if (cached) return new Map(cached.map((item) => [item.team, item]));
+        }
+        const data = await client.request('/ppa/teams', { year: season }, { cacheKey });
+        const map = new Map();
+        (data || []).forEach((item) => map.set(item.team, item));
+        setCache('metrics', cacheKey, Array.from(map.values()));
+        return map;
+      }
+
+      async function fetchPpaGames(client, season, forceRefresh) {
+        const cacheKey = `ppaGames-${season}`;
+        if (!forceRefresh) {
+          const cached = getCache('metrics', cacheKey);
+          if (cached) return cached;
+        }
+        const data = await client.request('/ppa/games', { year: season }, { cacheKey });
+        setCache('metrics', cacheKey, data);
+        return data || [];
+      }
+
+      async function fetchPregame(client, season, forceRefresh) {
+        const cacheKey = `pregame-${season}`;
+        if (!forceRefresh) {
+          const cached = getCache('metrics', cacheKey);
+          if (cached) return new Map(cached.map((item) => [item.gameId, item]));
+        }
+        const data = await client.request('/metrics/wp/pregame', { year: season }, { cacheKey });
+        const map = new Map();
+        (data || []).forEach((item) => map.set(item.gameId, item));
+        setCache('metrics', cacheKey, Array.from(map.values()));
+        return map;
+      }
+
+      async function fetchLines(client, season, forceRefresh) {
+        const cacheKey = `lines-${season}`;
+        if (!forceRefresh) {
+          const cached = getCache('lines', cacheKey);
+          if (cached) return new Map(cached.map((item) => [item.gameId, item]));
+        }
+        const data = await client.request('/lines', { year: season }, { cacheKey, type: 'lines' });
+        const map = new Map();
+        (data || []).forEach((item) => {
+          const simplified = simplifyLine(item);
+          const current = map.get(item.gameId);
+          if (!current) {
+            map.set(item.gameId, simplified);
+          } else if (!current.lastUpdated || (simplified.lastUpdated && Date.parse(simplified.lastUpdated) > Date.parse(current.lastUpdated))) {
+            map.set(item.gameId, simplified);
+          }
+        });
+        setCache('lines', cacheKey, Array.from(map.values()));
+        return map;
+      }
+
+      async function fetchTeams(client, season, forceRefresh) {
+        const cacheKey = `teams-${season}`;
+        if (!forceRefresh) {
+          const cached = getCache('metrics', cacheKey);
+          if (cached) {
+            const colors = new Map(cached.map((team) => [team.school, { primary: team.color || '#4f9cff' }]));
+            return { colors };
+          }
+        }
+        const data = await client.request('/teams', { year: season }, { cacheKey });
+        const colors = new Map();
+        (data || []).forEach((team) => {
+          colors.set(team.school, { primary: team.color || '#4f9cff' });
+        });
+        setCache('metrics', cacheKey, data);
+        return { colors };
+      }
+
+      function simplifyLine(item) {
+        return {
+          gameId: item.gameId,
+          provider: item.provider,
+          spread: typeof item.spread === 'number' ? item.spread : (typeof item.spreadOpen === 'number' ? item.spreadOpen : null),
+          moneylineHome: typeof item.moneylineHome === 'number' ? item.moneylineHome : null,
+          moneylineAway: typeof item.moneylineAway === 'number' ? item.moneylineAway : null,
+          overUnder: typeof item.overUnder === 'number' ? item.overUnder : null,
+          lastUpdated: item.lastUpdated || null
+        };
+      }
+      async function ensureVenue(venue) {
+        if (!venue) return null;
+        if (venue.latitude && venue.longitude) return venue;
+        if (venue.id && venueCache.has(venue.id)) {
+          return venueCache.get(venue.id);
+        }
+        if (!venue.id) return venue;
+        const client = ensureCfbdClient();
+        const result = await client.request('/venues', { id: venue.id });
+        const resolved = Array.isArray(result) ? result[0] : result;
+        if (resolved) {
+          venueCache.set(venue.id, resolved);
+        }
+        return resolved || venue;
+      }
+
+      class CfbdClient {
+        constructor(getKey) {
+          this.getKey = getKey;
+          this.rateLimiter = new TokenBucket({ capacity: 6, refillRate: 6 });
+        }
+
+        async request(path, params = {}, metadata = {}) {
+          const url = new URL(CFBD_BASE + path);
+          for (const [key, value] of Object.entries(params)) {
+            if (value === undefined || value === null) continue;
+            url.searchParams.set(key, value);
+          }
+          await this.rateLimiter.removeToken();
+          const options = {
+            headers: {
+              'Authorization': `Bearer ${this.getKey()}`
+            }
+          };
+          let attempt = 0;
+          while (attempt < 5) {
+            attempt += 1;
+            const response = await fetchWithBackoff(url.toString(), options);
+            if (response.status === 401) {
+              throw createError('Unauthorized: Check API key', 'auth', 401);
+            }
+            if (response.status === 429) {
+              const waitMs = Math.min(60000, Math.pow(2, attempt) * 1000 + deterministicJitter(attempt));
+              await sleep(waitMs);
+              continue;
+            }
+            if (!response.ok) {
+              throw createError(`Request failed: ${response.status}`, metadata.type || 'metrics', response.status);
+            }
+            return response.json();
+          }
+          throw createError('Rate limit exceeded after retries', metadata.type || 'metrics', 429);
+        }
+      }
+
+      class TokenBucket {
+        constructor({ capacity, refillRate }) {
+          this.capacity = capacity;
+          this.tokens = capacity;
+          this.refillRate = refillRate;
+          this.lastRefill = performance.now();
+        }
+
+        async removeToken() {
+          while (this.tokens < 1) {
+            this.refill();
+            await sleep(100);
+          }
+          this.tokens -= 1;
+          this.refill();
+        }
+
+        refill() {
+          const now = performance.now();
+          const elapsed = (now - this.lastRefill) / 1000;
+          if (elapsed <= 0) return;
+          this.tokens = Math.min(this.capacity, this.tokens + elapsed * this.refillRate);
+          this.lastRefill = now;
+        }
+      }
+
+      async function fetchWithBackoff(url, options = {}) {
+        try {
+          return await fetch(url, options);
+        } catch (err) {
+          throw createError('Network error', 'network');
+        }
+      }
+
+      function deterministicJitter(seedOffset) {
+        const rand = mulberry32(DETERMINISTIC_SEED + seedOffset * 97);
+        return Math.floor(rand() * 500);
+      }
+
+      function mulberry32(a) {
+        return function () {
+          let t = a += 0x6D2B79F5;
+          t = Math.imul(t ^ t >>> 15, t | 1);
+          t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+          return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        };
+      }
+
+      function setCache(type, key, value) {
+        const ttlHours = CACHE_TTLS[type] || 6;
+        const record = {
+          value,
+          expires: Date.now() + ttlHours * 3600 * 1000,
+          version: APP_VERSION
+        };
+        localStorage.setItem(`${STORAGE_PREFIX}cache-${type}-${key}`, JSON.stringify(record));
+      }
+
+      function getCache(type, key) {
+        const raw = localStorage.getItem(`${STORAGE_PREFIX}cache-${type}-${key}`);
+        if (!raw) return null;
+        try {
+          const record = JSON.parse(raw);
+          if (record.version !== APP_VERSION) return null;
+          if (Date.now() > record.expires) {
+            localStorage.removeItem(`${STORAGE_PREFIX}cache-${type}-${key}`);
+            return null;
+          }
+          return record.value;
+        } catch (err) {
+          return null;
+        }
+      }
+
+      function clearCaches() {
+        const toDelete = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith(`${STORAGE_PREFIX}cache-`)) {
+            toDelete.push(key);
+          }
+        }
+        toDelete.forEach((key) => localStorage.removeItem(key));
+      }
+      function handleError(err, type) {
+        console.error(err);
+        if (type === 'lines') {
+          state.settings.includeMarkets = false;
+          elements.toggleMarkets.checked = false;
+          showToast('Markets unavailable. Disabled market features.', 'warning');
+        } else if (type === 'weather') {
+          state.settings.includeWeather = false;
+          elements.toggleWeather.checked = false;
+          showToast('Weather unavailable. Disabled weather features.', 'warning');
+        } else if (type === 'auth') {
+          showToast('Unauthorized. Please update API key.', 'danger');
+          toggleSettings(true);
+        } else if (type === 'metrics') {
+          showToast('Metrics unavailable. Try again later.', 'danger');
+        } else if (type === 'schedule') {
+          showToast('Schedule unavailable. Check API status.', 'danger');
+        } else {
+          showToast(err.message || 'Unexpected error', 'danger');
+        }
+      }
+
+      function showLoading() {
+        elements.loadingOverlay.classList.add('active');
+      }
+
+      function hideLoading() {
+        elements.loadingOverlay.classList.remove('active');
+      }
+
+      function showToast(message, variant = 'info') {
+        const div = document.createElement('div');
+        div.className = `toast ${variant}`;
+        div.textContent = message;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = '✕';
+        button.addEventListener('click', () => div.remove());
+        div.appendChild(button);
+        elements.toastContainer.appendChild(div);
+        setTimeout(() => {
+          div.classList.add('visible');
+        }, 20);
+        setTimeout(() => {
+          div.remove();
+        }, 6000);
+      }
+
+      function resetAll() {
+        clearCaches();
+        state.predictions = [];
+        state.availability = {};
+        persistAvailability();
+        renderPredictions();
+        showToast('State reset.', 'success');
+      }
+
+      function getSeasonYear(date = new Date()) {
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        return month >= 7 ? year : year - 1;
+      }
+
+      function moneylineToProbability(line) {
+        if (line === null || line === undefined) return null;
+        if (line < 0) {
+          return (-line) / ((-line) + 100);
+        }
+        return 100 / (line + 100);
+      }
+
+      function normalCdf(x) {
+        return (1 + erf(x / Math.sqrt(2))) / 2;
+      }
+
+      function erf(x) {
+        const sign = x >= 0 ? 1 : -1;
+        x = Math.abs(x);
+        const a1 = 0.254829592;
+        const a2 = -0.284496736;
+        const a3 = 1.421413741;
+        const a4 = -1.453152027;
+        const a5 = 1.061405429;
+        const p = 0.3275911;
+        const t = 1 / (1 + p * x);
+        const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+        return sign * y;
+      }
+
+      function createError(message, type, status) {
+        const error = new Error(message);
+        error.metadata = { type, status };
+        return error;
+      }
+
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+    })();
+  </script>
+</body>
+</html>
