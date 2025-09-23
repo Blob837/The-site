@@ -90,6 +90,20 @@
       gap: 12px;
     }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-button {
+      min-width: 44px;
+      width: 44px;
+      padding: 10px;
+      font-size: 20px;
+      line-height: 1;
+    }
+
     header h1 {
       margin: 0;
       font-size: clamp(22px, 5vw, 30px);
@@ -630,9 +644,475 @@
       animation: spin 1s linear infinite;
     }
 
+    .diagnostics-panel {
+      margin: 12px clamp(16px, 5vw, 48px);
+      background: rgba(11, 15, 20, 0.78);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .diagnostics-panel.active {
+      display: flex;
+    }
+
+    .diagnostics-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .diagnostics-header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .diagnostics-subtitle {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .diagnostics-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .diagnostics-tests {
+      background: rgba(17, 24, 35, 0.7);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .diagnostics-tests h3 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: 0.01em;
+    }
+
+    .diagnostics-test-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .diagnostics-test {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: rgba(23, 34, 48, 0.65);
+      font-size: 14px;
+    }
+
+    .diagnostics-test span.status {
+      font-weight: 600;
+    }
+
+    .diagnostics-test.pass span.status {
+      color: var(--success);
+    }
+
+    .diagnostics-test.fail span.status {
+      color: var(--danger);
+    }
+
+    .diagnostics-test.pending span.status {
+      color: var(--warning);
+    }
+
+    .diagnostics-test.running span.status {
+      color: var(--accent);
+    }
+
+    .diagnostics-empty {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .diagnostics-log {
+      display: grid;
+      gap: 12px;
+    }
+
+    .diagnostics-entry {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(23, 34, 48, 0.7);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .diagnostics-entry.success {
+      border-color: rgba(52, 211, 153, 0.4);
+    }
+
+    .diagnostics-entry.error {
+      border-color: rgba(248, 113, 113, 0.45);
+    }
+
+    .diagnostics-entry.rate-limit {
+      border-color: rgba(251, 191, 36, 0.45);
+    }
+
+    .diagnostics-entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .diagnostics-entry-header h4 {
+      margin: 0;
+      font-size: 15px;
+      word-break: break-all;
+    }
+
+    .diagnostics-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .diagnostics-message {
+      font-size: 14px;
+    }
+
+    .diagnostics-sample {
+      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+      background: rgba(4, 7, 13, 0.6);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      color: var(--text-muted);
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .diagnostics-entry .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(79, 156, 255, 0.18);
+      color: var(--accent-strong);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
     @keyframes spin {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 640px) {
+      .diagnostics-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      function toggleDiagnosticsPanel(force) {
+        const panel = elements.diagnosticsPanel;
+        const toggle = elements.diagnosticsToggle;
+        if (!panel || !toggle) return;
+        const isOpen = force === undefined ? !panel.classList.contains('active') : Boolean(force);
+        panel.classList.toggle('active', isOpen);
+        panel.setAttribute('aria-hidden', String(!isOpen));
+        toggle.setAttribute('aria-expanded', String(isOpen));
+      }
+
+      function renderDiagnosticsPanel(snapshot) {
+        const { entries = [], tests = [] } = snapshot || {};
+        if (!elements.diagnosticsLog) return;
+        elements.diagnosticsLog.innerHTML = '';
+        if (!entries.length) {
+          elements.diagnosticsEmpty.style.display = 'block';
+          elements.copyDiagnostics.disabled = true;
+        } else {
+          elements.diagnosticsEmpty.style.display = 'none';
+          elements.copyDiagnostics.disabled = false;
+          for (const entry of entries) {
+            const card = document.createElement('article');
+            const endpoint = `${entry.path || ''}${entry.query || ''}`;
+            const statusCode = entry.statusCode ?? '—';
+            const cardStatus = entry.ok ? 'success' : (statusCode === 429 ? 'rate-limit' : 'error');
+            card.className = `diagnostics-entry ${cardStatus}`;
+
+            const header = document.createElement('div');
+            header.className = 'diagnostics-entry-header';
+            const title = document.createElement('h4');
+            title.textContent = endpoint || entry.label || 'Request';
+            header.appendChild(title);
+            if (entry.label) {
+              const badge = document.createElement('span');
+              badge.className = 'badge';
+              badge.textContent = entry.label;
+              header.appendChild(badge);
+            }
+            card.appendChild(header);
+
+            const meta = document.createElement('div');
+            meta.className = 'diagnostics-meta';
+            const statusSpan = document.createElement('span');
+            statusSpan.textContent = `Status ${statusCode}`;
+            meta.appendChild(statusSpan);
+            const retriesSpan = document.createElement('span');
+            retriesSpan.textContent = `Retries ${entry.retries ?? 0}`;
+            meta.appendChild(retriesSpan);
+            if (entry.timestamp) {
+              const tsSpan = document.createElement('span');
+              try {
+                tsSpan.textContent = new Date(entry.timestamp).toLocaleTimeString();
+              } catch (err) {
+                tsSpan.textContent = entry.timestamp;
+              }
+              meta.appendChild(tsSpan);
+            }
+            card.appendChild(meta);
+
+            if (entry.message) {
+              const message = document.createElement('div');
+              message.className = 'diagnostics-message';
+              message.textContent = entry.message;
+              card.appendChild(message);
+            }
+
+            if (entry.sample) {
+              const sample = document.createElement('pre');
+              sample.className = 'diagnostics-sample';
+              sample.textContent = entry.sample;
+              card.appendChild(sample);
+            }
+
+            elements.diagnosticsLog.appendChild(card);
+          }
+        }
+
+        elements.diagnosticsTestList.innerHTML = '';
+        if (!tests.length) {
+          const li = document.createElement('li');
+          li.className = 'diagnostics-test pending';
+          li.innerHTML = '<span>Awaiting test run</span><span class="status">—</span>';
+          elements.diagnosticsTestList.appendChild(li);
+        } else {
+          for (const test of tests) {
+            const li = document.createElement('li');
+            li.className = `diagnostics-test ${test.status || 'pending'}`;
+            const label = document.createElement('span');
+            label.textContent = test.label;
+            const status = document.createElement('span');
+            status.className = 'status';
+            status.textContent = formatTestStatus(test);
+            if (test.message) {
+              status.title = test.message;
+            }
+            li.appendChild(label);
+            li.appendChild(status);
+            elements.diagnosticsTestList.appendChild(li);
+          }
+        }
+      }
+
+      function primeDiagnosticsTests() {
+        diagnosticsStore.initializeTests(API_TESTS.map((test) => ({
+          key: test.key,
+          label: test.label,
+          status: 'pending',
+          code: null,
+          message: 'Not run'
+        })));
+      }
+
+      function formatTestStatus(test) {
+        if (!test) return '—';
+        if (test.status === 'pass') {
+          return `✅ ${test.code ?? 200}`;
+        }
+        if (test.status === 'fail') {
+          return `❌ ${test.code ?? 'ERR'}`;
+        }
+        if (test.status === 'running') {
+          return '⟳ Running…';
+        }
+        return '—';
+      }
+
+      async function copyDiagnostics() {
+        if (!navigator.clipboard) {
+          showToast('Clipboard unavailable in this browser.', 'warning');
+          return;
+        }
+        try {
+          const snapshot = diagnosticsStore.getSnapshot();
+          const payload = {
+            exportedAt: new Date().toISOString(),
+            entries: snapshot.entries,
+            tests: snapshot.tests
+          };
+          await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+          showToast('Diagnostics copied to clipboard.', 'success');
+        } catch (err) {
+          showToast('Unable to copy diagnostics.', 'danger');
+        }
+      }
+
+      async function runApiTests(forceRefresh = false) {
+        if (state.settings.demoMode) {
+          showToast('Disable demo mode to run live API tests.', 'warning');
+          return;
+        }
+        if (!state.apiKey) {
+          showToast('Add your API key in Settings first.', 'danger');
+          toggleSettings(true);
+          return;
+        }
+        try {
+          await validateApiKey({ force: forceRefresh, showSuccess: false });
+        } catch (err) {
+          handleError(err, err.metadata?.type || 'auth');
+          return;
+        }
+        let context;
+        try {
+          context = await resolveSeasonContext({ forceRefresh });
+        } catch (err) {
+          handleError(err, err.metadata?.type || 'schedule');
+          return;
+        }
+        toggleDiagnosticsPanel(true);
+        diagnosticsStore.initializeTests(API_TESTS.map((test) => ({
+          key: test.key,
+          label: test.label,
+          status: 'pending',
+          code: null,
+          message: 'Pending'
+        })));
+        const client = ensureCfbdClient();
+        for (const test of API_TESTS) {
+          diagnosticsStore.updateTest(test.key, { status: 'running', code: '…', message: 'Running…' });
+          const params = typeof test.params === 'function' ? test.params(context) : (test.params || {});
+          try {
+            await client.request(test.path, params, { label: test.label, type: 'metrics' });
+            diagnosticsStore.updateTest(test.key, { status: 'pass', code: 200, message: 'OK' });
+          } catch (err) {
+            const status = err.metadata?.status || 'ERR';
+            diagnosticsStore.updateTest(test.key, { status: 'fail', code: status, message: err.metadata?.toast || err.message });
+            handleError(err, err.metadata?.type || 'metrics');
+            if (status === 401) {
+              break;
+            }
+          }
+        }
+        showToast('API diagnostics complete.', 'success');
+      }
+
+      function createDiagnosticsStore() {
+        let entries = [];
+        let tests = [];
+        let runId = 0;
+        let counter = 0;
+        const subscribers = new Set();
+
+        function snapshot() {
+          return {
+            entries: entries.map((entry) => ({ ...entry })),
+            tests: tests.map((test) => ({ ...test })),
+            runId
+          };
+        }
+
+        function notify() {
+          const data = snapshot();
+          subscribers.forEach((callback) => {
+            try {
+              callback(data);
+            } catch (err) {
+              // Diagnostics rendering should not interrupt execution
+            }
+          });
+        }
+
+        return {
+          reset() {
+            entries = [];
+            runId += 1;
+            notify();
+          },
+          add(entry) {
+            const record = {
+              id: `diag-${Date.now()}-${counter++}`,
+              path: entry.path,
+              params: entry.params || {},
+              query: entry.query || '',
+              label: entry.label || null,
+              status: 'pending',
+              statusCode: null,
+              retries: 0,
+              message: 'Pending',
+              sample: '',
+              timestamp: new Date().toISOString(),
+              ok: false
+            };
+            entries.push(record);
+            notify();
+            return record;
+          },
+          update(id, updates = {}) {
+            const index = entries.findIndex((item) => item.id === id);
+            if (index === -1) return;
+            entries[index] = { ...entries[index], ...updates };
+            notify();
+          },
+          initializeTests(initial = []) {
+            tests = initial.map((test) => ({ ...test }));
+            notify();
+          },
+          updateTest(key, updates = {}) {
+            const index = tests.findIndex((item) => item.key === key);
+            if (index === -1) return;
+            tests[index] = { ...tests[index], ...updates };
+            notify();
+          },
+          getSnapshot: snapshot,
+          subscribe(callback) {
+            if (typeof callback !== 'function') return () => {};
+            subscribers.add(callback);
+            callback(snapshot());
+            return () => subscribers.delete(callback);
+          }
+        };
+      }
+
+      .diagnostics-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .diagnostics-actions button {
+        flex: 1 1 auto;
+      }
     }
   </style>
 </head>
@@ -641,7 +1121,13 @@
     <header>
       <div class="title-row">
         <h1>CFB Winner Predictor</h1>
-        <button id="open-settings" class="ghost" aria-haspopup="dialog">Settings</button>
+        <div class="header-actions">
+          <button id="diagnostics-toggle" class="ghost icon-button" type="button" aria-expanded="false" aria-controls="diagnostics-panel" title="Diagnostics">
+            <span aria-hidden="true">🐞</span>
+            <span class="sr-only">Toggle diagnostics</span>
+          </button>
+          <button id="open-settings" class="ghost" aria-haspopup="dialog">Settings</button>
+        </div>
       </div>
       <div class="week-controls" id="week-controls">
         <label for="week-picker" class="sr-only">Week</label>
@@ -649,6 +1135,24 @@
         <div class="pill" id="season-label">Season</div>
       </div>
     </header>
+    <section class="diagnostics-panel" id="diagnostics-panel" aria-live="polite" aria-hidden="true">
+      <div class="diagnostics-header">
+        <div>
+          <h2>Diagnostics</h2>
+          <p class="diagnostics-subtitle">Latest CFBD requests, retries, and payload samples</p>
+        </div>
+        <div class="diagnostics-actions">
+          <button id="copy-diagnostics" class="ghost" type="button" disabled>Copy diagnostics</button>
+          <button id="run-tests" class="ghost" type="button">Test API</button>
+        </div>
+      </div>
+      <div class="diagnostics-tests" aria-live="polite">
+        <h3>Test API suite</h3>
+        <ul id="diagnostics-test-list" class="diagnostics-test-list"></ul>
+      </div>
+      <div id="diagnostics-empty" class="diagnostics-empty">Diagnostics will populate after your next refresh.</div>
+      <div id="diagnostics-log" class="diagnostics-log" role="log"></div>
+    </section>
     <main id="results" aria-live="polite"></main>
     <div class="sticky-bar" role="toolbar" aria-label="Primary actions">
       <div class="button-group">
@@ -707,7 +1211,6 @@
       const STORAGE_PREFIX = 'cfbdPredictor-v1-';
       const CFBD_BASE = 'https://apinext.collegefootballdata.com';
       const OPEN_METEO = 'https://api.open-meteo.com/v1/forecast';
-      const DETERMINISTIC_SEED = 9352471;
       const GLM_FEATURES = [
         'deltaR',
         'netPpaOff',
@@ -723,6 +1226,14 @@
         'specialTeamsProxy',
         'penaltyYdsDelta',
         'passProMismatch'
+      ];
+      const API_TESTS = [
+        { key: 'info', label: 'GET /info', path: '/info', params: () => ({}) },
+        { key: 'calendar', label: 'GET /calendar', path: '/calendar', params: (ctx) => ({ year: ctx.year, seasonType: ctx.seasonType }) },
+        { key: 'games', label: 'GET /games', path: '/games', params: (ctx) => ({ year: ctx.year, week: ctx.week, seasonType: ctx.seasonType }) },
+        { key: 'ppaTeams', label: 'GET /ppa/teams', path: '/ppa/teams', params: (ctx) => ({ year: ctx.year }) },
+        { key: 'pregame', label: 'GET /metrics/wp/pregame', path: '/metrics/wp/pregame', params: (ctx) => ({ year: ctx.year, week: ctx.week }) },
+        { key: 'ppaGames', label: 'GET /ppa/games', path: '/ppa/games', params: (ctx) => ({ year: ctx.year, week: Math.max(1, ctx.week - 1) }) }
       ];
       const CACHE_TTLS = {
         metrics: 24,
@@ -894,6 +1405,14 @@
         passProMismatch: 'Pass Protection'
       };
 
+      function defaultDataHealth() {
+        return {
+          pregameFallback: false,
+          limitedPpaGames: false,
+          linesMissing: false
+        };
+      }
+
       const elements = {
         weekPicker: document.getElementById('week-picker'),
         seasonLabel: document.getElementById('season-label'),
@@ -914,7 +1433,14 @@
         forgetKey: document.getElementById('forget-key'),
         importState: document.getElementById('import-state'),
         loadingOverlay: document.getElementById('loading-overlay'),
-        toastContainer: document.getElementById('toast-container')
+        toastContainer: document.getElementById('toast-container'),
+        diagnosticsToggle: document.getElementById('diagnostics-toggle'),
+        diagnosticsPanel: document.getElementById('diagnostics-panel'),
+        diagnosticsLog: document.getElementById('diagnostics-log'),
+        diagnosticsEmpty: document.getElementById('diagnostics-empty'),
+        copyDiagnostics: document.getElementById('copy-diagnostics'),
+        runTests: document.getElementById('run-tests'),
+        diagnosticsTestList: document.getElementById('diagnostics-test-list')
       };
 
       const state = {
@@ -931,13 +1457,18 @@
           manualAvailability: false,
           demoMode: false
         },
+        seasonType: 'regular',
+        apiKeyValid: false,
+        dataHealth: defaultDataHealth(),
         lastDataset: null,
         calibratorCache: null
       };
 
+      const diagnosticsStore = createDiagnosticsStore();
       let worker;
       let cfbdClient;
       let venueCache = new Map();
+      let venueNameCache = new Map();
       let teamColors = new Map();
 
       init();
@@ -946,6 +1477,8 @@
         loadStoredState();
         bindEvents();
         setupWorker();
+        diagnosticsStore.subscribe(renderDiagnosticsPanel);
+        primeDiagnosticsTests();
         renderEmptyState('Connect your CFBD API key to begin. Demo mode is available in Settings.');
         if (state.apiKey && !state.settings.demoMode) {
           hydrateWeekPicker().catch((err) => handleError(err, 'schedule'));
@@ -998,10 +1531,14 @@
         window.addEventListener('keydown', (ev) => {
           if (ev.key === 'Escape') {
             toggleSettings(false);
+            toggleDiagnosticsPanel(false);
           }
         });
         window.addEventListener('online', () => showToast('Back online.'));
         window.addEventListener('offline', () => showToast('Offline detected. Demo mode recommended.', 'warning'));
+        elements.diagnosticsToggle.addEventListener('click', () => toggleDiagnosticsPanel());
+        elements.copyDiagnostics.addEventListener('click', copyDiagnostics);
+        elements.runTests.addEventListener('click', () => runApiTests(true));
       }
       function setupWorker() {
         const workerSrc = `(() => {
@@ -1311,7 +1848,7 @@
       }
 
       function loadStoredState() {
-        const storedKey = localStorage.getItem(STORAGE_KEYS.apiKey);
+        const storedKey = sanitizeApiKey(localStorage.getItem(STORAGE_KEYS.apiKey));
         if (storedKey) {
           state.apiKey = storedKey;
           elements.apiKeyInput.value = state.apiKey;
@@ -1344,6 +1881,11 @@
         }
       }
 
+      function sanitizeApiKey(raw) {
+        if (!raw || typeof raw !== 'string') return '';
+        return raw.replace(/\uFEFF/g, '').replace(/\s+/g, '').trim();
+      }
+
       function persistSettings() {
         localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
       }
@@ -1366,32 +1908,77 @@
         }
       }
 
-      function onSaveSettings(event) {
+      async function onSaveSettings(event) {
         event.preventDefault();
-        const newKey = elements.apiKeyInput.value.trim();
+        const newKey = sanitizeApiKey(elements.apiKeyInput.value);
+        let shouldClose = true;
         if (newKey) {
           state.apiKey = newKey;
+          elements.apiKeyInput.value = newKey;
           localStorage.setItem(STORAGE_KEYS.apiKey, state.apiKey);
-          showToast('API key saved.', 'success');
+        } else {
+          if (state.apiKey) {
+            showToast('API key cleared.', 'warning');
+          }
+          state.apiKey = '';
+          state.apiKeyValid = false;
+          localStorage.removeItem(STORAGE_KEYS.apiKey);
         }
         state.settings.includeMarkets = elements.toggleMarkets.checked;
         state.settings.includeWeather = elements.toggleWeather.checked;
         state.settings.manualAvailability = elements.toggleAvailability.checked;
         state.settings.demoMode = elements.toggleDemo.checked;
         persistSettings();
-        toggleSettings(false);
         if (state.settings.demoMode) {
+          toggleSettings(false);
           useDemoSchedule();
-        } else if (state.apiKey) {
-          hydrateWeekPicker().catch((err) => handleError(err, 'schedule'));
+          return;
+        }
+        if (!state.apiKey) {
+          toggleSettings(false);
+          return;
+        }
+        try {
+          await validateApiKey({ showSuccess: true });
+        } catch (err) {
+          shouldClose = false;
+          handleError(err, err.metadata?.type || 'auth');
+        }
+        if (shouldClose) {
+          toggleSettings(false);
+          await hydrateWeekPicker().catch((err) => handleError(err, 'schedule'));
         }
       }
 
       function forgetKeys() {
         localStorage.removeItem(STORAGE_KEYS.apiKey);
-        state.apiKey = null;
+        state.apiKey = '';
+        state.apiKeyValid = false;
+        diagnosticsStore.reset();
         elements.apiKeyInput.value = '';
         showToast('API key cleared.', 'success');
+      }
+
+      async function validateApiKey(options = {}) {
+        const { showSuccess = false, force = false } = options;
+        const key = sanitizeApiKey(state.apiKey || elements.apiKeyInput.value);
+        if (!key) {
+          state.apiKeyValid = false;
+          throw createError('CFBD API key required.', 'auth', 0, { toast: 'CFBD API key required.' });
+        }
+        state.apiKey = key;
+        elements.apiKeyInput.value = key;
+        const client = ensureCfbdClient();
+        try {
+          await client.validateKey(force);
+          state.apiKeyValid = true;
+          if (showSuccess) {
+            showToast('CFBD key validated.', 'success');
+          }
+        } catch (err) {
+          state.apiKeyValid = false;
+          throw err;
+        }
       }
 
       function onImportState(event) {
@@ -1433,39 +2020,68 @@
         });
         showToast('State exported.', 'success');
       }
-      async function hydrateWeekPicker() {
-        if (!state.apiKey) {
-          return;
+      async function resolveSeasonContext(options = {}) {
+        const { forceRefresh = false } = options;
+        if (!state.apiKey || state.settings.demoMode) {
+          return { year: state.year, week: state.week, seasonType: state.seasonType };
         }
-        showLoading();
         const client = ensureCfbdClient();
-        const year = state.year;
-        const calendar = await client.request('/calendar', { year, seasonType: 'regular' }, { cacheKey: `calendar-${year}` });
-        hideLoading();
-        const now = Date.now();
-        const weeks = (calendar || []).map((week) => ({
+        const seasonType = 'regular';
+        let targetYear = state.year || getSeasonYear();
+        const cacheKey = `calendar-${targetYear}-${seasonType}`;
+        let calendar = forceRefresh ? null : getCache('metrics', cacheKey);
+        if (!calendar) {
+          calendar = await client.request('/calendar', { year: targetYear, seasonType }, { type: 'schedule', label: `Calendar ${targetYear}` });
+          if (Array.isArray(calendar)) {
+            setCache('metrics', cacheKey, calendar);
+          }
+        }
+        const weeks = Array.isArray(calendar) ? calendar.map((week) => ({
           week: week.week,
           start: week.firstGameStart,
           end: week.lastGameStart,
           label: `Week ${week.week}`
-        }));
+        })) : [];
         state.weeks = weeks;
-        let currentWeek = weeks.find((w) => {
-          const start = Date.parse(w.start);
-          const end = Date.parse(w.end);
-          return now >= start && now <= end;
-        });
-        if (!currentWeek) {
-          currentWeek = weeks.find((w) => Date.parse(w.start) > now) || weeks[weeks.length - 1];
+        state.seasonType = seasonType;
+        state.year = targetYear;
+        if (weeks.length) {
+          const now = Date.now();
+          let currentWeek = weeks.find((w) => {
+            const start = Date.parse(w.start);
+            const end = Date.parse(w.end);
+            return Number.isFinite(start) && Number.isFinite(end) && now >= start && now <= end;
+          });
+          if (!currentWeek) {
+            currentWeek = weeks.find((w) => Date.parse(w.start) > now) || weeks[weeks.length - 1];
+          }
+          if (!weeks.some((w) => w.week === state.week)) {
+            state.week = currentWeek?.week || weeks[0]?.week || 1;
+          }
+        } else if (!state.week) {
+          state.week = 1;
         }
-        state.week = currentWeek?.week || weeks[0]?.week || 1;
         renderWeekPicker();
+        return { year: state.year, week: state.week, seasonType: state.seasonType };
+      }
+
+      async function hydrateWeekPicker(forceRefresh = false) {
+        if (!state.apiKey || state.settings.demoMode) {
+          return;
+        }
+        showLoading();
+        try {
+          await resolveSeasonContext({ forceRefresh });
+        } finally {
+          hideLoading();
+        }
       }
 
       function useDemoSchedule() {
         state.weeks = DEMO_DATA.weeks;
         state.year = DEMO_DATA.season;
         state.week = DEMO_DATA.weeks[0].week;
+        state.dataHealth = defaultDataHealth();
         renderWeekPicker();
         showToast('Demo schedule loaded.', 'info');
       }
@@ -1503,7 +2119,9 @@
       }
 
       async function predict(forceRefresh) {
+        diagnosticsStore.reset();
         if (state.settings.demoMode) {
+          state.dataHealth = defaultDataHealth();
           showLoading();
           setTimeout(() => {
             const calibrator = DEMO_DATA.calibrator;
@@ -1529,15 +2147,19 @@
         }
         try {
           showLoading();
+          await validateApiKey({ force: forceRefresh && !state.apiKeyValid });
+          await resolveSeasonContext({ forceRefresh });
           const dataset = await buildDataset(forceRefresh);
           state.lastDataset = dataset;
+          state.dataHealth = dataset.health;
+          const lambda = state.dataHealth.limitedPpaGames ? 0.3 : 0.35;
           worker.postMessage({
             type: 'trainAndPredict',
             payload: {
               training: dataset.training,
               inference: dataset.inference,
               features: GLM_FEATURES,
-              lambda: 0.35,
+              lambda,
               fallbackCalibrator: state.calibratorCache
             }
           });
@@ -1548,32 +2170,71 @@
       }
       async function buildDataset(forceRefresh = false) {
         const client = ensureCfbdClient();
-        const targetWeek = state.week;
         const seasonYear = state.year;
+        const targetWeek = state.week;
+        const seasonType = state.seasonType || 'regular';
+        const includeMarkets = state.settings.includeMarkets;
+        const includeWeather = state.settings.includeWeather;
         const seasons = [seasonYear - 2, seasonYear - 1, seasonYear];
-        const resultsBySeason = {};
+        const health = defaultDataHealth();
+        if (!includeMarkets) {
+          health.linesMissing = true;
+        }
+
         const scheduleBySeason = {};
+        const resultsBySeason = {};
+        const weekGames = await fetchWeekGames(client, seasonYear, targetWeek, seasonType, forceRefresh);
+        state.games = weekGames;
+
+        await fetchVenues(client, forceRefresh);
+
         for (const season of seasons) {
           const schedule = await fetchScheduleSeason(client, season, forceRefresh);
           scheduleBySeason[season] = schedule;
+          const tasks = [
+            () => fetchPpaTeams(client, season, forceRefresh),
+            () => fetchPregame(client, season, forceRefresh, { week: season === seasonYear ? targetWeek : undefined }),
+            () => fetchPpaGames(client, season, forceRefresh, { throughWeek: season === seasonYear ? Math.max(1, targetWeek - 1) : undefined })
+          ];
+          if (includeMarkets) {
+            tasks.push(() => fetchLines(client, season, forceRefresh, { week: season === seasonYear ? targetWeek : undefined }));
+          } else {
+            tasks.push(() => Promise.resolve(new Map()));
+          }
+          const [ppaTeams, pregame, ppaGames, lines] = await runWithConcurrency(tasks, 2);
           resultsBySeason[season] = {
-            ppaTeams: await fetchPpaTeams(client, season, forceRefresh),
-            ppaGames: await fetchPpaGames(client, season, forceRefresh),
-            pregame: await fetchPregame(client, season, forceRefresh),
-            lines: state.settings.includeMarkets ? await fetchLines(client, season, forceRefresh) : new Map()
+            ppaTeams,
+            pregame,
+            ppaGames,
+            lines: includeMarkets ? lines : new Map()
           };
+          if (season === seasonYear) {
+            if (!pregame || pregame.size === 0) {
+              health.pregameFallback = true;
+            }
+            if (!ppaGames || ppaGames.length === 0) {
+              health.limitedPpaGames = true;
+            }
+            if (includeMarkets) {
+              health.linesMissing = !lines || lines.size === 0;
+            }
+          }
         }
+
         const teams = await fetchTeams(client, seasonYear, forceRefresh);
         teamColors = teams.colors;
-        const inferenceGamesRaw = scheduleBySeason[seasonYear].filter((game) => game.week === targetWeek && (!game.status || !game.status.toLowerCase().includes('final')));
-        if (!inferenceGamesRaw.length) {
-          showToast('No games scheduled for the selected week.', 'warning');
-        }
+
         const training = [];
         const inference = [];
         const teamHistories = buildTeamHistories(scheduleBySeason, resultsBySeason);
+        const inferenceCandidates = weekGames && weekGames.length ? weekGames : (scheduleBySeason[seasonYear] || []).filter((game) => game.week === targetWeek);
+        const inferenceIds = new Set((inferenceCandidates || []).map((game) => game.id));
+        if (!inferenceCandidates.length) {
+          showToast('No games scheduled for the selected week.', 'warning');
+        }
+
         for (const season of seasons) {
-          const schedule = scheduleBySeason[season];
+          const schedule = scheduleBySeason[season] || [];
           const context = resultsBySeason[season];
           for (const game of schedule) {
             const gameTime = Date.parse(game.startDate);
@@ -1583,8 +2244,8 @@
             const completed = game.status && game.status.toLowerCase().includes('final');
             const homePoints = typeof game.homePoints === 'number' ? game.homePoints : null;
             const awayPoints = typeof game.awayPoints === 'number' ? game.awayPoints : null;
-            if (season === seasonYear && game.week === targetWeek && !completed) {
-              const weather = state.settings.includeWeather ? await resolveWeather(game, forceRefresh) : null;
+            if (season === seasonYear && inferenceIds.has(game.id) && !completed) {
+              const weather = includeWeather ? await resolveWeather(game, forceRefresh) : null;
               const adjusted = applyWeatherToFeatures(featuresBase, weather);
               inference.push({
                 features: adjusted.features,
@@ -1617,10 +2278,12 @@
             }
           }
         }
+
         if (!training.length) {
-          throw createError('Training set is empty. Unable to compute predictions.', 'metrics');
+          throw createError('Training set is empty. Unable to compute predictions.', 'metrics', 0, { toast: 'Training set unavailable from CFBD data.' });
         }
-        return { training, inference };
+
+        return { training, inference, health };
       }
 
       function buildTeamHistories(scheduleBySeason, resultsBySeason) {
@@ -1629,7 +2292,8 @@
           const games = scheduleBySeason[season];
           const context = resultsBySeason[season];
           const gameMap = new Map(games.map((g) => [g.id, g]));
-          for (const entry of context.ppaGames) {
+          const ppaGames = Array.isArray(context.ppaGames) ? context.ppaGames : [];
+          for (const entry of ppaGames) {
             const game = gameMap.get(entry.gameId);
             if (!game) continue;
             const timestamp = Date.parse(game.startDate);
@@ -1665,7 +2329,7 @@
         const tempoHome = (Number(offenseHome.standardDownsPpa) || 0) + (Number(offenseHome.passingDownsPpa) || 0);
         const tempoAway = (Number(offenseAway.standardDownsPpa) || 0) + (Number(offenseAway.passingDownsPpa) || 0);
         const tempoDelta = tempoHome - tempoAway;
-        const deltaR = resolveDeltaR(game.id, context);
+        const deltaR = resolveDeltaR(game, context);
         const market = state.settings.includeMarkets ? resolveMarket(game.id, context) : null;
         const availability = resolveAvailability(home, away);
         const gameTimestamp = Date.parse(game.startDate);
@@ -1705,26 +2369,41 @@
         };
       }
 
-      function resolveDeltaR(gameId, context) {
-        const pre = context.pregame.get(gameId);
+      function resolveDeltaR(game, context) {
+        if (!game || !context) return 0;
+        const pre = context.pregame?.get(game.id);
         if (pre) {
-          return Number(pre.homeWp || 0) - Number(pre.awayWp || 0);
+          const home = Number(pre.homeWp ?? pre.homeWinProb ?? 0);
+          const away = Number(pre.awayWp ?? pre.awayWinProb ?? 0);
+          if (Number.isFinite(home) && Number.isFinite(away)) {
+            return home - away;
+          }
         }
-        const market = context.lines.get(gameId);
+        const market = context.lines instanceof Map ? context.lines.get(game.id) : null;
         if (market && typeof market.spread === 'number') {
           const spread = Number(market.spread);
           const implied = normalCdf(-spread / 13.5);
           return implied - (1 - implied);
         }
-        return 0;
+        const metricsHome = context.ppaTeams?.get(game.homeTeam) || {};
+        const metricsAway = context.ppaTeams?.get(game.awayTeam) || {};
+        const offenseHome = Number(metricsHome.offense?.ppa) || 0;
+        const offenseAway = Number(metricsAway.offense?.ppa) || 0;
+        const defenseHome = Number(metricsHome.defense?.ppa) || 0;
+        const defenseAway = Number(metricsAway.defense?.ppa) || 0;
+        const rating = (offenseHome - defenseAway) - (offenseAway - defenseHome);
+        const homeEdge = game.neutralSite ? 0 : 0.05;
+        const logistic = 1 / (1 + Math.exp(-(rating * 8 + homeEdge)));
+        return logistic - (1 - logistic);
       }
 
       function resolveMarket(gameId, context) {
+        if (!context.lines || !(context.lines instanceof Map)) return null;
         return context.lines.get(gameId) || null;
       }
 
       async function resolveWeather(game, forceRefresh) {
-        const venue = await ensureVenue(game.venue);
+        const venue = await ensureVenue(game.venue, forceRefresh);
         if (!venue || venue.roof === 'closed' || venue.roof === 'domed') {
           return { wind: 0, precip: 0, temp: null, precipProb: 0 };
         }
@@ -1824,12 +2503,20 @@
         const meta = pred.meta || {};
         const startTime = Date.parse(meta.start);
         const probability = pred.probability;
-        const edge = computeMarketEdge(meta.market, probability);
+        let market = meta.market;
+        let edge = computeMarketEdge(market, probability);
+        if (!state.settings.includeMarkets || state.dataHealth.linesMissing) {
+          market = null;
+          edge = null;
+        }
         const drivers = computeDrivers(pred.contributions);
         const badge = [];
         if (meta.neutral) badge.push('Neutral Site');
         if (meta.venue?.roof) badge.push(`${meta.venue.roof} roof`);
         if (meta.venue?.surface) badge.push(meta.venue.surface);
+        const intervalPadding = predictionIntervalPadding();
+        const intervalRaw = pred.interval && intervalPadding > 0 ? widenInterval(pred.interval, intervalPadding) : pred.interval;
+        const finalInterval = intervalRaw || { p5: Math.max(0, probability - 0.01), p95: Math.min(1, probability + 0.01) };
         return {
           gameId: meta.gameId,
           homeTeam: meta.homeTeam,
@@ -1838,12 +2525,12 @@
           startTime,
           venue: meta.venue,
           weather: meta.weather,
-          market: meta.market,
+          market,
           availability: meta.availability,
           probability,
           awayProbability: 1 - probability,
           edge,
-          interval: pred.interval,
+          interval: finalInterval,
           drivers,
           badge,
           conference: meta.conference || {}
@@ -1868,6 +2555,25 @@
         if (implied === null) return null;
         const diff = probability - implied;
         return { diff, implied };
+      }
+
+      function predictionIntervalPadding() {
+        let padding = 0;
+        if (state.dataHealth.pregameFallback) {
+          padding += 0.05;
+        }
+        if (state.dataHealth.limitedPpaGames) {
+          padding += 0.04;
+        }
+        return Math.min(0.2, padding);
+      }
+
+      function widenInterval(interval, padding) {
+        if (!interval) return interval;
+        return {
+          p5: Math.max(0, interval.p5 - padding),
+          p95: Math.min(1, interval.p95 + padding)
+        };
       }
 
       function computeDrivers(contributions) {
@@ -1904,6 +2610,7 @@
         const weather = game.weather ? `<div class="metric"><strong>Weather</strong><span>${formatWeather(game.weather)}</span></div>` : '';
         const market = game.market ? `<div class="metric"><strong>Market</strong><span>${formatMarket(game.market)}</span></div>` : '';
         const availability = game.availability ? `<div class="metric"><strong>Availability</strong><span>${formatAvailability(game.availability)}</span></div>` : '';
+        const edgeMetric = game.edge ? `<div class="metric"><strong>Edge vs Market</strong><span>${formatEdge(game.edge)}</span></div>` : '';
         const badges = game.badge.map((b) => `<span>${b}</span>`).join('');
         card.innerHTML = `
           <div class="game-header">
@@ -1937,7 +2644,7 @@
             ${weather}
             ${market}
             ${availability}
-            <div class="metric"><strong>Edge vs Market</strong><span>${formatEdge(game.edge)}</span></div>
+            ${edgeMetric}
           </div>
           <details class="why">
             <summary>Why this prediction</summary>
@@ -2028,15 +2735,32 @@
         return cfbdClient;
       }
 
-      async function fetchScheduleSeason(client, season, forceRefresh) {
-        const cacheKey = `schedule-${season}`;
+      async function fetchWeekGames(client, year, week, seasonType, forceRefresh) {
+        const cacheKey = `weekGames-${year}-${seasonType || 'regular'}-${week}`;
         if (!forceRefresh) {
           const cached = getCache('metrics', cacheKey);
           if (cached) return cached;
         }
-        const data = await client.request('/games', { year: season, seasonType: 'regular' }, { cacheKey });
-        setCache('metrics', cacheKey, data);
-        return data || [];
+        const params = { year, week };
+        if (seasonType) {
+          params.seasonType = seasonType;
+        }
+        const data = await client.request('/games', params, { type: 'schedule', label: `Games ${year} week ${week}` });
+        const list = Array.isArray(data) ? data : [];
+        setCache('metrics', cacheKey, list);
+        return list;
+      }
+
+      async function fetchScheduleSeason(client, season, forceRefresh, seasonType = 'regular') {
+        const cacheKey = `schedule-${season}-${seasonType}`;
+        if (!forceRefresh) {
+          const cached = getCache('metrics', cacheKey);
+          if (cached) return cached;
+        }
+        const data = await client.request('/games', { year: season, seasonType }, { type: 'schedule', label: `Schedule ${season}` });
+        const list = Array.isArray(data) ? data : [];
+        setCache('metrics', cacheKey, list);
+        return list;
       }
 
       async function fetchPpaTeams(client, season, forceRefresh) {
@@ -2045,44 +2769,60 @@
           const cached = getCache('metrics', cacheKey);
           if (cached) return new Map(cached.map((item) => [item.team, item]));
         }
-        const data = await client.request('/ppa/teams', { year: season }, { cacheKey });
+        const data = await client.request('/ppa/teams', { year: season }, { label: `PPA teams ${season}` });
         const map = new Map();
         (data || []).forEach((item) => map.set(item.team, item));
         setCache('metrics', cacheKey, Array.from(map.values()));
         return map;
       }
 
-      async function fetchPpaGames(client, season, forceRefresh) {
-        const cacheKey = `ppaGames-${season}`;
+      async function fetchPpaGames(client, season, forceRefresh, options = {}) {
+        const throughWeek = typeof options.throughWeek === 'number' ? options.throughWeek : undefined;
+        const cacheKey = throughWeek ? `ppaGames-${season}-${throughWeek}` : `ppaGames-${season}`;
         if (!forceRefresh) {
           const cached = getCache('metrics', cacheKey);
           if (cached) return cached;
         }
-        const data = await client.request('/ppa/games', { year: season }, { cacheKey });
-        setCache('metrics', cacheKey, data);
-        return data || [];
+        const params = { year: season };
+        if (throughWeek !== undefined && throughWeek >= 1) {
+          params.week = throughWeek;
+        }
+        const data = await client.request('/ppa/games', params, { label: `PPA games ${season}`, type: 'metrics' });
+        const list = Array.isArray(data) ? data : [];
+        setCache('metrics', cacheKey, list);
+        return list;
       }
 
-      async function fetchPregame(client, season, forceRefresh) {
-        const cacheKey = `pregame-${season}`;
+      async function fetchPregame(client, season, forceRefresh, options = {}) {
+        const weekParam = typeof options.week === 'number' && options.week >= 1 ? options.week : undefined;
+        const cacheKey = weekParam ? `pregame-${season}-${weekParam}` : `pregame-${season}`;
         if (!forceRefresh) {
           const cached = getCache('metrics', cacheKey);
           if (cached) return new Map(cached.map((item) => [item.gameId, item]));
         }
-        const data = await client.request('/metrics/wp/pregame', { year: season }, { cacheKey });
+        const params = { year: season };
+        if (weekParam !== undefined) {
+          params.week = weekParam;
+        }
+        const data = await client.request('/metrics/wp/pregame', params, { label: `Pregame WP ${season}`, type: 'metrics' });
         const map = new Map();
         (data || []).forEach((item) => map.set(item.gameId, item));
         setCache('metrics', cacheKey, Array.from(map.values()));
         return map;
       }
 
-      async function fetchLines(client, season, forceRefresh) {
-        const cacheKey = `lines-${season}`;
+      async function fetchLines(client, season, forceRefresh, options = {}) {
+        const weekParam = typeof options.week === 'number' && options.week >= 1 ? options.week : undefined;
+        const cacheKey = weekParam ? `lines-${season}-${weekParam}` : `lines-${season}`;
         if (!forceRefresh) {
           const cached = getCache('lines', cacheKey);
           if (cached) return new Map(cached.map((item) => [item.gameId, item]));
         }
-        const data = await client.request('/lines', { year: season }, { cacheKey, type: 'lines' });
+        const params = { year: season };
+        if (weekParam !== undefined) {
+          params.week = weekParam;
+        }
+        const data = await client.request('/lines', params, { type: 'lines', label: `Lines ${season}` });
         const map = new Map();
         (data || []).forEach((item) => {
           const simplified = simplifyLine(item);
@@ -2106,13 +2846,47 @@
             return { colors };
           }
         }
-        const data = await client.request('/teams', { year: season }, { cacheKey });
+        const data = await client.request('/teams', { year: season }, { label: `Teams ${season}` });
         const colors = new Map();
         (data || []).forEach((team) => {
           colors.set(team.school, { primary: team.color || '#4f9cff' });
         });
         setCache('metrics', cacheKey, data);
         return { colors };
+      }
+
+      async function fetchVenues(client, forceRefresh) {
+        const cacheKey = 'venues-all';
+        if (!forceRefresh && venueCache.size) {
+          return venueCache;
+        }
+        if (!forceRefresh) {
+          const cached = getCache('metrics', cacheKey);
+          if (cached) {
+            hydrateVenueCaches(cached);
+            return venueCache;
+          }
+        }
+        const data = await client.request('/venues', {}, { label: 'Venues' });
+        hydrateVenueCaches(data || []);
+        setCache('metrics', cacheKey, Array.from(venueCache.values()));
+        return venueCache;
+      }
+
+      function hydrateVenueCaches(list) {
+        venueCache = new Map();
+        venueNameCache = new Map();
+        (list || []).forEach((venue) => storeVenueRecord(venue));
+      }
+
+      function storeVenueRecord(venue) {
+        if (!venue) return;
+        if (venue.id !== undefined && venue.id !== null) {
+          venueCache.set(String(venue.id), venue);
+        }
+        if (venue.name) {
+          venueNameCache.set(String(venue.name).toLowerCase(), venue);
+        }
       }
 
       function simplifyLine(item) {
@@ -2126,58 +2900,71 @@
           lastUpdated: item.lastUpdated || null
         };
       }
-      async function ensureVenue(venue) {
+      async function ensureVenue(venue, forceRefresh = false) {
         if (!venue) return null;
-        if (venue.latitude && venue.longitude) return venue;
-        if (venue.id && venueCache.has(venue.id)) {
-          return venueCache.get(venue.id);
-        }
-        if (!venue.id) return venue;
         const client = ensureCfbdClient();
-        const result = await client.request('/venues', { id: venue.id });
-        const resolved = Array.isArray(result) ? result[0] : result;
-        if (resolved) {
-          venueCache.set(venue.id, resolved);
+        await fetchVenues(client, forceRefresh || (!venueCache.size && !forceRefresh));
+        let resolved = null;
+        if (venue.id !== undefined && venue.id !== null) {
+          resolved = venueCache.get(String(venue.id)) || null;
         }
-        return resolved || venue;
+        if (!resolved && venue.name) {
+          resolved = venueNameCache.get(String(venue.name).toLowerCase()) || null;
+        }
+        if (resolved) {
+          return Object.assign({}, resolved, venue);
+        }
+        return venue;
       }
 
       class CfbdClient {
         constructor(getKey) {
-          this.getKey = getKey;
-          this.rateLimiter = new TokenBucket({ capacity: 6, refillRate: 6 });
+          this.getKeyFn = getKey;
+          this.rateLimiter = new TokenBucket({ capacity: 2, refillRate: 2 });
+          this.validatedKey = null;
         }
 
-        async request(path, params = {}, metadata = {}) {
-          const url = new URL(CFBD_BASE + path);
-          for (const [key, value] of Object.entries(params)) {
-            if (value === undefined || value === null) continue;
-            url.searchParams.set(key, value);
+        getKey() {
+          return sanitizeApiKey(this.getKeyFn() || '');
+        }
+
+        async validateKey(force = false) {
+          const key = this.getKey();
+          if (!key) {
+            throw createError('CFBD API key required.', 'auth', 0, { toast: 'CFBD API key required.' });
           }
-          await this.rateLimiter.removeToken();
-          const options = {
-            headers: {
-              'Authorization': `Bearer ${this.getKey()}`
-            }
-          };
-          let attempt = 0;
-          while (attempt < 5) {
-            attempt += 1;
-            const response = await fetchWithBackoff(url.toString(), options);
-            if (response.status === 401) {
-              throw createError('Unauthorized: Check API key', 'auth', 401);
-            }
-            if (response.status === 429) {
-              const waitMs = Math.min(60000, Math.pow(2, attempt) * 1000 + deterministicJitter(attempt));
-              await sleep(waitMs);
-              continue;
-            }
-            if (!response.ok) {
-              throw createError(`Request failed: ${response.status}`, metadata.type || 'metrics', response.status);
-            }
-            return response.json();
+          if (!force && this.validatedKey === key && state.apiKeyValid) {
+            return true;
           }
-          throw createError('Rate limit exceeded after retries', metadata.type || 'metrics', 429);
+          await cfbdFetch('/info', {
+            key,
+            params: {},
+            label: 'Key validation',
+            type: 'auth',
+            rateLimiter: this.rateLimiter
+          });
+          this.validatedKey = key;
+          return true;
+        }
+
+        async request(path, params = {}, options = {}) {
+          const key = this.getKey();
+          if (!key) {
+            throw createError('CFBD API key required.', options.type || 'metrics', 0, { toast: 'CFBD API key required.' });
+          }
+          if (options.skipValidation !== true) {
+            if (this.validatedKey !== key) {
+              await this.validateKey(options.forceValidate);
+            }
+          }
+          const result = await cfbdFetch(path, {
+            key,
+            params,
+            label: options.label,
+            type: options.type || 'metrics',
+            rateLimiter: this.rateLimiter
+          });
+          return result.data;
         }
       }
 
@@ -2192,7 +2979,7 @@
         async removeToken() {
           while (this.tokens < 1) {
             this.refill();
-            await sleep(100);
+            await sleep(120);
           }
           this.tokens -= 1;
           this.refill();
@@ -2200,33 +2987,215 @@
 
         refill() {
           const now = performance.now();
-          const elapsed = (now - this.lastRefill) / 1000;
+          const elapsed = Math.max(0, (now - this.lastRefill) / 1000);
           if (elapsed <= 0) return;
           this.tokens = Math.min(this.capacity, this.tokens + elapsed * this.refillRate);
           this.lastRefill = now;
         }
       }
 
+      async function cfbdFetch(path, { params = {}, key, label, type = 'metrics', rateLimiter, signal } = {}) {
+        const query = buildQueryString(params);
+        const entry = diagnosticsStore.add({ path, params, query, label });
+        const url = `${CFBD_BASE}${path}${query}`;
+        const headers = {
+          Authorization: `Bearer ${key}`,
+          Accept: 'application/json'
+        };
+        const options = {
+          method: 'GET',
+          headers,
+          mode: 'cors',
+          cache: 'no-store',
+          credentials: 'omit',
+          signal
+        };
+        const retrySchedule = [0, 300, 800, 1600, 3000];
+        for (let attempt = 0; attempt < retrySchedule.length; attempt += 1) {
+          if (rateLimiter) {
+            await rateLimiter.removeToken();
+          }
+          diagnosticsStore.update(entry.id, {
+            retries: attempt,
+            status: attempt === 0 ? 'pending' : 'rate-limit',
+            statusCode: null,
+            message: attempt === 0 ? 'Pending' : 'CFBD 429: Rate limited; retrying…',
+            ok: false
+          });
+          try {
+            const response = await fetch(url, options);
+            const status = response.status;
+            const text = await response.text();
+            let data = null;
+            if (text) {
+              try {
+                data = JSON.parse(text);
+              } catch (err) {
+                diagnosticsStore.update(entry.id, {
+                  status: 'error',
+                  statusCode: status,
+                  message: 'Malformed JSON payload.',
+                  sample: text.slice(0, 200)
+                });
+                throw createError(`Malformed JSON from ${path}${query}`, type, status, {
+                  toast: `Malformed JSON: ${path}${query}`,
+                  entryId: entry.id,
+                  path,
+                  params
+                });
+              }
+            }
+            const sample = text ? text.slice(0, 200) : '';
+            if (response.ok) {
+              const empty = data === null || (Array.isArray(data) && data.length === 0);
+              diagnosticsStore.update(entry.id, {
+                status: 'success',
+                statusCode: status,
+                message: empty ? '200 OK (empty payload)' : '200 OK',
+                sample,
+                retries: attempt,
+                ok: true
+              });
+              return { data: empty ? (Array.isArray(data) ? [] : data) : data, status, entryId: entry.id };
+            }
+            if (status === 429 && attempt < retrySchedule.length - 1) {
+              diagnosticsStore.update(entry.id, {
+                status: 'rate-limit',
+                statusCode: status,
+                message: 'CFBD 429: Rate limited; retrying…',
+                sample,
+                retries: attempt,
+                ok: false
+              });
+              const jitter = 50 + Math.random() * 150;
+              await sleep(retrySchedule[attempt + 1] + jitter);
+              continue;
+            }
+            const mapped = mapCfbdError(status, path, query, params);
+            diagnosticsStore.update(entry.id, {
+              status: 'error',
+              statusCode: status,
+              message: mapped.message,
+              sample,
+              retries: attempt,
+              ok: false
+            });
+            throw createError(mapped.toast, type, status, {
+              toast: mapped.toast,
+              entryId: entry.id,
+              path,
+              params
+            });
+          } catch (err) {
+            if (err.name === 'AbortError') {
+              diagnosticsStore.update(entry.id, {
+                status: 'error',
+                statusCode: null,
+                message: 'Request aborted.',
+                ok: false
+              });
+              throw createError('Request aborted.', type, 0, {
+                toast: 'Request aborted.',
+                entryId: entry.id,
+                path,
+                params
+              });
+            }
+            if (err.metadata) {
+              throw err;
+            }
+            diagnosticsStore.update(entry.id, {
+              status: 'error',
+              statusCode: null,
+              message: 'Network error/offline.',
+              ok: false
+            });
+            throw createError('Network error/offline.', type, 0, {
+              toast: 'Network error/offline.',
+              entryId: entry.id,
+              path,
+              params
+            });
+          }
+        }
+        diagnosticsStore.update(entry.id, {
+          status: 'error',
+          statusCode: 429,
+          message: 'CFBD 429: Rate limited after retries.',
+          ok: false
+        });
+        throw createError('CFBD 429: Rate limited after retries.', type, 429, {
+          toast: `CFBD 429: Rate limited after retries. ${path}${query}`,
+          entryId: entry.id,
+          path,
+          params
+        });
+      }
+
+      function buildQueryString(params = {}) {
+        const entries = [];
+        for (const [key, value] of Object.entries(params)) {
+          if (value === undefined || value === null || value === '') continue;
+          if (Array.isArray(value)) {
+            value.forEach((item) => {
+              if (item === undefined || item === null || item === '') return;
+              entries.push(`${encodeURIComponent(key)}=${encodeURIComponent(item)}`);
+            });
+          } else {
+            entries.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+          }
+        }
+        return entries.length ? `?${entries.join('&')}` : '';
+      }
+
+      function mapCfbdError(status, path, query, params) {
+        const endpoint = `${path}${query}`;
+        if (status === 401) {
+          return { message: 'CFBD 401: Invalid key.', toast: 'CFBD 401: Invalid key.' };
+        }
+        if (status === 403) {
+          return { message: 'CFBD 403: Forbidden (check plan/permissions).', toast: `CFBD 403: Forbidden → ${endpoint}` };
+        }
+        if (status === 404) {
+          return { message: 'CFBD 404: Endpoint/path not found.', toast: `CFBD 404: ${endpoint}` };
+        }
+        if (status === 422 || status === 400) {
+          const paramEcho = JSON.stringify(params);
+          const message = `CFBD param error: ${endpoint} → ${paramEcho}`;
+          return { message, toast: message };
+        }
+        if (status === 429) {
+          return { message: 'CFBD 429: Rate limited; retrying…', toast: `CFBD 429: Rate limited → ${endpoint}` };
+        }
+        return { message: `CFBD ${status}: ${endpoint}`, toast: `CFBD ${status}: ${endpoint}` };
+      }
+
       async function fetchWithBackoff(url, options = {}) {
         try {
-          return await fetch(url, options);
+          return await fetch(url, Object.assign({
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-store',
+            credentials: 'omit'
+          }, options));
         } catch (err) {
-          throw createError('Network error', 'network');
+          throw createError('Network error/offline.', 'network', 0, { toast: 'Network error/offline.' });
         }
       }
 
-      function deterministicJitter(seedOffset) {
-        const rand = mulberry32(DETERMINISTIC_SEED + seedOffset * 97);
-        return Math.floor(rand() * 500);
-      }
-
-      function mulberry32(a) {
-        return function () {
-          let t = a += 0x6D2B79F5;
-          t = Math.imul(t ^ t >>> 15, t | 1);
-          t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-          return ((t ^ t >>> 14) >>> 0) / 4294967296;
-        };
+      async function runWithConcurrency(tasks, limit = 2) {
+        const executing = new Set();
+        const results = [];
+        for (const task of tasks) {
+          while (executing.size >= limit) {
+            await Promise.race(executing);
+          }
+          const taskPromise = Promise.resolve().then(task);
+          executing.add(taskPromise);
+          results.push(taskPromise);
+          taskPromise.finally(() => executing.delete(taskPromise));
+        }
+        return Promise.all(results);
       }
 
       function setCache(type, key, value) {
@@ -2265,26 +3234,32 @@
         }
         toDelete.forEach((key) => localStorage.removeItem(key));
       }
-      function handleError(err, type) {
+      function handleError(err, fallbackType) {
         console.error(err);
+        const meta = err && err.metadata ? err.metadata : {};
+        const type = meta.type || fallbackType || 'metrics';
+        const message = meta.toast || err.message || 'Unexpected error';
+        if (meta.entryId) {
+          toggleDiagnosticsPanel(true);
+        }
         if (type === 'lines') {
           state.settings.includeMarkets = false;
           elements.toggleMarkets.checked = false;
-          showToast('Markets unavailable. Disabled market features.', 'warning');
-        } else if (type === 'weather') {
+          showToast(message, 'warning');
+          return;
+        }
+        if (type === 'weather') {
           state.settings.includeWeather = false;
           elements.toggleWeather.checked = false;
-          showToast('Weather unavailable. Disabled weather features.', 'warning');
-        } else if (type === 'auth') {
-          showToast('Unauthorized. Please update API key.', 'danger');
-          toggleSettings(true);
-        } else if (type === 'metrics') {
-          showToast('Metrics unavailable. Try again later.', 'danger');
-        } else if (type === 'schedule') {
-          showToast('Schedule unavailable. Check API status.', 'danger');
-        } else {
-          showToast(err.message || 'Unexpected error', 'danger');
+          showToast(message, 'warning');
+          return;
         }
+        if (type === 'auth') {
+          showToast(message, 'danger');
+          toggleSettings(true);
+          return;
+        }
+        showToast(message, 'danger');
       }
 
       function showLoading() {
@@ -2315,8 +3290,10 @@
 
       function resetAll() {
         clearCaches();
+        diagnosticsStore.reset();
         state.predictions = [];
         state.availability = {};
+        state.dataHealth = defaultDataHealth();
         persistAvailability();
         renderPredictions();
         showToast('State reset.', 'success');
@@ -2356,7 +3333,7 @@
 
       function createError(message, type, status) {
         const error = new Error(message);
-        error.metadata = { type, status };
+        error.metadata = Object.assign({ type, status }, arguments[3] || {});
         return error;
       }
 
@@ -2365,5 +3342,17 @@
       }
     })();
   </script>
+
+  <!-- README: Diagnostics & Retry Logic
+    Diagnostics panel: Toggle the bug icon in the header to review the most recent CFBD
+    requests, statuses, retry attempts, and payload snippets. Use "Copy diagnostics" to share
+    the structured log or run "Test API" to execute the /info, /calendar, /games, /ppa/teams,
+    and /metrics/wp/pregame smoke checks.
+
+    Retry & rate limiting: All CFBD fetches flow through cfbdFetch with a token bucket capped at
+    two requests per second. 429 responses trigger exponential backoff (300ms → 800ms → 1600ms →
+    3000ms) with jitter, while other HTTP errors surface descriptive status messages so the UI can
+    degrade gracefully without surfacing the old "metrics unavailable" banner.
+  -->
 </body>
 </html>
