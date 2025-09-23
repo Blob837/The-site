@@ -401,7 +401,7 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>CFB Wizard</h1>
+        <h1>CFB Wizard V3</h1>
         <div class="week-selector">
             <button class="week-btn" data-offset="-1">← Prev</button>
             <button class="week-btn active" data-offset="0">This Week</button>
@@ -592,16 +592,28 @@
             
             getWeekBounds(offset = 0) {
                 const now = new Date();
-                const dayOfWeek = now.getDay();
-                const friday = new Date(now);
-                friday.setDate(now.getDate() - dayOfWeek + 5 + (offset * 7));
-                friday.setHours(0, 0, 0, 0);
                 
-                const sunday = new Date(friday);
-                sunday.setDate(friday.getDate() + 2);
-                sunday.setHours(23, 59, 59, 999);
+                // For college football, let's use Tuesday-Monday as our "week"
+                // since games can happen Tuesday through Monday
+                const currentTuesday = new Date(now);
+                const daysFromTuesday = (now.getDay() + 5) % 7; // Convert to days from Tuesday
+                currentTuesday.setDate(now.getDate() - daysFromTuesday);
                 
-                return { start: friday, end: sunday };
+                // Apply offset
+                const targetTuesday = new Date(currentTuesday);
+                targetTuesday.setDate(currentTuesday.getDate() + (offset * 7));
+                targetTuesday.setHours(0, 0, 0, 0);
+                
+                const nextMonday = new Date(targetTuesday);
+                nextMonday.setDate(targetTuesday.getDate() + 6);
+                nextMonday.setHours(23, 59, 59, 999);
+                
+                console.log(`Week bounds (offset ${offset}):`, {
+                    start: targetTuesday.toISOString(),
+                    end: nextMonday.toISOString()
+                });
+                
+                return { start: targetTuesday, end: nextMonday };
             },
             
             exponentialDecay(value, weeks, lambda = 0.7) {
@@ -1175,12 +1187,38 @@
                     this.cache.set(cacheKey, games, 120); // 2 hour TTL
                 }
                 
+                // Debug: Check what we got back
+                console.log(`API returned ${games ? games.length : 0} total games`);
+                console.log('Date range filtering:', { start: start.toISOString(), end: end.toISOString() });
+                
+                if (games && games.length > 0) {
+                    console.log('Sample game dates:', games.slice(0, 3).map(g => ({
+                        teams: `${g.away_team} @ ${g.home_team}`,
+                        date: g.start_date,
+                        parsed: new Date(g.start_date).toISOString()
+                    })));
+                }
+                
                 // Filter games for selected date range
-                state.games = games.filter(game => {
-                    if (!game.start_date) return false;
+                state.games = games ? games.filter(game => {
+                    if (!game.start_date) {
+                        console.log('Game missing start_date:', game);
+                        return false;
+                    }
                     const gameDate = new Date(game.start_date);
-                    return gameDate >= start && gameDate <= end;
-                });
+                    const inRange = gameDate >= start && gameDate <= end;
+                    if (!inRange) {
+                        console.log('Game outside range:', {
+                            teams: `${game.away_team} @ ${game.home_team}`,
+                            gameDate: gameDate.toISOString(),
+                            start: start.toISOString(),
+                            end: end.toISOString()
+                        });
+                    }
+                    return inRange;
+                }) : [];
+                
+                console.log(`Filtered to ${state.games.length} games for selected week`);
                 
                 this.renderGames();
             }
@@ -1193,11 +1231,31 @@
             }
             
             getWeekNumber(date) {
-                // Simplified week calculation for CFB season
-                const seasonStart = new Date(date.getFullYear(), 7, 26); // Late August
-                const diffTime = date - seasonStart;
-                const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
-                return Math.max(1, Math.min(15, diffWeeks));
+                // College football season typically starts late August/early September
+                // Week 1 is usually the Saturday closest to September 1st
+                const year = date.getFullYear();
+                const sept1 = new Date(year, 8, 1); // September 1st
+                
+                // Find the first Saturday of the season (closest to Sept 1)
+                let seasonStart = new Date(sept1);
+                while (seasonStart.getDay() !== 6) { // 6 = Saturday
+                    seasonStart.setDate(seasonStart.getDate() + 1);
+                }
+                
+                // If we're before the season, try previous year
+                if (date < seasonStart) {
+                    seasonStart = new Date(year - 1, 8, 1);
+                    while (seasonStart.getDay() !== 6) {
+                        seasonStart.setDate(seasonStart.getDate() + 1);
+                    }
+                }
+                
+                const diffTime = date.getTime() - seasonStart.getTime();
+                const diffWeeks = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7)) + 1;
+                
+                console.log(`Week calculation: ${date.toDateString()} -> Week ${diffWeeks} (season started ${seasonStart.toDateString()})`);
+                
+                return Math.max(1, Math.min(17, diffWeeks)); // CFB season is roughly 17 weeks including playoffs
             }
             
             async runPredictions() {
