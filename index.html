@@ -585,14 +585,22 @@
         seededRNG: new RNG(),
         
         formatDate(dateStr) {
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('en-US', {
-                weekday: 'short',
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit'
-            });
+            try {
+                if (!dateStr) return 'TBD';
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) return 'Invalid Date';
+                
+                return date.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+            } catch (error) {
+                console.error('Date formatting error:', error, dateStr);
+                return 'Date Error';
+            }
         },
         
         getWeekBounds(offset = 0) {
@@ -1206,72 +1214,27 @@
                 this.cfbdClient = new CFBDClient(state.settings.cfbdKey);
             }
             
-            const { start, end } = utils.getWeekBounds(state.currentWeek);
-            const year = start.getFullYear();
-            const week = this.getWeekNumber(start);
+            // KISS principle - just get 2024 games for now
+            const year = 2024; // Use 2024 since 2025 season might not be available
             
             // Check cache first
-            const cacheKey = `games_${year}_${week}`;
+            const cacheKey = `games_${year}`;
             let games = this.cache.get(cacheKey);
             
             if (!games) {
-                try {
-                    // Try with week parameter first
-                    games = await this.cfbdClient.getGames(year, week);
-                } catch (error) {
-                    // If week fails, try without week and filter client-side
-                    console.warn('Week parameter failed, trying without:', error.message);
-                    games = await this.cfbdClient.getGames(year);
+                console.log('Fetching games from API...');
+                games = await this.cfbdClient.getGames(year, null, 'fbs');
+                console.log('Got games:', games?.length || 0);
+                if (games && games.length > 0) {
+                    console.log('Sample game:', games[0]);
                 }
                 this.cache.set(cacheKey, games, 120); // 2 hour TTL
             }
             
-            // Debug: Check what we got back
-            console.log(`API returned ${games ? games.length : 0} total games`);
-            console.log('Date range filtering:', { start: start.toISOString(), end: end.toISOString() });
+            // Just take the games as-is for now - no date filtering
+            state.games = games || [];
             
-            if (games && games.length > 0) {
-                console.log('Sample game dates:', games.slice(0, 3).map(g => ({
-                    teams: `${g.away_team} @ ${g.home_team}`,
-                    date: g.start_date,
-                    parsed: new Date(g.start_date).toISOString()
-                })));
-            }
-            
-            // Filter games for selected date range
-            state.games = games ? games.filter(game => {
-                if (!game.start_date) {
-                    console.log('Game missing start_date:', game);
-                    return false;
-                }
-                
-                let gameDate;
-                try {
-                    gameDate = new Date(game.start_date);
-                    // Check if date is valid
-                    if (isNaN(gameDate.getTime())) {
-                        console.error('Invalid date for game:', game.start_date, game);
-                        return false;
-                    }
-                } catch (error) {
-                    console.error('Error parsing game date:', error, game);
-                    return false;
-                }
-                
-                const inRange = gameDate >= start && gameDate <= end;
-                if (!inRange) {
-                    console.log('Game outside range:', {
-                        teams: `${game.away_team} @ ${game.home_team}`,
-                        gameDate: gameDate.toISOString(),
-                        start: start.toISOString(),
-                        end: end.toISOString()
-                    });
-                }
-                return inRange;
-            }) : [];
-            
-            console.log(`Filtered to ${state.games.length} games for selected week`);
-            
+            console.log(`Final game count: ${state.games.length}`);
             this.renderGames();
         }
         
