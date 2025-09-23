@@ -589,8 +589,10 @@
                 <label for="demoMode">Demo mode (offline data)</label>
             </div>
 
-            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <div style="display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
                 <button class="button" id="saveSettings">Save Settings</button>
+                <!-- Added Test API button so users can validate their key against the v2 endpoint -->
+                <button class="button secondary" id="testApi">Test API</button>
                 <button class="button secondary" id="closeSettings2">Cancel</button>
                 <button class="button danger" id="forgetKeys">Forget Keys</button>
             </div>
@@ -599,7 +601,8 @@
 
     <div class="bottom-bar">
         <div class="bottom-actions">
-            <button class="button" id="refreshData">Refresh Data</button>
+            <!-- Renamed to match the expected user flow described in the requirements -->
+            <button class="button" id="loadGames">Load Games</button>
             <button class="button" id="predict">Predict</button>
             <button class="button secondary" id="exportData">Export JSON</button>
             <button class="button secondary" id="resetApp">Reset</button>
@@ -760,7 +763,8 @@
         // CFBD API client
         class CFBDClient {
             constructor() {
-                this.baseURL = 'https://api.collegefootballdata.com';
+                // v1 host stopped serving requests for this app - point to the v2 "apinext" host instead.
+                this.baseURL = 'https://apinext.collegefootballdata.com';
                 this.rateLimiter = new RateLimiter(2, 5);
             }
 
@@ -786,11 +790,13 @@
             }
 
             async fetch(endpoint, params = {}) {
+                // Prevent silent failures when no key was saved.
                 if (!AppState.settings.cfbdKey && !AppState.settings.demoMode) {
                     throw new Error('CFBD API key required');
                 }
 
                 if (AppState.settings.demoMode) {
+                    console.log('[CFBD] Demo mode request', { endpoint, params });
                     return this.getDemoData(endpoint);
                 }
 
@@ -802,13 +808,23 @@
                         url.searchParams.append(key, value);
                     }
                 });
+                const requestUrl = url.toString();
 
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': `Bearer ${AppState.settings.cfbdKey}`,
-                        'Accept': 'application/json'
-                    }
-                });
+                console.log('[CFBD] Request', { url: requestUrl, params });
+
+                let response;
+                try {
+                    response = await fetch(requestUrl, {
+                        headers: {
+                            'Authorization': `Bearer ${AppState.settings.cfbdKey}`,
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                } catch (networkError) {
+                    console.error('[CFBD] Network error', networkError);
+                    throw new Error('Network error reaching CollegeFootballData API');
+                }
 
                 const rawText = await response.text();
                 let data = null;
@@ -817,15 +833,23 @@
                     try {
                         data = JSON.parse(rawText);
                     } catch (parseError) {
+                        console.warn('[CFBD] Response parse fallback', parseError);
                         data = rawText;
                     }
                 }
+
+                console.log('[CFBD] Response', {
+                    url: requestUrl,
+                    status: response.status,
+                    ok: response.ok,
+                    sample: Array.isArray(data) ? data.slice(0, 5) : data
+                });
 
                 if (response.status === 401) {
                     throw new Error('Invalid CFBD API key');
                 }
                 if (response.status === 429) {
-                    throw new Error('Rate limit exceeded, retrying...');
+                    throw new Error('Rate limit exceeded. Please wait before retrying.');
                 }
                 if (!response.ok) {
                     let detail = '';
@@ -843,11 +867,22 @@
                     throw new Error(`CFBD API error: ${response.status}${suffix}`);
                 }
 
-                if (data === null) {
+                if (data === null || data === '') {
+                    console.warn('[CFBD] Empty response body', { url: requestUrl });
                     return [];
                 }
 
                 return data;
+            }
+
+            // Added explicit connectivity check so we can validate credentials before loading games.
+            async testConnection() {
+                const teams = await this.fetch('/teams', { classification: 'fbs' });
+                const normalized = Array.isArray(teams) ? teams : [];
+                return {
+                    count: normalized.length,
+                    sample: normalized.slice(0, 5)
+                };
             }
 
             getDemoData(endpoint) {
@@ -1385,11 +1420,12 @@
             settings.useWeather = document.getElementById('useWeather').checked;
             settings.manualInjuries = document.getElementById('manualInjuries').checked;
             settings.demoMode = document.getElementById('demoMode').checked;
-            
+
             if (settings.cfbdKey) {
                 localStorage.setItem('cfbd_key', settings.cfbdKey);
             }
-            
+
+            console.log('Settings saved (key length):', settings.cfbdKey ? settings.cfbdKey.length : 0);
             document.getElementById('settingsModal').classList.remove('show');
             showToast('Settings saved', 'success');
         }
@@ -1451,15 +1487,17 @@
                 document.getElementById('closeSettings').addEventListener('click', () => {
                     document.getElementById('settingsModal').classList.remove('show');
                 });
-                
+
+                document.getElementById('testApi').addEventListener('click', () => this.testApiConnection());
+
                 document.getElementById('closeSettings2').addEventListener('click', () => {
                     document.getElementById('settingsModal').classList.remove('show');
                 });
-                
+
                 document.getElementById('saveSettings').addEventListener('click', saveSettings);
                 document.getElementById('forgetKeys').addEventListener('click', forgetKeys);
-                
-                document.getElementById('refreshData').addEventListener('click', () => this.refreshData({ maintainSelection: true }));
+
+                document.getElementById('loadGames').addEventListener('click', () => this.refreshData({ maintainSelection: true }));
                 document.getElementById('predict').addEventListener('click', () => this.predict());
                 document.getElementById('exportData').addEventListener('click', () => this.exportData());
                 document.getElementById('resetApp').addEventListener('click', () => this.reset());
@@ -1475,6 +1513,54 @@
                         e.target.classList.remove('show');
                     }
                 });
+            }
+
+            // Allow users to validate their API key before loading games.
+            async testApiConnection() {
+                const keyInput = document.getElementById('cfbdKey');
+                const button = document.getElementById('testApi');
+                if (!keyInput) {
+                    return;
+                }
+
+                const apiKey = keyInput.value.trim();
+                if (!apiKey) {
+                    showToast('Enter your CFBD API key before testing', 'danger');
+                    return;
+                }
+
+                const previousKey = AppState.settings.cfbdKey;
+                const previousDemo = AppState.settings.demoMode;
+
+                showToast('Testing API connection...', 'warning');
+                console.log('Testing CFBD API key (length only):', apiKey.length);
+
+                if (button) {
+                    button.disabled = true;
+                    button.textContent = 'Testing...';
+                }
+
+                AppState.settings.cfbdKey = apiKey;
+                AppState.settings.demoMode = false;
+
+                try {
+                    const result = await this.predictionEngine.cfbdClient.testConnection();
+                    const teamCount = result.count ?? 0;
+                    showToast(`API connection good - Found ${teamCount} teams`, 'success');
+                    console.log('CFBD API test result:', result);
+                } catch (error) {
+                    console.error('CFBD API test failed:', error);
+                    const toastType = error.message.includes('Rate limit') ? 'warning' : 'danger';
+                    showToast(`API test failed: ${error.message}`, toastType);
+                } finally {
+                    AppState.settings.cfbdKey = previousKey;
+                    AppState.settings.demoMode = previousDemo;
+
+                    if (button) {
+                        button.disabled = false;
+                        button.textContent = 'Test API';
+                    }
+                }
             }
 
             async ensureCalendarLoaded() {
@@ -1657,6 +1743,8 @@
                     return;
                 }
 
+                // Surface progress to the user so they know the request is underway.
+                showToast('Loading games from CollegeFootballData...', 'warning');
                 UI.showLoading();
 
                 try {
@@ -1664,6 +1752,11 @@
                     this.syncCalendarSelection({ maintainSelection });
 
                     const seasonType = this.predictionEngine.cfbdClient.normalizeSeasonType(AppState.currentSeasonType);
+                    console.log('Requesting games with params:', {
+                        season: AppState.currentSeason,
+                        week: AppState.currentWeek,
+                        seasonType
+                    });
 
                     const games = await this.predictionEngine.cfbdClient.getGames(
                         AppState.currentSeason,
@@ -1676,6 +1769,11 @@
                     let resolvedGames = games;
 
                     if (!resolvedGames || resolvedGames.length === 0) {
+                        console.warn('Empty games response received', {
+                            season: AppState.currentSeason,
+                            week: AppState.currentWeek,
+                            seasonType
+                        });
                         if (!maintainSelection) {
                             const fallback = await this.findNextWeekWithGames(AppState.currentCalendarIndex ?? -1);
 
