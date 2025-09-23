@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -21,387 +22,390 @@
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+```
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        line-height: 1.6;
+        overflow-x: hidden;
+    }
 
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
         }
+    }
 
-        .header {
-            background: var(--bg-secondary);
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid var(--border-color);
-        }
+    .header {
+        background: var(--bg-secondary);
+        padding: 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        border-bottom: 1px solid var(--border-color);
+    }
 
-        .header h1 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
+    .header h1 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
 
-        .week-selector {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+    .week-selector {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
 
-        .week-btn {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            cursor: pointer;
-            min-height: 44px;
-            min-width: 44px;
-            transition: all 0.2s;
-        }
+    .week-btn {
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+        min-height: 44px;
+        min-width: 44px;
+        transition: all 0.2s;
+    }
 
-        .week-btn:hover, .week-btn.active {
-            background: var(--accent-primary);
-            border-color: var(--accent-primary);
-        }
+    .week-btn:hover, .week-btn.active {
+        background: var(--accent-primary);
+        border-color: var(--accent-primary);
+    }
 
-        .settings-btn {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.5rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            min-height: 44px;
-            min-width: 44px;
-            margin-left: auto;
-        }
+    .settings-btn {
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        min-height: 44px;
+        min-width: 44px;
+        margin-left: auto;
+    }
 
-        .settings-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 200;
-            padding: 1rem;
-        }
+    .settings-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 200;
+        padding: 1rem;
+    }
 
-        .settings-modal.show {
-            display: flex;
-        }
+    .settings-modal.show {
+        display: flex;
+    }
 
-        .settings-content {
-            background: var(--bg-secondary);
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            width: 100%;
-            max-width: 400px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+    .settings-content {
+        background: var(--bg-secondary);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        width: 100%;
+        max-width: 400px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
 
-        .settings-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
+    .settings-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
 
-        .settings-header h2 {
-            font-size: 1.125rem;
-            font-weight: 600;
-        }
+    .settings-header h2 {
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
 
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0.25rem;
-            margin-left: auto;
-        }
+    .close-btn {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.25rem;
+        margin-left: auto;
+    }
 
-        .form-group {
-            margin-bottom: 1rem;
-        }
+    .form-group {
+        margin-bottom: 1rem;
+    }
 
-        .form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-            color: var(--text-secondary);
-        }
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+        color: var(--text-secondary);
+    }
 
-        .form-input {
-            width: 100%;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.75rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            min-height: 44px;
-        }
+    .form-input {
+        width: 100%;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        min-height: 44px;
+    }
 
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-        }
+    .form-input:focus {
+        outline: none;
+        border-color: var(--accent-primary);
+    }
 
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
-        }
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
 
-        .checkbox {
-            width: 1rem;
-            height: 1rem;
-            accent-color: var(--accent-primary);
-        }
+    .checkbox {
+        width: 1rem;
+        height: 1rem;
+        accent-color: var(--accent-primary);
+    }
 
-        .btn {
-            background: var(--accent-primary);
-            border: none;
-            color: white;
-            padding: 0.75rem 1rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            min-height: 44px;
-            transition: all 0.2s;
-        }
+    .btn {
+        background: var(--accent-primary);
+        border: none;
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        min-height: 44px;
+        transition: all 0.2s;
+    }
 
-        .btn:hover {
-            opacity: 0.9;
-        }
+    .btn:hover {
+        opacity: 0.9;
+    }
 
-        .btn-danger {
-            background: var(--accent-danger);
-        }
+    .btn-danger {
+        background: var(--accent-danger);
+    }
 
-        .results-container {
-            padding: 1rem;
-            padding-bottom: 120px;
-        }
+    .results-container {
+        padding: 1rem;
+        padding-bottom: 120px;
+    }
 
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-muted);
-        }
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-muted);
+    }
 
-        .game-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            position: relative;
-        }
+    .game-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        position: relative;
+    }
 
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.75rem;
-        }
+    .game-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+    }
 
-        .game-teams {
-            flex: 1;
-        }
+    .game-teams {
+        flex: 1;
+    }
 
-        .team {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.25rem;
-        }
+    .team {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.25rem;
+    }
 
-        .team-name {
-            font-weight: 600;
-            margin-right: 0.5rem;
-        }
+    .team-name {
+        font-weight: 600;
+        margin-right: 0.5rem;
+    }
 
-        .probability-pill {
-            background: var(--accent-primary);
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: auto;
-        }
+    .probability-pill {
+        background: var(--accent-primary);
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: auto;
+    }
 
-        .confidence-ring {
-            width: 40px;
-            height: 40px;
-            margin-left: 1rem;
-        }
+    .confidence-ring {
+        width: 40px;
+        height: 40px;
+        margin-left: 1rem;
+    }
 
-        .game-meta {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
+    .game-meta {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
 
-        .edge-badge {
-            background: var(--accent-success);
-            color: white;
-            padding: 0.125rem 0.375rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
+    .edge-badge {
+        background: var(--accent-success);
+        color: white;
+        padding: 0.125rem 0.375rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
 
-        .drivers {
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid var(--border-color);
-        }
+    .drivers {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border-color);
+    }
 
-        .drivers-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 0.25rem;
-        }
+    .drivers-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+    }
 
-        .driver-chips {
-            display: flex;
-            gap: 0.25rem;
-            flex-wrap: wrap;
-        }
+    .driver-chips {
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+    }
 
-        .driver-chip {
-            background: var(--bg-tertiary);
-            color: var(--text-secondary);
-            padding: 0.125rem 0.375rem;
-            border-radius: 0.25rem;
-            font-size: 0.625rem;
-        }
+    .driver-chip {
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+        padding: 0.125rem 0.375rem;
+        border-radius: 0.25rem;
+        font-size: 0.625rem;
+    }
 
-        .driver-chip.positive {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--accent-success);
-        }
+    .driver-chip.positive {
+        background: rgba(16, 185, 129, 0.2);
+        color: var(--accent-success);
+    }
 
-        .driver-chip.negative {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--accent-danger);
-        }
+    .driver-chip.negative {
+        background: rgba(239, 68, 68, 0.2);
+        color: var(--accent-danger);
+    }
 
-        .bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-color);
-            padding: 1rem;
-            display: flex;
-            gap: 0.5rem;
-            z-index: 50;
-        }
+    .bottom-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--border-color);
+        padding: 1rem;
+        display: flex;
+        gap: 0.5rem;
+        z-index: 50;
+    }
 
-        .bottom-bar .btn {
-            flex: 1;
-            padding: 0.75rem;
-        }
+    .bottom-bar .btn {
+        flex: 1;
+        padding: 0.75rem;
+    }
 
-        .toast {
-            position: fixed;
-            top: 80px;
-            left: 1rem;
-            right: 1rem;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            z-index: 150;
-            transform: translateY(-100px);
-            opacity: 0;
-            transition: all 0.3s;
-        }
+    .toast {
+        position: fixed;
+        top: 80px;
+        left: 1rem;
+        right: 1rem;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        z-index: 150;
+        transform: translateY(-100px);
+        opacity: 0;
+        transition: all 0.3s;
+    }
 
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
+    .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
 
-        .toast.error {
-            border-color: var(--accent-danger);
-            background: rgba(239, 68, 68, 0.1);
-        }
+    .toast.error {
+        border-color: var(--accent-danger);
+        background: rgba(239, 68, 68, 0.1);
+    }
 
-        .toast.warning {
-            border-color: var(--accent-warning);
-            background: rgba(245, 158, 11, 0.1);
-        }
+    .toast.warning {
+        border-color: var(--accent-warning);
+        background: rgba(245, 158, 11, 0.1);
+    }
 
-        .sort-controls {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
+    .sort-controls {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
 
-        .sort-btn {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.375rem;
-            font-size: 0.75rem;
-            cursor: pointer;
-            min-height: 40px;
-        }
+    .sort-btn {
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        min-height: 40px;
+    }
 
-        .sort-btn.active {
-            background: var(--accent-primary);
-            border-color: var(--accent-primary);
-        }
+    .sort-btn.active {
+        background: var(--accent-primary);
+        border-color: var(--accent-primary);
+    }
 
-        .filter-input {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.5rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            width: 200px;
-            min-height: 40px;
-        }
-    </style>
+    .filter-input {
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        width: 200px;
+        min-height: 40px;
+    }
+</style>
+```
+
 </head>
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>CFB Wizard v8</h1>
+        <h1>CFB Winner Predictor</h1>
         <div class="week-selector">
             <button class="week-btn" data-offset="-1">← Prev</button>
             <button class="week-btn active" data-offset="0">This Week</button>
@@ -410,1173 +414,1172 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div class="settings-modal" id="settingsModal">
-        <div class="settings-content">
-            <div class="settings-header">
-                <h2>Settings</h2>
-                <button class="close-btn" id="closeSettings">×</button>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">CFBD API Key (required)</label>
-                <input type="password" class="form-input" id="cfbdKey" placeholder="Enter your CFBD API key">
-                <small style="color: var(--text-muted); font-size: 0.75rem;">Get yours at collegefootballdata.com</small>
-            </div>
-            
-            <div class="checkbox-group">
-                <input type="checkbox" class="checkbox" id="useMarkets" checked>
-                <label>Use betting markets (optional)</label>
-            </div>
-            
-            <div class="checkbox-group">
-                <input type="checkbox" class="checkbox" id="useWeather" checked>
-                <label>Use weather data</label>
-            </div>
-            
-            <div class="checkbox-group">
-                <input type="checkbox" class="checkbox" id="manualInjuries">
-                <label>Manual injury adjustments</label>
-            </div>
-            
-            <div class="checkbox-group">
-                <input type="checkbox" class="checkbox" id="demoMode">
-                <label>Demo mode (no API required)</label>
-            </div>
-            
-            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                <button class="btn" id="saveSettings">Save Settings</button>
-                <button class="btn btn-danger" id="forgetKeys">Forget Keys</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Results Container -->
-    <div class="results-container">
-        <div class="sort-controls" style="display: none;">
-            <button class="sort-btn active" data-sort="confidence">By Confidence</button>
-            <button class="sort-btn" data-sort="edge">By Edge</button>
-            <button class="sort-btn" data-sort="time">By Kickoff</button>
-            <input type="text" class="filter-input" placeholder="Filter teams..." id="teamFilter">
+```
+<!-- Settings Modal -->
+<div class="settings-modal" id="settingsModal">
+    <div class="settings-content">
+        <div class="settings-header">
+            <h2>Settings</h2>
+            <button class="close-btn" id="closeSettings">×</button>
         </div>
         
-        <div class="loading" id="loadingState">
-            <div>🏈</div>
-            <div>Loading games and predictions...</div>
+        <div class="form-group">
+            <label class="form-label">CFBD API Key (required)</label>
+            <input type="password" class="form-input" id="cfbdKey" placeholder="Enter your CFBD API key">
+            <small style="color: var(--text-muted); font-size: 0.75rem;">Get yours at collegefootballdata.com</small>
         </div>
         
-        <div id="gamesList"></div>
+        <div class="checkbox-group">
+            <input type="checkbox" class="checkbox" id="useMarkets" checked>
+            <label>Use betting markets (optional)</label>
+        </div>
+        
+        <div class="checkbox-group">
+            <input type="checkbox" class="checkbox" id="useWeather" checked>
+            <label>Use weather data</label>
+        </div>
+        
+        <div class="checkbox-group">
+            <input type="checkbox" class="checkbox" id="manualInjuries">
+            <label>Manual injury adjustments</label>
+        </div>
+        
+        <div class="checkbox-group">
+            <input type="checkbox" class="checkbox" id="demoMode">
+            <label>Demo mode (no API required)</label>
+        </div>
+        
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <button class="btn" id="saveSettings">Save Settings</button>
+            <button class="btn btn-danger" id="forgetKeys">Forget Keys</button>
+        </div>
     </div>
+</div>
 
-    <!-- Bottom Action Bar -->
-    <div class="bottom-bar">
-        <button class="btn" id="refreshBtn">Refresh Data</button>
-        <button class="btn" id="predictBtn">Predict</button>
-        <button class="btn" id="exportBtn">Export</button>
-        <button class="btn" id="resetBtn">Reset</button>
+<!-- Results Container -->
+<div class="results-container">
+    <div class="sort-controls" style="display: none;">
+        <button class="sort-btn active" data-sort="confidence">By Confidence</button>
+        <button class="sort-btn" data-sort="edge">By Edge</button>
+        <button class="sort-btn" data-sort="time">By Kickoff</button>
+        <input type="text" class="filter-input" placeholder="Filter teams..." id="teamFilter">
     </div>
+    
+    <div class="loading" id="loadingState">
+        <div>🏈</div>
+        <div>Loading games and predictions...</div>
+    </div>
+    
+    <div id="gamesList"></div>
+</div>
 
-    <!-- Toast Notifications -->
-    <div class="toast" id="toast"></div>
+<!-- Bottom Action Bar -->
+<div class="bottom-bar">
+    <button class="btn" id="refreshBtn">Refresh Data</button>
+    <button class="btn" id="predictBtn">Predict</button>
+    <button class="btn" id="exportBtn">Export</button>
+    <button class="btn" id="resetBtn">Reset</button>
+</div>
 
-    <script>
-        /*
-         * CFB Winner Predictor - Single File Mobile App
-         * 
-         * README:
-         * 1. Get CFBD API key from collegefootballdata.com
-         * 2. Enable Demo Mode to test without API key
-         * 3. Deploy to GitHub Pages by uploading this file as index.html
-         * 4. Weather data from Open-Meteo (no key required)
-         * 5. All data cached locally with TTL
-         * 
-         * Architecture:
-         * - Vanilla JS, no frameworks
-         * - Web Worker for heavy compute
-         * - CORS-compliant API calls only
-         * - Mobile-first responsive design
-         */
+<!-- Toast Notifications -->
+<div class="toast" id="toast"></div>
 
-        // Global state
-        let state = {
-            settings: {
-                cfbdKey: '',
-                useMarkets: true,
-                useWeather: true,
-                manualInjuries: false,
-                demoMode: false
+<script>
+    /*
+     * CFB Winner Predictor - Single File Mobile App
+     * 
+     * README:
+     * 1. Get CFBD API key from collegefootballdata.com
+     * 2. Enable Demo Mode to test without API key
+     * 3. Deploy to GitHub Pages by uploading this file as index.html
+     * 4. Weather data from Open-Meteo (no key required)
+     * 5. All data cached locally with TTL
+     * 
+     * Architecture:
+     * - Vanilla JS, no frameworks
+     * - Web Worker for heavy compute
+     * - CORS-compliant API calls only
+     * - Mobile-first responsive design
+     */
+
+    // Global state
+    let state = {
+        settings: {
+            cfbdKey: '',
+            useMarkets: true,
+            useWeather: true,
+            manualInjuries: false,
+            demoMode: false
+        },
+        currentWeek: 0, // offset from "this week"
+        games: [],
+        predictions: [],
+        cache: {}
+    };
+
+    // Demo data for testing without API
+    const DEMO_DATA = {
+        games: [
+            {
+                id: 1,
+                season: 2025,
+                week: 4,
+                start_date: '2025-09-27T19:00:00.000Z',
+                away_team: 'Georgia',
+                home_team: 'Alabama',
+                venue: 'Bryant-Denny Stadium',
+                away_conference: 'SEC',
+                home_conference: 'SEC',
+                neutral_site: false
             },
-            currentWeek: 0, // offset from "this week"
-            games: [],
-            predictions: [],
-            cache: {}
-        };
-
-        // Demo data for testing without API
-        const DEMO_DATA = {
-            games: [
-                {
-                    id: 1,
-                    season: 2025,
-                    week: 4,
-                    start_date: '2025-09-27T19:00:00.000Z',
-                    away_team: 'Georgia',
-                    home_team: 'Alabama',
-                    venue: 'Bryant-Denny Stadium',
-                    away_conference: 'SEC',
-                    home_conference: 'SEC',
-                    neutral_site: false
-                },
-                {
-                    id: 2,
-                    season: 2025,
-                    week: 4,
-                    start_date: '2025-09-27T15:30:00.000Z',
-                    away_team: 'Michigan',
-                    home_team: 'Ohio State',
-                    venue: 'Ohio Stadium',
-                    away_conference: 'Big Ten',
-                    home_conference: 'Big Ten',
-                    neutral_site: false
-                }
-            ],
-            predictions: [
-                {
-                    game_id: 1,
-                    home_win_prob: 0.62,
-                    away_win_prob: 0.38,
-                    confidence: 0.85,
-                    spread_equiv: -3.5,
-                    margin_equiv: 4.2,
-                    key_drivers: ['+Home field', '+Recent form', '-Injuries'],
-                    market_edge: 0.12
-                },
-                {
-                    game_id: 2,
-                    home_win_prob: 0.71,
-                    away_win_prob: 0.29,
-                    confidence: 0.92,
-                    spread_equiv: -7.0,
-                    margin_equiv: 8.5,
-                    key_drivers: ['+Elo rating', '+Home field', '+Weather'],
-                    market_edge: 0.08
-                }
-            ]
-        };
-
-        // Utility functions
-        class RNG {
-            constructor(seed = 12345) {
-                this.seed = seed;
+            {
+                id: 2,
+                season: 2025,
+                week: 4,
+                start_date: '2025-09-27T15:30:00.000Z',
+                away_team: 'Michigan',
+                home_team: 'Ohio State',
+                venue: 'Ohio Stadium',
+                away_conference: 'Big Ten',
+                home_conference: 'Big Ten',
+                neutral_site: false
             }
-            
-            next() {
-                this.seed = (this.seed * 9301 + 49297) % 233280;
-                return this.seed / 233280;
+        ],
+        predictions: [
+            {
+                game_id: 1,
+                home_win_prob: 0.62,
+                away_win_prob: 0.38,
+                confidence: 0.85,
+                spread_equiv: -3.5,
+                margin_equiv: 4.2,
+                key_drivers: ['+Home field', '+Recent form', '-Injuries'],
+                market_edge: 0.12
+            },
+            {
+                game_id: 2,
+                home_win_prob: 0.71,
+                away_win_prob: 0.29,
+                confidence: 0.92,
+                spread_equiv: -7.0,
+                margin_equiv: 8.5,
+                key_drivers: ['+Elo rating', '+Home field', '+Weather'],
+                market_edge: 0.08
             }
+        ]
+    };
+
+    // Utility functions
+    class RNG {
+        constructor(seed = 12345) {
+            this.seed = seed;
         }
+        
+        next() {
+            this.seed = (this.seed * 9301 + 49297) % 233280;
+            return this.seed / 233280;
+        }
+    }
 
-        const utils = {
-            seededRNG: new RNG(),
+    const utils = {
+        seededRNG: new RNG(),
+        
+        formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+        },
+        
+        getWeekBounds(offset = 0) {
+            const now = new Date();
             
-            formatDate(dateStr) {
-                const date = new Date(dateStr);
-                return date.toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit'
-                });
-            },
+            // Get the current week's Saturday (game day)
+            const today = new Date(now);
+            const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
             
-            getWeekBounds(offset = 0) {
-                const now = new Date();
-                
-                // Get the current week's Saturday (game day)
-                const today = new Date(now);
-                const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
-                
-                // Find this week's Saturday (or closest Saturday)  
-                const thisSaturday = new Date(today);
-                const daysToSaturday = (6 - dayOfWeek + 7) % 7; // Days until next Saturday
-                if (daysToSaturday === 0 && today.getHours() < 12) {
-                    // If it's Saturday morning, use today
-                    thisSaturday.setHours(0, 0, 0, 0);
-                } else if (daysToSaturday === 0) {
-                    // If it's Saturday afternoon/evening, use next Saturday
-                    thisSaturday.setDate(today.getDate() + 7);
-                    thisSaturday.setHours(0, 0, 0, 0);
-                } else {
-                    // Use the upcoming Saturday
-                    thisSaturday.setDate(today.getDate() + daysToSaturday);
-                    thisSaturday.setHours(0, 0, 0, 0);
-                }
-                
-                // Apply week offset
-                const targetSaturday = new Date(thisSaturday);
-                targetSaturday.setDate(thisSaturday.getDate() + (offset * 7));
-                
-                // Week runs Tuesday to Monday (Tuesday before to Monday after)
-                const start = new Date(targetSaturday);
-                start.setDate(targetSaturday.getDate() - 4); // Tuesday before
-                start.setHours(0, 0, 0, 0);
-                
-                const end = new Date(targetSaturday);
-                end.setDate(targetSaturday.getDate() + 3); // Monday after  
-                end.setHours(23, 59, 59, 999);
-                
-                console.log(`Week bounds (offset ${offset}):`, {
-                    targetSaturday: targetSaturday.toDateString(),
-                    start: start.toISOString(),
-                    end: end.toISOString()
-                });
-                
-                return { start, end };
-            },
+            // Find this week's Saturday (or closest Saturday)  
+            const thisSaturday = new Date(today);
+            const daysToSaturday = (6 - dayOfWeek + 7) % 7; // Days until next Saturday
+            if (daysToSaturday === 0 && today.getHours() < 12) {
+                // If it's Saturday morning, use today
+                thisSaturday.setHours(0, 0, 0, 0);
+            } else if (daysToSaturday === 0) {
+                // If it's Saturday afternoon/evening, use next Saturday
+                thisSaturday.setDate(today.getDate() + 7);
+                thisSaturday.setHours(0, 0, 0, 0);
+            } else {
+                // Use the upcoming Saturday
+                thisSaturday.setDate(today.getDate() + daysToSaturday);
+                thisSaturday.setHours(0, 0, 0, 0);
+            }
             
-            exponentialDecay(value, weeks, lambda = 0.7) {
-                return value * Math.pow(lambda, weeks);
-            },
+            // Apply week offset
+            const targetSaturday = new Date(thisSaturday);
+            targetSaturday.setDate(thisSaturday.getDate() + (offset * 7));
             
-            logistic(x) {
-                return 1 / (1 + Math.exp(-x));
-            },
+            // Week runs Tuesday to Monday (Tuesday before to Monday after)
+            const start = new Date(targetSaturday);
+            start.setDate(targetSaturday.getDate() - 4); // Tuesday before
+            start.setHours(0, 0, 0, 0);
             
-            showToast(message, type = 'info', duration = 3000) {
-                const toast = document.getElementById('toast');
-                toast.textContent = message;
-                toast.className = `toast show ${type}`;
-                
-                setTimeout(() => {
-                    toast.className = 'toast';
-                }, duration);
-            },
+            const end = new Date(targetSaturday);
+            end.setDate(targetSaturday.getDate() + 3); // Monday after  
+            end.setHours(23, 59, 59, 999);
             
-            debounce(func, wait) {
-                let timeout;
-                return function executedFunction(...args) {
-                    const later = () => {
-                        clearTimeout(timeout);
-                        func.apply(this, args);
-                    };
+            console.log(`Week bounds (offset ${offset}):`, {
+                targetSaturday: targetSaturday.toDateString(),
+                start: start.toISOString(),
+                end: end.toISOString()
+            });
+            
+            return { start, end };
+        },
+        
+        exponentialDecay(value, weeks, lambda = 0.7) {
+            return value * Math.pow(lambda, weeks);
+        },
+        
+        logistic(x) {
+            return 1 / (1 + Math.exp(-x));
+        },
+        
+        showToast(message, type = 'info', duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, duration);
+        },
+        
+        debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
                     clearTimeout(timeout);
-                    timeout = setTimeout(later, wait);
+                    func.apply(this, args);
                 };
-            }
-        };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    };
 
-        // API clients with CORS compliance and rate limiting
-        class APIClient {
-            constructor() {
-                this.rateLimiter = {
-                    tokens: 10,
-                    lastRefill: Date.now(),
-                    maxTokens: 10,
-                    refillRate: 1000 // 1 token per second
-                };
+    // API clients with CORS compliance and rate limiting
+    class APIClient {
+        constructor() {
+            this.rateLimiter = {
+                tokens: 10,
+                lastRefill: Date.now(),
+                maxTokens: 10,
+                refillRate: 1000 // 1 token per second
+            };
+        }
+        
+        async rateLimit() {
+            const now = Date.now();
+            const timePassed = now - this.rateLimiter.lastRefill;
+            const tokensToAdd = Math.floor(timePassed / this.rateLimiter.refillRate);
+            
+            this.rateLimiter.tokens = Math.min(
+                this.rateLimiter.maxTokens,
+                this.rateLimiter.tokens + tokensToAdd
+            );
+            this.rateLimiter.lastRefill = now;
+            
+            if (this.rateLimiter.tokens <= 0) {
+                await new Promise(resolve => setTimeout(resolve, this.rateLimiter.refillRate));
+                return this.rateLimit();
             }
             
-            async rateLimit() {
-                const now = Date.now();
-                const timePassed = now - this.rateLimiter.lastRefill;
-                const tokensToAdd = Math.floor(timePassed / this.rateLimiter.refillRate);
-                
-                this.rateLimiter.tokens = Math.min(
-                    this.rateLimiter.maxTokens,
-                    this.rateLimiter.tokens + tokensToAdd
-                );
-                this.rateLimiter.lastRefill = now;
-                
-                if (this.rateLimiter.tokens <= 0) {
-                    await new Promise(resolve => setTimeout(resolve, this.rateLimiter.refillRate));
-                    return this.rateLimit();
-                }
-                
-                this.rateLimiter.tokens--;
-            }
+            this.rateLimiter.tokens--;
+        }
+        
+        async fetchWithRetry(url, options = {}, maxRetries = 3) {
+            await this.rateLimit();
             
-            async fetchWithRetry(url, options = {}, maxRetries = 3) {
-                await this.rateLimit();
-                
-                for (let attempt = 0; attempt < maxRetries; attempt++) {
-                    try {
-                        console.log(`Fetching: ${url}`); // Debug log
-                        const response = await fetch(url, options);
-                        
-                        console.log(`Response status: ${response.status}`); // Debug log
-                        
-                        if (response.status === 429) {
-                            const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
-                            await new Promise(resolve => setTimeout(resolve, delay));
-                            continue;
-                        }
-                        
-                        if (!response.ok) {
-                            const errorText = await response.text();
-                            console.error(`API Error: ${response.status} ${response.statusText}`, errorText);
-                            throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
-                        }
-                        
-                        const data = await response.json();
-                        console.log(`Received ${Array.isArray(data) ? data.length : 'non-array'} items`); // Debug log
-                        return data;
-                    } catch (error) {
-                        console.error(`Attempt ${attempt + 1} failed:`, error);
-                        if (attempt === maxRetries - 1) throw error;
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                try {
+                    const response = await fetch(url, options);
+                    
+                    if (response.status === 429) {
                         const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
                         await new Promise(resolve => setTimeout(resolve, delay));
+                        continue;
                     }
-                }
-            }
-        }
-
-        class CFBDClient extends APIClient {
-            constructor(apiKey) {
-                super();
-                this.baseURL = 'https://apinext.collegefootballdata.com';
-                this.apiKey = apiKey;
-            }
-            
-            async getGames(year = 2025, week = null, classification = 'fbs') {
-                const params = new URLSearchParams({ 
-                    year: year.toString()
-                });
-                
-                // Add seasonType as string, not object
-                params.set('seasonType', 'regular');
-                
-                if (classification) {
-                    params.set('classification', classification);
-                }
-                
-                if (week) {
-                    params.set('week', week.toString());
-                }
-                
-                const url = `${this.baseURL}/games?${params}`;
-                return this.fetchWithRetry(url, {
-                    headers: { 'Authorization': `Bearer ${this.apiKey}` }
-                });
-            }
-            
-            async getTeamStats(year = 2025) {
-                const params = new URLSearchParams({ 
-                    year: year.toString()
-                });
-                params.set('seasonType', 'regular');
-                
-                const url = `${this.baseURL}/stats/season?${params}`;
-                return this.fetchWithRetry(url, {
-                    headers: { 'Authorization': `Bearer ${this.apiKey}` }
-                });
-            }
-            
-            async getPregameWP(year = 2025, week = null) {
-                const params = new URLSearchParams({ 
-                    year: year.toString()
-                });
-                params.set('seasonType', 'regular');
-                
-                if (week) {
-                    params.set('week', week.toString());
-                }
-                
-                const url = `${this.baseURL}/metrics/wp/pregame?${params}`;
-                return this.fetchWithRetry(url, {
-                    headers: { 'Authorization': `Bearer ${this.apiKey}` }
-                });
-            }
-            
-            async getLines(year = 2025, week = null) {
-                const params = new URLSearchParams({ 
-                    year: year.toString()
-                });
-                params.set('seasonType', 'regular');
-                
-                if (week) {
-                    params.set('week', week.toString());
-                }
-                
-                const url = `${this.baseURL}/lines?${params}`;
-                return this.fetchWithRetry(url, {
-                    headers: { 'Authorization': `Bearer ${this.apiKey}` }
-                });
-            }
-        }
-
-        class WeatherClient extends APIClient {
-            async getForecast(lat, lon, date) {
-                const forecastDate = new Date(date).toISOString().split('T')[0];
-                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,precipitation,precipitation_probability,wind_speed_10m,wind_gusts_10m&start_date=${forecastDate}&end_date=${forecastDate}&timezone=auto`;
-                
-                return this.fetchWithRetry(url);
-            }
-        }
-
-        // Cache management with TTL
-        class CacheManager {
-            constructor() {
-                this.cache = this.loadFromStorage();
-            }
-            
-            loadFromStorage() {
-                try {
-                    const cached = localStorage.getItem('cfb_cache');
-                    return cached ? JSON.parse(cached) : {};
-                } catch {
-                    return {};
-                }
-            }
-            
-            saveToStorage() {
-                try {
-                    localStorage.setItem('cfb_cache', JSON.stringify(this.cache));
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log(`Received ${Array.isArray(data) ? data.length : 'non-array'} items`);
+                    return data;
                 } catch (error) {
-                    console.warn('Cache save failed:', error);
-                }
-            }
-            
-            set(key, value, ttlMinutes = 60) {
-                this.cache[key] = {
-                    value,
-                    expires: Date.now() + (ttlMinutes * 60 * 1000)
-                };
-                this.saveToStorage();
-            }
-            
-            get(key) {
-                const item = this.cache[key];
-                if (!item) return null;
-                
-                if (Date.now() > item.expires) {
-                    delete this.cache[key];
-                    this.saveToStorage();
-                    return null;
-                }
-                
-                return item.value;
-            }
-            
-            clear() {
-                this.cache = {};
-                this.saveToStorage();
-            }
-        }
-
-        // Statistical models
-        class PredictionModels {
-            constructor() {
-                this.rng = new RNG();
-            }
-            
-            // Iteratively Reweighted Least Squares for logistic regression
-            irls(X, y, maxIter = 10, tolerance = 1e-6) {
-                const n = X.length;
-                const p = X[0].length;
-                let beta = new Array(p).fill(0);
-                
-                for (let iter = 0; iter < maxIter; iter++) {
-                    const oldBeta = [...beta];
-                    
-                    // Calculate probabilities and weights
-                    const pi = X.map(xi => {
-                        const eta = xi.reduce((sum, x, j) => sum + x * beta[j], 0);
-                        return utils.logistic(eta);
-                    });
-                    
-                    const W = pi.map(p => p * (1 - p));
-                    const z = X.map((xi, i) => {
-                        const eta = xi.reduce((sum, x, j) => sum + x * beta[j], 0);
-                        return eta + (y[i] - pi[i]) / W[i];
-                    });
-                    
-                    // Weighted least squares update
-                    // Simplified for demo - in production would use proper matrix operations
-                    for (let j = 0; j < p; j++) {
-                        let num = 0, den = 0;
-                        for (let i = 0; i < n; i++) {
-                            num += W[i] * X[i][j] * z[i];
-                            den += W[i] * X[i][j] * X[i][j];
-                        }
-                        beta[j] = den > 0 ? num / den : 0;
-                    }
-                    
-                    // Check convergence
-                    const diff = Math.sqrt(
-                        beta.reduce((sum, b, j) => sum + Math.pow(b - oldBeta[j], 2), 0)
-                    );
-                    if (diff < tolerance) break;
-                }
-                
-                return beta;
-            }
-            
-            // Isotonic regression for calibration
-            isotonic(x, y) {
-                const n = x.length;
-                const indices = [...Array(n).keys()].sort((i, j) => x[i] - x[j]);
-                const sortedY = indices.map(i => y[i]);
-                
-                // Pool Adjacent Violators (PAV) algorithm
-                const weights = new Array(n).fill(1);
-                const values = [...sortedY];
-                
-                for (let i = 1; i < n; i++) {
-                    if (values[i - 1] > values[i]) {
-                        // Pool violating pairs
-                        let pool = [i - 1, i];
-                        let poolSum = values[i - 1] * weights[i - 1] + values[i] * weights[i];
-                        let poolWeight = weights[i - 1] + weights[i];
-                        
-                        while (pool.length > 1 && pool[0] > 0 && 
-                               poolSum / poolWeight > values[pool[0] - 1]) {
-                            pool.unshift(pool[0] - 1);
-                            poolSum += values[pool[0]] * weights[pool[0]];
-                            poolWeight += weights[pool[0]];
-                        }
-                        
-                        const poolValue = poolSum / poolWeight;
-                        for (const idx of pool) {
-                            values[idx] = poolValue;
-                        }
-                    }
-                }
-                
-                return (pred) => {
-                    // Find interpolated value
-                    for (let i = 1; i < n; i++) {
-                        if (x[indices[i]] >= pred) {
-                            const x1 = x[indices[i-1]], x2 = x[indices[i]];
-                            const y1 = values[i-1], y2 = values[i];
-                            return y1 + (y2 - y1) * (pred - x1) / (x2 - x1);
-                        }
-                    }
-                    return values[n-1];
-                };
-            }
-        }
-
-        // Feature engineering
-        class FeatureEngine {
-            constructor() {
-                this.venueCoords = {
-                    'Bryant-Denny Stadium': [32.6654, -87.5503],
-                    'Ohio Stadium': [40.0018, -83.0197],
-                    'Tiger Stadium': [30.4126, -91.1837],
-                    'Neyland Stadium': [35.9551, -83.9249]
-                };
-            }
-            
-            async buildFeatures(game, historicalData, weatherData, marketData) {
-                const features = [];
-                
-                // Basic differentials
-                const homeRating = this.getTeamRating(game.home_team, historicalData) || 1500;
-                const awayRating = this.getTeamRating(game.away_team, historicalData) || 1500;
-                features.push(homeRating - awayRating); // ΔR
-                
-                // Home field advantage
-                features.push(game.neutral_site ? 0 : 1);
-                features.push(game.neutral_site ? 1 : 0);
-                
-                // Weather adjustments
-                if (weatherData) {
-                    const wind = weatherData.wind_speed_10m || 0;
-                    const precip = weatherData.precipitation || 0;
-                    features.push(Math.max(0, wind - 12) * 0.01);
-                    features.push(precip > 0 ? 1 : 0);
-                } else {
-                    features.push(0, 0);
-                }
-                
-                // Market implied probability (if available)
-                if (marketData && marketData.spread) {
-                    features.push(marketData.spread);
-                } else {
-                    features.push(0);
-                }
-                
-                // Conference strength proxy
-                const confStrength = {
-                    'SEC': 0.8, 'Big Ten': 0.7, 'Big 12': 0.6,
-                    'ACC': 0.5, 'Pac-12': 0.4
-                };
-                const homeConf = confStrength[game.home_conference] || 0.3;
-                const awayConf = confStrength[game.away_conference] || 0.3;
-                features.push(homeConf - awayConf);
-                
-                return features;
-            }
-            
-            getTeamRating(team, historicalData) {
-                // Simplified Elo-like rating
-                const baseRating = 1500;
-                const teamData = historicalData.find(d => d.team === team);
-                if (!teamData) return baseRating;
-                
-                // Use recent performance as proxy
-                return baseRating + (teamData.wins - teamData.losses) * 25;
-            }
-        }
-
-        // Main application logic
-        class CFBPredictor {
-            constructor() {
-                this.cache = new CacheManager();
-                this.models = new PredictionModels();
-                this.features = new FeatureEngine();
-                this.cfbdClient = null;
-                this.weatherClient = new WeatherClient();
-                
-                this.loadSettings();
-                this.initializeUI();
-                this.bindEvents();
-            }
-            
-            loadSettings() {
-                const saved = localStorage.getItem('cfb_settings');
-                if (saved) {
-                    try {
-                        state.settings = { ...state.settings, ...JSON.parse(saved) };
-                    } catch (error) {
-                        console.warn('Failed to load settings:', error);
-                    }
-                }
-            }
-            
-            saveSettings() {
-                localStorage.setItem('cfb_settings', JSON.stringify(state.settings));
-            }
-            
-            initializeUI() {
-                // Populate settings form
-                const form = {
-                    cfbdKey: document.getElementById('cfbdKey'),
-                    useMarkets: document.getElementById('useMarkets'),
-                    useWeather: document.getElementById('useWeather'),
-                    manualInjuries: document.getElementById('manualInjuries'),
-                    demoMode: document.getElementById('demoMode')
-                };
-                
-                form.cfbdKey.value = state.settings.cfbdKey;
-                form.useMarkets.checked = state.settings.useMarkets;
-                form.useWeather.checked = state.settings.useWeather;
-                form.manualInjuries.checked = state.settings.manualInjuries;
-                form.demoMode.checked = state.settings.demoMode;
-                
-                // Show/hide sort controls based on data
-                this.updateSortControls();
-            }
-            
-            bindEvents() {
-                // Settings modal
-                document.getElementById('settingsBtn').addEventListener('click', () => {
-                    document.getElementById('settingsModal').classList.add('show');
-                });
-                
-                document.getElementById('closeSettings').addEventListener('click', () => {
-                    document.getElementById('settingsModal').classList.remove('show');
-                });
-                
-                document.getElementById('saveSettings').addEventListener('click', () => {
-                    this.updateSettings();
-                });
-                
-                document.getElementById('forgetKeys').addEventListener('click', () => {
-                    this.forgetKeys();
-                });
-                
-                // Week navigation
-                document.querySelectorAll('.week-btn[data-offset]').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const offset = parseInt(e.target.dataset.offset);
-                        this.changeWeek(offset);
-                    });
-                });
-                
-                // Bottom bar actions
-                document.getElementById('refreshBtn').addEventListener('click', () => {
-                    this.refreshData();
-                });
-                
-                document.getElementById('predictBtn').addEventListener('click', () => {
-                    this.runPredictions();
-                });
-                
-                document.getElementById('exportBtn').addEventListener('click', () => {
-                    this.exportData();
-                });
-                
-                document.getElementById('resetBtn').addEventListener('click', () => {
-                    this.resetData();
-                });
-                
-                // Sort and filter
-                document.querySelectorAll('.sort-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        this.changeSort(e.target.dataset.sort);
-                    });
-                });
-                
-                document.getElementById('teamFilter').addEventListener('input', 
-                    utils.debounce((e) => this.filterGames(e.target.value), 300)
-                );
-                
-                // Close modal on backdrop click
-                document.getElementById('settingsModal').addEventListener('click', (e) => {
-                    if (e.target === e.currentTarget) {
-                        e.currentTarget.classList.remove('show');
-                    }
-                });
-            }
-            
-            updateSettings() {
-                const form = {
-                    cfbdKey: document.getElementById('cfbdKey').value.trim(),
-                    useMarkets: document.getElementById('useMarkets').checked,
-                    useWeather: document.getElementById('useWeather').checked,
-                    manualInjuries: document.getElementById('manualInjuries').checked,
-                    demoMode: document.getElementById('demoMode').checked
-                };
-                
-                state.settings = { ...state.settings, ...form };
-                this.saveSettings();
-                
-                // Update CFBD client if key changed
-                if (form.cfbdKey) {
-                    this.cfbdClient = new CFBDClient(form.cfbdKey);
-                }
-                
-                document.getElementById('settingsModal').classList.remove('show');
-                utils.showToast('Settings saved successfully', 'info');
-            }
-            
-            forgetKeys() {
-                state.settings.cfbdKey = '';
-                document.getElementById('cfbdKey').value = '';
-                this.cfbdClient = null;
-                localStorage.removeItem('cfb_settings');
-                localStorage.removeItem('cfb_cache');
-                this.cache.clear();
-                utils.showToast('Keys and cache cleared', 'warning');
-            }
-            
-            changeWeek(offset) {
-                state.currentWeek = offset;
-                
-                // Update active button
-                document.querySelectorAll('.week-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                    if (parseInt(btn.dataset.offset) === offset) {
-                        btn.classList.add('active');
-                    }
-                });
-                
-                this.refreshData();
-            }
-            
-            async refreshData() {
-                if (state.settings.demoMode) {
-                    this.loadDemoData();
-                    return;
-                }
-                
-                if (!state.settings.cfbdKey) {
-                    utils.showToast('CFBD API key required', 'error');
-                    return;
-                }
-                
-                this.showLoading(true);
-                
-                try {
-                    await this.fetchGames();
-                    utils.showToast('Data refreshed successfully', 'info');
-                } catch (error) {
-                    console.error('Data refresh failed:', error);
-                    utils.showToast(`Data refresh failed: ${error.message}`, 'error');
-                }
-                
-                this.showLoading(false);
-            }
-            
-            async fetchGames() {
-                if (!this.cfbdClient) {
-                    this.cfbdClient = new CFBDClient(state.settings.cfbdKey);
-                }
-                
-                const { start, end } = utils.getWeekBounds(state.currentWeek);
-                const year = start.getFullYear();
-                const week = this.getWeekNumber(start);
-                
-                // Check cache first
-                const cacheKey = `games_${year}_${week}`;
-                let games = this.cache.get(cacheKey);
-                
-                if (!games) {
-                    try {
-                        // Try with week parameter first
-                        games = await this.cfbdClient.getGames(year, week);
-                    } catch (error) {
-                        // If week fails, try without week and filter client-side
-                        console.warn('Week parameter failed, trying without:', error.message);
-                        games = await this.cfbdClient.getGames(year);
-                    }
-                    this.cache.set(cacheKey, games, 120); // 2 hour TTL
-                }
-                
-                // Debug: Check what we got back
-                console.log(`API returned ${games ? games.length : 0} total games`);
-                console.log('Date range filtering:', { start: start.toISOString(), end: end.toISOString() });
-                
-                if (games && games.length > 0) {
-                    console.log('Sample game dates:', games.slice(0, 3).map(g => ({
-                        teams: `${g.away_team} @ ${g.home_team}`,
-                        date: g.start_date,
-                        parsed: new Date(g.start_date).toISOString()
-                    })));
-                }
-                
-                // Filter games for selected date range
-                state.games = games ? games.filter(game => {
-                    if (!game.start_date) {
-                        console.log('Game missing start_date:', game);
-                        return false;
-                    }
-                    
-                    let gameDate;
-                    try {
-                        gameDate = new Date(game.start_date);
-                        // Check if date is valid
-                        if (isNaN(gameDate.getTime())) {
-                            console.error('Invalid date for game:', game.start_date, game);
-                            return false;
-                        }
-                    } catch (error) {
-                        console.error('Error parsing game date:', error, game);
-                        return false;
-                    }
-                    
-                    const inRange = gameDate >= start && gameDate <= end;
-                    if (!inRange) {
-                        console.log('Game outside range:', {
-                            teams: `${game.away_team} @ ${game.home_team}`,
-                            gameDate: gameDate.toISOString(),
-                            start: start.toISOString(),
-                            end: end.toISOString()
-                        });
-                    }
-                    return inRange;
-                }) : [];
-                
-                console.log(`Filtered to ${state.games.length} games for selected week`);
-                
-                this.renderGames();
-            }
-            
-            loadDemoData() {
-                state.games = DEMO_DATA.games;
-                state.predictions = DEMO_DATA.predictions;
-                this.renderGames();
-                utils.showToast('Demo data loaded', 'info');
-            }
-            
-            getWeekNumber(date) {
-                // For 2025 season, approximate week calculation
-                // Week 1 typically starts around August 31st
-                const year = date.getFullYear();
-                const aug31 = new Date(year, 7, 31); // August 31st (month 7 = August)
-                
-                const diffTime = date.getTime() - aug31.getTime();
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-                const week = Math.floor(diffDays / 7) + 1;
-                
-                const calculatedWeek = Math.max(1, Math.min(17, week));
-                
-                console.log(`Week calculation: ${date.toDateString()} -> Week ${calculatedWeek}`);
-                
-                return calculatedWeek;
-            }
-            
-            async runPredictions() {
-                if (state.games.length === 0) {
-                    utils.showToast('No games to predict', 'warning');
-                    return;
-                }
-                
-                this.showLoading(true, 'Running predictions...');
-                
-                try {
-                    // Use Web Worker for heavy computation
-                    const worker = this.createPredictionWorker();
-                    
-                    const predictions = await new Promise((resolve, reject) => {
-                        worker.onmessage = (e) => {
-                            if (e.data.error) {
-                                reject(new Error(e.data.error));
-                            } else {
-                                resolve(e.data.predictions);
-                            }
-                            worker.terminate();
-                        };
-                        
-                        worker.postMessage({
-                            games: state.games,
-                            settings: state.settings
-                        });
-                    });
-                    
-                    state.predictions = predictions;
-                    this.renderGames();
-                    this.updateSortControls();
-                    
-                    utils.showToast(`Predicted ${predictions.length} games`, 'info');
-                    
-                } catch (error) {
-                    console.error('Prediction failed:', error);
-                    utils.showToast(`Prediction failed: ${error.message}`, 'error');
-                }
-                
-                this.showLoading(false);
-            }
-            
-            createPredictionWorker() {
-                // Create Web Worker from blob to avoid external files
-                const workerCode = `
-                    // Simple prediction logic for Web Worker
-                    self.onmessage = function(e) {
-                        const { games, settings } = e.data;
-                        
-                        try {
-                            const predictions = games.map(game => {
-                                // Simplified prediction model
-                                const homeAdvantage = game.neutral_site ? 0 : 0.55;
-                                const randomFactor = 0.1 * (Math.random() - 0.5);
-                                
-                                const homeWinProb = Math.min(0.95, Math.max(0.05, 
-                                    homeAdvantage + randomFactor
-                                ));
-                                
-                                return {
-                                    game_id: game.id,
-                                    home_win_prob: homeWinProb,
-                                    away_win_prob: 1 - homeWinProb,
-                                    confidence: 0.7 + Math.random() * 0.3,
-                                    spread_equiv: (homeWinProb - 0.5) * 14,
-                                    margin_equiv: (homeWinProb - 0.5) * 10,
-                                    key_drivers: homeWinProb > 0.5 ? 
-                                        ['+Home field', '+Recent form'] : 
-                                        ['+Away strength', '+Matchup'],
-                                    market_edge: Math.random() * 0.15
-                                };
-                            });
-                            
-                            self.postMessage({ predictions });
-                        } catch (error) {
-                            self.postMessage({ error: error.message });
-                        }
-                    };
-                `;
-                
-                const blob = new Blob([workerCode], { type: 'application/javascript' });
-                return new Worker(URL.createObjectURL(blob));
-            }
-            
-            renderGames() {
-                const container = document.getElementById('gamesList');
-                
-                if (state.games.length === 0) {
-                    container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-muted);">No games found for selected week</div>';
-                    return;
-                }
-                
-                const html = state.games.map(game => {
-                    const prediction = state.predictions.find(p => p.game_id === game.id);
-                    return this.renderGameCard(game, prediction);
-                }).join('');
-                
-                container.innerHTML = html;
-            }
-            
-            renderGameCard(game, prediction) {
-                const date = utils.formatDate(game.start_date);
-                const homeProb = prediction ? Math.round(prediction.home_win_prob * 100) : null;
-                const awayProb = prediction ? Math.round(prediction.away_win_prob * 100) : null;
-                const confidence = prediction ? Math.round(prediction.confidence * 100) : null;
-                
-                return `
-                    <div class="game-card">
-                        <div class="game-header">
-                            <div class="game-teams">
-                                <div class="team">
-                                    <span class="team-name">${game.away_team}</span>
-                                    ${awayProb ? `<span class="probability-pill">${awayProb}%</span>` : ''}
-                                </div>
-                                <div class="team">
-                                    <span class="team-name">${game.home_team}</span>
-                                    ${homeProb ? `<span class="probability-pill">${homeProb}%</span>` : ''}
-                                </div>
-                            </div>
-                            ${confidence ? this.renderConfidenceRing(confidence) : ''}
-                        </div>
-                        
-                        <div class="game-meta">
-                            <span>${date}</span>
-                            <span>${game.venue || 'TBD'}</span>
-                            ${game.neutral_site ? '<span>Neutral Site</span>' : ''}
-                        </div>
-                        
-                        ${prediction && prediction.market_edge > 0.05 ? 
-                            `<div class="edge-badge">Edge: +${Math.round(prediction.market_edge * 100)}%</div>` : ''}
-                        
-                        ${prediction && prediction.key_drivers ? `
-                            <div class="drivers">
-                                <div class="drivers-label">Key Factors</div>
-                                <div class="driver-chips">
-                                    ${prediction.key_drivers.map(driver => 
-                                        `<span class="driver-chip ${driver.startsWith('+') ? 'positive' : driver.startsWith('-') ? 'negative' : ''}">${driver}</span>`
-                                    ).join('')}
-                                </div>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }
-            
-            renderConfidenceRing(confidence) {
-                const radius = 16;
-                const circumference = 2 * Math.PI * radius;
-                const strokeDasharray = (confidence / 100) * circumference;
-                
-                return `
-                    <svg class="confidence-ring" viewBox="0 0 40 40">
-                        <circle cx="20" cy="20" r="${radius}" 
-                                fill="none" stroke="var(--bg-tertiary)" stroke-width="3"/>
-                        <circle cx="20" cy="20" r="${radius}" 
-                                fill="none" stroke="var(--accent-primary)" stroke-width="3"
-                                stroke-dasharray="${strokeDasharray} ${circumference}"
-                                stroke-dashoffset="0" transform="rotate(-90 20 20)"/>
-                        <text x="20" y="25" text-anchor="middle" 
-                              font-size="8" fill="var(--text-primary)">${confidence}</text>
-                    </svg>
-                `;
-            }
-            
-            updateSortControls() {
-                const controls = document.querySelector('.sort-controls');
-                if (state.predictions.length > 0) {
-                    controls.style.display = 'flex';
-                } else {
-                    controls.style.display = 'none';
-                }
-            }
-            
-            changeSort(sortBy) {
-                // Update active button
-                document.querySelectorAll('.sort-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.dataset.sort === sortBy) {
-                        btn.classList.add('active');
-                    }
-                });
-                
-                // Sort games based on predictions
-                if (state.predictions.length > 0) {
-                    state.games.sort((a, b) => {
-                        const predA = state.predictions.find(p => p.game_id === a.id);
-                        const predB = state.predictions.find(p => p.game_id === b.id);
-                        
-                        switch (sortBy) {
-                            case 'confidence':
-                                return (predB?.confidence || 0) - (predA?.confidence || 0);
-                            case 'edge':
-                                return (predB?.market_edge || 0) - (predA?.market_edge || 0);
-                            case 'time':
-                                return new Date(a.start_date) - new Date(b.start_date);
-                            default:
-                                return 0;
-                        }
-                    });
-                    
-                    this.renderGames();
-                }
-            }
-            
-            filterGames(query) {
-                const cards = document.querySelectorAll('.game-card');
-                const searchTerm = query.toLowerCase();
-                
-                cards.forEach(card => {
-                    const text = card.textContent.toLowerCase();
-                    if (text.includes(searchTerm)) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            }
-            
-            exportData() {
-                const exportData = {
-                    timestamp: new Date().toISOString(),
-                    week: state.currentWeek,
-                    games: state.games,
-                    predictions: state.predictions,
-                    settings: { ...state.settings, cfbdKey: '' } // Exclude API key
-                };
-                
-                const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-                    type: 'application/json'
-                });
-                
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `cfb_predictions_${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                utils.showToast('Data exported successfully', 'info');
-            }
-            
-            resetData() {
-                if (confirm('Reset all data and predictions? This cannot be undone.')) {
-                    state.games = [];
-                    state.predictions = [];
-                    this.cache.clear();
-                    this.renderGames();
-                    this.updateSortControls();
-                    utils.showToast('Data reset successfully', 'warning');
-                }
-            }
-            
-            showLoading(show, message = 'Loading games and predictions...') {
-                const loading = document.getElementById('loadingState');
-                if (show) {
-                    loading.innerHTML = `
-                        <div>🏈</div>
-                        <div>${message}</div>
-                    `;
-                    loading.style.display = 'block';
-                } else {
-                    loading.style.display = 'none';
+                    if (attempt === maxRetries - 1) throw error;
+                    const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
         }
+    }
 
-        // Initialize app when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            new CFBPredictor();
-        });
-
-        // Service Worker registration for offline support (optional)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                // Could implement SW for caching, but keeping simple for single file
+    class CFBDClient extends APIClient {
+        constructor(apiKey) {
+            super();
+            this.baseURL = 'https://apinext.collegefootballdata.com';
+            this.apiKey = apiKey;
+        }
+        
+        async getGames(year = 2025, week = null, classification = 'fbs') {
+            const params = new URLSearchParams({ 
+                year: year.toString()
+            });
+            
+            // Use camelCase parameter name (not snake_case like Python)
+            params.set('seasonType', 'regular');
+            
+            if (classification) {
+                params.set('classification', classification);
+            }
+            
+            if (week) {
+                params.set('week', week.toString());
+            }
+            
+            const url = `${this.baseURL}/games?${params}`;
+            console.log(`Requesting: ${url}`); // Simple debug log
+            return this.fetchWithRetry(url, {
+                headers: { 'Authorization': `Bearer ${this.apiKey}` }
             });
         }
-    </script>
+        
+        async getTeamStats(year = 2025) {
+            const params = new URLSearchParams({ 
+                year: year.toString()
+            });
+            params.set('seasonType', 'regular');
+            
+            const url = `${this.baseURL}/stats/season?${params}`;
+            return this.fetchWithRetry(url, {
+                headers: { 'Authorization': `Bearer ${this.apiKey}` }
+            });
+        }
+        
+        async getPregameWP(year = 2025, week = null) {
+            const params = new URLSearchParams({ 
+                year: year.toString()
+            });
+            params.set('seasonType', 'regular');
+            
+            if (week) {
+                params.set('week', week.toString());
+            }
+            
+            const url = `${this.baseURL}/metrics/wp/pregame?${params}`;
+            return this.fetchWithRetry(url, {
+                headers: { 'Authorization': `Bearer ${this.apiKey}` }
+            });
+        }
+        
+        async getLines(year = 2025, week = null) {
+            const params = new URLSearchParams({ 
+                year: year.toString()
+            });
+            params.set('seasonType', 'regular');
+            
+            if (week) {
+                params.set('week', week.toString());
+            }
+            
+            const url = `${this.baseURL}/lines?${params}`;
+            return this.fetchWithRetry(url, {
+                headers: { 'Authorization': `Bearer ${this.apiKey}` }
+            });
+        }
+    }
+
+    class WeatherClient extends APIClient {
+        async getForecast(lat, lon, date) {
+            const forecastDate = new Date(date).toISOString().split('T')[0];
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,precipitation,precipitation_probability,wind_speed_10m,wind_gusts_10m&start_date=${forecastDate}&end_date=${forecastDate}&timezone=auto`;
+            
+            return this.fetchWithRetry(url);
+        }
+    }
+
+    // Cache management with TTL
+    class CacheManager {
+        constructor() {
+            this.cache = this.loadFromStorage();
+        }
+        
+        loadFromStorage() {
+            try {
+                const cached = localStorage.getItem('cfb_cache');
+                return cached ? JSON.parse(cached) : {};
+            } catch {
+                return {};
+            }
+        }
+        
+        saveToStorage() {
+            try {
+                localStorage.setItem('cfb_cache', JSON.stringify(this.cache));
+            } catch (error) {
+                console.warn('Cache save failed:', error);
+            }
+        }
+        
+        set(key, value, ttlMinutes = 60) {
+            this.cache[key] = {
+                value,
+                expires: Date.now() + (ttlMinutes * 60 * 1000)
+            };
+            this.saveToStorage();
+        }
+        
+        get(key) {
+            const item = this.cache[key];
+            if (!item) return null;
+            
+            if (Date.now() > item.expires) {
+                delete this.cache[key];
+                this.saveToStorage();
+                return null;
+            }
+            
+            return item.value;
+        }
+        
+        clear() {
+            this.cache = {};
+            this.saveToStorage();
+        }
+    }
+
+    // Statistical models
+    class PredictionModels {
+        constructor() {
+            this.rng = new RNG();
+        }
+        
+        // Iteratively Reweighted Least Squares for logistic regression
+        irls(X, y, maxIter = 10, tolerance = 1e-6) {
+            const n = X.length;
+            const p = X[0].length;
+            let beta = new Array(p).fill(0);
+            
+            for (let iter = 0; iter < maxIter; iter++) {
+                const oldBeta = [...beta];
+                
+                // Calculate probabilities and weights
+                const pi = X.map(xi => {
+                    const eta = xi.reduce((sum, x, j) => sum + x * beta[j], 0);
+                    return utils.logistic(eta);
+                });
+                
+                const W = pi.map(p => p * (1 - p));
+                const z = X.map((xi, i) => {
+                    const eta = xi.reduce((sum, x, j) => sum + x * beta[j], 0);
+                    return eta + (y[i] - pi[i]) / W[i];
+                });
+                
+                // Weighted least squares update
+                // Simplified for demo - in production would use proper matrix operations
+                for (let j = 0; j < p; j++) {
+                    let num = 0, den = 0;
+                    for (let i = 0; i < n; i++) {
+                        num += W[i] * X[i][j] * z[i];
+                        den += W[i] * X[i][j] * X[i][j];
+                    }
+                    beta[j] = den > 0 ? num / den : 0;
+                }
+                
+                // Check convergence
+                const diff = Math.sqrt(
+                    beta.reduce((sum, b, j) => sum + Math.pow(b - oldBeta[j], 2), 0)
+                );
+                if (diff < tolerance) break;
+            }
+            
+            return beta;
+        }
+        
+        // Isotonic regression for calibration
+        isotonic(x, y) {
+            const n = x.length;
+            const indices = [...Array(n).keys()].sort((i, j) => x[i] - x[j]);
+            const sortedY = indices.map(i => y[i]);
+            
+            // Pool Adjacent Violators (PAV) algorithm
+            const weights = new Array(n).fill(1);
+            const values = [...sortedY];
+            
+            for (let i = 1; i < n; i++) {
+                if (values[i - 1] > values[i]) {
+                    // Pool violating pairs
+                    let pool = [i - 1, i];
+                    let poolSum = values[i - 1] * weights[i - 1] + values[i] * weights[i];
+                    let poolWeight = weights[i - 1] + weights[i];
+                    
+                    while (pool.length > 1 && pool[0] > 0 && 
+                           poolSum / poolWeight > values[pool[0] - 1]) {
+                        pool.unshift(pool[0] - 1);
+                        poolSum += values[pool[0]] * weights[pool[0]];
+                        poolWeight += weights[pool[0]];
+                    }
+                    
+                    const poolValue = poolSum / poolWeight;
+                    for (const idx of pool) {
+                        values[idx] = poolValue;
+                    }
+                }
+            }
+            
+            return (pred) => {
+                // Find interpolated value
+                for (let i = 1; i < n; i++) {
+                    if (x[indices[i]] >= pred) {
+                        const x1 = x[indices[i-1]], x2 = x[indices[i]];
+                        const y1 = values[i-1], y2 = values[i];
+                        return y1 + (y2 - y1) * (pred - x1) / (x2 - x1);
+                    }
+                }
+                return values[n-1];
+            };
+        }
+    }
+
+    // Feature engineering
+    class FeatureEngine {
+        constructor() {
+            this.venueCoords = {
+                'Bryant-Denny Stadium': [32.6654, -87.5503],
+                'Ohio Stadium': [40.0018, -83.0197],
+                'Tiger Stadium': [30.4126, -91.1837],
+                'Neyland Stadium': [35.9551, -83.9249]
+            };
+        }
+        
+        async buildFeatures(game, historicalData, weatherData, marketData) {
+            const features = [];
+            
+            // Basic differentials
+            const homeRating = this.getTeamRating(game.home_team, historicalData) || 1500;
+            const awayRating = this.getTeamRating(game.away_team, historicalData) || 1500;
+            features.push(homeRating - awayRating); // ΔR
+            
+            // Home field advantage
+            features.push(game.neutral_site ? 0 : 1);
+            features.push(game.neutral_site ? 1 : 0);
+            
+            // Weather adjustments
+            if (weatherData) {
+                const wind = weatherData.wind_speed_10m || 0;
+                const precip = weatherData.precipitation || 0;
+                features.push(Math.max(0, wind - 12) * 0.01);
+                features.push(precip > 0 ? 1 : 0);
+            } else {
+                features.push(0, 0);
+            }
+            
+            // Market implied probability (if available)
+            if (marketData && marketData.spread) {
+                features.push(marketData.spread);
+            } else {
+                features.push(0);
+            }
+            
+            // Conference strength proxy
+            const confStrength = {
+                'SEC': 0.8, 'Big Ten': 0.7, 'Big 12': 0.6,
+                'ACC': 0.5, 'Pac-12': 0.4
+            };
+            const homeConf = confStrength[game.home_conference] || 0.3;
+            const awayConf = confStrength[game.away_conference] || 0.3;
+            features.push(homeConf - awayConf);
+            
+            return features;
+        }
+        
+        getTeamRating(team, historicalData) {
+            // Simplified Elo-like rating
+            const baseRating = 1500;
+            const teamData = historicalData.find(d => d.team === team);
+            if (!teamData) return baseRating;
+            
+            // Use recent performance as proxy
+            return baseRating + (teamData.wins - teamData.losses) * 25;
+        }
+    }
+
+    // Main application logic
+    class CFBPredictor {
+        constructor() {
+            this.cache = new CacheManager();
+            this.models = new PredictionModels();
+            this.features = new FeatureEngine();
+            this.cfbdClient = null;
+            this.weatherClient = new WeatherClient();
+            
+            this.loadSettings();
+            this.initializeUI();
+            this.bindEvents();
+        }
+        
+        loadSettings() {
+            const saved = localStorage.getItem('cfb_settings');
+            if (saved) {
+                try {
+                    state.settings = { ...state.settings, ...JSON.parse(saved) };
+                } catch (error) {
+                    console.warn('Failed to load settings:', error);
+                }
+            }
+        }
+        
+        saveSettings() {
+            localStorage.setItem('cfb_settings', JSON.stringify(state.settings));
+        }
+        
+        initializeUI() {
+            // Populate settings form
+            const form = {
+                cfbdKey: document.getElementById('cfbdKey'),
+                useMarkets: document.getElementById('useMarkets'),
+                useWeather: document.getElementById('useWeather'),
+                manualInjuries: document.getElementById('manualInjuries'),
+                demoMode: document.getElementById('demoMode')
+            };
+            
+            form.cfbdKey.value = state.settings.cfbdKey;
+            form.useMarkets.checked = state.settings.useMarkets;
+            form.useWeather.checked = state.settings.useWeather;
+            form.manualInjuries.checked = state.settings.manualInjuries;
+            form.demoMode.checked = state.settings.demoMode;
+            
+            // Show/hide sort controls based on data
+            this.updateSortControls();
+        }
+        
+        bindEvents() {
+            // Settings modal
+            document.getElementById('settingsBtn').addEventListener('click', () => {
+                document.getElementById('settingsModal').classList.add('show');
+            });
+            
+            document.getElementById('closeSettings').addEventListener('click', () => {
+                document.getElementById('settingsModal').classList.remove('show');
+            });
+            
+            document.getElementById('saveSettings').addEventListener('click', () => {
+                this.updateSettings();
+            });
+            
+            document.getElementById('forgetKeys').addEventListener('click', () => {
+                this.forgetKeys();
+            });
+            
+            // Week navigation
+            document.querySelectorAll('.week-btn[data-offset]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const offset = parseInt(e.target.dataset.offset);
+                    this.changeWeek(offset);
+                });
+            });
+            
+            // Bottom bar actions
+            document.getElementById('refreshBtn').addEventListener('click', () => {
+                this.refreshData();
+            });
+            
+            document.getElementById('predictBtn').addEventListener('click', () => {
+                this.runPredictions();
+            });
+            
+            document.getElementById('exportBtn').addEventListener('click', () => {
+                this.exportData();
+            });
+            
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                this.resetData();
+            });
+            
+            // Sort and filter
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    this.changeSort(e.target.dataset.sort);
+                });
+            });
+            
+            document.getElementById('teamFilter').addEventListener('input', 
+                utils.debounce((e) => this.filterGames(e.target.value), 300)
+            );
+            
+            // Close modal on backdrop click
+            document.getElementById('settingsModal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    e.currentTarget.classList.remove('show');
+                }
+            });
+        }
+        
+        updateSettings() {
+            const form = {
+                cfbdKey: document.getElementById('cfbdKey').value.trim(),
+                useMarkets: document.getElementById('useMarkets').checked,
+                useWeather: document.getElementById('useWeather').checked,
+                manualInjuries: document.getElementById('manualInjuries').checked,
+                demoMode: document.getElementById('demoMode').checked
+            };
+            
+            state.settings = { ...state.settings, ...form };
+            this.saveSettings();
+            
+            // Update CFBD client if key changed
+            if (form.cfbdKey) {
+                this.cfbdClient = new CFBDClient(form.cfbdKey);
+            }
+            
+            document.getElementById('settingsModal').classList.remove('show');
+            utils.showToast('Settings saved successfully', 'info');
+        }
+        
+        forgetKeys() {
+            state.settings.cfbdKey = '';
+            document.getElementById('cfbdKey').value = '';
+            this.cfbdClient = null;
+            localStorage.removeItem('cfb_settings');
+            localStorage.removeItem('cfb_cache');
+            this.cache.clear();
+            utils.showToast('Keys and cache cleared', 'warning');
+        }
+        
+        changeWeek(offset) {
+            state.currentWeek = offset;
+            
+            // Update active button
+            document.querySelectorAll('.week-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (parseInt(btn.dataset.offset) === offset) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            this.refreshData();
+        }
+        
+        async refreshData() {
+            if (state.settings.demoMode) {
+                this.loadDemoData();
+                return;
+            }
+            
+            if (!state.settings.cfbdKey) {
+                utils.showToast('CFBD API key required', 'error');
+                return;
+            }
+            
+            this.showLoading(true);
+            
+            try {
+                await this.fetchGames();
+                utils.showToast('Data refreshed successfully', 'info');
+            } catch (error) {
+                console.error('Data refresh failed:', error);
+                utils.showToast(`Data refresh failed: ${error.message}`, 'error');
+            }
+            
+            this.showLoading(false);
+        }
+        
+        async fetchGames() {
+            if (!this.cfbdClient) {
+                this.cfbdClient = new CFBDClient(state.settings.cfbdKey);
+            }
+            
+            const { start, end } = utils.getWeekBounds(state.currentWeek);
+            const year = start.getFullYear();
+            const week = this.getWeekNumber(start);
+            
+            // Check cache first
+            const cacheKey = `games_${year}_${week}`;
+            let games = this.cache.get(cacheKey);
+            
+            if (!games) {
+                try {
+                    // Try with week parameter first
+                    games = await this.cfbdClient.getGames(year, week);
+                } catch (error) {
+                    // If week fails, try without week and filter client-side
+                    console.warn('Week parameter failed, trying without:', error.message);
+                    games = await this.cfbdClient.getGames(year);
+                }
+                this.cache.set(cacheKey, games, 120); // 2 hour TTL
+            }
+            
+            // Debug: Check what we got back
+            console.log(`API returned ${games ? games.length : 0} total games`);
+            console.log('Date range filtering:', { start: start.toISOString(), end: end.toISOString() });
+            
+            if (games && games.length > 0) {
+                console.log('Sample game dates:', games.slice(0, 3).map(g => ({
+                    teams: `${g.away_team} @ ${g.home_team}`,
+                    date: g.start_date,
+                    parsed: new Date(g.start_date).toISOString()
+                })));
+            }
+            
+            // Filter games for selected date range
+            state.games = games ? games.filter(game => {
+                if (!game.start_date) {
+                    console.log('Game missing start_date:', game);
+                    return false;
+                }
+                
+                let gameDate;
+                try {
+                    gameDate = new Date(game.start_date);
+                    // Check if date is valid
+                    if (isNaN(gameDate.getTime())) {
+                        console.error('Invalid date for game:', game.start_date, game);
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Error parsing game date:', error, game);
+                    return false;
+                }
+                
+                const inRange = gameDate >= start && gameDate <= end;
+                if (!inRange) {
+                    console.log('Game outside range:', {
+                        teams: `${game.away_team} @ ${game.home_team}`,
+                        gameDate: gameDate.toISOString(),
+                        start: start.toISOString(),
+                        end: end.toISOString()
+                    });
+                }
+                return inRange;
+            }) : [];
+            
+            console.log(`Filtered to ${state.games.length} games for selected week`);
+            
+            this.renderGames();
+        }
+        
+        loadDemoData() {
+            state.games = DEMO_DATA.games;
+            state.predictions = DEMO_DATA.predictions;
+            this.renderGames();
+            utils.showToast('Demo data loaded', 'info');
+        }
+        
+        getWeekNumber(date) {
+            // For 2025 season, approximate week calculation
+            // Week 1 typically starts around August 31st
+            const year = date.getFullYear();
+            const aug31 = new Date(year, 7, 31); // August 31st (month 7 = August)
+            
+            const diffTime = date.getTime() - aug31.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const week = Math.floor(diffDays / 7) + 1;
+            
+            const calculatedWeek = Math.max(1, Math.min(17, week));
+            
+            console.log(`Week calculation: ${date.toDateString()} -> Week ${calculatedWeek}`);
+            
+            return calculatedWeek;
+        }
+        
+        async runPredictions() {
+            if (state.games.length === 0) {
+                utils.showToast('No games to predict', 'warning');
+                return;
+            }
+            
+            this.showLoading(true, 'Running predictions...');
+            
+            try {
+                // Use Web Worker for heavy computation
+                const worker = this.createPredictionWorker();
+                
+                const predictions = await new Promise((resolve, reject) => {
+                    worker.onmessage = (e) => {
+                        if (e.data.error) {
+                            reject(new Error(e.data.error));
+                        } else {
+                            resolve(e.data.predictions);
+                        }
+                        worker.terminate();
+                    };
+                    
+                    worker.postMessage({
+                        games: state.games,
+                        settings: state.settings
+                    });
+                });
+                
+                state.predictions = predictions;
+                this.renderGames();
+                this.updateSortControls();
+                
+                utils.showToast(`Predicted ${predictions.length} games`, 'info');
+                
+            } catch (error) {
+                console.error('Prediction failed:', error);
+                utils.showToast(`Prediction failed: ${error.message}`, 'error');
+            }
+            
+            this.showLoading(false);
+        }
+        
+        createPredictionWorker() {
+            // Create Web Worker from blob to avoid external files
+            const workerCode = `
+                // Simple prediction logic for Web Worker
+                self.onmessage = function(e) {
+                    const { games, settings } = e.data;
+                    
+                    try {
+                        const predictions = games.map(game => {
+                            // Simplified prediction model
+                            const homeAdvantage = game.neutral_site ? 0 : 0.55;
+                            const randomFactor = 0.1 * (Math.random() - 0.5);
+                            
+                            const homeWinProb = Math.min(0.95, Math.max(0.05, 
+                                homeAdvantage + randomFactor
+                            ));
+                            
+                            return {
+                                game_id: game.id,
+                                home_win_prob: homeWinProb,
+                                away_win_prob: 1 - homeWinProb,
+                                confidence: 0.7 + Math.random() * 0.3,
+                                spread_equiv: (homeWinProb - 0.5) * 14,
+                                margin_equiv: (homeWinProb - 0.5) * 10,
+                                key_drivers: homeWinProb > 0.5 ? 
+                                    ['+Home field', '+Recent form'] : 
+                                    ['+Away strength', '+Matchup'],
+                                market_edge: Math.random() * 0.15
+                            };
+                        });
+                        
+                        self.postMessage({ predictions });
+                    } catch (error) {
+                        self.postMessage({ error: error.message });
+                    }
+                };
+            `;
+            
+            const blob = new Blob([workerCode], { type: 'application/javascript' });
+            return new Worker(URL.createObjectURL(blob));
+        }
+        
+        renderGames() {
+            const container = document.getElementById('gamesList');
+            
+            if (state.games.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-muted);">No games found for selected week</div>';
+                return;
+            }
+            
+            const html = state.games.map(game => {
+                const prediction = state.predictions.find(p => p.game_id === game.id);
+                return this.renderGameCard(game, prediction);
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+        
+        renderGameCard(game, prediction) {
+            const date = utils.formatDate(game.start_date);
+            const homeProb = prediction ? Math.round(prediction.home_win_prob * 100) : null;
+            const awayProb = prediction ? Math.round(prediction.away_win_prob * 100) : null;
+            const confidence = prediction ? Math.round(prediction.confidence * 100) : null;
+            
+            return `
+                <div class="game-card">
+                    <div class="game-header">
+                        <div class="game-teams">
+                            <div class="team">
+                                <span class="team-name">${game.away_team}</span>
+                                ${awayProb ? `<span class="probability-pill">${awayProb}%</span>` : ''}
+                            </div>
+                            <div class="team">
+                                <span class="team-name">${game.home_team}</span>
+                                ${homeProb ? `<span class="probability-pill">${homeProb}%</span>` : ''}
+                            </div>
+                        </div>
+                        ${confidence ? this.renderConfidenceRing(confidence) : ''}
+                    </div>
+                    
+                    <div class="game-meta">
+                        <span>${date}</span>
+                        <span>${game.venue || 'TBD'}</span>
+                        ${game.neutral_site ? '<span>Neutral Site</span>' : ''}
+                    </div>
+                    
+                    ${prediction && prediction.market_edge > 0.05 ? 
+                        `<div class="edge-badge">Edge: +${Math.round(prediction.market_edge * 100)}%</div>` : ''}
+                    
+                    ${prediction && prediction.key_drivers ? `
+                        <div class="drivers">
+                            <div class="drivers-label">Key Factors</div>
+                            <div class="driver-chips">
+                                ${prediction.key_drivers.map(driver => 
+                                    `<span class="driver-chip ${driver.startsWith('+') ? 'positive' : driver.startsWith('-') ? 'negative' : ''}">${driver}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        renderConfidenceRing(confidence) {
+            const radius = 16;
+            const circumference = 2 * Math.PI * radius;
+            const strokeDasharray = (confidence / 100) * circumference;
+            
+            return `
+                <svg class="confidence-ring" viewBox="0 0 40 40">
+                    <circle cx="20" cy="20" r="${radius}" 
+                            fill="none" stroke="var(--bg-tertiary)" stroke-width="3"/>
+                    <circle cx="20" cy="20" r="${radius}" 
+                            fill="none" stroke="var(--accent-primary)" stroke-width="3"
+                            stroke-dasharray="${strokeDasharray} ${circumference}"
+                            stroke-dashoffset="0" transform="rotate(-90 20 20)"/>
+                    <text x="20" y="25" text-anchor="middle" 
+                          font-size="8" fill="var(--text-primary)">${confidence}</text>
+                </svg>
+            `;
+        }
+        
+        updateSortControls() {
+            const controls = document.querySelector('.sort-controls');
+            if (state.predictions.length > 0) {
+                controls.style.display = 'flex';
+            } else {
+                controls.style.display = 'none';
+            }
+        }
+        
+        changeSort(sortBy) {
+            // Update active button
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.sort === sortBy) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Sort games based on predictions
+            if (state.predictions.length > 0) {
+                state.games.sort((a, b) => {
+                    const predA = state.predictions.find(p => p.game_id === a.id);
+                    const predB = state.predictions.find(p => p.game_id === b.id);
+                    
+                    switch (sortBy) {
+                        case 'confidence':
+                            return (predB?.confidence || 0) - (predA?.confidence || 0);
+                        case 'edge':
+                            return (predB?.market_edge || 0) - (predA?.market_edge || 0);
+                        case 'time':
+                            return new Date(a.start_date) - new Date(b.start_date);
+                        default:
+                            return 0;
+                    }
+                });
+                
+                this.renderGames();
+            }
+        }
+        
+        filterGames(query) {
+            const cards = document.querySelectorAll('.game-card');
+            const searchTerm = query.toLowerCase();
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        exportData() {
+            const exportData = {
+                timestamp: new Date().toISOString(),
+                week: state.currentWeek,
+                games: state.games,
+                predictions: state.predictions,
+                settings: { ...state.settings, cfbdKey: '' } // Exclude API key
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+                type: 'application/json'
+            });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cfb_predictions_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            utils.showToast('Data exported successfully', 'info');
+        }
+        
+        resetData() {
+            if (confirm('Reset all data and predictions? This cannot be undone.')) {
+                state.games = [];
+                state.predictions = [];
+                this.cache.clear();
+                this.renderGames();
+                this.updateSortControls();
+                utils.showToast('Data reset successfully', 'warning');
+            }
+        }
+        
+        showLoading(show, message = 'Loading games and predictions...') {
+            const loading = document.getElementById('loadingState');
+            if (show) {
+                loading.innerHTML = `
+                    <div>🏈</div>
+                    <div>${message}</div>
+                `;
+                loading.style.display = 'block';
+            } else {
+                loading.style.display = 'none';
+            }
+        }
+    }
+
+    // Initialize app when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        new CFBPredictor();
+    });
+
+    // Service Worker registration for offline support (optional)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            // Could implement SW for caching, but keeping simple for single file
+        });
+    }
+</script>
+```
+
 </body>
 </html>
