@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#0b0f14">
-    <title>CFB Wizard v4.21</title>
+    <title>CFB Winner Predictor</title>
     <style>
         :root {
             --bg-primary: #0b0f14;
@@ -401,7 +401,7 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>CFB Winner Predictor</h1>
+        <h1>CFB Wizard</h1>
         <div class="week-selector">
             <button class="week-btn" data-offset="-1">← Prev</button>
             <button class="week-btn active" data-offset="0">This Week</button>
@@ -670,7 +670,10 @@
                 
                 for (let attempt = 0; attempt < maxRetries; attempt++) {
                     try {
+                        console.log(`Fetching: ${url}`); // Debug log
                         const response = await fetch(url, options);
+                        
+                        console.log(`Response status: ${response.status}`); // Debug log
                         
                         if (response.status === 429) {
                             const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
@@ -679,11 +682,16 @@
                         }
                         
                         if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                            const errorText = await response.text();
+                            console.error(`API Error: ${response.status} ${response.statusText}`, errorText);
+                            throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
                         }
                         
-                        return await response.json();
+                        const data = await response.json();
+                        console.log(`Received ${Array.isArray(data) ? data.length : 'non-array'} items`); // Debug log
+                        return data;
                     } catch (error) {
+                        console.error(`Attempt ${attempt + 1} failed:`, error);
                         if (attempt === maxRetries - 1) throw error;
                         const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
                         await new Promise(resolve => setTimeout(resolve, delay));
@@ -699,9 +707,13 @@
                 this.apiKey = apiKey;
             }
             
-            async getGames(season = 2025, week = null) {
-                const params = new URLSearchParams({ season });
-                if (week) params.set('week', week);
+            async getGames(year = 2025, week = null, classification = 'fbs') {
+                const params = new URLSearchParams({ 
+                    year: year.toString(),
+                    seasonType: 'regular',
+                    classification 
+                });
+                if (week) params.set('week', week.toString());
                 
                 const url = `${this.baseURL}/games?${params}`;
                 return this.fetchWithRetry(url, {
@@ -709,16 +721,19 @@
                 });
             }
             
-            async getTeamStats(season = 2025) {
-                const url = `${this.baseURL}/stats/season?season=${season}`;
+            async getTeamStats(year = 2025) {
+                const url = `${this.baseURL}/stats/season?year=${year}&seasonType=regular`;
                 return this.fetchWithRetry(url, {
                     headers: { 'Authorization': `Bearer ${this.apiKey}` }
                 });
             }
             
-            async getPregameWP(season = 2025, week = null) {
-                const params = new URLSearchParams({ season });
-                if (week) params.set('week', week);
+            async getPregameWP(year = 2025, week = null) {
+                const params = new URLSearchParams({ 
+                    year: year.toString(),
+                    seasonType: 'regular' 
+                });
+                if (week) params.set('week', week.toString());
                 
                 const url = `${this.baseURL}/metrics/wp/pregame?${params}`;
                 return this.fetchWithRetry(url, {
@@ -726,9 +741,12 @@
                 });
             }
             
-            async getLines(season = 2025, week = null) {
-                const params = new URLSearchParams({ season });
-                if (week) params.set('week', week);
+            async getLines(year = 2025, week = null) {
+                const params = new URLSearchParams({ 
+                    year: year.toString(),
+                    seasonType: 'regular' 
+                });
+                if (week) params.set('week', week.toString());
                 
                 const url = `${this.baseURL}/lines?${params}`;
                 return this.fetchWithRetry(url, {
@@ -1138,20 +1156,28 @@
                 }
                 
                 const { start, end } = utils.getWeekBounds(state.currentWeek);
-                const season = start.getFullYear();
+                const year = start.getFullYear();
                 const week = this.getWeekNumber(start);
                 
                 // Check cache first
-                const cacheKey = `games_${season}_${week}`;
+                const cacheKey = `games_${year}_${week}`;
                 let games = this.cache.get(cacheKey);
                 
                 if (!games) {
-                    games = await this.cfbdClient.getGames(season, week);
+                    try {
+                        // Try with week parameter first
+                        games = await this.cfbdClient.getGames(year, week);
+                    } catch (error) {
+                        // If week fails, try without week and filter client-side
+                        console.warn('Week parameter failed, trying without:', error.message);
+                        games = await this.cfbdClient.getGames(year);
+                    }
                     this.cache.set(cacheKey, games, 120); // 2 hour TTL
                 }
                 
                 // Filter games for selected date range
                 state.games = games.filter(game => {
+                    if (!game.start_date) return false;
                     const gameDate = new Date(game.start_date);
                     return gameDate >= start && gameDate <= end;
                 });
