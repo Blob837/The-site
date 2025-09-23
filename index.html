@@ -454,6 +454,24 @@
       z-index: 50;
     }
 
+    .sticky-bar .force-refresh-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(12, 18, 28, 0.8);
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .sticky-bar .force-refresh-toggle input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+    }
+
     .sticky-bar .button-group {
       display: flex;
       gap: 12px;
@@ -634,6 +652,31 @@
       color: var(--text-muted);
       padding: 0;
       min-height: unset;
+    }
+
+    .notice-banner {
+      grid-column: 1 / -1;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(79, 156, 255, 0.35);
+      background: rgba(17, 26, 40, 0.72);
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .notice-banner.warning {
+      border-color: rgba(251, 191, 36, 0.6);
+      background: rgba(251, 191, 36, 0.12);
+      color: var(--warning);
+    }
+
+    .notice-banner.danger {
+      border-color: rgba(248, 113, 113, 0.6);
+      background: rgba(248, 113, 113, 0.12);
+      color: var(--danger);
     }
 
     .empty-state {
@@ -930,6 +973,10 @@
         <button id="export-btn" class="ghost" type="button">Export JSON</button>
         <button id="reset-btn" class="danger" type="button">Reset</button>
       </div>
+      <label class="force-refresh-toggle" for="force-refresh-toggle">
+        <input type="checkbox" id="force-refresh-toggle" aria-label="Force refresh">
+        <span>Force Refresh</span>
+      </label>
     </div>
     <div class="settings-modal" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
       <div class="settings-panel">
@@ -976,6 +1023,343 @@
   </div>
   <script>
     (function () {
+      const safeStore = (() => {
+        const memory = new Map();
+        let diagnosticsEmitter = null;
+        const storage = (() => {
+          try {
+            if (typeof localStorage === 'undefined') {
+              return null;
+            }
+            const probe = '__cfbd_probe__';
+            localStorage.setItem(probe, '1');
+            localStorage.removeItem(probe);
+            return localStorage;
+          } catch (err) {
+            return null;
+          }
+        })();
+
+        function cloneValue(value) {
+          if (value === null || typeof value !== 'object') {
+            return value;
+          }
+          try {
+            return structuredClone(value);
+          } catch (err) {
+            try {
+              return JSON.parse(JSON.stringify(value));
+            } catch (fallbackErr) {
+              return null;
+            }
+          }
+        }
+
+        function parseValue(raw) {
+          if (raw === null || raw === undefined) return null;
+          if (raw === '') return '';
+          try {
+            return JSON.parse(raw);
+          } catch (err) {
+            return raw;
+          }
+        }
+
+        function emit(event) {
+          if (typeof diagnosticsEmitter !== 'function') return;
+          try {
+            diagnosticsEmitter(event);
+          } catch (err) {
+            // swallow diagnostics errors
+          }
+        }
+
+        function isQuotaError(err) {
+          if (!err) return false;
+          return err.name === 'QuotaExceededError' || err.code === 22 || err.number === -2147024882;
+        }
+
+        function pruneValue(value, hint) {
+          if (!hint) return value;
+          if (value && typeof value === 'object' && !Array.isArray(value) && Object.prototype.hasOwnProperty.call(value, 'value')) {
+            const record = Object.assign({}, value);
+            record.value = pruneValue(record.value, hint);
+            return record;
+          }
+          if (value === null || value === undefined) return value;
+          switch (hint) {
+            case 'games':
+              return Array.isArray(value)
+                ? value.map((game) => ({
+                    id: game.id,
+                    season: game.season,
+                    week: game.week,
+                    startDate: game.startDate,
+                    homeTeam: game.homeTeam,
+                    awayTeam: game.awayTeam,
+                    neutralSite: Boolean(game.neutralSite),
+                    status: game.status,
+                    venue: game.venue
+                      ? {
+                          id: game.venue.id,
+                          name: game.venue.name
+                        }
+                      : undefined
+                  }))
+                : value;
+            case 'venues':
+              return Array.isArray(value)
+                ? value.map((venue) => ({
+                    id: venue.id,
+                    name: venue.name,
+                    latitude: venue.latitude,
+                    longitude: venue.longitude,
+                    roof: venue.roof,
+                    surface: venue.surface ?? venue.grass ?? null
+                  }))
+                : value;
+            case 'pregame':
+              return Array.isArray(value)
+                ? value.map((item) => ({
+                    gameId: item.gameId,
+                    homeTeam: item.homeTeam,
+                    awayTeam: item.awayTeam,
+                    homeWp: item.homeWp ?? item.homeWinProb ?? null,
+                    awayWp: item.awayWp ?? item.awayWinProb ?? null
+                  }))
+                : value;
+            case 'ppaTeams':
+              return Array.isArray(value)
+                ? value.map((item) => ({
+                    team: item.team,
+                    offense: {
+                      ppa: item.offense?.ppa,
+                      successRate: item.offense?.successRate
+                    },
+                    defense: {
+                      ppa: item.defense?.ppa,
+                      successRate: item.defense?.successRate
+                    }
+                  }))
+                : value;
+            case 'ppaGames':
+              return Array.isArray(value)
+                ? value.map((item) => ({
+                    gameId: item.gameId,
+                    team: item.team,
+                    opponent: item.opponent,
+                    offensePpa: item.offensePpa,
+                    defensePpa: item.defensePpa,
+                    successRateOffense: item.successRateOffense,
+                    successRateDefense: item.successRateDefense
+                  }))
+                : value;
+            case 'lines':
+              return Array.isArray(value)
+                ? value.map((item) => ({
+                    gameId: item.gameId,
+                    provider: item.provider,
+                    spread: item.spread,
+                    overUnder: item.overUnder,
+                    moneylineHome: item.moneylineHome,
+                    moneylineAway: item.moneylineAway,
+                    lastUpdated: item.lastUpdated,
+                    isClosed: item.isClosed ?? null
+                  }))
+                : value;
+            default:
+              return value;
+          }
+        }
+
+        function serialize(value) {
+          if (typeof value === 'string') return value;
+          try {
+            return JSON.stringify(value);
+          } catch (err) {
+            return null;
+          }
+        }
+
+        function shrinkToBudget(value, hint, budgetBytes) {
+          if (typeof value === 'string') {
+            return { serialized: value, payload: value };
+          }
+          let candidate = pruneValue(cloneValue(value), hint);
+          let serialized = serialize(candidate) || '';
+          if (serialized.length <= budgetBytes) {
+            return { serialized, payload: candidate };
+          }
+          const extractArray = (input) => {
+            if (Array.isArray(input)) return input.slice();
+            if (input && typeof input === 'object' && Array.isArray(input.value)) {
+              return input.value.slice();
+            }
+            return null;
+          };
+          const replaceArray = (input, nextArray) => {
+            if (Array.isArray(input)) {
+              return nextArray.slice();
+            }
+            if (input && typeof input === 'object' && Array.isArray(input.value)) {
+              const copy = Object.assign({}, input);
+              copy.value = nextArray.slice();
+              return copy;
+            }
+            return input;
+          };
+          let arrayCopy = extractArray(candidate);
+          if (arrayCopy && arrayCopy.length) {
+            let slice = arrayCopy.slice();
+            while (slice.length > 1) {
+              slice = slice.slice(0, Math.max(1, Math.floor(slice.length * 0.75)));
+              const nextCandidate = replaceArray(candidate, slice);
+              const nextSerialized = serialize(nextCandidate) || '';
+              if (nextSerialized.length <= budgetBytes) {
+                return { serialized: nextSerialized, payload: nextCandidate };
+              }
+            }
+            const minimal = replaceArray(candidate, slice);
+            return { serialized: serialize(minimal) || '', payload: minimal };
+          }
+          return { serialized, payload: candidate };
+        }
+
+        function get(key) {
+          if (memory.has(key)) {
+            return cloneValue(memory.get(key));
+          }
+          if (!storage) return null;
+          try {
+            const raw = storage.getItem(key);
+            if (raw === null || raw === undefined) return null;
+            return parseValue(raw);
+          } catch (err) {
+            return memory.has(key) ? cloneValue(memory.get(key)) : null;
+          }
+        }
+
+        function set(key, value, options = {}) {
+          if (value === undefined) {
+            del(key);
+            return;
+          }
+          const budgetKB = Number.isFinite(options.budgetKB) ? options.budgetKB : 512;
+          const budgetBytes = Math.max(1024, budgetKB * 1024);
+          let serialized;
+          let payload;
+          if (typeof value === 'string') {
+            serialized = value;
+            payload = value;
+          } else {
+            const shrunk = shrinkToBudget(value, options.pruneHint, budgetBytes);
+            serialized = shrunk.serialized;
+            payload = shrunk.payload;
+          }
+          if (!storage) {
+            memory.set(key, cloneValue(value));
+            emit({ type: 'storage.quotaExceeded', key, size: serialized ? serialized.length : 0 });
+            return;
+          }
+          try {
+            storage.setItem(key, serialized);
+            if (memory.has(key)) {
+              memory.delete(key);
+            }
+          } catch (err) {
+            if (isQuotaError(err)) {
+              memory.set(key, cloneValue(value));
+              emit({ type: 'storage.quotaExceeded', key, size: serialized ? serialized.length : 0 });
+            } else {
+              throw err;
+            }
+          }
+        }
+
+        function del(key) {
+          if (storage) {
+            try {
+              storage.removeItem(key);
+            } catch (err) {
+              // ignore
+            }
+          }
+          memory.delete(key);
+        }
+
+        function clearNamespace(prefix) {
+          if (storage) {
+            const targets = [];
+            try {
+              for (let i = 0; i < storage.length; i++) {
+                const key = storage.key(i);
+                if (key && key.startsWith(prefix)) {
+                  targets.push(key);
+                }
+              }
+            } catch (err) {
+              // ignore enumeration errors
+            }
+            targets.forEach((key) => {
+              try {
+                storage.removeItem(key);
+              } catch (err) {
+                // ignore
+              }
+            });
+          }
+          for (const key of Array.from(memory.keys())) {
+            if (key.startsWith(prefix)) {
+              memory.delete(key);
+            }
+          }
+        }
+
+        function dumpMemory() {
+          return Array.from(memory.entries()).map(([key, val]) => [key, cloneValue(val)]);
+        }
+
+        function listEntries(prefix) {
+          const results = [];
+          if (storage) {
+            try {
+              for (let i = 0; i < storage.length; i++) {
+                const key = storage.key(i);
+                if (!key) continue;
+                if (prefix && !key.startsWith(prefix)) continue;
+                const raw = storage.getItem(key);
+                results.push([key, parseValue(raw)]);
+              }
+            } catch (err) {
+              // ignore iteration issues
+            }
+          }
+          for (const [key, value] of memory.entries()) {
+            if (prefix && !key.startsWith(prefix)) continue;
+            if (!results.some(([stored]) => stored === key)) {
+              results.push([key, cloneValue(value)]);
+            }
+          }
+          return results;
+        }
+
+        return {
+          get,
+          set,
+          del,
+          clearNamespace,
+          dumpMemory,
+          entries: listEntries,
+          simulateQuota(key = 'safeStore-simulated', size = 0) {
+            memory.set(key, null);
+            emit({ type: 'storage.quotaExceeded', key, size });
+          },
+          setDiagnosticsEmitter(fn) {
+            diagnosticsEmitter = fn;
+          }
+        };
+      })();
+
       const APP_VERSION = '1.0.0';
       const STORAGE_PREFIX = 'cfbdPredictor-v1-';
       const CFBD_BASE = 'https://apinext.collegefootballdata.com';
@@ -1002,7 +1386,87 @@
         { key: 'games', label: 'GET /games', path: '/games', params: (ctx) => ({ year: ctx.year, week: ctx.week, seasonType: ctx.seasonType }) },
         { key: 'ppaTeams', label: 'GET /ppa/teams', path: '/ppa/teams', params: (ctx) => ({ year: ctx.year }) },
         { key: 'pregame', label: 'GET /metrics/wp/pregame', path: '/metrics/wp/pregame', params: (ctx) => ({ year: ctx.year, week: ctx.week }) },
-        { key: 'ppaGames', label: 'GET /ppa/games', path: '/ppa/games', params: (ctx) => ({ year: ctx.year, week: Math.max(1, ctx.week - 1) }) }
+        { key: 'ppaGames', label: 'GET /ppa/games', path: '/ppa/games', params: (ctx) => ({ year: ctx.year, week: Math.max(1, ctx.week - 1) }) },
+        {
+          key: 'invalidKey',
+          label: 'Simulate invalid key (401)',
+          run: async ({ client }) => {
+            try {
+              await cfbdFetch('/info', {
+                key: 'invalid-diagnostics-key',
+                params: {},
+                label: 'Diagnostics invalid key simulation',
+                type: 'auth',
+                rateLimiter: client?.rateLimiter,
+                retries: 1
+              });
+              return { status: 'fail', code: 200, message: 'Expected 401 but request succeeded.' };
+            } catch (err) {
+              if (err?.metadata?.status === 401) {
+                return { status: 'pass', code: 401, message: '401 handled correctly.' };
+              }
+              throw err;
+            }
+          }
+        },
+        {
+          key: 'storageQuota',
+          label: 'Simulate storage quota',
+          run: async () => {
+            const key = `${STORAGE_PREFIX}diagnostics-quota`;
+            const previous = state.storageDegraded;
+            safeStore.simulateQuota(key, 640 * 1024);
+            await sleep(30);
+            safeStore.del(key);
+            state.storageDegraded = previous;
+            if (state.predictions.length) {
+              renderPredictions();
+            } else if (state.games.length) {
+              renderGames(state.games, state.lastGamesMeta);
+            } else {
+              renderNotices();
+            }
+            return { status: 'pass', code: 'SIM', message: 'Quota event emitted.' };
+          }
+        },
+        {
+          key: 'rateLimitRecovery',
+          label: 'Simulate 429 recovery',
+          run: async ({ client, context }) => {
+            const params = {
+              year: context.year,
+              week: context.week,
+              seasonType: context.seasonType
+            };
+            const result = await client.request('/games', params, {
+              label: 'Simulated 429 → /games',
+              type: 'metrics',
+              simulate429: {
+                data: [
+                  {
+                    id: 'simulated-429-game',
+                    season: context.year,
+                    week: context.week,
+                    startDate: new Date().toISOString(),
+                    homeTeam: 'Simulated Home',
+                    awayTeam: 'Simulated Away',
+                    neutralSite: false,
+                    status: 'scheduled'
+                  }
+                ]
+              },
+              retries: 3,
+              skipValidation: true
+            });
+            if (result.soft) {
+              return { status: 'fail', code: result.status || 429, message: 'Simulation reported soft failure.' };
+            }
+            if (result.status !== 200) {
+              return { status: 'fail', code: result.status || 'SIM', message: 'Expected 200 after simulated retries.' };
+            }
+            return { status: 'pass', code: 200, message: 'Recovered after simulated 429.' };
+          }
+        }
       ];
       const CACHE_TTLS = {
         metrics: 24,
@@ -1212,7 +1676,8 @@
         diagnosticsEmpty: document.getElementById('diagnostics-empty'),
         copyDiagnostics: document.getElementById('copy-diagnostics'),
         runTests: document.getElementById('run-tests'),
-        diagnosticsTestList: document.getElementById('diagnostics-test-list')
+        diagnosticsTestList: document.getElementById('diagnostics-test-list'),
+        forceRefreshToggle: document.getElementById('force-refresh-toggle')
       };
 
       const state = {
@@ -1233,7 +1698,16 @@
         apiKeyValid: false,
         dataHealth: defaultDataHealth(),
         lastDataset: null,
-        calibratorCache: null
+        calibratorCache: null,
+        storageDegraded: false,
+        forceRefresh: false,
+        weekLocked: false,
+        lastGamesMeta: {
+          checkedAdjacent: false,
+          scoreboard: false,
+          usedWeek: null,
+          baseWeek: null
+        }
       };
 
       function createDiagnosticsStore() {
@@ -1476,7 +1950,7 @@
         }
         let context;
         try {
-          context = await resolveSeasonContext({ forceRefresh });
+          context = await resolveSlate({ forceRefresh });
         } catch (err) {
           handleError(err, err.metadata?.type || 'schedule');
           return;
@@ -1492,10 +1966,30 @@
         const client = ensureCfbdClient();
         for (const test of API_TESTS) {
           diagnosticsStore.updateTest(test.key, { status: 'running', code: '…', message: 'Running…' });
-          const params = typeof test.params === 'function' ? test.params(context) : (test.params || {});
           try {
-            await client.request(test.path, params, { label: test.label, type: 'metrics' });
-            diagnosticsStore.updateTest(test.key, { status: 'pass', code: 200, message: 'OK' });
+            let outcome;
+            if (typeof test.run === 'function') {
+              outcome = await test.run({
+                client,
+                context,
+                forceRefresh,
+                update: (updates) => diagnosticsStore.updateTest(test.key, updates)
+              });
+            } else {
+              const params = typeof test.params === 'function' ? test.params(context) : (test.params || {});
+              const result = await client.request(test.path, params, { label: test.label, type: 'metrics' });
+              if (result.soft) {
+                outcome = { status: 'fail', code: result.status || 429, message: 'Rate limited' };
+              } else {
+                outcome = { status: 'pass', code: result.status || 200, message: 'OK' };
+              }
+            }
+            const finalOutcome = {
+              status: outcome?.status || 'pass',
+              code: outcome?.code ?? 200,
+              message: outcome?.message || (outcome?.status === 'fail' ? 'Failed' : 'OK')
+            };
+            diagnosticsStore.updateTest(test.key, finalOutcome);
           } catch (err) {
             const status = err.metadata?.status || 'ERR';
             diagnosticsStore.updateTest(test.key, { status: 'fail', code: status, message: err.metadata?.toast || err.message });
@@ -1509,6 +2003,26 @@
       }
 
       const diagnosticsStore = createDiagnosticsStore();
+      safeStore.setDiagnosticsEmitter((event) => {
+        if (!event || event.type !== 'storage.quotaExceeded') return;
+        state.storageDegraded = true;
+        const entry = diagnosticsStore.add({ path: 'storage', label: 'Storage quota', params: { key: event.key } });
+        diagnosticsStore.update(entry.id, {
+          status: 'error',
+          statusCode: '—',
+          message: `Local storage quota exceeded for ${event.key}. Using memory cache.`,
+          sample: `approx ${Math.round((event.size || 0) / 1024)} KB`,
+          ok: false
+        });
+        showToast('Storage degraded (using memory cache).', 'warning');
+        if (state.predictions.length) {
+          renderPredictions();
+        } else if (state.games.length) {
+          renderGames(state.games, state.lastGamesMeta);
+        } else {
+          renderNotices();
+        }
+      });
       let worker;
       let cfbdClient;
       let venueCache = new Map();
@@ -1535,7 +2049,7 @@
         elements.openSettings.addEventListener('click', () => toggleSettings(true));
         elements.closeSettings.addEventListener('click', () => toggleSettings(false));
         elements.settingsForm.addEventListener('submit', onSaveSettings);
-        elements.predictBtn.addEventListener('click', () => predict(false));
+        elements.predictBtn.addEventListener('click', () => predict(state.forceRefresh));
         elements.refreshBtn.addEventListener('click', () => predict(true));
         elements.exportBtn.addEventListener('click', exportState);
         elements.resetBtn.addEventListener('click', resetAll);
@@ -1583,6 +2097,18 @@
         elements.diagnosticsToggle.addEventListener('click', () => toggleDiagnosticsPanel());
         elements.copyDiagnostics.addEventListener('click', copyDiagnostics);
         elements.runTests.addEventListener('click', () => runApiTests(true));
+        if (elements.forceRefreshToggle) {
+          elements.forceRefreshToggle.addEventListener('change', () => {
+            state.forceRefresh = elements.forceRefreshToggle.checked;
+            if (state.forceRefresh) {
+              safeStore.clearNamespace(`${STORAGE_PREFIX}cache-`);
+              safeStore.del(STORAGE_KEYS.calibration);
+              showToast('Force refresh enabled. Cache cleared for next run.', 'warning');
+            } else {
+              showToast('Force refresh disabled.', 'info');
+            }
+          });
+        }
       }
       function setupWorker() {
         const workerSrc = `(() => {
@@ -1892,36 +2418,27 @@
       }
 
       function loadStoredState() {
-        const storedKey = sanitizeApiKey(localStorage.getItem(STORAGE_KEYS.apiKey));
+        const storedKeyRaw = safeStore.get(STORAGE_KEYS.apiKey);
+        const storedKey = sanitizeApiKey(typeof storedKeyRaw === 'string' ? storedKeyRaw : '');
         if (storedKey) {
           state.apiKey = storedKey;
           elements.apiKeyInput.value = state.apiKey;
         }
-        const storedSettings = safeParse(localStorage.getItem(STORAGE_KEYS.settings));
-        if (storedSettings) {
+        const storedSettings = safeStore.get(STORAGE_KEYS.settings);
+        if (storedSettings && typeof storedSettings === 'object') {
           state.settings = Object.assign(state.settings, storedSettings);
         }
         elements.toggleMarkets.checked = state.settings.includeMarkets;
         elements.toggleWeather.checked = state.settings.includeWeather;
         elements.toggleAvailability.checked = state.settings.manualAvailability;
         elements.toggleDemo.checked = state.settings.demoMode;
-        const storedAvailability = safeParse(localStorage.getItem(STORAGE_KEYS.availability));
-        if (storedAvailability) {
+        const storedAvailability = safeStore.get(STORAGE_KEYS.availability);
+        if (storedAvailability && typeof storedAvailability === 'object') {
           state.availability = storedAvailability;
         }
-        const cachedCal = safeParse(localStorage.getItem(STORAGE_KEYS.calibration));
+        const cachedCal = safeStore.get(STORAGE_KEYS.calibration);
         if (cachedCal && cachedCal.version === APP_VERSION && Date.now() < cachedCal.expires) {
           state.calibratorCache = cachedCal.value;
-        }
-      }
-
-      function safeParse(value) {
-        if (!value) return null;
-        try {
-          return JSON.parse(value);
-        } catch (err) {
-          console.warn('Failed to parse storage', err);
-          return null;
         }
       }
 
@@ -1931,17 +2448,19 @@
       }
 
       function persistSettings() {
-        localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(state.settings));
+        safeStore.set(STORAGE_KEYS.settings, state.settings, { budgetKB: 32 });
       }
 
       function persistAvailability() {
-        localStorage.setItem(STORAGE_KEYS.availability, JSON.stringify(state.availability));
+        safeStore.set(STORAGE_KEYS.availability, state.availability, { budgetKB: 48 });
       }
 
       function persistCalibrator() {
         if (state.calibratorCache) {
           const payload = { value: state.calibratorCache, expires: Date.now() + CACHE_TTLS.calibration * 3600 * 1000, version: APP_VERSION };
-          localStorage.setItem(STORAGE_KEYS.calibration, JSON.stringify(payload));
+          safeStore.set(STORAGE_KEYS.calibration, payload, { budgetKB: 128 });
+        } else {
+          safeStore.del(STORAGE_KEYS.calibration);
         }
       }
 
@@ -1959,14 +2478,14 @@
         if (newKey) {
           state.apiKey = newKey;
           elements.apiKeyInput.value = newKey;
-          localStorage.setItem(STORAGE_KEYS.apiKey, state.apiKey);
+          safeStore.set(STORAGE_KEYS.apiKey, state.apiKey, { budgetKB: 4 });
         } else {
           if (state.apiKey) {
             showToast('API key cleared.', 'warning');
           }
           state.apiKey = '';
           state.apiKeyValid = false;
-          localStorage.removeItem(STORAGE_KEYS.apiKey);
+          safeStore.del(STORAGE_KEYS.apiKey);
         }
         state.settings.includeMarkets = elements.toggleMarkets.checked;
         state.settings.includeWeather = elements.toggleWeather.checked;
@@ -1995,7 +2514,7 @@
       }
 
       function forgetKeys() {
-        localStorage.removeItem(STORAGE_KEYS.apiKey);
+        safeStore.del(STORAGE_KEYS.apiKey);
         state.apiKey = '';
         state.apiKeyValid = false;
         diagnosticsStore.reset();
@@ -2042,7 +2561,8 @@
           try {
             const data = JSON.parse(reader.result);
             for (const [key, value] of Object.entries(data || {})) {
-              localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+              const hint = inferStorageHint(key);
+              safeStore.set(key, value, { pruneHint: hint });
             }
             showToast('State imported. Reloading...', 'success');
             setTimeout(() => window.location.reload(), 600);
@@ -2055,11 +2575,10 @@
 
       function exportState() {
         const exportPayload = {};
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (!key || !key.startsWith(STORAGE_PREFIX)) continue;
-          exportPayload[key] = localStorage.getItem(key);
-        }
+        const entries = safeStore.entries(STORAGE_PREFIX);
+        entries.forEach(([key, value]) => {
+          exportPayload[key] = value;
+        });
         const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -2073,10 +2592,17 @@
         });
         showToast('State exported.', 'success');
       }
-      async function resolveSeasonContext(options = {}) {
+      async function resolveSlate(options = {}) {
         const { forceRefresh = false } = options;
         if (!state.apiKey || state.settings.demoMode) {
-          return { year: state.year, week: state.week, seasonType: state.seasonType };
+          renderWeekPicker();
+          return {
+            year: state.year,
+            week: state.week,
+            seasonType: state.seasonType,
+            weeks: state.weeks,
+            recommendedWeek: state.week
+          };
         }
         const client = ensureCfbdClient();
         const seasonType = 'regular';
@@ -2084,38 +2610,57 @@
         const cacheKey = `calendar-${targetYear}-${seasonType}`;
         let calendar = forceRefresh ? null : getCache('metrics', cacheKey);
         if (!calendar) {
-          calendar = await client.request('/calendar', { year: targetYear, seasonType }, { type: 'schedule', label: `Calendar ${targetYear}` });
-          if (Array.isArray(calendar)) {
-            setCache('metrics', cacheKey, calendar);
+          const response = await client.request('/calendar', { year: targetYear, seasonType }, { type: 'schedule', label: `Calendar ${targetYear}` });
+          const data = Array.isArray(response.data) ? response.data : [];
+          if (!response.soft && !response.skipCache) {
+            setCache('metrics', cacheKey, data, { budgetKB: 128 });
           }
+          if (response.soft) {
+            showToast('CFBD 429: Calendar temporarily unavailable.', 'warning');
+          }
+          calendar = data;
         }
-        const weeks = Array.isArray(calendar) ? calendar.map((week) => ({
-          week: week.week,
-          start: week.firstGameStart,
-          end: week.lastGameStart,
-          label: `Week ${week.week}`
-        })) : [];
+        if (!Array.isArray(calendar)) {
+          calendar = [];
+        }
+        const weeks = calendar.map((week) => {
+          const startTs = Date.parse(week.firstGameStart);
+          const startLabel = Number.isFinite(startTs)
+            ? new Date(startTs).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+            : 'TBD';
+          return {
+            week: week.week,
+            start: week.firstGameStart,
+            end: week.lastGameStart,
+            label: `Week ${week.week} — ${startLabel}`
+          };
+        });
         state.weeks = weeks;
         state.seasonType = seasonType;
         state.year = targetYear;
-        if (weeks.length) {
-          const now = Date.now();
-          let currentWeek = weeks.find((w) => {
-            const start = Date.parse(w.start);
-            const end = Date.parse(w.end);
-            return Number.isFinite(start) && Number.isFinite(end) && now >= start && now <= end;
-          });
-          if (!currentWeek) {
-            currentWeek = weeks.find((w) => Date.parse(w.start) > now) || weeks[weeks.length - 1];
-          }
-          if (!weeks.some((w) => w.week === state.week)) {
-            state.week = currentWeek?.week || weeks[0]?.week || 1;
-          }
-        } else if (!state.week) {
-          state.week = 1;
+
+        const now = Date.now();
+        let recommended = weeks.find((w) => {
+          const start = Date.parse(w.start);
+          const end = Date.parse(w.end);
+          return Number.isFinite(start) && Number.isFinite(end) && now >= start && now <= end;
+        }) || weeks.find((w) => Date.parse(w.start) > now) || (weeks.length ? weeks[weeks.length - 1] : null);
+
+        let selectedWeek = state.week;
+        if (!state.weekLocked || !weeks.some((w) => w.week === selectedWeek)) {
+          selectedWeek = recommended?.week || weeks[0]?.week || selectedWeek || 1;
+          state.weekLocked = false;
         }
+        state.week = selectedWeek;
         renderWeekPicker();
-        return { year: state.year, week: state.week, seasonType: state.seasonType };
+        return {
+          year: state.year,
+          week: state.week,
+          seasonType: state.seasonType,
+          weeks,
+          recommendedWeek: recommended?.week || state.week,
+          calendar
+        };
       }
 
       async function hydrateWeekPicker(forceRefresh = false) {
@@ -2124,7 +2669,7 @@
         }
         showLoading();
         try {
-          await resolveSeasonContext({ forceRefresh });
+          await resolveSlate({ forceRefresh });
         } finally {
           hideLoading();
         }
@@ -2157,18 +2702,97 @@
         const value = Number(elements.weekPicker.value);
         if (!Number.isNaN(value)) {
           state.week = value;
+          state.weekLocked = true;
           if (state.settings.demoMode) {
             predict(false);
           }
         }
       }
 
-      function renderEmptyState(message) {
+      function renderMessageState(message, subtext) {
         elements.results.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+        renderNotices(fragment);
         const div = document.createElement('div');
         div.className = 'empty-state';
-        div.innerHTML = `<strong>${message}</strong><span>Use the Predict button after configuring settings.</span>`;
-        elements.results.appendChild(div);
+        div.innerHTML = `<strong>${message}</strong>${subtext ? `<span>${subtext}</span>` : ''}`;
+        fragment.appendChild(div);
+        elements.results.appendChild(fragment);
+      }
+
+      function renderEmptyState(message) {
+        renderMessageState(message, 'Use the Predict button after configuring settings.');
+      }
+
+      function collectNotices() {
+        const notices = [];
+        if (state.storageDegraded) {
+          notices.push({ text: 'Storage degraded (using memory cache).', variant: 'warning' });
+        }
+        if (state.lastGamesMeta.checkedAdjacent) {
+          const baseWeek = state.lastGamesMeta.baseWeek ?? state.week;
+          notices.push({ text: `No games in resolved week ${baseWeek}; tried week±1.`, variant: 'warning' });
+        }
+        if (
+          state.lastGamesMeta.usedWeek &&
+          state.lastGamesMeta.baseWeek &&
+          state.lastGamesMeta.usedWeek !== state.lastGamesMeta.baseWeek
+        ) {
+          notices.push({ text: `Showing games from week ${state.lastGamesMeta.usedWeek} after boundary adjustment.`, variant: 'warning' });
+        }
+        if (state.lastGamesMeta.scoreboard) {
+          notices.push({ text: 'Using scoreboard fallback data for this slate.', variant: 'warning' });
+        }
+        return notices;
+      }
+
+      function renderNotices(target) {
+        const notices = collectNotices();
+        if (!notices.length) return;
+        const fragment = document.createDocumentFragment();
+        notices.forEach((notice) => {
+          const banner = document.createElement('div');
+          banner.className = `notice-banner${notice.variant ? ` ${notice.variant}` : ''}`;
+          banner.textContent = notice.text;
+          fragment.appendChild(banner);
+        });
+        if (target) {
+          target.appendChild(fragment);
+        } else {
+          elements.results.appendChild(fragment);
+        }
+      }
+
+      function renderGames(games, meta = {}) {
+        state.games = Array.isArray(games) ? games : [];
+        state.lastGamesMeta = Object.assign({}, state.lastGamesMeta, {
+          checkedAdjacent: Boolean(meta.checkedAdjacent),
+          scoreboard: Boolean(meta.scoreboard),
+          usedWeek: typeof meta.usedWeek === 'number' ? meta.usedWeek : state.week,
+          baseWeek: typeof meta.baseWeek === 'number' ? meta.baseWeek : state.week
+        });
+
+        if (!state.games.length) {
+          const baseWeek = state.lastGamesMeta.baseWeek ?? state.week;
+          const message = state.lastGamesMeta.checkedAdjacent
+            ? `No games for ${state.year} week ${baseWeek} (checked week±1).`
+            : `No games for ${state.year} week ${state.week}.`;
+          renderMessageState(message, 'Use Refresh to try again or adjust the week in Settings.');
+          return;
+        }
+
+        if (!state.predictions.length) {
+          elements.results.innerHTML = '';
+          const fragment = document.createDocumentFragment();
+          renderNotices(fragment);
+          const summary = document.createElement('div');
+          summary.className = 'notice-banner';
+          summary.textContent = `${state.games.length} games loaded for week ${state.lastGamesMeta.usedWeek}.`;
+          fragment.appendChild(summary);
+          elements.results.appendChild(fragment);
+        } else {
+          renderPredictions();
+        }
       }
 
       async function predict(forceRefresh) {
@@ -2198,11 +2822,16 @@
           toggleSettings(true);
           return;
         }
+        const bypass = Boolean(forceRefresh || state.forceRefresh);
+        state.predictions = [];
         try {
           showLoading();
-          await validateApiKey({ force: forceRefresh && !state.apiKeyValid });
-          await resolveSeasonContext({ forceRefresh });
-          const dataset = await buildDataset(forceRefresh);
+          await validateApiKey({ force: bypass && !state.apiKeyValid });
+          const slate = await resolveSlate({ forceRefresh: bypass });
+          const client = ensureCfbdClient();
+          const gamesResult = await loadGamesForSlate(client, slate, { forceRefresh: bypass });
+          renderGames(gamesResult.games, Object.assign({ baseWeek: slate.recommendedWeek }, gamesResult.meta));
+          const dataset = await buildDataset(bypass, { slate, gamesResult });
           state.lastDataset = dataset;
           state.dataHealth = dataset.health;
           const lambda = state.dataHealth.limitedPpaGames ? 0.3 : 0.35;
@@ -2262,11 +2891,13 @@
           throw err;
         }
       }
-      async function buildDataset(forceRefresh = false) {
+      async function buildDataset(forceRefresh = false, pipeline = {}) {
         const client = ensureCfbdClient();
-        const seasonYear = state.year;
-        const targetWeek = state.week;
-        const seasonType = state.seasonType || 'regular';
+        const slate = pipeline.slate || { year: state.year, week: state.week, seasonType: state.seasonType || 'regular' };
+        const gamesResult = pipeline.gamesResult || { games: state.games, meta: state.lastGamesMeta };
+        const seasonYear = slate.year;
+        const targetWeek = gamesResult.meta?.usedWeek ?? slate.week;
+        const seasonType = slate.seasonType || 'regular';
         let includeMarkets = state.settings.includeMarkets;
         const includeWeather = state.settings.includeWeather;
         const seasons = [seasonYear - 2, seasonYear - 1, seasonYear];
@@ -2277,7 +2908,7 @@
 
         const scheduleBySeason = {};
         const resultsBySeason = {};
-        const weekGames = await fetchWeekGames(client, seasonYear, targetWeek, seasonType, forceRefresh);
+        const weekGames = Array.isArray(gamesResult.games) ? gamesResult.games : [];
         state.games = weekGames;
 
         await fetchVenues(client, forceRefresh);
@@ -2376,7 +3007,9 @@
         const training = [];
         const inference = [];
         const teamHistories = buildTeamHistories(scheduleBySeason, resultsBySeason);
-        const inferenceCandidates = weekGames && weekGames.length ? weekGames : (scheduleBySeason[seasonYear] || []).filter((game) => game.week === targetWeek);
+        const inferenceCandidates = weekGames && weekGames.length
+          ? weekGames
+          : (scheduleBySeason[seasonYear] || []).filter((game) => game.week === targetWeek);
         const inferenceIds = new Set((inferenceCandidates || []).map((game) => game.id));
         if (!inferenceCandidates.length) {
           showToast('No games scheduled for the selected week.', 'warning');
@@ -2746,11 +3379,16 @@
 
       function renderPredictions() {
         elements.results.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+        renderNotices(fragment);
         if (!state.predictions.length) {
-          renderEmptyState('No predictions generated yet.');
+          const div = document.createElement('div');
+          div.className = 'empty-state';
+          div.innerHTML = '<strong>No predictions generated yet.</strong><span>Use the Predict button after configuring settings.</span>';
+          fragment.appendChild(div);
+          elements.results.appendChild(fragment);
           return;
         }
-        const fragment = document.createDocumentFragment();
         state.predictions.forEach((game) => {
           fragment.appendChild(renderGameCard(game));
         });
@@ -2915,16 +3553,20 @@
         const cacheKey = `weekGames-${year}-${seasonType || 'regular'}-${week}`;
         if (!forceRefresh) {
           const cached = getCache('metrics', cacheKey);
-          if (cached) return cached;
+          if (cached) {
+            return { games: cached, soft: false, fromCache: true };
+          }
         }
         const params = { year, week };
         if (seasonType) {
           params.seasonType = seasonType;
         }
-        const data = await client.request('/games', params, { type: 'schedule', label: `Games ${year} week ${week}` });
-        const list = Array.isArray(data) ? data : [];
-        setCache('metrics', cacheKey, list);
-        return list;
+        const response = await client.request('/games', params, { type: 'schedule', label: `Games ${year} week ${week}` });
+        const list = Array.isArray(response.data) ? response.data : [];
+        if (!response.soft && !response.skipCache) {
+          setCache('metrics', cacheKey, list);
+        }
+        return { games: list, soft: Boolean(response.soft), skipCache: Boolean(response.skipCache), entryId: response.entryId };
       }
 
       async function fetchScheduleSeason(client, season, forceRefresh, seasonType = 'regular') {
@@ -2933,10 +3575,169 @@
           const cached = getCache('metrics', cacheKey);
           if (cached) return cached;
         }
-        const data = await client.request('/games', { year: season, seasonType }, { type: 'schedule', label: `Schedule ${season}` });
-        const list = Array.isArray(data) ? data : [];
-        setCache('metrics', cacheKey, list);
+        const response = await client.request('/games', { year: season, seasonType }, { type: 'schedule', label: `Schedule ${season}` });
+        const list = Array.isArray(response.data) ? response.data : [];
+        if (!response.soft && !response.skipCache) {
+          setCache('metrics', cacheKey, list);
+        }
         return list;
+      }
+
+      async function fetchScoreboard(client, year, week, seasonType, forceRefresh) {
+        const cacheKey = `scoreboard-${year}-${seasonType || 'regular'}-${week}`;
+        if (!forceRefresh) {
+          const cached = getCache('metrics', cacheKey);
+          if (cached) {
+            return { games: cached, soft: false };
+          }
+        }
+        const params = { year, week };
+        if (seasonType) {
+          params.seasonType = seasonType;
+        }
+        const response = await client.request('/scoreboard', params, { type: 'schedule', label: `Scoreboard ${year} week ${week}` });
+        const raw = Array.isArray(response.data?.games) ? response.data.games : (Array.isArray(response.data) ? response.data : []);
+        const list = raw.map((game) => normalizeScoreboardGame(game, { year, week })).filter(Boolean);
+        if (!response.soft && !response.skipCache) {
+          setCache('metrics', cacheKey, list);
+        }
+        return { games: list, soft: Boolean(response.soft) };
+      }
+
+      function normalizeScoreboardGame(game, context) {
+        if (!game) return null;
+        const pickTeamName = (...candidates) => {
+          for (const candidate of candidates) {
+            if (!candidate) continue;
+            if (typeof candidate === 'string') return candidate;
+            if (typeof candidate === 'number') return String(candidate);
+            if (typeof candidate === 'object') {
+              const nested = pickTeamName(
+                candidate.team,
+                candidate.school,
+                candidate.name,
+                candidate.displayName,
+                candidate.shortDisplayName,
+                candidate.abbreviation,
+                candidate.nickname,
+                candidate.id
+              );
+              if (nested) return nested;
+            }
+          }
+          return null;
+        };
+        const homeTeam = pickTeamName(
+          game.homeTeam,
+          game.home_team,
+          game.home,
+          game.home?.team,
+          game.home?.school,
+          game.home?.name,
+          game.home?.displayName,
+          game.home?.shortDisplayName
+        );
+        const awayTeam = pickTeamName(
+          game.awayTeam,
+          game.away_team,
+          game.away,
+          game.away?.team,
+          game.away?.school,
+          game.away?.name,
+          game.away?.displayName,
+          game.away?.shortDisplayName
+        );
+        const start =
+          game.startDate ||
+          game.kickoff ||
+          game.start ||
+          game.startTime ||
+          game.start_time ||
+          game.kickoffTime ||
+          game.gameDate ||
+          game.game_date ||
+          game.time ||
+          null;
+        const venueCandidate = [game.venue, game.gameVenue, game.site, game.location].find(
+          (value) => value && typeof value === 'object' && !Array.isArray(value)
+        );
+        const venueLabel = typeof game.venue === 'string' ? game.venue : (typeof game.site === 'string' ? game.site : null);
+        const venue = venueCandidate || (venueLabel ? { name: venueLabel } : null);
+        const fallbackWeekLabel = `${context.year}-${context.week}`;
+        const fallbackId = `${homeTeam || 'TBD'}-${awayTeam || 'TBD'}-${start || fallbackWeekLabel}`;
+        return {
+          id: String(game.id || game.gameId || game.game_id || fallbackId),
+          season: game.season || context.year,
+          week: game.week ?? context.week,
+          startDate: start || null,
+          homeTeam: homeTeam || 'TBD',
+          awayTeam: awayTeam || 'TBD',
+          neutralSite: Boolean(
+            game.neutralSite ??
+              game.neutral_site ??
+              venue?.isNeutralSite ??
+              venue?.neutralSite ??
+              venue?.isNeutral ??
+              false
+          ),
+          venue: venue
+            ? {
+                id: venue.id ?? null,
+                name: venue.name ?? venue.fullName ?? venue.displayName ?? venueLabel ?? null
+              }
+            : undefined,
+          status: game.status || game.state || game.note || game.detail || game.gameStatus || null
+        };
+      }
+
+      async function loadGamesForSlate(client, slate, options = {}) {
+        const { forceRefresh = false } = options;
+        const seasonType = slate.seasonType || 'regular';
+        const year = slate.year;
+        const baseWeek = slate.week;
+        const meta = {
+          checkedAdjacent: false,
+          scoreboard: false,
+          usedWeek: baseWeek,
+          baseWeek
+        };
+
+        const pull = async (targetWeek) => {
+          const result = await fetchWeekGames(client, year, targetWeek, seasonType, forceRefresh);
+          return Object.assign({ week: targetWeek }, result);
+        };
+
+        let primary = await pull(baseWeek);
+        let games = Array.isArray(primary.games) ? primary.games : [];
+
+        if (!games.length) {
+          const neighbors = [];
+          if (baseWeek > 1) neighbors.push(baseWeek - 1);
+          if (baseWeek < 20) neighbors.push(baseWeek + 1);
+          for (const altWeek of neighbors) {
+            meta.checkedAdjacent = true;
+            const alt = await pull(altWeek);
+            if (alt.games && alt.games.length) {
+              games = alt.games;
+              meta.usedWeek = altWeek;
+              break;
+            }
+          }
+        }
+
+        if (!games.length) {
+          const board = await fetchScoreboard(client, year, baseWeek, seasonType, forceRefresh);
+          if (board.games && board.games.length) {
+            games = board.games;
+            meta.scoreboard = true;
+            meta.usedWeek = baseWeek;
+          }
+        }
+
+        state.week = meta.usedWeek;
+        state.weekLocked = false;
+        renderWeekPicker();
+        return { games, meta };
       }
 
       async function fetchPpaTeams(client, season, forceRefresh) {
@@ -2945,10 +3746,12 @@
           const cached = getCache('metrics', cacheKey);
           if (cached) return new Map(cached.map((item) => [item.team, item]));
         }
-        const data = await client.request('/ppa/teams', { year: season }, { label: `PPA teams ${season}` });
+        const response = await client.request('/ppa/teams', { year: season }, { label: `PPA teams ${season}` });
         const map = new Map();
-        (data || []).forEach((item) => map.set(item.team, item));
-        setCache('metrics', cacheKey, Array.from(map.values()));
+        (response.data || []).forEach((item) => map.set(item.team, item));
+        if (!response.soft && !response.skipCache) {
+          setCache('metrics', cacheKey, Array.from(map.values()));
+        }
         return map;
       }
 
@@ -2963,9 +3766,11 @@
         if (throughWeek !== undefined && throughWeek >= 1) {
           params.week = throughWeek;
         }
-        const data = await client.request('/ppa/games', params, { label: `PPA games ${season}`, type: 'metrics' });
-        const list = Array.isArray(data) ? data : [];
-        setCache('metrics', cacheKey, list);
+        const response = await client.request('/ppa/games', params, { label: `PPA games ${season}`, type: 'metrics' });
+        const list = Array.isArray(response.data) ? response.data : [];
+        if (!response.soft && !response.skipCache) {
+          setCache('metrics', cacheKey, list);
+        }
         return list;
       }
 
@@ -2980,10 +3785,12 @@
         if (weekParam !== undefined) {
           params.week = weekParam;
         }
-        const data = await client.request('/metrics/wp/pregame', params, { label: `Pregame WP ${season}`, type: 'metrics' });
+        const response = await client.request('/metrics/wp/pregame', params, { label: `Pregame WP ${season}`, type: 'metrics' });
         const map = new Map();
-        (data || []).forEach((item) => map.set(item.gameId, item));
-        setCache('metrics', cacheKey, Array.from(map.values()));
+        (response.data || []).forEach((item) => map.set(item.gameId, item));
+        if (!response.soft && !response.skipCache) {
+          setCache('metrics', cacheKey, Array.from(map.values()));
+        }
         return map;
       }
 
@@ -2998,9 +3805,9 @@
         if (weekParam !== undefined) {
           params.week = weekParam;
         }
-        const data = await client.request('/lines', params, { type: 'lines', label: `Lines ${season}` });
+        const response = await client.request('/lines', params, { type: 'lines', label: `Lines ${season}` });
         const map = new Map();
-        (data || []).forEach((item) => {
+        (response.data || []).forEach((item) => {
           const simplified = simplifyLine(item);
           const current = map.get(item.gameId);
           if (!current) {
@@ -3009,7 +3816,9 @@
             map.set(item.gameId, simplified);
           }
         });
-        setCache('lines', cacheKey, Array.from(map.values()));
+        if (!response.soft && !response.skipCache) {
+          setCache('lines', cacheKey, Array.from(map.values()));
+        }
         return map;
       }
 
@@ -3022,12 +3831,14 @@
             return { colors };
           }
         }
-        const data = await client.request('/teams', { year: season }, { label: `Teams ${season}` });
+        const response = await client.request('/teams', { year: season }, { label: `Teams ${season}` });
         const colors = new Map();
-        (data || []).forEach((team) => {
+        (response.data || []).forEach((team) => {
           colors.set(team.school, { primary: team.color || '#4f9cff' });
         });
-        setCache('metrics', cacheKey, data);
+        if (!response.soft && !response.skipCache) {
+          setCache('metrics', cacheKey, response.data || []);
+        }
         return { colors };
       }
 
@@ -3043,9 +3854,11 @@
             return venueCache;
           }
         }
-        const data = await client.request('/venues', {}, { label: 'Venues' });
-        hydrateVenueCaches(data || []);
-        setCache('metrics', cacheKey, Array.from(venueCache.values()));
+        const response = await client.request('/venues', {}, { label: 'Venues' });
+        hydrateVenueCaches(response.data || []);
+        if (!response.soft && !response.skipCache) {
+          setCache('metrics', cacheKey, Array.from(venueCache.values()));
+        }
         return venueCache;
       }
 
@@ -3116,13 +3929,22 @@
           if (!force && this.validatedKey === key && state.apiKeyValid) {
             return true;
           }
-          await cfbdFetch('/info', {
+          const response = await cfbdFetch('/info', {
             key,
             params: {},
             label: 'Key validation',
             type: 'auth',
             rateLimiter: this.rateLimiter
           });
+          if (response.error === 'network') {
+            throw createError('Network error/offline.', 'auth', 0, { toast: 'Network error/offline.', entryId: response.entryId });
+          }
+          if (response.soft) {
+            throw createError('CFBD 429: Unable to validate key right now.', 'auth', 429, {
+              toast: 'CFBD 429: Unable to validate key right now.',
+              entryId: response.entryId
+            });
+          }
           this.validatedKey = key;
           return true;
         }
@@ -3142,9 +3964,20 @@
             params,
             label: options.label,
             type: options.type || 'metrics',
-            rateLimiter: this.rateLimiter
+            rateLimiter: this.rateLimiter,
+            retries: options.retries,
+            simulate429: options.simulate429,
+            signal: options.signal
           });
-          return result.data;
+          if (result.error === 'network') {
+            throw createError('Network error/offline.', options.type || 'metrics', 0, {
+              toast: 'Network error/offline.',
+              entryId: result.entryId,
+              path,
+              params
+            });
+          }
+          return result;
         }
       }
 
@@ -3174,7 +4007,7 @@
         }
       }
 
-      async function cfbdFetch(path, { params = {}, key, label, type = 'metrics', rateLimiter, signal } = {}) {
+      async function cfbdFetch(path, { params = {}, key, label, type = 'metrics', rateLimiter, signal, retries = 3, simulate429 } = {}) {
         const query = buildQueryString(params);
         const entry = diagnosticsStore.add({ path, params, query, label });
         const url = `${CFBD_BASE}${path}${query}`;
@@ -3190,11 +4023,17 @@
           credentials: 'omit',
           signal
         };
-        const retrySchedule = [0, 300, 800, 1600, 3000];
-        for (let attempt = 0; attempt < retrySchedule.length; attempt += 1) {
+        const simulation = simulate429 ? (typeof simulate429 === 'object' ? simulate429 : {}) : null;
+        const simulationSequence = simulation ? [429, 429, simulation.status ?? 200] : null;
+        const attemptLimit = simulationSequence
+          ? Math.max(Math.max(1, retries), simulationSequence.length)
+          : Math.max(1, retries);
+        const backoff = [400, 900, 1800];
+        for (let attempt = 0; attempt < attemptLimit; attempt += 1) {
           if (rateLimiter) {
             await rateLimiter.removeToken();
           }
+          await sleep(Math.random() * 250);
           diagnosticsStore.update(entry.id, {
             retries: attempt,
             status: attempt === 0 ? 'pending' : 'rate-limit',
@@ -3202,10 +4041,43 @@
             message: attempt === 0 ? 'Pending' : 'CFBD 429: Rate limited; retrying…',
             ok: false
           });
+          if (simulationSequence) {
+            const index = Math.min(attempt, simulationSequence.length - 1);
+            const simulatedStatus = simulationSequence[index];
+            if (simulatedStatus === 429 && index < simulationSequence.length - 1) {
+              diagnosticsStore.update(entry.id, {
+                status: 'rate-limit',
+                statusCode: simulatedStatus,
+                message: 'api.429: Rate limited, retrying… (simulated)',
+                sample: simulation.sample429 || 'Simulated 429',
+                retries: attempt,
+                ok: false
+              });
+              const wait = backoff[Math.min(attempt, backoff.length - 1)] + Math.random() * 250;
+              await sleep(wait);
+              continue;
+            }
+            const finalData = Array.isArray(simulation.data)
+              ? simulation.data
+              : (simulation.data !== undefined ? simulation.data : []);
+            const empty = Array.isArray(finalData) && finalData.length === 0;
+            const sample = simulation.sample || JSON.stringify(finalData).slice(0, 200);
+            diagnosticsStore.update(entry.id, {
+              status: empty ? 'empty' : 'success',
+              statusCode: simulatedStatus,
+              message: simulation.message || '200 OK (simulated after 429)',
+              sample,
+              retries: attempt,
+              ok: true
+            });
+            return { data: finalData, status: simulatedStatus, entryId: entry.id, skipCache: true, empty };
+          }
           try {
             const response = await fetch(url, options);
             const status = response.status;
-            const text = await response.text();
+            const text = await response.clone().text();
+            const sample = text ? text.slice(0, 200) : '';
+            const skipCache = text.length > 4.5 * 1024 * 1024;
             let data = null;
             if (text) {
               try {
@@ -3215,7 +4087,9 @@
                   status: 'error',
                   statusCode: status,
                   message: 'Malformed JSON payload.',
-                  sample: text.slice(0, 200)
+                  sample,
+                  retries: attempt,
+                  ok: false
                 });
                 throw createError(`Malformed JSON from ${path}${query}`, type, status, {
                   toast: `Malformed JSON: ${path}${query}`,
@@ -3225,31 +4099,50 @@
                 });
               }
             }
-            const sample = text ? text.slice(0, 200) : '';
             if (response.ok) {
-              const empty = data === null || (Array.isArray(data) && data.length === 0);
+              const empty = Array.isArray(data) && data.length === 0;
               diagnosticsStore.update(entry.id, {
-                status: 'success',
+                status: empty ? 'empty' : 'success',
                 statusCode: status,
-                message: empty ? '200 OK (empty payload)' : '200 OK',
+                message: empty ? 'api.empty: 200 OK but no games returned.' : '200 OK',
                 sample,
                 retries: attempt,
                 ok: true
               });
-              return { data: empty ? (Array.isArray(data) ? [] : data) : data, status, entryId: entry.id };
+              return { data: data ?? null, status, entryId: entry.id, skipCache, empty };
             }
-            if (status === 429 && attempt < retrySchedule.length - 1) {
+            if (status === 429) {
+              const hasMore = attempt < attemptLimit - 1;
               diagnosticsStore.update(entry.id, {
                 status: 'rate-limit',
                 statusCode: status,
-                message: 'CFBD 429: Rate limited; retrying…',
+                message: hasMore ? 'api.429: Rate limited, retrying…' : 'api.429: Rate limited after retries (soft fail).',
                 sample,
                 retries: attempt,
                 ok: false
               });
-              const jitter = 50 + Math.random() * 150;
-              await sleep(retrySchedule[attempt + 1] + jitter);
+              if (!hasMore) {
+                return { data: Array.isArray(data) ? data : [], status, entryId: entry.id, soft: true, skipCache: true };
+              }
+              const wait = backoff[Math.min(attempt, backoff.length - 1)] + Math.random() * 250;
+              await sleep(wait);
               continue;
+            }
+            if (status === 401) {
+              diagnosticsStore.update(entry.id, {
+                status: 'error',
+                statusCode: status,
+                message: 'api.401: Invalid key',
+                sample,
+                retries: attempt,
+                ok: false
+              });
+              throw createError('CFBD 401 invalid key.', type, 401, {
+                toast: 'CFBD 401 invalid key.',
+                entryId: entry.id,
+                path,
+                params
+              });
             }
             const mapped = mapCfbdError(status, path, query, params);
             diagnosticsStore.update(entry.id, {
@@ -3290,26 +4183,16 @@
               message: 'Network error/offline.',
               ok: false
             });
-            throw createError('Network error/offline.', type, 0, {
-              toast: 'Network error/offline.',
-              entryId: entry.id,
-              path,
-              params
-            });
+            return { data: null, error: 'network', entryId: entry.id, skipCache: true };
           }
         }
         diagnosticsStore.update(entry.id, {
           status: 'error',
           statusCode: 429,
-          message: 'CFBD 429: Rate limited after retries.',
+          message: 'api.429: Rate limited after retries (soft fail).',
           ok: false
         });
-        throw createError('CFBD 429: Rate limited after retries.', type, 429, {
-          toast: `CFBD 429: Rate limited after retries. ${path}${query}`,
-          entryId: entry.id,
-          path,
-          params
-        });
+        return { data: [], status: 429, entryId: entry.id, soft: true, skipCache: true };
       }
 
       function buildQueryString(params = {}) {
@@ -3381,41 +4264,42 @@
         return Promise.all(results);
       }
 
-      function setCache(type, key, value) {
+      function inferStorageHint(key) {
+        if (!key) return undefined;
+        if (key.includes('weekGames') || key.includes('schedule')) return 'games';
+        if (key.includes('venues')) return 'venues';
+        if (key.includes('pregame')) return 'pregame';
+        if (key.includes('ppaTeams')) return 'ppaTeams';
+        if (key.includes('ppaGames')) return 'ppaGames';
+        if (key.includes('lines')) return 'lines';
+        return undefined;
+      }
+
+      function setCache(type, key, value, options = {}) {
         const ttlHours = CACHE_TTLS[type] || 6;
         const record = {
           value,
           expires: Date.now() + ttlHours * 3600 * 1000,
           version: APP_VERSION
         };
-        localStorage.setItem(`${STORAGE_PREFIX}cache-${type}-${key}`, JSON.stringify(record));
+        const storageKey = `${STORAGE_PREFIX}cache-${type}-${key}`;
+        const hint = options.pruneHint || inferStorageHint(storageKey);
+        safeStore.set(storageKey, record, { budgetKB: options.budgetKB || 512, pruneHint: hint });
       }
 
       function getCache(type, key) {
-        const raw = localStorage.getItem(`${STORAGE_PREFIX}cache-${type}-${key}`);
-        if (!raw) return null;
-        try {
-          const record = JSON.parse(raw);
-          if (record.version !== APP_VERSION) return null;
-          if (Date.now() > record.expires) {
-            localStorage.removeItem(`${STORAGE_PREFIX}cache-${type}-${key}`);
-            return null;
-          }
-          return record.value;
-        } catch (err) {
+        const storageKey = `${STORAGE_PREFIX}cache-${type}-${key}`;
+        const record = safeStore.get(storageKey);
+        if (!record || record.version !== APP_VERSION) return null;
+        if (Date.now() > record.expires) {
+          safeStore.del(storageKey);
           return null;
         }
+        return record.value;
       }
 
       function clearCaches() {
-        const toDelete = [];
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && key.startsWith(`${STORAGE_PREFIX}cache-`)) {
-            toDelete.push(key);
-          }
-        }
-        toDelete.forEach((key) => localStorage.removeItem(key));
+        safeStore.clearNamespace(`${STORAGE_PREFIX}cache-`);
       }
       function handleError(err, fallbackType) {
         console.error(err);
@@ -3485,6 +4369,13 @@
         state.predictions = [];
         state.availability = {};
         state.dataHealth = defaultDataHealth();
+        state.storageDegraded = false;
+        state.lastGamesMeta = {
+          checkedAdjacent: false,
+          scoreboard: false,
+          usedWeek: null,
+          baseWeek: null
+        };
         persistAvailability();
         renderPredictions();
         showToast('State reset.', 'success');
