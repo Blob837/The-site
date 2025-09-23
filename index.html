@@ -1331,7 +1331,9 @@
       }
 
       function applyKeylessState() {
-        keylessOverlay.classList.toggle('active', !state.apiKey);
+        const shouldShowOverlay = !state.apiKey && state.route.view !== 'settings';
+        keylessOverlay.classList.toggle('active', shouldShowOverlay);
+        keylessOverlay.setAttribute('aria-hidden', shouldShowOverlay ? 'false' : 'true');
       }
 
       function parseDate(dateStr) {
