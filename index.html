@@ -3,368 +3,397 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oil Terminal</title>
+    <meta name="description" content="Real-time Oil Price Dashboard - Professional Cyberpunk Interface">
+    <title>Grok Oil Price Dashboard</title>
     <style>
-        /* Modern CRT Cyberpunk Aesthetic */
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap');
+        /* Inline CSS: Cyberpunk Glassmorphism Design System */
+        :root {
+            --deep-space-1: #0a0a0f;
+            --deep-space-2: #0d1117;
+            --deep-space-3: #111827;
+            --electric-cyan: #00f5ff;
+            --electric-blue: #3b82f6;
+            --neon-purple: #8b5cf6;
+            --neon-magenta: #ec4899;
+            --success-green: #10b981;
+            --warning-amber: #f59e0b;
+            --danger-red: #ef4444;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'Fira Code', 'Courier New', monospace;
+            --grid-unit: 8px;
+            --blur-amount: blur(12px);
+            --glow-border: 0 0 8px rgba(0, 245, 255, 0.3);
+        }
 
-        body {
+        * {
             margin: 0;
             padding: 0;
-            background-color: #0a0a0a;
-            color: #00ff41;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 16px;
-            overflow: hidden;
+            box-sizing: border-box;
         }
 
-        #crt-container {
-            position: relative;
-            width: 95%;
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #0a0a0a;
-            border: 4px solid #00ff41;
+        body {
+            font-family: var(--font-primary);
+            background: linear-gradient(to bottom, var(--deep-space-1), var(--deep-space-3));
+            color: #e5e7eb;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: var(--blur-amount);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4), inset 0 0 10px rgba(0, 255, 65, 0.2);
+            box-shadow: var(--glow-border);
+            padding: calc(var(--grid-unit) * 2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 16px rgba(0, 245, 255, 0.5);
+        }
+
+        /* Hero Section */
+        #hero {
+            padding: calc(var(--grid-unit) * 4) calc(var(--grid-unit) * 2);
+            text-align: center;
+            position: relative;
             overflow: hidden;
         }
 
-        /* Subtle scanlines */
-        #crt-container::before {
+        #hero::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: repeating-linear-gradient(to bottom, transparent 0px, transparent 4px, rgba(0, 0, 0, 0.05) 4px, rgba(0, 0, 0, 0.05) 8px);
-            pointer-events: none;
-            z-index: 10;
+            background: radial-gradient(circle, rgba(0, 245, 255, 0.1), transparent);
+            animation: pulse 4s infinite ease-in-out;
         }
 
-        /* Smooth flicker */
-        @keyframes flicker {
-            0% { opacity: 1; }
-            50% { opacity: 0.98; }
-            100% { opacity: 1; }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
-        #crt-container {
-            animation: flicker 0.8s infinite;
+        .price-display {
+            font-family: var(--font-mono);
+            font-size: 4rem;
+            font-weight: 600;
+            color: var(--electric-cyan);
+            text-shadow: 0 0 8px var(--electric-cyan);
+            animation: count-up 1s ease-out;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #ffd700;
-            font-size: 1.5em;
-            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        @keyframes count-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .charts {
+        .trend-indicator {
+            font-size: 1.5rem;
+            margin-left: 8px;
+            animation: breathe 2s infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        /* Chart Section */
+        #chart-section {
+            padding: calc(var(--grid-unit) * 2);
+        }
+
+        canvas {
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+            background: var(--deep-space-2);
+        }
+
+        /* News Feed */
+        #news-feed {
+            padding: calc(var(--grid-unit) * 2);
+        }
+
+        .news-card {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 450px; /* Bigger for mobile */
-            max-height: 50vh;
-            background-color: #000;
-            border: 2px solid #00ff41;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
-        }
-
-        .chart-label {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 11;
-            color: #ffd700;
-            font-weight: 700;
-        }
-
-        .price-change {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 11;
-            font-size: 14px;
-        }
-
-        .up { color: #00ff41; }
-        .down { color: red; }
-
-        nav {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        button {
-            background-color: #000;
-            color: #00ff41;
-            border: 2px solid #00ff41;
-            padding: 10px 20px;
+            gap: calc(var(--grid-unit));
+            margin-bottom: calc(var(--grid-unit) * 2);
             cursor: pointer;
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: 14px;
-            border-radius: 8px;
             transition: all 0.3s ease;
-            touch-action: manipulation;
         }
 
-        button:hover {
-            background-color: #00ff41;
-            color: #0a0a0a;
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
-        }
-
-        #news-feed {
-            height: 400px;
-            overflow-y: auto;
-            border: 2px solid #00ff41;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
-            overscroll-behavior: contain;
-        }
-
-        .news-item {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-bottom: 1px solid rgba(0, 255, 65, 0.2);
-            transition: background 0.2s;
-        }
-
-        .news-item:hover {
-            background: rgba(0, 255, 65, 0.1);
+        .news-card:hover {
+            transform: scale(1.02);
         }
 
         .news-title {
-            color: #ffd700;
-            font-weight: 700;
+            font-weight: 500;
+            color: var(--neon-purple);
         }
 
-        .news-desc {
-            color: #00ff41;
-            font-size: 14px;
+        .news-source {
+            font-size: 0.875rem;
+            color: var(--electric-blue);
         }
 
-        .error {
-            color: red;
-            text-align: center;
+        .shimmer {
+            background: linear-gradient(90deg, var(--deep-space-2) 0%, var(--deep-space-3) 50%, var(--deep-space-2) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            height: 20px;
+            border-radius: 4px;
         }
 
-        /* Responsive design */
-        @media (min-width: 768px) {
-            .charts {
-                flex-direction: row;
-                gap: 20px;
-            }
-
-            .chart-container {
-                height: 600px; /* Massive for desktop */
-                flex: 1;
-            }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .price-display { font-size: 3rem; }
+            canvas { height: 250px; }
+        }
+
+        /* Accessibility & Micro-interactions */
+        button, a { transition: background 0.2s ease; }
+        button:hover { background: rgba(0, 245, 255, 0.1); }
     </style>
 </head>
 <body>
-    <div id="crt-container">
-        <header>Oil Terminal - <span id="datetime"></span></header>
-        <div class="charts">
-            <div class="chart-container">
-                <div class="chart-label">WTI Crude <span class="price-change" id="wti-change"></span></div>
-                <canvas id="wti-chart"></canvas>
-            </div>
-            <div class="chart-container">
-                <div class="chart-label">Brent Crude <span class="price-change" id="brent-change"></span></div>
-                <canvas id="brent-chart"></canvas>
-            </div>
-        </div>
-        <nav>
-            <button onclick="loadNews('texas')">Texas Oil</button>
-            <button onclick="loadNews('us')">US Oil</button>
-            <button onclick="loadNews('global')">Global Oil</button>
-        </nav>
-        <div id="news-feed">
-            <p class="status">Loading news...</p>
-        </div>
-    </div>
+    <!-- Hero Section -->
+    <section id="hero" class="glass-card">
+        <h1 style="font-size: 2rem; font-weight: 600; margin-bottom: var(--grid-unit);">Grok Oil Price Dashboard</h1>
+        <div id="wti-price" class="price-display">$--.-- <span id="wti-trend" class="trend-indicator"></span></div>
+        <p id="wti-change" style="font-size: 1.25rem; color: var(--warning-amber);">Loading WTI Crude...</p>
+        <div id="brent-price" class="price-display">$--.-- <span id="brent-trend" class="trend-indicator"></span></div>
+        <p id="brent-change" style="font-size: 1.25rem; color: var(--warning-amber);">Loading Brent Crude...</p>
+        <p id="market-status" style="font-size: 1rem; color: var(--success-green);">Market Status: Loading...</p>
+    </section>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Chart Section -->
+    <section id="chart-section" class="glass-card">
+        <h2 style="font-size: 1.5rem; margin-bottom: var(--grid-unit);">WTI Price Chart (1D)</h2>
+        <canvas id="price-chart"></canvas>
+        <div style="display: flex; justify-content: center; gap: var(--grid-unit); margin-top: var(--grid-unit);">
+            <button onclick="updateChart('1d')">1D</button>
+            <button onclick="updateChart('5d')">5D</button>
+            <button onclick="updateChart('1mo')">1M</button>
+            <button onclick="updateChart('3mo')">3M</button>
+            <button onclick="updateChart('6mo')">6M</button>
+            <button onclick="updateChart('1y')">1Y</button>
+        </div>
+    </section>
+
+    <!-- News Feed -->
+    <section id="news-feed" class="glass-card">
+        <h2 style="font-size: 1.5rem; margin-bottom: var(--grid-unit);">Energy News Feed</h2>
+        <div id="news-container"></div>
+        <div id="news-loading" style="display: flex; flex-direction: column; gap: var(--grid-unit);">
+            <div class="shimmer" style="width: 80%;"></div>
+            <div class="shimmer" style="width: 60%;"></div>
+            <div class="shimmer" style="width: 90%;"></div>
+        </div>
+    </section>
+
     <script>
-        // Simulated news data (static to avoid RSS issues)
-        const newsData = [
-            { title: "Permian Basin Sees Record Output", description: "Texas drillers hit new highs in shale production, boosting WTI supply.", region: "texas" },
-            { title: "Houston Refinery Expansion Approved", description: "Major Texas refinery gets green light for $2B upgrade.", region: "texas" },
-            { title: "US Shale Boom Continues", description: "North Dakota and Texas lead US oil output surge.", region: "us" },
-            { title: "OPEC Cuts Impact Global Prices", description: "Brent prices climb as OPEC tightens supply.", region: "global" },
-            { title: "Texas Pipeline Bottleneck Eases", description: "New pipelines in Permian reduce transport delays.", region: "texas" },
-            { title: "US Offshore Drilling Faces Hurdles", description: "Gulf of Mexico projects delayed by regulatory reviews.", region: "us" },
-            { title: "Global Demand for Crude Spikes", description: "China and India drive oil consumption in Q3.", region: "global" },
-            { title: "WTI Hits $80 Amid Supply Fears", description: "US crude prices rally on geopolitical tensions.", region: "us" },
-            { title: "Brent Forecast Raised for 2026", description: "Analysts see tighter global markets pushing prices up.", region: "global" },
-            { title: "Permian Drillers Adopt AI Tech", description: "Texas operators use AI to optimize fracking yields.", region: "texas" }
-        ];
+        // Inline JS: Modern ES6+, Clean Modular Structure
+        const PROXY = 'https://api.allorigins.win/get?url=';
+        const RSS_PROXY = 'https://api.rss2json.com/v1/api.json?rss_url=';
+        const SYMBOLS = { wti: 'CL%3DF', brent: 'BZ%3DF' };
+        const REUTERS_RSS = 'https://www.reuters.com/arc/outboundfeeds/rss/category/energy/';
+        let chartData = {};
+        let currentRange = '1d';
+        let chartCtx = document.getElementById('price-chart').getContext('2d');
+        let priceChart;
 
-        // Update date/time
-        function updateDateTime() {
-            const now = new Date();
-            document.getElementById('datetime').textContent = now.toLocaleString();
-        }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
-
-        // Chart.js setup
-        const wtiChart = new Chart(document.getElementById('wti-chart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'WTI Price',
-                    data: [],
-                    borderColor: '#00ff41',
-                    backgroundColor: 'rgba(0, 255, 65, 0.2)',
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { display: true, grid: { color: 'rgba(0, 255, 65, 0.1)' } },
-                    y: { display: true, grid: { color: 'rgba(0, 255, 65, 0.1)' } }
-                },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { backgroundColor: '#0a0a0a', titleColor: '#ffd700', bodyColor: '#00ff41' }
-                }
-            }
-        });
-
-        const brentChart = new Chart(document.getElementById('brent-chart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Brent Price',
-                    data: [],
-                    borderColor: '#00ff41',
-                    backgroundColor: 'rgba(0, 255, 65, 0.2)',
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { display: true, grid: { color: 'rgba(0, 255, 65, 0.1)' } },
-                    y: { display: true, grid: { color: 'rgba(0, 255, 65, 0.1)' } }
-                },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { backgroundColor: '#0a0a0a', titleColor: '#ffd700', bodyColor: '#00ff41' }
-                }
-            }
-        });
-
-        // Fetch oil prices (Alpha Vantage public endpoint, no key for basic use)
-        let wtiLastPrice = null;
-        let brentLastPrice = null;
-
-        async function fetchPrices() {
-            const newsFeed = document.getElementById('news-feed');
+        // Utility: Fetch with fallback and error handling
+        async function safeFetch(url) {
             try {
-                // Simulated API response for WTI and Brent (replace with real Alpha Vantage call if available)
-                const wtiResponse = await fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=CL=F'); // WTI proxy
-                const brentResponse = await fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=BNO'); // Brent proxy
-                const wtiData = await wtiResponse.json();
-                const brentData = await brentResponse.json();
-
-                const now = new Date().toLocaleTimeString();
-                const wtiPrice = parseFloat(wtiData['Global Quote']?.['05. price']) || 70; // Fallback
-                const brentPrice = parseFloat(brentData['Global Quote']?.['05. price']) || 75; // Fallback
-
-                // Update WTI chart
-                wtiChart.data.labels.push(now);
-                wtiChart.data.datasets[0].data.push(wtiPrice);
-                if (wtiChart.data.labels.length > 20) {
-                    wtiChart.data.labels.shift();
-                    wtiChart.data.datasets[0].data.shift();
+                const response = await fetch(PROXY + encodeURIComponent(url));
+                if (!response.ok) throw new Error('Network hiccup');
+                const data = await response.json();
+                return JSON.parse(data.contents);
+            } catch (err) {
+                console.error('Fetch failed:', err);
+                // Fallback: Try another proxy or offline mode
+                try {
+                    const altResponse = await fetch('https://cors-anywhere.herokuapp.com/' + url); // Note: May need user activation
+                    return await altResponse.json();
+                } catch {
+                    return null; // Graceful degradation
                 }
-                wtiChart.update();
-
-                // Update Brent chart
-                brentChart.data.labels.push(now);
-                brentChart.data.datasets[0].data.push(brentPrice);
-                if (brentChart.data.labels.length > 20) {
-                    brentChart.data.labels.shift();
-                    brentChart.data.datasets[0].data.shift();
-                }
-                brentChart.update();
-
-                // Update price change indicators
-                if (wtiLastPrice !== null) {
-                    const wtiChange = wtiPrice - wtiLastPrice;
-                    document.getElementById('wti-change').textContent = `${wtiChange > 0 ? '↑' : '↓'} ${Math.abs(wtiChange).toFixed(2)}`;
-                    document.getElementById('wti-change').className = `price-change ${wtiChange > 0 ? 'up' : 'down'}`;
-                }
-                if (brentLastPrice !== null) {
-                    const brentChange = brentPrice - brentLastPrice;
-                    document.getElementById('brent-change').textContent = `${brentChange > 0 ? '↑' : '↓'} ${Math.abs(brentChange).toFixed(2)}`;
-                    document.getElementById('brent-change').className = `price-change ${brentChange > 0 ? 'up' : 'down'}`;
-                }
-
-                wtiLastPrice = wtiPrice;
-                brentLastPrice = brentPrice;
-            } catch (error) {
-                console.error('Price fetch failed:', error);
-                newsFeed.innerHTML = `<p class="error">Price data unavailable: ${error.message}</p>`;
             }
         }
 
-        // Load news from static data
-        function loadNews(region) {
-            const newsFeed = document.getElementById('news-feed');
-            newsFeed.innerHTML = '';
+        // Fetch Prices and Update Hero
+        async function fetchPrices() {
+            const wtiData = await safeFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${SYMBOLS.wti}?range=1d&interval=1m`);
+            const brentData = await safeFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${SYMBOLS.brent}?range=1d&interval=1m`);
 
-            const filteredNews = newsData.filter(item => {
-                if (region === 'global') return true;
-                return item.region === region;
+            if (wtiData) updatePrice('wti', wtiData);
+            if (brentData) updatePrice('brent', brentData);
+
+            // Market Status
+            const now = new Date();
+            const marketOpen = now.getHours() >= 9 && now.getHours() < 16; // Simplified NYSE check
+            document.getElementById('market-status').textContent = `Market Status: ${marketOpen ? 'Open' : 'Closed'}`;
+            document.getElementById('market-status').style.color = marketOpen ? 'var(--success-green)' : 'var(--danger-red)';
+        }
+
+        function updatePrice(symbol, data) {
+            const quote = data.chart.result[0].meta;
+            const price = quote.regularMarketPrice.toFixed(2);
+            const change = ((quote.regularMarketChange / quote.previousClose) * 100).toFixed(2);
+            const trend = change > 0 ? '↑' : '↓';
+            const color = change > 0 ? 'var(--success-green)' : 'var(--danger-red)';
+
+            const priceEl = document.getElementById(`${symbol}-price`);
+            const changeEl = document.getElementById(`${symbol}-change`);
+            const trendEl = document.getElementById(`${symbol}-trend`);
+
+            priceEl.innerHTML = `$${price} <span class="trend-indicator" style="color: ${color};">${trend}</span>`;
+            changeEl.textContent = `${change}% Today`;
+            changeEl.style.color = color;
+            trendEl.style.color = color;
+        }
+
+        // Fetch Chart Data
+        async function fetchChartData(range = '1d') {
+            const data = await safeFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${SYMBOLS.wti}?range=${range}&interval=${range === '1d' ? '5m' : '1d'}`);
+            if (!data) return;
+            const result = data.chart.result[0];
+            chartData[range] = {
+                timestamps: result.timestamp.map(ts => new Date(ts * 1000).toLocaleTimeString()),
+                prices: result.indicators.quote[0].close
+            };
+            drawChart();
+        }
+
+        // Custom Canvas Chart (Simple Line with Gradient)
+        function drawChart() {
+            const data = chartData[currentRange];
+            if (!data) return;
+
+            if (priceChart) priceChart.clearRect(0, 0, chartCtx.canvas.width, chartCtx.canvas.height);
+
+            const w = chartCtx.canvas.width;
+            const h = chartCtx.canvas.height;
+            const padding = 40;
+            const maxPrice = Math.max(...data.prices);
+            const minPrice = Math.min(...data.prices);
+            const priceRange = maxPrice - minPrice;
+            const xStep = (w - padding * 2) / (data.prices.length - 1);
+            const yScale = (h - padding * 2) / priceRange;
+
+            // Gradient Fill
+            const gradient = chartCtx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, 'rgba(0, 245, 255, 0.3)');
+            gradient.addColorStop(1, 'rgba(0, 245, 255, 0)');
+
+            // Line Path
+            chartCtx.beginPath();
+            chartCtx.moveTo(padding, h - padding - (data.prices[0] - minPrice) * yScale);
+            data.prices.forEach((price, i) => {
+                chartCtx.lineTo(padding + i * xStep, h - padding - (price - minPrice) * yScale);
             });
+            chartCtx.strokeStyle = 'var(--electric-cyan)';
+            chartCtx.lineWidth = 2;
+            chartCtx.stroke();
 
-            if (filteredNews.length === 0) {
-                newsFeed.innerHTML = '<p class="error">No relevant news found.</p>';
-                return;
-            }
+            // Area Fill
+            chartCtx.lineTo(w - padding, h - padding);
+            chartCtx.lineTo(padding, h - padding);
+            chartCtx.closePath();
+            chartCtx.fillStyle = gradient;
+            chartCtx.fill();
 
-            filteredNews.slice(0, 20).forEach(item => {
-                const div = document.createElement('div');
-                div.classList.add('news-item');
-                div.innerHTML = `
-                    <div class="news-title">${item.title}</div>
-                    <div class="news-desc">${item.description}</div>
+            // Axes (Simplified)
+            chartCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+            chartCtx.beginPath();
+            chartCtx.moveTo(padding, padding);
+            chartCtx.lineTo(padding, h - padding);
+            chartCtx.lineTo(w - padding, h - padding);
+            chartCtx.stroke();
+        }
+
+        // Update Chart Range
+        function updateChart(range) {
+            currentRange = range;
+            if (!chartData[range]) fetchChartData(range);
+            else drawChart();
+        }
+
+        // Fetch News
+        async function fetchNews() {
+            const data = await safeFetch(RSS_PROXY + encodeURIComponent(REUTERS_RSS));
+            if (!data || !data.items) return;
+            const container = document.getElementById('news-container');
+            container.innerHTML = '';
+            document.getElementById('news-loading').style.display = 'none';
+            data.items.slice(0, 10).forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'news-card glass-card';
+                card.innerHTML = `
+                    <h3 class="news-title">${item.title}</h3>
+                    <p>${item.description.substring(0, 150)}...</p>
+                    <span class="news-source">${item.author || 'Reuters'} - ${new Date(item.pubDate).toLocaleDateString()}</span>
+                    <a href="${item.link}" target="_blank" style="color: var(--neon-magenta);">Read More</a>
                 `;
-                newsFeed.appendChild(div);
+                container.appendChild(card);
             });
         }
 
-        // Initial load
-        fetchPrices();
-        setInterval(fetchPrices, 30000); // Poll every 30s
-        loadNews('global');
+        // Init: Pull-to-refresh simulation (touch events)
+        function initGestures() {
+            let startY;
+            document.addEventListener('touchstart', e => startY = e.touches[0].clientY);
+            document.addEventListener('touchmove', e => {
+                if (e.touches[0].clientY - startY > 50) {
+                    fetchPrices();
+                    fetchNews();
+                    updateChart(currentRange);
+                }
+            });
+        }
+
+        // LocalStorage Caching
+        function cacheData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        function getCached(key) {
+            return JSON.parse(localStorage.getItem(key));
+        }
+
+        // Progressive Web App Setup
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register(new URL('', import.meta.url), { type: 'module' }); // Placeholder for actual SW if needed
+        }
+
+        // Load on Init
+        window.onload = () => {
+            fetchPrices();
+            fetchChartData('1d');
+            fetchNews();
+            initGestures();
+            // Refresh every 5min
+            setInterval(() => { fetchPrices(); fetchNews(); }, 300000);
+        };
+
+        // Resize Chart on Window Resize
+        window.addEventListener('resize', drawChart);
     </script>
 </body>
 </html>
