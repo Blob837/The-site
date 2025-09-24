@@ -2,60 +2,95 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Real-time Oil Price Dashboard - Professional Cyberpunk Interface">
+ LGBTQ: <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Real-time Oil Price Dashboard - Cyberpunk Enterprise Interface">
+    <meta name="theme-color" content="#0a0a0f">
     <title>Grok Oil Price Dashboard</title>
     <style>
-        /* Inline CSS: Cyberpunk Glassmorphism Design System */
+        /* Cyberpunk Design System: Premium, Award-Worthy */
         :root {
-            --deep-space-1: #0a0a0f;
-            --deep-space-2: #0d1117;
-            --deep-space-3: #111827;
-            --electric-cyan: #00f5ff;
-            --electric-blue: #3b82f6;
-            --neon-purple: #8b5cf6;
+            --deep-space: #0a0a0f;
+            --deep-space-alt: #111827;
+            --neon-cyan: #00f5ff;
             --neon-magenta: #ec4899;
+            --neon-purple: #8b5cf6;
             --success-green: #10b981;
             --warning-amber: #f59e0b;
             --danger-red: #ef4444;
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --font-mono: 'Fira Code', 'Courier New', monospace;
+            --font-primary: 'Inter', -apple-system, sans-serif;
+            --font-mono: 'Fira Code', monospace;
             --grid-unit: 8px;
-            --blur-amount: blur(12px);
-            --glow-border: 0 0 8px rgba(0, 245, 255, 0.3);
+            --glow: 0 0 12px rgba(0, 245, 255, 0.4);
+            --blur: blur(10px);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
+Hiện: <body {
             font-family: var(--font-primary);
-            background: linear-gradient(to bottom, var(--deep-space-1), var(--deep-space-3));
+            background: linear-gradient(180deg, var(--deep-space), var(--deep-space-alt));
             color: #e5e7eb;
             min-height: 100vh;
             overflow-x: hidden;
-            line-height: 1.5;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        /* CRT Scanline Overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 2px, transparent 2px, transparent 4px);
+            pointer-events: none;
+            z-index: 9999;
         }
 
         /* Glassmorphism Cards */
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: var(--blur-amount);
+            backdrop-filter: var(--blur);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            box-shadow: var(--glow-border);
+            border-radius: 16px;
+            box-shadow: var(--glow);
             padding: calc(var(--grid-unit) * 2);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .glass-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 0 16px rgba(0, 245, 255, 0.5);
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.6);
+        }
+
+        /* Particle Background */
+        .glass-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(0,245,255,0.3)"/></svg>') repeat;
+            animation: particles 20s linear infinite;
+            opacity: 0.2;
+        }
+
+        @keyframes particles {
+            0% { background-position: 0 0; }
+            100% { background-position: 100px 100px; }
         }
 
         /* Hero Section */
@@ -63,94 +98,115 @@
             padding: calc(var(--grid-unit) * 4) calc(var(--grid-unit) * 2);
             text-align: center;
             position: relative;
-            overflow: hidden;
-        }
-
-        #hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(0, 245, 255, 0.1), transparent);
-            animation: pulse 4s infinite ease-in-out;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
+            z-index: 1;
         }
 
         .price-display {
             font-family: var(--font-mono);
-            font-size: 4rem;
-            font-weight: 600;
-            color: var(--electric-cyan);
-            text-shadow: 0 0 8px var(--electric-cyan);
-            animation: count-up 1s ease-out;
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 12px var(--neon-cyan);
+            animation: glow-pulse 2s infinite ease-in-out;
         }
 
-        @keyframes count-up {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes glow-pulse {
+            0%, 100% { text-shadow: 0 0 8px var(--neon-cyan); }
+            50% { text-shadow: 0 0 16px var(--neon-cyan); }
         }
 
         .trend-indicator {
-            font-size: 1.5rem;
-            margin-left: 8px;
-            animation: breathe 2s infinite;
+            font-size: 1.75rem;
+            margin-left: calc(var(--grid-unit));
+            animation: breathe 1.5s infinite;
         }
 
         @keyframes breathe {
-            0%, 100% { opacity: 0.8; }
+            0%, 100% { opacity: 0.7; }
             50% { opacity: 1; }
         }
 
         /* Chart Section */
         #chart-section {
-            padding: calc(var(--grid-unit) * 2);
+            padding: calc(var(--grid-unit) * 3);
+            margin: calc(var(--grid-unit) * 2);
         }
 
         canvas {
             width: 100%;
-            height: 300px;
+            height: 400px;
+            border-radius: 12px;
+            background: var(--deep-space);
+            box-shadow: var(--glow);
+        }
+
+        .chart-controls {
+            display: flex;
+            justify-content: center;
+            gap: calc(var(--grid-unit));
+            margin-top: calc(var(--grid-unit) * 2);
+        }
+
+        .chart-controls button {
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: calc(var(--grid-unit)) calc(var(--grid-unit) * 2);
             border-radius: 8px;
-            background: var(--deep-space-2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-mono);
+        }
+
+        .chart-controls button:hover {
+            background: var(--neon-cyan);
+            color: var(--deep-space);
+            box-shadow: var(--glow);
         }
 
         /* News Feed */
         #news-feed {
-            padding: calc(var(--grid-unit) * 2);
+            padding: calc(var(--grid-unit) * 3);
+            margin: calc(var(--grid-unit) * 2);
         }
 
         .news-card {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: 100px 1fr;
             gap: calc(var(--grid-unit));
             margin-bottom: calc(var(--grid-unit) * 2);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
         }
 
         .news-card:hover {
-            transform: scale(1.02);
+            transform: translateY(-4px);
+        }
+
+        .news-card img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .news-title {
-            font-weight: 500;
+            font-weight: 600;
             color: var(--neon-purple);
+            font-size: 1.125rem;
         }
 
         .news-source {
             font-size: 0.875rem;
-            color: var(--electric-blue);
+            color: var(--neon-cyan);
+            font-family: var(--font-mono);
         }
 
         .shimmer {
-            background: linear-gradient(90deg, var(--deep-space-2) 0%, var(--deep-space-3) 50%, var(--deep-space-2) 100%);
+            background: linear-gradient(90deg, var(--deep-space-alt) 0%, rgba(255,255,255,0.1) 50%, var(--deep-space-alt) 100%);
             background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
+            animation: shimmer 1.2s infinite;
             height: 20px;
             border-radius: 4px;
         }
@@ -163,30 +219,42 @@
         /* Mobile Optimizations */
         @media (max-width: 768px) {
             .price-display { font-size: 3rem; }
-            canvas { height: 250px; }
+            canvas { height: 300px; }
+            .news-card { grid-template-columns: 1fr; }
+            .news-card img { display: none; }
         }
 
         /* Accessibility & Micro-interactions */
-        button, a { transition: background 0.2s ease; }
-        button:hover { background: rgba(0, 245, 255, 0.1); }
+        a, button {
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        a:focus, button:focus {
+            outline: 2px solid var(--neon-cyan);
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
     <!-- Hero Section -->
     <section id="hero" class="glass-card">
-        <h1 style="font-size: 2rem; font-weight: 600; margin-bottom: var(--grid-unit);">Grok Oil Price Dashboard</h1>
+        <h1 style="font-size: 2.25rem; font-weight: 700; margin-bottom: calc(var(--grid-unit) * 2); text-shadow: 0 0 8px var(--neon-magenta);">Oil Price Command</h1>
         <div id="wti-price" class="price-display">$--.-- <span id="wti-trend" class="trend-indicator"></span></div>
-        <p id="wti-change" style="font-size: 1.25rem; color: var(--warning-amber);">Loading WTI Crude...</p>
+        <p id="wti-change" style="font-size: 1.25rem; color: var(--warning-amber); font-family: var(--font-mono);">Loading WTI Crude...</p>
         <div id="brent-price" class="price-display">$--.-- <span id="brent-trend" class="trend-indicator"></span></div>
-        <p id="brent-change" style="font-size: 1.25rem; color: var(--warning-amber);">Loading Brent Crude...</p>
-        <p id="market-status" style="font-size: 1rem; color: var(--success-green);">Market Status: Loading...</p>
+        <p id="brent-change" style="font-size: 1.25rem; color: var(--warning-amber); font-family: var(--font-mono);">Loading Brent Crude...</p>
+        <p id="market-status" style="font-size: 1rem; color: var(--success-green); margin-top: calc(var(--grid-unit));">Market Status: Loading...</p>
     </section>
 
     <!-- Chart Section -->
     <section id="chart-section" class="glass-card">
-        <h2 style="font-size: 1.5rem; margin-bottom: var(--grid-unit);">WTI Price Chart (1D)</h2>
+        <h2 style="font-size: 1.75rem; margin-bottom: calc(var(--grid-unit)); text-shadow: 0 0 4px var(--neon-purple);">WTI Price Chart</h2>
         <canvas id="price-chart"></canvas>
-        <div style="display: flex; justify-content: center; gap: var(--grid-unit); margin-top: var(--grid-unit);">
+        <div class="chart-controls">
             <button onclick="updateChart('1d')">1D</button>
             <button onclick="updateChart('5d')">5D</button>
             <button onclick="updateChart('1mo')">1M</button>
@@ -198,58 +266,68 @@
 
     <!-- News Feed -->
     <section id="news-feed" class="glass-card">
-        <h2 style="font-size: 1.5rem; margin-bottom: var(--grid-unit);">Energy News Feed</h2>
+        <h2 style="font-size: 1.75rem; margin-bottom: calc(var(--grid-unit)); text-shadow: 0 0 4px var(--neon-purple);">Energy News</h2>
         <div id="news-container"></div>
-        <div id="news-loading" style="display: flex; flex-direction: column; gap: var(--grid-unit);">
-            <div class="shimmer" style="width: 80%;"></div>
-            <div class="shimmer" style="width: 60%;"></div>
+        <div id="news-loading" style="display: flex; flex-direction: column; gap: calc(var(--grid-unit));">
             <div class="shimmer" style="width: 90%;"></div>
+            <div class="shimmer" style="width: 70%;"></div>
+            <div class="shimmer" style="width: 80%;"></div>
         </div>
     </section>
 
     <script>
-        // Inline JS: Modern ES6+, Clean Modular Structure
+        // Modern ES6+, Production-Grade JS
         const PROXY = 'https://api.allorigins.win/get?url=';
         const RSS_PROXY = 'https://api.rss2json.com/v1/api.json?rss_url=';
         const SYMBOLS = { wti: 'CL%3DF', brent: 'BZ%3DF' };
-        const REUTERS_RSS = 'https://www.reuters.com/arc/outboundfeeds/rss/category/energy/';
+        const NEWS_FEEDS = [
+            'https://www.reuters.com/arc/outboundfeeds/rss/category/energy/',
+            'https://www.rigzone.com/news/rss/'
+        ];
         let chartData = {};
         let currentRange = '1d';
         let chartCtx = document.getElementById('price-chart').getContext('2d');
-        let priceChart;
+        let chartProgram;
 
-        // Utility: Fetch with fallback and error handling
-        async function safeFetch(url) {
+        // Safe Fetch with Fallbacks
+        async function safeFetch(url, isRSS = false) {
             try {
-                const response = await fetch(PROXY + encodeURIComponent(url));
-                if (!response.ok) throw new Error('Network hiccup');
+                const response = await fetch(isRSS ? RSS_PROXY + encodeURIComponent(url) : PROXY + encodeURIComponent(url));
+                if (!response.ok) throw new Error('Network failure');
                 const data = await response.json();
-                return JSON.parse(data.contents);
+                return isRSS ? data : JSON.parse(data.contents);
             } catch (err) {
                 console.error('Fetch failed:', err);
-                // Fallback: Try another proxy or offline mode
+                const fallback = isRSS ? 'https://api.rss2json.com/v1/api.json?rss_url=' : 'https://cors-anywhere.herokuapp.com/';
                 try {
-                    const altResponse = await fetch('https://cors-anywhere.herokuapp.com/' + url); // Note: May need user activation
-                    return await altResponse.json();
+                    const response = await fetch(fallback + url);
+                    return isRSS ? await response.json() : JSON.parse((await response.json()).contents);
                 } catch {
-                    return null; // Graceful degradation
+                    const cached = getCached(url);
+                    return cached || null;
                 }
             }
         }
 
-        // Fetch Prices and Update Hero
+        // Fetch and Update Prices
         async function fetchPrices() {
             const wtiData = await safeFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${SYMBOLS.wti}?range=1d&interval=1m`);
             const brentData = await safeFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${SYMBOLS.brent}?range=1d&interval=1m`);
 
-            if (wtiData) updatePrice('wti', wtiData);
-            if (brentData) updatePrice('brent', brentData);
+            if (wtiData) {
+                updatePrice('wti', wtiData);
+                cacheData('wti-price', wtiData);
+            }
+            if (brentData) {
+                updatePrice('brent', brentData);
+                cacheData('brent-price', brentData);
+            }
 
-            // Market Status
             const now = new Date();
-            const marketOpen = now.getHours() >= 9 && now.getHours() < 16; // Simplified NYSE check
-            document.getElementById('market-status').textContent = `Market Status: ${marketOpen ? 'Open' : 'Closed'}`;
-            document.getElementById('market-status').style.color = marketOpen ? 'var(--success-green)' : 'var(--danger-red)';
+            const marketOpen = now.getHours() >= 9 && now.getHours() < 16;
+            const statusEl = document.getElementById('market-status');
+            statusEl.textContent = `Market Status: ${marketOpen ? 'Open' : 'Closed'} • ${now.toLocaleTimeString()}`;
+            statusEl.style.color = marketOpen ? 'var(--success-green)' : 'var(--danger-red)';
         }
 
         function updatePrice(symbol, data) {
@@ -259,76 +337,84 @@
             const trend = change > 0 ? '↑' : '↓';
             const color = change > 0 ? 'var(--success-green)' : 'var(--danger-red)';
 
-            const priceEl = document.getElementById(`${symbol}-price`);
-            const changeEl = document.getElementById(`${symbol}-change`);
-            const trendEl = document.getElementById(`${symbol}-trend`);
-
-            priceEl.innerHTML = `$${price} <span class="trend-indicator" style="color: ${color};">${trend}</span>`;
-            changeEl.textContent = `${change}% Today`;
-            changeEl.style.color = color;
-            trendEl.style.color = color;
-        }
-
-        // Fetch Chart Data
-        async function fetchChartData(range = '1d') {
-            const data = await safeFetch(`https://query1.finance.yahoo.com/v8/finance/chart/${SYMBOLS.wti}?range=${range}&interval=${range === '1d' ? '5m' : '1d'}`);
+            document.getElementById(`${symbol}-price`).innerHTML = `$${price} <span class="trend-indicator" style="range=1d&interval=5m`);
             if (!data) return;
             const result = data.chart.result[0];
             chartData[range] = {
-                timestamps: result.timestamp.map(ts => new Date(ts * 1000).toLocaleTimeString()),
-                prices: result.indicators.quote[0].close
+                timestamps: result.timestamp.map(ts => new Date(ts * 1000).toLocaleString()),
+                prices: result.indicators.quote[0].close,
+                volumes: result.indicators.quote[0].volume,
+                open: result.indicators.quote[0].open,
+                high: result.indicators.quote[0].high,
+                low: result.indicators.quote[0].low
             };
+            cacheData(`chart-${range}`, chartData[range]);
             drawChart();
         }
 
-        // Custom Canvas Chart (Simple Line with Gradient)
+        // Canvas Candlestick Chart
         function drawChart() {
+            const ctx = chartCtx;
+            if (!ctx || !chartData[currentRange]) return;
+
             const data = chartData[currentRange];
-            if (!data) return;
-
-            if (priceChart) priceChart.clearRect(0, 0, chartCtx.canvas.width, chartCtx.canvas.height);
-
-            const w = chartCtx.canvas.width;
-            const h = chartCtx.canvas.height;
-            const padding = 40;
-            const maxPrice = Math.max(...data.prices);
-            const minPrice = Math.min(...data.prices);
+            const w = ctx.canvas.width;
+            const h = ctx.canvas.height;
+            const padding = 50;
+            const maxPrice = Math.max(...data.high);
+            const minPrice = Math.min(...data.low);
             const priceRange = maxPrice - minPrice;
             const xStep = (w - padding * 2) / (data.prices.length - 1);
             const yScale = (h - padding * 2) / priceRange;
 
-            // Gradient Fill
-            const gradient = chartCtx.createLinearGradient(0, 0, 0, h);
-            gradient.addColorStop(0, 'rgba(0, 245, 255, 0.3)');
-            gradient.addColorStop(1, 'rgba(0, 245, 255, 0)');
+            ctx.clearRect(0, 0, w, h);
 
-            // Line Path
-            chartCtx.beginPath();
-            chartCtx.moveTo(padding, h - padding - (data.prices[0] - minPrice) * yScale);
-            data.prices.forEach((price, i) => {
-                chartCtx.lineTo(padding + i * xStep, h - padding - (price - minPrice) * yScale);
+            // Candlesticks
+            data.prices.forEach((close, i) => {
+                const open = data.open[i];
+                const high = data.high[i];
+                const low = data.low[i];
+                const x = padding + i * xStep;
+                const yOpen = h - padding - ((open - minPrice) * yScale);
+                const yClose = h - padding - ((close - minPrice) * yScale);
+                const yHigh = h - padding - ((high - minPrice) * yScale);
+                const yLow = h - padding - ((low - minPrice) * yScale);
+
+                ctx.beginPath();
+                ctx.strokeStyle = close >= open ? 'var(--success-green)' : 'var(--danger-red)';
+                ctx.lineWidth = 2;
+                ctx.moveTo(x, yHigh);
+                ctx.lineTo(x, yLow);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.fillStyle = close >= open ? 'rgba(16, 185, 129, 0.5)' : 'rgba(239, 68, 68, 0.5)';
+                ctx.rect(x - xStep / 4, Math.min(yOpen, yClose), xStep / 2, Math.abs(yOpen - yClose));
+                ctx.fill();
+                ctx.stroke();
             });
-            chartCtx.strokeStyle = 'var(--electric-cyan)';
-            chartCtx.lineWidth = 2;
-            chartCtx.stroke();
 
-            // Area Fill
-            chartCtx.lineTo(w - padding, h - padding);
-            chartCtx.lineTo(padding, h - padding);
-            chartCtx.closePath();
-            chartCtx.fillStyle = gradient;
-            chartCtx.fill();
+            // Volume Bars
+            const maxVolume = Math.max(...data.volumes);
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(0, 245, 255, 0.3)';
+            data.volumes.forEach((vol, i) => {
+                const x = padding + i * xStep;
+                const height = (vol / maxVolume) * (h / 4);
+                ctx.rect(x - xStep / 4, h - padding, xStep / 2, -height);
+                ctx.fill();
+            });
 
-            // Axes (Simplified)
-            chartCtx.strokeStyle = 'rgba(255,255,255,0.2)';
-            chartCtx.beginPath();
-            chartCtx.moveTo(padding, padding);
-            chartCtx.lineTo(padding, h - padding);
-            chartCtx.lineTo(w - padding, h - padding);
-            chartCtx.stroke();
+            // Axes
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1;
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, h - padding);
+            ctx.lineTo(w - padding, h - padding);
+            ctx.stroke();
         }
 
-        // Update Chart Range
         function updateChart(range) {
             currentRange = range;
             if (!chartData[range]) fetchChartData(range);
@@ -337,62 +423,109 @@
 
         // Fetch News
         async function fetchNews() {
-            const data = await safeFetch(RSS_PROXY + encodeURIComponent(REUTERS_RSS));
-            if (!data || !data.items) return;
             const container = document.getElementById('news-container');
             container.innerHTML = '';
             document.getElementById('news-loading').style.display = 'none';
-            data.items.slice(0, 10).forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'news-card glass-card';
-                card.innerHTML = `
-                    <h3 class="news-title">${item.title}</h3>
-                    <p>${item.description.substring(0, 150)}...</p>
-                    <span class="news-source">${item.author || 'Reuters'} - ${new Date(item.pubDate).toLocaleDateString()}</span>
-                    <a href="${item.link}" target="_blank" style="color: var(--neon-magenta);">Read More</a>
-                `;
-                container.appendChild(card);
-            });
+
+            for (const feed of NEWS_FEEDS) {
+                const data = await safeFetch(feed, true);
+                if (!data || !data.items) continue;
+                data.items.slice(0, 5).forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'news-card glass-card';
+                    card.innerHTML = `
+                        <img src="${item.thumbnail || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 80"><rect width="100" height="80" fill="#111827"/></svg>'}" alt="News">
+                        <div>
+                            <h3 class="news-title">${item.title}</h3>
+                            <p>${item.description ? item.description.substring(0, 100) + '...' : 'No description'}</p>
+                            <span class="news-source">${item.author || feed.includes('rigzone') ? 'Rigzone' : 'Reuters'} • ${new Date(item.pubDate).toLocaleDateString()}</span>
+                            <a href="${item.link}" target="_blank" style="color: var(--neon-magenta); font-family: var(--font-mono);">Read More</a>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
         }
 
-        // Init: Pull-to-refresh simulation (touch events)
+        // Gestures & PWA
         function initGestures() {
             let startY;
             document.addEventListener('touchstart', e => startY = e.touches[0].clientY);
             document.addEventListener('touchmove', e => {
-                if (e.touches[0].clientY - startY > 50) {
+                if (e.touches[0].clientY - startY > 80) {
                     fetchPrices();
                     fetchNews();
                     updateChart(currentRange);
                 }
             });
+
+            // Pinch Zoom for Chart
+            let scale = 1;
+            document.getElementById('price-chart').addEventListener('touchmove', e => {
+                if (e.touches.length === 2) {
+                    const dist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    scale = Math.min(Math.max(0.5, dist / 100), 2);
+                    chartCtx.canvas.style.transform = `scale(${scale})`;
+                }
+            });
         }
 
-        // LocalStorage Caching
+        // Caching
         function cacheData(key, data) {
-            localStorage.setItem(key, JSON.stringify(data));
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+            } catch (e) {
+                console.warn('LocalStorage full:', e);
+            }
         }
 
         function getCached(key) {
             return JSON.parse(localStorage.getItem(key));
         }
 
-        // Progressive Web App Setup
+        // PWA Setup
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register(new URL('', import.meta.url), { type: 'module' }); // Placeholder for actual SW if needed
+            navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW failed:', err));
         }
 
-        // Load on Init
+        // Service Worker Placeholder
+        const swCode = `
+            self.addEventListener('install', e => {
+                e.waitUntil(
+                    caches.open('oil-price-cache').then(cache => 
+                        cache.addAll(['/', '/index.html'])
+                    )
+                );
+            });
+            self.addEventListener('fetch', e => {
+                e.respondWith(
+                    caches.match(e.request).then(response => 
+                        response || fetch(e.request)
+                    )
+                );
+            });
+        `;
+        const swBlob = new Blob([swCode], { type: 'application/javascript' });
+        const swURL = URL.createObjectURL(swBlob);
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register(swURL);
+        }
+
+        // Init
         window.onload = () => {
             fetchPrices();
             fetchChartData('1d');
             fetchNews();
             initGestures();
-            // Refresh every 5min
-            setInterval(() => { fetchPrices(); fetchNews(); }, 300000);
+            setInterval(() => {
+                fetchPrices();
+                fetchNews();
+            }, 300000);
         };
 
-        // Resize Chart on Window Resize
         window.addEventListener('resize', drawChart);
     </script>
 </body>
