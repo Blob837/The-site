@@ -178,14 +178,14 @@
         setInterval(updateDateTime, 1000);
         updateDateTime();
 
-        // Load TradingView charts (no API key required)
+        // Load TradingView charts (using free CFD symbols)
         function loadCharts() {
-            // WTI Chart
+            // WTI Chart (TVC:USOIL)
             new TradingView.widget({
                 "container_id": "wti-chart",
                 "width": "100%",
                 "height": "100%",
-                "symbol": "NYMEX:CL1!",
+                "symbol": "TVC:USOIL",
                 "interval": "5",
                 "timezone": "Etc/UTC",
                 "theme": "dark",
@@ -198,12 +198,12 @@
                 "withdateranges": true
             });
 
-            // Brent Chart
+            // Brent Chart (TVC:UKOIL)
             new TradingView.widget({
                 "container_id": "brent-chart",
                 "width": "100%",
                 "height": "100%",
-                "symbol": "ICE:BRN1!",
+                "symbol": "TVC:UKOIL",
                 "interval": "5",
                 "timezone": "Etc/UTC",
                 "theme": "dark",
