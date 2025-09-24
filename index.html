@@ -96,6 +96,7 @@
             padding: 10px 20px;
             cursor: pointer;
             font-family: inherit;
+            touch-action: manipulation;
         }
 
         button:hover {
@@ -142,20 +143,6 @@
                 flex: 1;
             }
         }
-
-        /* Price change indicators (integrated in charts, but placeholder for custom if needed) */
-        .price-change {
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .up {
-            color: #00ff41;
-        }
-
-        .down {
-            color: red;
-        }
     </style>
 </head>
 <body>
@@ -191,7 +178,7 @@
         setInterval(updateDateTime, 1000);
         updateDateTime();
 
-        // Load TradingView charts
+        // Load TradingView charts (no API key required)
         function loadCharts() {
             // WTI Chart
             new TradingView.widget({
@@ -230,56 +217,64 @@
             });
         }
 
-        // News API integration (replace with your NewsAPI key)
-        const apiKey = 'YOUR_NEWSAPI_KEY_HERE'; // Get free key from https://newsapi.org/
-
-        function loadNews(region) {
-            let query;
-            switch (region) {
-                case 'texas':
-                    query = 'texas oil';
-                    break;
-                case 'us':
-                    query = 'us oil';
-                    break;
-                case 'global':
-                    query = 'oil';
-                    break;
-                default:
-                    query = 'oil';
-            }
-
-            const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&sortBy=publishedAt&apiKey=${apiKey}`;
-
+        // RSS feed parsing
+        async function loadNews(region) {
             const newsFeed = document.getElementById('news-feed');
             newsFeed.innerHTML = '<p class="status">Loading news...</p>';
 
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('API request failed');
+            // Use Reuters RSS feed for oil/energy news
+            const rssUrl = 'https://www.reuters.com/arc/outboundfeeds/rss/category/energy/';
+            // Use CORS proxy to fetch RSS (client-side workaround)
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`;
+
+            try {
+                const response = await fetch(proxyUrl);
+                if (!response.ok) throw new Error('Failed to fetch RSS feed');
+                const text = await response.text();
+
+                // Parse XML
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(text, 'text/xml');
+                const items = xmlDoc.getElementsByTagName('item');
+                const newsItems = [];
+
+                // Filter news based on region
+                const keywords = {
+                    'texas': ['texas', 'houston', 'permian', 'shale'],
+                    'us': ['united states', 'us oil', 'shale', 'offshore'],
+                    'global': ['oil', 'crude', 'brent', 'wti']
+                }[region];
+
+                for (let item of items) {
+                    const title = item.getElementsByTagName('title')[0]?.textContent || 'No title';
+                    const description = item.getElementsByTagName('description')[0]?.textContent || 'No description';
+                    const content = (title + ' ' + description).toLowerCase();
+
+                    // Check if item matches region keywords
+                    if (keywords.some(keyword => content.includes(keyword.toLowerCase()))) {
+                        newsItems.push({ title, description });
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.status !== 'ok' || data.articles.length === 0) {
-                        newsFeed.innerHTML = '<p class="error">No news found or API error.</p>';
-                        return;
-                    }
-                    newsFeed.innerHTML = '';
-                    data.articles.slice(0, 20).forEach(article => { // Limit to 20 items
-                        const item = document.createElement('div');
-                        item.classList.add('news-item');
-                        item.innerHTML = `
-                            <div class="news-title">${article.title}</div>
-                            <div class="news-desc">${article.description || 'No description available.'}</div>
-                        `;
-                        newsFeed.appendChild(item);
-                    });
-                })
-                .catch(error => {
-                    newsFeed.innerHTML = '<p class="error">Error loading news: ' + error.message + '. Check API key or connection.</p>';
+                }
+
+                // Display news or fallback
+                if (newsItems.length === 0) {
+                    newsFeed.innerHTML = '<p class="error">No relevant news found.</p>';
+                    return;
+                }
+
+                newsFeed.innerHTML = '';
+                newsItems.slice(0, 20).forEach(item => {
+                    const div = document.createElement('div');
+                    div.classList.add('news-item');
+                    div.innerHTML = `
+                        <div class="news-title">${item.title}</div>
+                        <div class="news-desc">${item.description}</div>
+                    `;
+                    newsFeed.appendChild(div);
                 });
+            } catch (error) {
+                newsFeed.innerHTML = `<p class="error">Error loading news: ${error.message}. Try again later.</p>`;
+            }
         }
 
         // Initial load
