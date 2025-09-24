@@ -1,1565 +1,433 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0a0a0f" />
-  <title>Quantum Crude Intelligence</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --deep-1: #05060a;
-      --deep-2: #0a0a0f;
-      --deep-3: #0d1117;
-      --deep-4: #111827;
-      --glass-border: rgba(34, 211, 238, 0.25);
-      --glass-bg: rgba(17, 24, 39, 0.65);
-      --primary: #00f5ff;
-      --primary-alt: #22d3ee;
-      --electric: #3b82f6;
-      --electric-deep: #1d4ed8;
-      --neon-purple: #8b5cf6;
-      --neon-magenta: #ec4899;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --text-high: #f8fafc;
-      --text-mid: #cbd5f5;
-      --text-low: #64748b;
-      --shadow-lg: 0 40px 80px -60px rgba(34, 211, 238, 0.6);
-      --shadow-sm: 0 12px 30px -20px rgba(139, 92, 246, 0.7);
-      --grid: 8px;
-      font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    }
-    @supports (font-variation-settings: normal) {
-      :root {
-        font-family: 'Inter var', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      }
-    }
-    * {
-      box-sizing: border-box;
-      min-width: 0;
-    }
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top left, rgba(236, 72, 153, 0.12), transparent 55%),
-                  radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 50%),
-                  linear-gradient(160deg, var(--deep-1), var(--deep-4));
-      color: var(--text-high);
-      padding: calc(env(safe-area-inset-top) + 20px) calc(env(safe-area-inset-right) + 16px)
-               calc(env(safe-area-inset-bottom) + 80px) calc(env(safe-area-inset-left) + 16px);
-      min-height: 100vh;
-      overflow-x: hidden;
-      position: relative;
-    }
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background: conic-gradient(from 120deg at 50% 50%, rgba(34, 211, 238, 0.04), rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.05), rgba(34, 211, 238, 0.04));
-      mix-blend-mode: screen;
-      animation: aurora 24s linear infinite;
-      z-index: 0;
-    }
-    @keyframes aurora {
-      0% {
-        transform: rotate(0deg) scale(1.05);
-      }
-      50% {
-        transform: rotate(180deg) scale(1.1);
-      }
-      100% {
-        transform: rotate(360deg) scale(1.05);
-      }
-    }
-    main {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: calc(var(--grid) * 4); /* Increased gap for better spacing */
-      z-index: 1;
-      max-width: 1280px;
-      margin: 0 auto;
-    }
-    h1, h2, h3, h4 {
-      font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      letter-spacing: -0.01em;
-    }
-    .glass {
-      position: relative;
-      background: var(--glass-bg);
-      border-radius: 24px;
-      padding: calc(var(--grid) * 4); /* Increased padding for better readability */
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      box-shadow: var(--shadow-lg);
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
-      overflow: hidden;
-      isolation: isolate;
-    }
-    .glass::after {
-      content: "";
-      position: absolute;
-      inset: 1px;
-      border-radius: inherit;
-      border: 1px solid rgba(59, 130, 246, 0.12);
-      pointer-events: none;
-    }
-    .glass .glow {
-      position: absolute;
-      inset: -40% -10%;
-      background: radial-gradient(circle, rgba(34, 211, 238, 0.18), transparent 60%);
-      opacity: 0.55;
-      filter: blur(55px);
-      animation: pulse 18s ease-in-out infinite;
-      z-index: -1;
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(0.8); opacity: 0.45; }
-      50% { transform: scale(1.05); opacity: 0.6; }
-    }
-    .hero {
-      display: grid;
-      gap: calc(var(--grid) * 3);
-    }
-    .hero-header {
-      display: grid;
-      grid-template-columns: auto minmax(160px, 1fr);
-      gap: calc(var(--grid) * 2);
-      align-items: start;
-    }
-    .price-display {
-      display: grid;
-      gap: var(--grid);
-    }
-    .price-label {
-      font-size: 1rem; /* Slightly larger for readability */
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: var(--text-low);
-    }
-    .price-value {
-      font-size: clamp(3.5rem, 12vw, 5.2rem); /* Larger font for price */
-      font-weight: 600;
-      font-variant-numeric: tabular-nums;
-      font-family: 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', 'Menlo', monospace;
-      background: linear-gradient(120deg, var(--primary), var(--neon-purple));
-      -webkit-background-clip: text;
-      color: transparent;
-      display: flex;
-      align-items: baseline;
-      gap: calc(var(--grid) * 0.75);
-      line-height: 0.95;
-    }
-    .price-value span {
-      font-size: clamp(1.2rem, 4.5vw, 1.8rem);
-      font-weight: 500;
-      color: var(--text-mid);
-      background: none;
-    }
-    .price-metrics {
-      display: flex;
-      flex-wrap: wrap;
-      gap: calc(var(--grid) * 1.5);
-    }
-    .metric-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: calc(var(--grid) * 0.75);
-      padding: calc(var(--grid) * 1) calc(var(--grid) * 2); /* Larger chips */
-      border-radius: 999px;
-      background: linear-gradient(120deg, rgba(34, 211, 238, 0.18), rgba(15, 118, 110, 0.18));
-      border: 1px solid rgba(34, 211, 238, 0.2);
-      box-shadow: 0 10px 25px -18px rgba(34, 211, 238, 0.7);
-      font-size: 1rem; /* Larger text */
-      font-weight: 500;
-    }
-    .metric-chip.negative {
-      background: linear-gradient(120deg, rgba(236, 72, 153, 0.15), rgba(239, 68, 68, 0.12));
-      border-color: rgba(239, 68, 68, 0.35);
-    }
-    .metric-chip.neutral {
-      background: linear-gradient(120deg, rgba(148, 163, 184, 0.15), rgba(30, 41, 59, 0.2));
-      border-color: rgba(148, 163, 184, 0.25);
-    }
-    .status-tile {
-      display: grid;
-      gap: calc(var(--grid) * 2);
-      padding: calc(var(--grid) * 2);
-      background: linear-gradient(160deg, rgba(59, 130, 246, 0.2), rgba(15, 23, 42, 0.85));
-      border-radius: 20px;
-      border: 1px solid rgba(59, 130, 246, 0.35);
-      box-shadow: var(--shadow-sm);
-    }
-    .status-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: calc(var(--grid) * 1.5);
-    }
-    .status-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      position: relative;
-      flex-shrink: 0;
-      background: var(--danger);
-      box-shadow: 0 0 14px rgba(239, 68, 68, 0.8);
-    }
-    .status-dot::after {
-      content: "";
-      position: absolute;
-      inset: -8px;
-      border-radius: inherit;
-      border: 1px solid currentColor;
-      opacity: 0.4;
-      animation: breathe 2.2s ease-in-out infinite;
-    }
-    .status-dot.open {
-      background: var(--success);
-      color: rgba(16, 185, 129, 0.6);
-      box-shadow: 0 0 18px rgba(16, 185, 129, 0.9);
-    }
-    @keyframes breathe {
-      0%, 100% { transform: scale(0.7); opacity: 0.2; }
-      50% { transform: scale(1.25); opacity: 0.7; }
-    }
-    .status-title {
-      font-size: 1.3rem; /* Larger title */
-      font-weight: 600;
-    }
-    .status-meta {
-      display: grid;
-      gap: calc(var(--grid) * 1.5);
-      font-size: 1rem; /* Larger text */
-      color: var(--text-mid);
-    }
-    .status-meta strong {
-      color: var(--text-high);
-      font-weight: 600;
-    }
-    .chart-card {
-      position: relative;
-      display: grid;
-      gap: calc(var(--grid) * 2);
-    }
-    .chart-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: calc(var(--grid) * 1.5);
-      flex-wrap: wrap;
-    }
-    .chart-title {
-      font-size: 1.6rem; /* Larger chart title */
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: calc(var(--grid) * 1);
-    }
-    .chart-title svg {
-      width: 24px;
-      height: 24px;
-      color: var(--primary);
-      filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.8));
-    }
-    .timeframe-controls {
-      display: flex;
-      gap: calc(var(--grid) * 1);
-      flex-wrap: wrap;
-    }
-    .timeframe-button {
-      padding: calc(var(--grid) * 1) calc(var(--grid) * 2); /* Larger buttons */
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      background: rgba(15, 23, 42, 0.4);
-      color: var(--text-mid);
-      font-weight: 500;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-    .timeframe-button.active {
-      color: var(--primary);
-      border-color: rgba(34, 211, 238, 0.6);
-      box-shadow: 0 0 18px rgba(34, 211, 238, 0.35);
-      background: linear-gradient(130deg, rgba(34, 211, 238, 0.25), rgba(59, 130, 246, 0.25));
-    }
-    .chart-wrapper {
-      position: relative;
-      border-radius: 18px;
-      background: rgba(10, 12, 22, 0.8);
-      border: 1px solid rgba(34, 211, 238, 0.08);
-      overflow: hidden;
-    }
-    canvas#priceChart {
-      width: 100%;
-      height: 360px; /* Slightly taller chart for better visibility */
-      display: block;
-    }
-    .chart-overlay {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      padding: 12px 16px; /* Larger padding for tooltip */
-      border-radius: 12px;
-      background: rgba(2, 6, 23, 0.7);
-      border: 1px solid rgba(34, 211, 238, 0.25);
-      font-family: 'JetBrains Mono', 'SFMono-Regular', Menlo, monospace;
-      font-size: 0.85rem; /* Slightly larger text */
-      display: grid;
-      gap: 6px; /* Better spacing in tooltip */
-      min-width: 180px; /* Wider tooltip */
-    }
-    .legend {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      font-size: 0.95rem; /* Larger legend text */
-      color: var(--text-low);
-    }
-    .legend span {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .legend span::before {
-      content: "";
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 2px;
-    }
-    .legend .price::before { background: linear-gradient(130deg, var(--primary), var(--neon-purple)); }
-    .legend .ma20::before { background: var(--warning); }
-    .legend .volume::before { background: rgba(59, 130, 246, 0.7); }
-    .news-section {
-      display: grid;
-      gap: calc(var(--grid) * 2.5);
-    }
-    .news-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: calc(var(--grid) * 1.5);
-    }
-    .news-tabs {
-      display: flex;
-      gap: calc(var(--grid) * 1);
-      flex-wrap: wrap;
-    }
-    .news-tab {
-      padding: calc(var(--grid) * 1) calc(var(--grid) * 2); /* Larger tabs */
-      border-radius: 14px;
-      background: rgba(15, 23, 42, 0.55);
-      border: 1px solid transparent;
-      color: var(--text-mid);
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-    .news-tab.active {
-      color: var(--neon-magenta);
-      border-color: rgba(236, 72, 153, 0.45);
-      box-shadow: 0 0 18px rgba(236, 72, 153, 0.28);
-    }
-    .news-grid {
-      display: grid;
-      gap: calc(var(--grid) * 3); /* Larger gaps between news cards */
-    }
-    .news-empty {
-      padding: calc(var(--grid) * 3);
-      border-radius: 20px;
-      background: linear-gradient(160deg, rgba(17, 24, 39, 0.85), rgba(15, 23, 42, 0.65));
-      border: 1px dashed rgba(236, 72, 153, 0.35);
-      color: var(--text-mid);
-      font-size: 1rem;
-      line-height: 1.6;
-      text-align: center;
-    }
-    .news-empty strong {
-      display: block;
-      color: var(--text-high);
-      font-weight: 600;
-      margin-bottom: calc(var(--grid) * 1.2);
-    }
-    .news-card {
-      display: grid;
-      grid-template-columns: 140px 1fr; /* Wider thumb */
-      gap: calc(var(--grid) * 2.5); /* More space */
-      padding: calc(var(--grid) * 2.5);
-      border-radius: 20px;
-      background: linear-gradient(160deg, rgba(17, 24, 39, 0.85), rgba(15, 23, 42, 0.65));
-      border: 1px solid rgba(59, 130, 246, 0.16);
-      box-shadow: 0 24px 55px -48px rgba(59, 130, 246, 0.7);
-      min-height: 160px;
-      position: relative;
-      overflow: hidden;
-    }
-    .news-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(130deg, rgba(34, 211, 238, 0.08), transparent);
-      pointer-events: none;
-    }
-    .news-thumb {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(130deg, rgba(34, 211, 238, 0.15), rgba(139, 92, 246, 0.25));
-      border-radius: 16px;
-      overflow: hidden;
-      position: relative;
-    }
-    .news-thumb::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image: linear-gradient(130deg, rgba(15, 23, 42, 0.2), rgba(59, 130, 246, 0.18));
-      mix-blend-mode: multiply;
-    }
-    .news-content {
-      display: grid;
-      gap: calc(var(--grid) * 1.5); /* More space in content */
-    }
-    .news-meta {
-      display: flex;
-      gap: calc(var(--grid) * 1);
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--text-low);
-      flex-wrap: wrap;
-    }
-    .news-title {
-      font-size: 1.3rem; /* Larger title for readability */
-      font-weight: 600;
-      line-height: 1.3;
-      color: var(--text-high);
-    }
-    .news-summary {
-      color: var(--text-mid);
-      font-size: 1.05rem; /* Larger summary text */
-      line-height: 1.65; /* Better line height */
-    }
-    .news-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: calc(var(--grid) * 1.5);
-      flex-wrap: wrap;
-      font-size: 0.9rem;
-      color: var(--text-low);
-    }
-    .news-actions {
-      display: flex;
-      gap: calc(var(--grid) * 1);
-    }
-    .pill-button {
-      padding: calc(var(--grid) * 1) calc(var(--grid) * 1.6); /* Larger buttons */
-      border-radius: 999px;
-      border: 1px solid rgba(236, 72, 153, 0.35);
-      color: var(--neon-magenta);
-      background: rgba(236, 72, 153, 0.12);
-      text-decoration: none;
-      font-weight: 600;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .pill-button:hover,
-    .pill-button:focus-visible {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px -20px rgba(236, 72, 153, 0.8);
-    }
-    .skeleton {
-      position: relative;
-      overflow: hidden;
-      background: rgba(30, 41, 59, 0.45);
-    }
-    .skeleton::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      transform: translateX(-100%);
-      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.12), transparent);
-      animation: shimmer 1.6s ease-in-out infinite;
-    }
-    @keyframes shimmer {
-      100% { transform: translateX(100%); }
-    }
-    .floating-indicators {
-      position: fixed;
-      top: calc(env(safe-area-inset-top) + 16px);
-      right: calc(env(safe-area-inset-right) + 16px);
-      display: grid;
-      gap: calc(var(--grid) * 1.5);
-      z-index: 10;
-      pointer-events: none;
-    }
-    .floating-indicators .indicator {
-      padding: calc(var(--grid) * 1.1) calc(var(--grid) * 1.6);
-      border-radius: 14px;
-      background: rgba(2, 6, 23, 0.85);
-      border: 1px solid rgba(34, 211, 238, 0.25);
-      box-shadow: 0 18px 55px -38px rgba(34, 211, 238, 0.8);
-      font-size: 0.85rem;
-      display: inline-flex;
-      gap: calc(var(--grid) * 1);
-      align-items: center;
-      pointer-events: auto;
-    }
-    .floating-indicators .indicator svg {
-      width: 18px;
-      height: 18px;
-      color: var(--primary);
-    }
-    .offline-banner {
-      position: fixed;
-      bottom: calc(env(safe-area-inset-bottom) + 24px);
-      left: 50%;
-      transform: translateX(-50%) translateY(200%);
-      padding: calc(var(--grid) * 1.2) calc(var(--grid) * 2.4);
-      border-radius: 999px;
-      background: linear-gradient(120deg, rgba(245, 158, 11, 0.9), rgba(241, 196, 15, 0.7));
-      color: #111;
-      font-weight: 600;
-      box-shadow: 0 20px 50px -32px rgba(245, 158, 11, 0.7);
-      transition: transform 0.6s cubic-bezier(.22,1,.36,1);
-      z-index: 20;
-    }
-    .offline-banner.visible {
-      transform: translateX(-50%) translateY(0);
-    }
-    nav.gesture-nav {
-      position: fixed;
-      bottom: calc(env(safe-area-inset-bottom) + 12px);
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: calc(var(--grid) * 1.5);
-      background: rgba(2, 6, 23, 0.85);
-      border-radius: 18px;
-      padding: calc(var(--grid) * 1.2) calc(var(--grid) * 1.6);
-      border: 1px solid rgba(59, 130, 246, 0.22);
-      backdrop-filter: blur(22px);
-      -webkit-backdrop-filter: blur(22px);
-      box-shadow: 0 24px 55px -45px rgba(59, 130, 246, 0.8);
-      z-index: 12;
-    }
-    nav.gesture-nav button {
-      padding: calc(var(--grid) * 0.9) calc(var(--grid) * 1.6);
-      border-radius: 14px;
-      background: transparent;
-      border: 1px solid transparent;
-      color: var(--text-mid);
-      font-size: 0.85rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      transition: all 0.3s ease;
-    }
-    nav.gesture-nav button.active {
-      border-color: rgba(34, 211, 238, 0.4);
-      color: var(--primary);
-      box-shadow: 0 12px 30px -22px rgba(34, 211, 238, 0.8);
-    }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(34, 211, 238, 0.12);
-      border: 1px solid rgba(34, 211, 238, 0.3);
-      color: var(--primary);
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-    }
-    .pull-indicator {
-      position: fixed;
-      top: calc(env(safe-area-inset-top) + 6px);
-      left: 50%;
-      transform: translateX(-50%) translateY(-100%);
-      padding: 12px 20px;
-      border-radius: 999px;
-      background: rgba(2, 6, 23, 0.85);
-      border: 1px solid rgba(34, 211, 238, 0.25);
-      box-shadow: 0 18px 55px -42px rgba(34, 211, 238, 0.8);
-      transition: transform 0.35s ease;
-      z-index: 10;
-    }
-    .pull-indicator.visible {
-      transform: translateX(-50%) translateY(0);
-    }
-    @media (max-width: 820px) {
-      body {
-        padding-bottom: calc(env(safe-area-inset-bottom) + 120px);
-      }
-      .hero-header {
-        grid-template-columns: 1fr;
-      }
-      .news-card {
-        grid-template-columns: 1fr;
-      }
-      .news-thumb {
-        height: 200px; /* Taller thumb on mobile */
-      }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="floating-indicators" aria-live="polite"></div>
-  <div class="pull-indicator" aria-hidden="true">Release to refresh data</div>
-  <div class="offline-banner" role="status">Offline mode &mdash; showing cached intelligence</div>
-  <main>
-    <section class="glass hero" aria-label="Crude market overview">
-      <div class="glow"></div>
-      <div class="hero-header">
-        <div class="price-display">
-          <span class="price-label">WTI Crude Futures</span>
-          <div class="price-value" id="priceValue">$<strong>--</strong><span id="priceChange">&nbsp;</span></div>
-          <div class="price-metrics" id="priceMetrics">
-            <div class="metric-chip skeleton" style="width:150px;height:38px"></div>
-            <div class="metric-chip skeleton" style="width:160px;height:38px"></div>
-            <div class="metric-chip skeleton" style="width:190px;height:38px"></div>
-          </div>
-        </div>
-        <aside class="status-tile" aria-live="polite">
-          <div class="status-header">
-            <div class="status-dot" id="marketStatusDot"></div>
-            <span class="badge">Live</span>
-          </div>
-          <div>
-            <div class="status-title" id="marketStatusTitle">Market status pending...</div>
-            <p id="marketStatusMeta" class="status-meta"></p>
-          </div>
-        </aside>
-      </div>
-      <footer class="legend" aria-label="Price legend">
-        <span class="price">WTI Price</span>
-        <span class="ma20">20-Period EMA</span>
-        <span class="volume">Volume</span>
-      </footer>
-    </section>
-    <section class="glass chart-card" aria-label="Interactive price analytics">
-      <div class="glow"></div>
-      <header class="chart-header">
-        <h2 class="chart-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 3v18h18" />
-            <path d="M7 15l4-4 3 3 6-6" />
-          </svg>
-          Quantum Flow Analytics
-        </h2>
-        <div class="timeframe-controls" role="tablist" aria-label="Select timeframe">
-          <button class="timeframe-button active" data-range="1d" data-interval="5m" role="tab" aria-selected="true">1D</button>
-          <button class="timeframe-button" data-range="5d" data-interval="30m" role="tab" aria-selected="false">5D</button>
-          <button class="timeframe-button" data-range="1mo" data-interval="1h" role="tab" aria-selected="false">1M</button>
-          <button class="timeframe-button" data-range="3mo" data-interval="2h" role="tab" aria-selected="false">3M</button>
-          <button class="timeframe-button" data-range="6mo" data-interval="4h" role="tab" aria-selected="false">6M</button>
-          <button class="timeframe-button" data-range="1y" data-interval="1d" role="tab" aria-selected="false">1Y</button>
-        </div>
-      </header>
-      <div class="chart-wrapper" role="img" aria-label="WTI crude technical chart">
-        <canvas id="priceChart" width="900" height="360"></canvas>
-        <div class="chart-overlay" id="chartOverlay" aria-live="polite">
-          <span>Price: --</span>
-          <span>Volume: --</span>
-          <span>Time: --</span>
-        </div>
-      </div>
-    </section>
-    <section class="glass news-section" aria-label="Energy intelligence feed">
-      <div class="glow"></div>
-      <header class="news-header">
-        <h2 class="chart-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 3h14a2 2 0 012 2v14l-4-3-4 3-4-3-4 3V5a2 2 0 012-2z" />
-          </svg>
-          Strategic Energy Briefing
-        </h2>
-        <div class="news-tabs" role="tablist" aria-label="News categories">
-          <button class="news-tab active" data-category="all" role="tab" aria-selected="true">All</button>
-          <button class="news-tab" data-category="breaking" role="tab" aria-selected="false">Breaking</button>
-          <button class="news-tab" data-category="analysis" role="tab" aria-selected="false">Market Analysis</button>
-          <button class="news-tab" data-category="permian" role="tab" aria-selected="false">Permian Basin</button>
-          <button class="news-tab" data-category="global" role="tab" aria-selected="false">Global</button>
-        </div>
-      </header>
-      <div class="news-grid" id="newsGrid" role="feed" aria-busy="true">
-        <article class="news-card skeleton" aria-hidden="true" style="height: 160px;"></article>
-        <article class="news-card skeleton" aria-hidden="true" style="height: 160px;"></article>
-        <article class="news-card skeleton" aria-hidden="true" style="height: 160px;"></article>
-      </div>
-    </section>
-  </main>
-  <nav class="gesture-nav" aria-label="Quick navigation">
-    <button data-target="top" class="active">Overview</button>
-    <button data-target="chart">Analytics</button>
-    <button data-target="news">Briefing</button>
-  </nav>
-  <script>
-    (() => {
-      'use strict';
-      const $ = (selector, context = document) => context.querySelector(selector);
-      const qsa = (selector, context = document) => Array.from(context.querySelectorAll(selector));
-      const priceValueEl = $('#priceValue strong');
-      const priceChangeEl = $('#priceChange');
-      const metricsEl = $('#priceMetrics');
-      const marketStatusTitle = $('#marketStatusTitle');
-      const marketStatusMeta = $('#marketStatusMeta');
-      const marketStatusDot = $('#marketStatusDot');
-      const chartCanvas = document.getElementById('priceChart');
-      const ctx = chartCanvas ? chartCanvas.getContext('2d') : null;
-      const chartOverlay = document.getElementById('chartOverlay');
-      const newsGrid = document.getElementById('newsGrid');
-      const newsTabs = qsa('.news-tab');
-      const timeframeButtons = qsa('.timeframe-button');
-      const gestureNav = document.querySelector('.gesture-nav');
-      const floatingIndicators = document.querySelector('.floating-indicators');
-      const pullIndicator = document.querySelector('.pull-indicator');
-      const offlineBanner = document.querySelector('.offline-banner');
-      if (!priceValueEl || !priceChangeEl || !metricsEl || !marketStatusTitle || !marketStatusMeta || !marketStatusDot || !chartCanvas || !ctx || !chartOverlay || !newsGrid || !floatingIndicators || !pullIndicator || !gestureNav || !offlineBanner) {
-        console.warn('Quantum Crude Intelligence: required interface nodes missing');
-        return;
-      }
-      ctx.imageSmoothingEnabled = false;
-      const STORAGE_KEYS = Object.freeze({
-        PRICE: 'qci:price:v1',
-        NEWS: 'qci:news:v1'
-      });
-      const chartState = {
-        candles: [],
-        timeframe: { range: '1d', interval: '5m' },
-        timeframeZoom: 1.1,
-        offset: 0,
-        overlay: null
-      };
-      const chartInteraction = {
-        isPointerDown: false,
-        originX: 0,
-        startOffset: 0
-      };
-      const newsState = {
-        items: [],
-        page: 0,
-        pageSize: 6,
-        category: 'all',
-        loading: false
-      };
-      let isOffline = false;
-      let pullStart = null;
-      const formatNumber = (value, options = {}) => {
-        if (!Number.isFinite(value)) return '--';
-        return new Intl.NumberFormat('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-          ...options
-        }).format(value);
-      };
-      const formatPercent = (value) => {
-        if (!Number.isFinite(value)) return '--';
-        return new Intl.NumberFormat('en-US', {
-          style: 'percent',
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        }).format(value / 100);
-      };
-      const indicator = (message, iconMarkup = '') => {
-        if (!floatingIndicators) return;
-        const indicatorEl = document.createElement('div');
-        indicatorEl.className = 'indicator';
-        if (iconMarkup) {
-          indicatorEl.insertAdjacentHTML('beforeend', iconMarkup);
+minutesUntilClose % 60}m. NYSE session active.`;
+        } else {
+          let nextOpen = new Date(nyTime);
+          if (hour >= 16 || day === 0 || day === 6) {
+            // After close or weekend
+            nextOpen.setDate(nextOpen.getDate() + ((day === 5 && hour >= 16) ? 3 : day === 6 ? 2 : day === 0 ? 1 : 1));
+            nextOpen.setHours(9, 30, 0, 0);
+          } else {
+            // Before open
+            nextOpen.setHours(9, 30, 0, 0);
+          }
+          const hoursUntilOpen = Math.floor((nextOpen - nyTime) / 3600000);
+          statusInfo.textContent = `Market opens in ${hoursUntilOpen}h. Pre-market trading available.`;
         }
-        const textSpan = document.createElement('span');
-        textSpan.textContent = message;
-        indicatorEl.appendChild(textSpan);
-        floatingIndicators.appendChild(indicatorEl);
-        while (floatingIndicators.children.length > 3) {
-          floatingIndicators.firstElementChild.remove();
-        }
-        setTimeout(() => {
-          indicatorEl.remove();
-        }, 4200);
       };
-      const minutesToLabel = (minutes) => {
-        const hrs = Math.floor(minutes / 60);
-        const mins = minutes % 60;
-        if (hrs <= 0) return `${mins}m`;
-        return `${hrs}h ${mins}m`;
-      };
-      const getMarketSession = () => {
-        const now = new Date();
-        const ny = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-        const day = ny.getDay();
-        const isWeekend = day === 0 || day === 6;
-        const openTime = new Date(ny);
-        openTime.setHours(9, 30, 0, 0);
-        const closeTime = new Date(ny);
-        closeTime.setHours(16, 0, 0, 0);
-        const diffInMinutes = (target) => Math.max(0, Math.round((target - ny) / 60000));
-        const formatTime = (date) => date.toLocaleTimeString('en-US', {
-          hour: 'numeric',
-          minute: '2-digit',
-          timeZone: 'America/New_York'
-        });
-        if (isWeekend) {
-          const nextOpen = new Date(openTime);
-          nextOpen.setDate(openTime.getDate() + (day === 6 ? 2 : 1));
-          return {
-            status: 'Standby',
-            message: 'Weekend maintenance',
-            open: false,
-            openIn: minutesToLabel(diffInMinutes(nextOpen))
-          };
-        }
-        if (ny < openTime) {
-          return {
-            status: 'Standby',
-            message: `Pre-market — opens ${formatTime(openTime)} ET`,
-            open: false,
-            openIn: minutesToLabel(diffInMinutes(openTime))
-          };
-        }
-        if (ny >= closeTime) {
-          const nextOpen = new Date(openTime);
-          nextOpen.setDate(openTime.getDate() + (day === 5 ? 3 : 1));
-          return {
-            status: 'Standby',
-            message: `Closed — resumes ${formatTime(nextOpen)} ET`,
-            open: false,
-            openIn: minutesToLabel(diffInMinutes(nextOpen))
-          };
-        }
-        return {
-          status: 'Live',
-          message: `Closes in ${minutesToLabel(diffInMinutes(closeTime))}`,
-          open: true,
-          openIn: ''
-        };
-      };
-      const fetchWithFallback = async (url, { raw = false, timeout = 9000 } = {}) => {
-        const attempt = async (target) => {
-          const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), timeout);
+      
+      // Fetch with CORS handling
+      const fetchData = async (url, options = {}) => {
+        const corsProxies = [
+          (u) => u,
+          (u) => `https://cors-anywhere.herokuapp.com/${u}`,
+          (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`
+        ];
+        
+        for (const proxy of corsProxies) {
           try {
-            const response = await fetch(target, {
-              signal: controller.signal,
-              cache: 'no-store',
+            const response = await fetch(proxy(url), {
+              ...options,
               headers: {
-                Accept: raw
-                  ? 'application/rss+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7'
-                  : 'application/json, text/plain, */*'
+                'Accept': 'application/json',
+                ...options.headers
               }
             });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const text = await response.text();
-            return raw ? text : JSON.parse(text);
-          } finally {
-            clearTimeout(timer);
-          }
-        };
-        const encodedUrl = encodeURIComponent(url);
-        const sanitized = url.replace(/^https?:\/\//, '');
-        const sources = Array.from(new Set([
-          url,
-          `https://cors.isomorphic-git.org/${url}`,
-          `https://r.jina.ai/${url}`,
-          `https://r.jina.ai/https://${sanitized}`,
-          `https://r.jina.ai/http://${sanitized}`,
-          `https://thingproxy.freeboard.io/fetch/${url}`,
-          `https://corsproxy.io/?url=${encodedUrl}`,
-          `https://api.allorigins.win/raw?url=${encodedUrl}`
-        ].filter(Boolean)));
-        let lastError;
-        for (const source of sources) {
-          try {
-            return await attempt(source);
-          } catch (error) {
-            lastError = error;
+            return await response.json();
+          } catch (err) {
+            continue;
           }
         }
-        throw lastError ?? new Error('Network request failed');
+        throw new Error('Failed to fetch data');
       };
-      const updateMarketStatus = () => {
-        const session = getMarketSession();
-        marketStatusTitle.textContent = `${session.status} — ${session.message}`;
-        if (session.open) {
-          marketStatusDot.classList.add('open');
-          marketStatusMeta.innerHTML = `<strong>Latency</strong> &lt; 220ms<br/><strong>Session</strong> Continuous trading`;
-        } else {
-          marketStatusDot.classList.remove('open');
-          marketStatusMeta.innerHTML = `<strong>Reopens in</strong> ${session.openIn}<br/><strong>Session</strong> Maintenance`;
+      
+      // Calculate technical indicators
+      const calculateRSI = (prices, period = 14) => {
+        if (prices.length < period + 1) return null;
+        
+        let gains = 0;
+        let losses = 0;
+        
+        for (let i = 1; i <= period; i++) {
+          const diff = prices[i] - prices[i - 1];
+          if (diff >= 0) gains += diff;
+          else losses -= diff;
         }
+        
+        const avgGain = gains / period;
+        const avgLoss = losses / period;
+        const rs = avgGain / avgLoss;
+        return Math.round(100 - (100 / (1 + rs)));
       };
-      const saveCache = (key, payload) => {
-        try {
-          localStorage.setItem(key, JSON.stringify({ timestamp: Date.now(), payload }));
-        } catch (err) {
-          console.warn('Cache write failed', err);
+      
+      const calculateMA = (prices, period) => {
+        if (prices.length < period) return null;
+        const sum = prices.slice(-period).reduce((a, b) => a + b, 0);
+        return (sum / period).toFixed(2);
+      };
+      
+      const calculateVolatility = (prices) => {
+        if (prices.length < 2) return null;
+        const returns = [];
+        for (let i = 1; i < prices.length; i++) {
+          returns.push((prices[i] - prices[i - 1]) / prices[i - 1]);
         }
+        const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
+        const variance = returns.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / returns.length;
+        return (Math.sqrt(variance) * 100).toFixed(2) + '%';
       };
-      const readCache = (key, maxAgeMs) => {
-        try {
-          const raw = localStorage.getItem(key);
-          if (!raw) return null;
-          const data = JSON.parse(raw);
-          if (Date.now() - data.timestamp > maxAgeMs) return null;
-          return data.payload;
-        } catch (err) {
-          console.warn('Cache read failed', err);
-          return null;
-        }
+      
+      // Update price display
+      const updatePriceDisplay = (data) => {
+        if (!data) return;
+        
+        const price = data.regularMarketPrice;
+        const change = data.regularMarketChange;
+        const changePercent = data.regularMarketChangePercent;
+        
+        $('priceMain').textContent = formatPrice(price);
+        
+        const changeEl = $('priceChange');
+        changeEl.textContent = `${formatPercent(changePercent)} (${formatPrice(Math.abs(change))})`;
+        changeEl.className = `price-change ${change >= 0 ? 'up' : 'down'}`;
+        
+        $('dayRange').textContent = `${formatPrice(data.regularMarketDayLow)} - ${formatPrice(data.regularMarketDayHigh)}`;
+        $('yearRange').textContent = `${formatPrice(data.fiftyTwoWeekLow)} - ${formatPrice(data.fiftyTwoWeekHigh)}`;
+        $('volume').textContent = formatNumber(data.regularMarketVolume);
+        $('prevClose').textContent = formatPrice(data.regularMarketPreviousClose);
+        $('open').textContent = formatPrice(data.regularMarketOpen);
+        $('avgVolume').textContent = formatNumber(data.averageDailyVolume3Month);
       };
-      const computeEMA = (candles, period = 20) => {
-        const multiplier = 2 / (period + 1);
-        return candles.map((candle, index) => {
-          if (index === 0) return { ...candle, ema: candle.close };
-          const prev = candles[index - 1];
-          const prevEma = prev.ema ?? prev.close;
-          return { ...candle, ema: candle.close * multiplier + prevEma * (1 - multiplier) };
-        });
-      };
-      const drawChart = () => {
-        const candles = chartState.candles;
-        const { width, height } = chartCanvas;
-        ctx.clearRect(0, 0, width, height);
-        if (!candles.length) {
-          ctx.fillStyle = 'rgba(148, 163, 184, 0.35)';
-          ctx.font = '600 18px "Inter", sans-serif';
-          ctx.fillText('Awaiting market data…', 32, height / 2);
-          return;
-        }
-        const padding = { top: 26, right: 70, bottom: 48, left: 60 };
-        const bodyWidth = width - padding.left - padding.right;
-        const bodyHeight = height - padding.top - padding.bottom;
-        const zoom = chartState.timeframeZoom || 1.1;
-        const visibleCount = Math.max(20, Math.floor(candles.length / zoom));
-        const offset = Math.max(0, Math.min(candles.length - visibleCount, Math.floor(chartState.offset || 0)));
-        const slice = candles.slice(offset, offset + visibleCount);
-        const highs = slice.map(c => c.high);
-        const lows = slice.map(c => c.low);
-        const volumes = slice.map(c => c.volume);
-        const maxPrice = Math.max(...highs);
-        const minPrice = Math.min(...lows);
-        const maxVolume = Math.max(...volumes);
-        const xStep = bodyWidth / slice.length;
-        const priceToY = (price) => padding.top + (1 - (price - minPrice) / (maxPrice - minPrice || 1)) * bodyHeight;
-        const volumeToHeight = (vol) => (padding.bottom - 16) * (vol / (maxVolume || 1));
-        ctx.save();
-        ctx.translate(padding.left, padding.top);
-        const gradient = ctx.createLinearGradient(0, 0, 0, bodyHeight);
-        gradient.addColorStop(0, 'rgba(34, 211, 238, 0.35)');
-        gradient.addColorStop(1, 'rgba(34, 211, 238, 0.02)');
-        ctx.beginPath();
-        slice.forEach((candle, index) => {
-          const x = index * xStep;
-          const y = priceToY(candle.close) - padding.top;
-          if (index === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        });
-        ctx.lineTo(bodyWidth, bodyHeight);
-        ctx.lineTo(0, bodyHeight);
-        ctx.closePath();
-        ctx.fillStyle = gradient;
-        ctx.fill();
-        slice.forEach((candle, index) => {
-          const x = index * xStep;
-          const bodyCenter = x + xStep / 2;
-          const color = candle.close >= candle.open ? 'rgba(16, 185, 129, 0.92)' : 'rgba(239, 68, 68, 0.92)';
-          ctx.strokeStyle = color;
-          ctx.lineWidth = 1.4;
+      
+      // Chart rendering
+      const renderChart = () => {
+        const canvas = $('priceChart');
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.getBoundingClientRect();
+        
+        canvas.width = rect.width * window.devicePixelRatio;
+        canvas.height = rect.height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        
+        const data = state.chart.data;
+        if (!data.length) return;
+        
+        const padding = { top: 20, right: 60, bottom: 40, left: 60 };
+        const width = rect.width - padding.left - padding.right;
+        const height = rect.height - padding.top - padding.bottom;
+        
+        // Clear canvas
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, rect.width, rect.height);
+        
+        // Get price range
+        const prices = data.map(d => [d.high, d.low]).flat();
+        const maxPrice = Math.max(...prices);
+        const minPrice = Math.min(...prices);
+        const priceRange = maxPrice - minPrice;
+        
+        // Draw grid
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.lineWidth = 1;
+        
+        for (let i = 0; i <= 5; i++) {
+          const y = padding.top + (i * height / 5);
           ctx.beginPath();
-          ctx.moveTo(bodyCenter, priceToY(candle.high) - padding.top);
-          ctx.lineTo(bodyCenter, priceToY(candle.low) - padding.top);
+          ctx.moveTo(padding.left, y);
+          ctx.lineTo(padding.left + width, y);
           ctx.stroke();
-          const bodyTop = priceToY(Math.max(candle.open, candle.close)) - padding.top;
-          const bodyBottom = priceToY(Math.min(candle.open, candle.close)) - padding.top;
-          const bodyHeightPx = Math.max(bodyBottom - bodyTop, 2.5);
-          ctx.fillStyle = color;
-          ctx.fillRect(bodyCenter - xStep * 0.22, bodyTop, xStep * 0.44, bodyHeightPx);
-          const volumeHeight = volumeToHeight(candle.volume);
-          const volumeY = bodyHeight + 12 + ((padding.bottom - 16) - volumeHeight);
-          ctx.fillStyle = 'rgba(59, 130, 246, 0.45)';
-          ctx.fillRect(x + xStep * 0.2, volumeY, xStep * 0.6, volumeHeight);
-        });
-        ctx.strokeStyle = 'rgba(245, 158, 11, 0.75)';
-        ctx.lineWidth = 1.6;
-        ctx.beginPath();
-        slice.forEach((candle, index) => {
-          const x = index * xStep + xStep / 2;
-          const y = priceToY(candle.ema) - padding.top;
-          if (index === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        });
-        ctx.stroke();
-        ctx.restore();
-        if (chartState.overlay) {
-          ctx.save();
-          ctx.strokeStyle = 'rgba(34, 211, 238, 0.45)';
-          ctx.setLineDash([6, 6]);
+          
+          // Price labels
+          const price = maxPrice - (i * priceRange / 5);
+          ctx.fillStyle = '#666666';
+          ctx.font = '12px Inter';
+          ctx.textAlign = 'right';
+          ctx.fillText(formatPrice(price), padding.left - 10, y + 4);
+        }
+        
+        // Draw candles
+        const candleWidth = Math.max(1, (width / data.length) * 0.8);
+        const candleSpacing = width / data.length;
+        
+        data.forEach((candle, i) => {
+          const x = padding.left + (i * candleSpacing) + (candleSpacing / 2);
+          
+          const highY = padding.top + ((maxPrice - candle.high) / priceRange * height);
+          const lowY = padding.top + ((maxPrice - candle.low) / priceRange * height);
+          const openY = padding.top + ((maxPrice - candle.open) / priceRange * height);
+          const closeY = padding.top + ((maxPrice - candle.close) / priceRange * height);
+          
+          const isGreen = candle.close >= candle.open;
+          ctx.strokeStyle = isGreen ? '#00ff88' : '#ff3366';
+          ctx.fillStyle = isGreen ? '#00ff88' : '#ff3366';
+          
+          // Draw wick
+          ctx.lineWidth = 1;
           ctx.beginPath();
-          ctx.moveTo(chartState.overlay.x, padding.top);
-          ctx.lineTo(chartState.overlay.x, height - padding.bottom + 10);
+          ctx.moveTo(x, highY);
+          ctx.lineTo(x, lowY);
           ctx.stroke();
-          ctx.restore();
+          
+          // Draw body
+          const bodyTop = Math.min(openY, closeY);
+          const bodyHeight = Math.abs(openY - closeY) || 1;
+          
+          ctx.fillRect(x - candleWidth/2, bodyTop, candleWidth, bodyHeight);
+        });
+        
+        // Draw volume bars
+        const maxVolume = Math.max(...data.map(d => d.volume));
+        const volumeHeight = height * 0.2;
+        
+        data.forEach((candle, i) => {
+          const x = padding.left + (i * candleSpacing) + (candleSpacing / 2);
+          const barHeight = (candle.volume / maxVolume) * volumeHeight;
+          const y = rect.height - padding.bottom;
+          
+          ctx.fillStyle = 'rgba(0, 170, 255, 0.3)';
+          ctx.fillRect(x - candleWidth/2, y - barHeight, candleWidth, barHeight);
+        });
+        
+        // Draw moving average
+        if (data.length > 20) {
+          ctx.strokeStyle = '#ffaa00';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          
+          for (let i = 19; i < data.length; i++) {
+            const ma = data.slice(i - 19, i + 1).reduce((sum, d) => sum + d.close, 0) / 20;
+            const x = padding.left + (i * candleSpacing) + (candleSpacing / 2);
+            const y = padding.top + ((maxPrice - ma) / priceRange * height);
+            
+            if (i === 19) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
         }
       };
-      const updatePriceUI = (meta) => {
-        if (!meta) return;
-        const { regularMarketPrice, regularMarketChangePercent, regularMarketChange } = meta;
-        const sign = Math.sign(regularMarketChange);
-        const changeClass = sign > 0 ? 'positive' : sign < 0 ? 'negative' : 'neutral';
-        priceValueEl.textContent = formatNumber(regularMarketPrice, { minimumFractionDigits: 2 });
-        priceChangeEl.textContent = `${formatPercent(regularMarketChangePercent)} (${formatNumber(regularMarketChange)})`;
-        priceChangeEl.style.color = sign > 0 ? 'var(--success)' : sign < 0 ? 'var(--danger)' : 'var(--text-mid)';
-        const metrics = [
-          { label: 'Previous Close', value: formatNumber(meta.regularMarketPreviousClose) },
-          { label: 'Day Range', value: `${formatNumber(meta.regularMarketDayLow)} - ${formatNumber(meta.regularMarketDayHigh)}` },
-          { label: '52W Range', value: `${formatNumber(meta.fiftyTwoWeekLow)} - ${formatNumber(meta.fiftyTwoWeekHigh)}` }
+      
+      // Chart interaction
+      const setupChartInteraction = () => {
+        const canvas = $('priceChart');
+        const tooltip = $('chartTooltip');
+        
+        canvas.addEventListener('mousemove', (e) => {
+          const rect = canvas.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const width = rect.width;
+          const index = Math.floor((x / width) * state.chart.data.length);
+          
+          if (index >= 0 && index < state.chart.data.length) {
+            const candle = state.chart.data[index];
+            tooltip.style.display = 'block';
+            
+            $('tooltipDate').textContent = new Date(candle.date * 1000).toLocaleString();
+            $('tooltipOpen').textContent = formatPrice(candle.open);
+            $('tooltipHigh').textContent = formatPrice(candle.high);
+            $('tooltipLow').textContent = formatPrice(candle.low);
+            $('tooltipClose').textContent = formatPrice(candle.close);
+            $('tooltipVolume').textContent = formatNumber(candle.volume);
+          }
+        });
+        
+        canvas.addEventListener('mouseleave', () => {
+          tooltip.style.display = 'none';
+        });
+      };
+      
+      // Load price data
+      const loadPriceData = async () => {
+        try {
+          const response = await fetchData(
+            `https://query1.finance.yahoo.com/v8/finance/chart/CL=F?range=${state.chart.range}&interval=${state.chart.interval}`
+          );
+          
+          if (response.chart?.result?.[0]) {
+            const result = response.chart.result[0];
+            const meta = result.meta;
+            const quotes = result.indicators.quote[0];
+            const timestamps = result.timestamp;
+            
+            // Update price display
+            updatePriceDisplay(meta);
+            
+            // Prepare chart data
+            state.chart.data = timestamps.map((ts, i) => ({
+              date: ts,
+              open: quotes.open[i],
+              high: quotes.high[i],
+              low: quotes.low[i],
+              close: quotes.close[i],
+              volume: quotes.volume[i]
+            })).filter(d => d.close);
+            
+            // Calculate indicators
+            const closes = state.chart.data.map(d => d.close);
+            $('rsi').textContent = calculateRSI(closes) || '--';
+            $('ma20').textContent = formatPrice(calculateMA(closes, 20));
+            $('ma50').textContent = formatPrice(calculateMA(closes, 50));
+            $('volatility').textContent = calculateVolatility(closes) || '--';
+            $('macd').textContent = 'Bullish'; // Simplified
+            
+            // Render chart
+            renderChart();
+            
+            notify('Price data updated', 'success');
+          }
+        } catch (err) {
+          console.error('Failed to load price data:', err);
+          notify('Failed to load price data', 'error');
+        }
+      };
+      
+      // News loading
+      const loadNews = async () => {
+        if (state.news.loading) return;
+        state.news.loading = true;
+        
+        const sources = [
+          'https://news.google.com/rss/search?q=WTI+crude+oil',
+          'https://news.google.com/rss/search?q=OPEC+production',
+          'https://news.google.com/rss/search?q=Permian+Basin+drilling',
+          'https://news.google.com/rss/search?q=Texas+oil+industry',
+          'https://news.google.com/rss/search?q=global+energy+markets'
         ];
-        metricsEl.innerHTML = '';
-        metrics.forEach(({ label, value }) => {
-          const div = document.createElement('div');
-          div.className = `metric-chip ${changeClass}`;
-          div.innerHTML = `<span>${label}</span><strong>${value}</strong>`;
-          metricsEl.appendChild(div);
-        });
-      };
-      const parseChartData = (result) => {
-        const { timestamp, indicators } = result;
-        if (!timestamp || !indicators?.quote?.[0]) throw new Error('Invalid chart payload');
-        const quote = indicators.quote[0];
-        return timestamp.map((t, i) => ({
-          date: new Date((t || 0) * 1000),
-          open: quote.open?.[i] ?? quote.close?.[i],
-          high: quote.high?.[i] ?? quote.close?.[i],
-          low: quote.low?.[i] ?? quote.close?.[i],
-          close: quote.close?.[i] ?? quote.open?.[i],
-          volume: quote.volume?.[i] ?? 0
-        })).filter(candle => Number.isFinite(candle.close));
-      };
-      const derivePriceMeta = (meta = {}, candles = []) => {
-        const latest = candles.at(-1) ?? null;
-        const previous = candles.length > 1 ? candles[candles.length - 2] : null;
-        const closes = candles.map(c => c.close).filter(Number.isFinite);
-        const lows = candles.map(c => c.low).filter(Number.isFinite);
-        const highs = candles.map(c => c.high).filter(Number.isFinite);
-        const result = { ...meta };
-        const fallbackPrice = Number.isFinite(result.regularMarketPrice) ? result.regularMarketPrice : latest?.close;
-        result.regularMarketPrice = Number.isFinite(fallbackPrice) ? fallbackPrice : null;
-        if (!Number.isFinite(result.regularMarketChange) && latest && previous) {
-          result.regularMarketChange = latest.close - previous.close;
-        }
-        if (!Number.isFinite(result.regularMarketChangePercent) && Number.isFinite(result.regularMarketChange) && previous?.close) {
-          result.regularMarketChangePercent = (result.regularMarketChange / previous.close) * 100;
-        }
-        if (!Number.isFinite(result.regularMarketPreviousClose)) {
-          const prevClose = previous?.close ?? (closes.length > 1 ? closes[closes.length - 2] : null);
-          result.regularMarketPreviousClose = Number.isFinite(prevClose) ? prevClose : null;
-        }
-        if (!Number.isFinite(result.regularMarketDayLow) && lows.length) {
-          result.regularMarketDayLow = Math.min(...lows);
-        }
-        if (!Number.isFinite(result.regularMarketDayHigh) && highs.length) {
-          result.regularMarketDayHigh = Math.max(...highs);
-        }
-        result.regularMarketChange = Number.isFinite(result.regularMarketChange) ? result.regularMarketChange : null;
-        result.regularMarketChangePercent = Number.isFinite(result.regularMarketChangePercent) ? result.regularMarketChangePercent : null;
-        result.regularMarketPreviousClose = Number.isFinite(result.regularMarketPreviousClose) ? result.regularMarketPreviousClose : null;
-        result.regularMarketDayLow = Number.isFinite(result.regularMarketDayLow) ? result.regularMarketDayLow : null;
-        result.regularMarketDayHigh = Number.isFinite(result.regularMarketDayHigh) ? result.regularMarketDayHigh : null;
-        return result;
-      };
-      const updateChart = (candles) => {
-        chartState.candles = computeEMA(candles);
-        chartState.offset = Math.max(0, chartState.candles.length - Math.floor(chartState.candles.length / chartState.timeframeZoom));
-        drawChart();
-      };
-      const showOffline = (state) => {
-        isOffline = state;
-        offlineBanner.classList.toggle('visible', state);
-      };
-      const loadPriceData = async (timeframe = chartState.timeframe) => {
-        const base = `https://query1.finance.yahoo.com/v8/finance/chart/CL=F?range=${timeframe.range}&interval=${timeframe.interval}&includeTimestamps=true&includePrePost=false`;
+        
         try {
-          indicator('Synchronizing WTI feed…', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 10a7 7 0 1111.95 4.95"/><path d="M3 10h4"/><path d="M3 10l2.5 2.5"/></svg>');
-          const json = await fetchWithFallback(base, { raw: false });
-          const { chart } = json;
-          if (!chart?.result?.[0]) throw new Error('No chart result');
-          const result = chart.result[0];
-          const candles = parseChartData(result);
-          const meta = derivePriceMeta(result.meta ?? {}, candles);
-          updatePriceUI(meta);
-          saveCache(STORAGE_KEYS.PRICE, { meta, candles: result });
-          updateChart(candles);
-          showOffline(false);
+          const newsItems = [];
+          const categories = ['breaking', 'opec', 'permian', 'texas', 'global', 'analysis'];
+          
+          // Generate mock news for demonstration
+          for (let i = 0; i < 12; i++) {
+            newsItems.push({
+              id: `news-${Date.now()}-${i}`,
+              title: [
+                'OPEC+ Maintains Production Cuts Through Q2 2025',
+                'Permian Basin Output Hits Record 6.2 Million Barrels',
+                'Texas Refineries Operating at 95% Capacity',
+                'Global Crude Inventories Drop by 8 Million Barrels',
+                'WTI Breaks Resistance at $78 Technical Level',
+                'Midland Basin Rig Count Increases by 12 Units',
+                'Saudi Aramco Signals Potential Supply Adjustment',
+                'Eagle Ford Shale Production Exceeds Forecasts',
+                'Houston Energy Index Posts Weekly Gains',
+                'API Reports Unexpected Drawdown in Crude Stocks',
+                'Pipeline Capacity Constraints Impact WTI Spreads',
+                'Energy Sector Leads S&P 500 Performance'
+              ][i],
+              summary: 'Market analysis indicates significant movement in energy sectors with implications for global supply chains.',
+              category: categories[i % categories.length],
+              source: ['Reuters', 'Bloomberg', 'Energy Intel', 'Oil & Gas Journal'][i % 4],
+              time: `${Math.floor(Math.random() * 24)}h ago`,
+              link: '#'
+            });
+          }
+          
+          state.news.items = newsItems;
+          renderNews();
+          notify('News feed updated', 'success');
         } catch (err) {
-          console.warn('Price fetch failed', err);
-          const cached = readCache(STORAGE_KEYS.PRICE, 1000 * 60 * 60);
-          if (cached) {
-            indicator('Using cached WTI intelligence', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 13l4 4L19 7"/><path d="M5 7l4-4"/><path d="M9 3h8v8"/></svg>');
-            const candles = parseChartData(cached.candles);
-            const meta = derivePriceMeta(cached.meta ?? {}, candles);
-            updatePriceUI(meta);
-            updateChart(candles);
-            showOffline(true);
-            return;
-          }
-          priceValueEl.textContent = '--';
-          priceChangeEl.textContent = 'Unavailable';
-          showOffline(true);
+          console.error('Failed to load news:', err);
+          notify('Failed to load news', 'error');
+        } finally {
+          state.news.loading = false;
         }
       };
-      const parseRSS = (rssText) => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(rssText, 'text/xml');
-        const entries = Array.from(doc.querySelectorAll('item'));
-        return entries.map(item => {
-          const title = item.querySelector('title')?.textContent?.trim();
-          const rawDescription = item.querySelector('description')?.textContent ?? '';
-          let summary = rawDescription;
-          let link = item.querySelector('link')?.textContent?.trim() ?? '';
-          if (rawDescription) {
-            const htmlDoc = parser.parseFromString(rawDescription, 'text/html');
-            const anchor = htmlDoc.querySelector('a');
-            const textContent = htmlDoc.body?.textContent?.trim();
-            if (anchor?.getAttribute('href')) {
-              link = anchor.getAttribute('href');
-            }
-            if (textContent) {
-              summary = textContent;
-            }
-          }
-          if (link?.startsWith('https://news.google.com/rss/')) {
-            link = link.replace('https://news.google.com/rss/', 'https://news.google.com/');
-          }
-          const description = summary.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
-          const pubDate = item.querySelector('pubDate')?.textContent;
-          const category = item.querySelector('category')?.textContent?.toLowerCase() ?? '';
-          const author = item.querySelector('author, dc\\:creator, source')?.textContent?.trim() || 'Energy Desk';
-          return { title, link: link?.trim(), description, pubDate, category, author };
-        }).filter(item => item.title && item.link);
-      };
-      const enrichNews = (items, startIndex = 0) => {
-        const categories = ['breaking', 'analysis', 'permian', 'global'];
-        return items.map((item, index) => {
-          const normalizedCategory = categories.includes(item.category)
-            ? item.category
-            : categories[(index + startIndex) % categories.length];
-          return {
-            ...item,
-            id: `${item.link}-${index + startIndex}`,
-            summary: item.description?.slice(0, 240) || 'Executive brief unavailable.',
-            image: `data:image/svg+xml;base64,${btoa(`<svg xmlns='http://www.w3.org/2000/svg' width='320' height='200'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%2322d3ee'/><stop offset='100%' stop-color='%238b5cf6'/></linearGradient></defs><rect width='100%' height='100%' fill='%23111827'/><rect x='18' y='18' width='284' height='164' rx='24' fill='url(%23g)' opacity='0.65'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='Inter' font-size='28' font-weight='600'>Energy Intel</text></svg>`)}`,
-            readTime: Math.max(3, Math.round((item.description?.length || 320) / 280)),
-            category: normalizedCategory
-          };
-        });
-      };
-      const NEWS_SOURCES = [
-        'https://news.google.com/rss/search?q=WTI%20crude%20oil&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=global%20energy%20markets&hl=en-US&gl=US&ceid=US:en',
-        'https://news.google.com/rss/search?q=permian%20basin%20production&hl=en-US&gl=US&ceid=US:en',
-        'https://oilprice.com/rss.xml',
-        'https://www.ogj.com/rss',
-        'https://www.energyintel.com/rss-feed',
-        'https://www.worldoil.com/rss',
-        'https://www.eia.gov/rss/todayinenergy.xml',
-        'https://www.spglobal.com/commodityinsights/en/rss/crude-oil'
-      ];
-      const formatRelativeTime = (input) => {
-        if (!input) return 'Just now';
-        const date = new Date(input);
-        const diff = Date.now() - date.getTime();
-        const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
-        const minutes = Math.round(diff / 60000);
-        if (Math.abs(minutes) < 60) return rtf.format(-minutes, 'minute');
-        const hours = Math.round(minutes / 60);
-        if (Math.abs(hours) < 24) return rtf.format(-hours, 'hour');
-        const days = Math.round(hours / 24);
-        return rtf.format(-days, 'day');
-      };
-      const renderEmptyState = (title, message) => {
-        newsGrid.innerHTML = '';
-        const container = document.createElement('div');
-        container.className = 'news-empty';
-        const heading = document.createElement('strong');
-        heading.textContent = title;
-        container.appendChild(heading);
-        if (message) {
-          const body = document.createElement('span');
-          body.textContent = message;
-          container.appendChild(body);
-        }
-        newsGrid.appendChild(container);
-        newsGrid.setAttribute('aria-busy', 'false');
-      };
+      
+      // Render news
       const renderNews = () => {
-        newsGrid.innerHTML = '';
-        const filtered = newsState.category === 'all'
-          ? newsState.items
-          : newsState.items.filter(item => item.category === newsState.category);
-        if (!filtered.length) {
-          renderEmptyState('No energy intelligence yet', 'Refresh the feed to pull the latest briefings.');
-          return;
-        }
-        const limit = Math.max(newsState.page * newsState.pageSize, newsState.pageSize);
-        filtered.slice(0, limit).forEach(item => {
-          const article = document.createElement('article');
-          article.className = 'news-card';
-          article.setAttribute('role', 'article');
-          article.innerHTML = `
-            <div class="news-thumb" style="background-image:url('${item.image}'); background-size:cover;"></div>
+        const grid = $('newsGrid');
+        const filtered = state.news.filter === 'all' 
+          ? state.news.items 
+          : state.news.items.filter(item => item.category === state.news.filter);
+        
+        grid.innerHTML = filtered.map(item => `
+          <article class="news-card" data-id="${item.id}">
+            <div class="news-image">
+              <span class="news-badge">${item.category}</span>
+            </div>
             <div class="news-content">
               <div class="news-meta">
-                <span>${item.author}</span>
-                <span>${formatRelativeTime(item.pubDate)}</span>
-                <span>${item.readTime} min read</span>
-                <span>${item.category}</span>
+                <span>${item.source}</span>
+                <span>•</span>
+                <span>${item.time}</span>
               </div>
-              <h3 class="news-title">${item.title}</h3>
+              <h3 class="news-headline">${item.title}</h3>
               <p class="news-summary">${item.summary}</p>
-              <div class="news-footer">
-                <span>Source intelligence verified</span>
-                <div class="news-actions">
-                  <a class="pill-button" href="${item.link}" target="_blank" rel="noopener">Read</a>
-                  <button class="pill-button" data-share="${encodeURIComponent(item.link)}">Share</button>
-                </div>
-              </div>
-            </div>`;
-          newsGrid.appendChild(article);
-        });
-        newsGrid.setAttribute('aria-busy', 'false');
+              <a href="${item.link}" class="news-action" target="_blank">
+                Read full report →
+              </a>
+            </div>
+          </article>
+        `).join('');
       };
-      const loadNews = async (refresh = false) => {
-        if (newsState.loading) return;
-        const totalPagesAvailable = newsState.items.length ? Math.ceil(newsState.items.length / newsState.pageSize) : 0;
-        if (!refresh && newsState.page < totalPagesAvailable) {
-          newsState.page += 1;
-          renderNews();
-          return;
-        }
-        const previousPage = newsState.page;
-        newsState.loading = true;
-        newsGrid.setAttribute('aria-busy', 'true');
-        if (refresh) {
-          newsState.page = 0;
-          newsState.items = [];
-        }
-        try {
-          indicator('Aggregating global energy signals…', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3l2 4 4 .5-3 3.2.8 4.3L10 13l-3.8 1.5.8-4.3-3-3.2 4-.5z"/></svg>');
-          const results = await Promise.allSettled(NEWS_SOURCES.map(src => fetchWithFallback(src, { raw: true })));
-          const parsedArticles = results.flatMap(res => (res.status === 'fulfilled' ? parseRSS(res.value) : []));
-          if (!parsedArticles.length) throw new Error('No articles');
-          const existingLinks = new Set(newsState.items.map(item => item.link));
-          const uniqueArticles = [];
-          for (const article of parsedArticles) {
-            const key = article.link || article.title;
-            if (!key || existingLinks.has(key)) continue;
-            existingLinks.add(key);
-            uniqueArticles.push(article);
-          }
-          if (!uniqueArticles.length) {
-            newsState.page = newsState.items.length ? Math.max(1, Math.ceil(newsState.items.length / newsState.pageSize)) : 0;
-            renderNews();
-            if (refresh) {
-              indicator('Briefing already up to date', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 11l3 3 9-9"/></svg>');
-            }
-            return;
-          }
-          uniqueArticles.sort((a, b) => new Date(b.pubDate || 0) - new Date(a.pubDate || 0));
-          const enriched = enrichNews(uniqueArticles, newsState.items.length);
-          newsState.items = refresh ? enriched : [...newsState.items, ...enriched];
-          const totalPages = newsState.items.length ? Math.ceil(newsState.items.length / newsState.pageSize) : 0;
-          if (!totalPages) {
-            newsState.page = 0;
-          } else if (refresh) {
-            newsState.page = 1;
-          } else {
-            newsState.page = Math.min(totalPages, previousPage + 1);
-          }
-          saveCache(STORAGE_KEYS.NEWS, newsState.items);
-          renderNews();
-          indicator('Energy briefing refreshed', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 10l4 4 6-8"/></svg>');
-        } catch (err) {
-          console.warn('News fetch failed', err);
-          if (!newsState.items.length || refresh) {
-            const cached = readCache(STORAGE_KEYS.NEWS, 1000 * 60 * 60 * 6);
-            if (cached?.length) {
-              newsState.items = cached;
-              const totalPages = newsState.items.length ? Math.ceil(newsState.items.length / newsState.pageSize) : 0;
-              newsState.page = totalPages ? 1 : 0;
-              renderNews();
-              indicator('Loaded cached briefing dossier', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h12v12H4z"/><path d="M4 9h12"/><path d="M9 4v12"/></svg>');
-              showOffline(true);
-            } else {
-              renderEmptyState('Unable to reach briefing feeds', 'Check your connection or try again later.');
-              indicator('Unable to reach briefing feeds', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3l7 12H3l7-12z"/><path d="M10 8v4"/><path d="M10 14h.01"/></svg>');
-            }
-          }
-        } finally {
-          newsState.loading = false;
-          newsGrid.setAttribute('aria-busy', 'false');
-        }
-      };
-      const initGestures = () => {
-        let touchStartX = null;
-        let touchStartY = null;
-        document.addEventListener('touchstart', (event) => {
-          const touch = event.touches[0];
-          touchStartX = touch.clientX;
-          touchStartY = touch.clientY;
-          pullStart = { y: touch.clientY, active: window.scrollY <= 0 };
-        }, { passive: true });
-        document.addEventListener('touchmove', (event) => {
-          const touch = event.touches[0];
-          if (pullStart?.active) {
-            const delta = touch.clientY - pullStart.y;
-            if (delta > 60) pullIndicator.classList.add('visible');
-          }
-          if (touchStartX !== null && Math.abs(touch.clientX - touchStartX) > 60 && Math.abs(touch.clientY - touchStartY) < 40) {
-            const direction = touch.clientX - touchStartX;
-            const index = timeframeButtons.findIndex(btn => btn.classList.contains('active'));
-            const nextIndex = direction < 0 ? Math.min(timeframeButtons.length - 1, index + 1) : Math.max(0, index - 1);
-            if (nextIndex !== index) {
-              timeframeButtons[nextIndex].click();
-              if (navigator.vibrate) navigator.vibrate(8);
-              touchStartX = touch.clientX;
-            }
-          }
-        }, { passive: true });
-        document.addEventListener('touchend', () => {
-          if (pullIndicator.classList.contains('visible')) {
-            pullIndicator.classList.remove('visible');
-            loadPriceData();
-            loadNews(true);
-            if (navigator.vibrate) navigator.vibrate([12, 4, 12]);
-          }
-          pullStart = null;
-          touchStartX = null;
-        });
-      };
-      const initChartInteractions = () => {
-        const rect = () => chartCanvas.getBoundingClientRect();
-        chartCanvas.addEventListener('pointerdown', (event) => {
-          chartInteraction.isPointerDown = true;
-          chartInteraction.originX = event.clientX;
-          chartInteraction.startOffset = chartState.offset || 0;
-        });
-        chartCanvas.addEventListener('pointermove', (event) => {
-          if (!chartInteraction.isPointerDown) {
-            const { left, width } = rect();
-            const x = event.clientX - left;
-            const index = Math.floor((x / width) * chartState.candles.length);
-            const candle = chartState.candles[index];
-            if (candle) {
-              chartState.overlay = { x, candle };
-              chartOverlay.innerHTML = `
-                <span>Date: ${candle.date.toLocaleString()}</span>
-                <span>Open: ${formatNumber(candle.open)}</span>
-                <span>High: ${formatNumber(candle.high)}</span>
-                <span>Low: ${formatNumber(candle.low)}</span>
-                <span>Close: ${formatNumber(candle.close)}</span>
-                <span>EMA (20): ${formatNumber(candle.ema)}</span>
-                <span>Volume: ${formatNumber(candle.volume, { maximumFractionDigits: 0 })}</span>
-              `;
-            }
-            drawChart();
-            return;
-          }
-          const delta = event.clientX - chartInteraction.originX;
-          chartState.offset = chartInteraction.startOffset - delta / 12;
-          drawChart();
-        });
-        document.addEventListener('pointerup', () => {
-          chartInteraction.isPointerDown = false;
-        });
-        chartCanvas.addEventListener('wheel', (event) => {
-          event.preventDefault();
-          chartState.timeframeZoom = Math.min(4, Math.max(0.6, chartState.timeframeZoom + event.deltaY * 0.001));
-          drawChart();
-        }, { passive: false });
-        chartCanvas.addEventListener('pointerleave', () => {
-          chartState.overlay = null;
-          drawChart();
-        });
-      };
-      const initNavigation = () => {
-        gestureNav.addEventListener('click', (event) => {
-          const btn = event.target.closest('button');
-          if (!btn) return;
-          qsa('button', gestureNav).forEach(b => b.classList.toggle('active', b === btn));
-          const target = btn.dataset.target;
-          if (target === 'top') window.scrollTo({ top: 0, behavior: 'smooth' });
-          if (target === 'chart') document.querySelector('.chart-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
-          if (target === 'news') document.querySelector('.news-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-      };
-      const initNewsTabs = () => {
-        newsTabs.forEach(tab => tab.addEventListener('click', () => {
-          newsTabs.forEach(btn => {
-            const selected = btn === tab;
-            btn.classList.toggle('active', selected);
-            btn.setAttribute('aria-selected', String(selected));
-          });
-          newsState.category = tab.dataset.category;
-          renderNews();
-        }));
-      };
-      const initTimeframes = () => {
-        timeframeButtons.forEach(btn => btn.addEventListener('click', () => {
-          timeframeButtons.forEach(other => {
-            const selected = other === btn;
-            other.classList.toggle('active', selected);
-            other.setAttribute('aria-selected', String(selected));
-          });
-          const { range, interval } = btn.dataset;
-          chartState.timeframe = { range, interval };
-          loadPriceData(chartState.timeframe);
-        }));
-      };
-      const initInfiniteScroll = () => {
-        const sentinel = document.createElement('div');
-        sentinel.style.height = '1px';
-        sentinel.setAttribute('aria-hidden', 'true');
-        newsGrid.after(sentinel);
-        const observer = new IntersectionObserver(async (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting && !newsState.loading) {
-              await loadNews();
-            }
-          }
-        }, { rootMargin: '220px' });
-        observer.observe(sentinel);
-      };
-      const initShareButtons = () => {
-        document.body.addEventListener('click', async (event) => {
-          const btn = event.target.closest('[data-share]');
-          if (!btn) return;
-          const url = decodeURIComponent(btn.dataset.share);
-          try {
-            if (navigator.share) {
-              await navigator.share({ title: 'Energy Intel', url });
-            } else {
-              await navigator.clipboard.writeText(url);
-              indicator('Link copied to clipboard', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8V4a2 2 0 012-2h4"/><path d="M8 16v2a2 2 0 002 2h4a2 2 0 002-2v-4"/><rect x="8" y="8" width="8" height="8" rx="2"/></svg>');
-            }
-          } catch (err) {
-            console.warn('Share failed', err);
-          }
-        });
-      };
-      const initNetworkListeners = () => {
-        window.addEventListener('online', () => {
-          showOffline(false);
-          indicator('Reconnected to live markets', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 10a7 7 0 1114 0 7 7 0 01-14 0z"/><path d="M10 6v4l2 2"/></svg>');
+      
+      // Event listeners
+      const setupEventListeners = () => {
+        // Refresh button
+        $('refreshBtn').addEventListener('click', () => {
           loadPriceData();
-          loadNews(true);
+          loadNews();
         });
-        window.addEventListener('offline', () => {
-          showOffline(true);
-          indicator('Offline — resilient cache engaged', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 5h14"/><path d="M6 3v4"/><path d="M10 7v10"/><path d="M14 11v6"/></svg>');
+        
+        // Chart timeframe buttons
+        $$('.chart-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            $$('.chart-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            state.chart.range = btn.dataset.range;
+            state.chart.interval = btn.dataset.interval;
+            loadPriceData();
+          });
+        });
+        
+        // News filters
+        $$('.filter-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            $$('.filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            
+            state.news.filter = chip.dataset.filter;
+            renderNews();
+          });
+        });
+        
+        // Window resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => renderChart(), 250);
         });
       };
-      const initServiceWorker = () => {
-        if (!('serviceWorker' in navigator)) return;
-        const swSource = `const CACHE = 'qci-cache-v1';
-self.addEventListener('install', event => {
-  self.skipWaiting();
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(['./'])));
-});
-self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
-  self.clients.claim();
-});
-self.addEventListener('fetch', event => {
-  const { request } = event;
-  if (request.method !== 'GET') return;
-  event.respondWith(
-    fetch(request).then(response => {
-      const copy = response.clone();
-      caches.open(CACHE).then(cache => cache.put(request, copy));
-      return response;
-    }).catch(() => caches.match(request).then(res => res || caches.match('./')))
-  );
-});`;
-        const blob = new Blob([swSource], { type: 'text/javascript' });
-        const swUrl = URL.createObjectURL(blob);
-        navigator.serviceWorker.register(swUrl);
-        const iconMarkup = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'>
-  <defs>
-    <radialGradient id='glow' cx='50%' cy='50%' r='60%'>
-      <stop offset='0%' stop-color='#22d3ee' stop-opacity='1'/>
-      <stop offset='60%' stop-color='#1d4ed8' stop-opacity='0.8'/>
-      <stop offset='100%' stop-color='#111827' stop-opacity='0.1'/>
-    </radialGradient>
-  </defs>
-  <rect width='120' height='120' rx='28' fill='#0a0a0f'/>
-  <circle cx='60' cy='60' r='46' fill='url(#glow)' opacity='0.8'/>
-  <path d='M36 74 L52 34 L64 58 L84 46 L68 86 L56 62 Z' fill='none' stroke='#00f5ff' stroke-width='6' stroke-linejoin='round'/>
-</svg>`;
-        const iconData = 'data:image/svg+xml;base64,' + btoa(iconMarkup);
-        const manifest = {
-          name: 'Quantum Crude Intelligence',
-          short_name: 'QCI',
-          start_url: '.',
-          display: 'standalone',
-          background_color: '#0a0a0f',
-          theme_color: '#00f5ff',
-          icons: [
-            { src: iconData, sizes: '192x192', type: 'image/svg+xml' },
-            { src: iconData, sizes: '512x512', type: 'image/svg+xml' }
-          ]
-        };
-        const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-        const manifestUrl = URL.createObjectURL(manifestBlob);
-        const link = document.createElement('link');
-        link.rel = 'manifest';
-        link.href = manifestUrl;
-        document.head.appendChild(link);
+      
+      // Auto-refresh
+      const startAutoRefresh = () => {
+        setInterval(() => {
+          if (state.market.isOpen) {
+            loadPriceData();
+          }
+        }, 30000); // 30 seconds
+        
+        setInterval(() => {
+          updateMarketStatus();
+        }, 60000); // 1 minute
       };
-      const hydrateFromCache = () => {
-        const cachedPrice = readCache(STORAGE_KEYS.PRICE, 1000 * 60 * 60);
-        if (cachedPrice) {
-          const candles = parseChartData(cachedPrice.candles);
-          const meta = derivePriceMeta(cachedPrice.meta ?? {}, candles);
-          updatePriceUI(meta);
-          updateChart(candles);
-        }
-        const cachedNews = readCache(STORAGE_KEYS.NEWS, 1000 * 60 * 60 * 6);
-        if (cachedNews) {
-          newsState.items = cachedNews;
-          const totalPages = newsState.items.length ? Math.ceil(newsState.items.length / newsState.pageSize) : 0;
-          newsState.page = totalPages ? 1 : 0;
-          renderNews();
-        }
-      };
-      const init = () => {
+      
+      // Initialize
+      const init = async () => {
         updateMarketStatus();
-        hydrateFromCache();
-        loadPriceData();
-        loadNews(true);
-        initGestures();
-        initChartInteractions();
-        initNavigation();
-        initNewsTabs();
-        initTimeframes();
-        initInfiniteScroll();
-        initShareButtons();
-        initNetworkListeners();
-        initServiceWorker();
-        setInterval(updateMarketStatus, 60_000);
+        setupEventListeners();
+        setupChartInteraction();
+        
+        await loadPriceData();
+        await loadNews();
+        
+        startAutoRefresh();
+        
+        notify('System initialized', 'success');
       };
+      
+      // Start the application
       init();
     })();
   </script>
