@@ -67,7 +67,8 @@
 
         .chart-container {
             position: relative;
-            height: 300px;
+            height: 400px; /* Bigger charts for mobile */
+            max-height: 50vh;
             background-color: #000;
             border: 2px solid #00ff41;
             border-radius: 10px;
@@ -105,11 +106,12 @@
         }
 
         #news-feed {
-            height: 300px;
+            height: 400px; /* Match chart size */
             overflow-y: auto;
             border: 2px solid #00ff41;
             padding: 10px;
             border-radius: 10px;
+            overscroll-behavior: contain;
         }
 
         .news-item {
@@ -139,7 +141,189 @@
             }
 
             .chart-container {
-                height: 400px;
+                height: 500px; /* Bigger for desktop */
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="crt-container">
+        <header>Oil Terminal - <span id="datetime"></span></header>
+        <div class="charts">
+            <div class="chart-container">
+                <div class="chart-label">WTI Crude</div>
+                <div id="wti-chart"></div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-label">Brent Crude</div>
+                <div id="brent-chart"></div>
+            </div>
+        </div>
+        <nav>
+            <button onclick="loadNews('texas')">Texas Oil</button>
+            <button onclick="loadNews('us')">US Oil</button>
+            <button onclick="loadNews('global')">Global Oil</button>
+        </nav>
+        <div id="news-feed">
+            <p class="status">Loading news...</p>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+        // Update date/time
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementBy-------
+
+System: I'm sorry, but it looks like the code was cut off. Let me complete and refine it for you, ensuring the charts are larger and the news feed pulls reliably from Yahoo Finance’s energy RSS, with a fallback to MarketWatch if needed. I’ll keep it tight, stick to the CRT aesthetic, and make sure it’s mobile-friendly, no API keys required. If the news still ain’t showin’, it’s likely the CORS proxy or a browser block—test it on a local server (e.g., `python -m http.server`) and let me know what’s breakin’.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oil Terminal</title>
+    <style>
+        /* CRT Terminal Aesthetic */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0a0a0a;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            overflow: hidden;
+        }
+
+        #crt-container {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #0a0a0a;
+            border: 5px solid #000;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            overflow: hidden;
+        }
+
+        /* Scanline effect */
+        #crt-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, rgba(0, 0, 0, 0.1) 2px, rgba(0, 0, 0, 0.1) 4px);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Subtle flicker animation */
+        @keyframes flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.95; }
+            100% { opacity: 1; }
+        }
+
+        #crt-container {
+            animation: flicker 0.1s infinite;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffd700; /* Amber accent */
+        }
+
+        .charts {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .chart/jquery-3.6.0.min.jscontainer {
+            position: relative;
+            height: 400px; /* Bigger for mobile */
+            max-height: 50vh;
+            background-color: #000;
+            border: 2px solid #00ff41;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .chart-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 11;
+            color: #ffd700;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        button {
+            background-color: #000;
+            color: #00ff41;
+            border: 1px solid #00ff41;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            touch-action: manipulation;
+        }
+
+        button:hover {
+            background-color: #00ff41;
+            color: #0a0a0a;
+        }
+
+        #news-feed {
+            height: 400px; /* Match chart size */
+            overflow-y: auto;
+            border: 2px solid #00ff41;
+            padding: 10px;
+            border-radius: 10px;
+            overscroll-behavior: contain;
+        }
+
+        .news-item {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #00ff41;
+            padding-bottom: 10px;
+        }
+
+        .news-title {
+            color: #ffd700;
+        }
+
+        .news-desc {
+            color: #00ff41;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+        }
+
+        /* Responsive design */
+        @media (min-width: 768px) {
+            .charts {
+                flex-direction: row;
+                gap: 20px;
+            }
+
+            .chart-container {
+                height: 500px; /* Bigger for desktop */
                 flex: 1;
             }
         }
@@ -217,64 +401,70 @@
             });
         }
 
-        // RSS feed parsing
+        // RSS feed parsing with fallback
         async function loadNews(region) {
             const newsFeed = document.getElementById('news-feed');
             newsFeed.innerHTML = '<p class="status">Loading news...</p>';
 
-            // Use Reuters RSS feed for oil/energy news
-            const rssUrl = 'https://www.reuters.com/arc/outboundfeeds/rss/category/energy/';
-            // Use CORS proxy to fetch RSS (client-side workaround)
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`;
+            // Primary: Yahoo Finance energy RSS
+            const rssUrls = [
+                'https://finance.yahoo.com/rss/energy',
+                'https://www.marketwatch.com/rss/energy' // Fallback
+            ];
+            const keywords = {
+                'texas': ['texas', 'houston', 'permian', 'shale'],
+                'us': ['united states', 'us oil', 'shale', 'offshore'],
+                'global': ['oil', 'crude', 'brent', 'wti']
+            }[region];
 
-            try {
-                const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error('Failed to fetch RSS feed');
-                const text = await response.text();
+            let newsItems = [];
+            let lastError = null;
 
-                // Parse XML
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(text, 'text/xml');
-                const items = xmlDoc.getElementsByTagName('item');
-                const newsItems = [];
+            for (let rssUrl of rssUrls) {
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(rssUrl)}`;
+                try {
+                    const response = await fetch(proxyUrl, { cache: 'no-store' });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const text = await response.text();
 
-                // Filter news based on region
-                const keywords = {
-                    'texas': ['texas', 'houston', 'permian', 'shale'],
-                    'us': ['united states', 'us oil', 'shale', 'offshore'],
-                    'global': ['oil', 'crude', 'brent', 'wti']
-                }[region];
+                    // Parse XML
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(text, 'text/xml');
+                    const items = xmlDoc.getElementsByTagName('item');
 
-                for (let item of items) {
-                    const title = item.getElementsByTagName('title')[0]?.textContent || 'No title';
-                    const description = item.getElementsByTagName('description')[0]?.textContent || 'No description';
-                    const content = (title + ' ' + description).toLowerCase();
+                    for (let item of items) {
+                        const title = item.getElementsByTagName('title')[0]?.textContent || 'No title';
+                        const description = item.getElementsByTagName('description')[0]?.textContent || 'No description';
+                        const content = (title + ' ' + description).toLowerCase();
 
-                    // Check if item matches region keywords
-                    if (keywords.some(keyword => content.includes(keyword.toLowerCase()))) {
-                        newsItems.push({ title, description });
+                        if (keywords.some(keyword => content.includes(keyword.toLowerCase()))) {
+                            newsItems.push({ title, description });
+                        }
                     }
-                }
 
-                // Display news or fallback
-                if (newsItems.length === 0) {
-                    newsFeed.innerHTML = '<p class="error">No relevant news found.</p>';
-                    return;
+                    if (newsItems.length > 0) break; // Exit if we got news
+                } catch (error) {
+                    lastError = error;
+                    console.error(`Failed to load ${rssUrl}: ${error.message}`);
                 }
-
-                newsFeed.innerHTML = '';
-                newsItems.slice(0, 20).forEach(item => {
-                    const div = document.createElement('div');
-                    div.classList.add('news-item');
-                    div.innerHTML = `
-                        <div class="news-title">${item.title}</div>
-                        <div class="news-desc">${item.description}</div>
-                    `;
-                    newsFeed.appendChild(div);
-                });
-            } catch (error) {
-                newsFeed.innerHTML = `<p class="error">Error loading news: ${error.message}. Try again later.</p>`;
             }
+
+            // Display news or fallback
+            if (newsItems.length === 0) {
+                newsFeed.innerHTML = `<p class="error">No relevant news found. ${lastError ? 'Error: ' + lastError.message : ''}</p>`;
+                return;
+            }
+
+            newsFeed.innerHTML = '';
+            newsItems.slice(0, 20).forEach(item => {
+                const div = document.createElement('div');
+                div.classList.add('news-item');
+                div.innerHTML = `
+                    <div class="news-title">${item.title}</div>
+                    <div class="news-desc">${item.description}</div>
+                `;
+                newsFeed.appendChild(div);
+            });
         }
 
         // Initial load
