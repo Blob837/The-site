@@ -418,6 +418,24 @@
       gap: calc(var(--grid) * 2);
     }
 
+    .news-empty {
+      padding: calc(var(--grid) * 3);
+      border-radius: 20px;
+      background: linear-gradient(160deg, rgba(17, 24, 39, 0.85), rgba(15, 23, 42, 0.65));
+      border: 1px dashed rgba(236, 72, 153, 0.35);
+      color: var(--text-mid);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .news-empty strong {
+      display: block;
+      color: var(--text-high);
+      font-weight: 600;
+      margin-bottom: calc(var(--grid) * 1.2);
+    }
+
     .news-card {
       display: grid;
       grid-template-columns: 110px 1fr;
@@ -941,7 +959,15 @@
           const controller = new AbortController();
           const timer = setTimeout(() => controller.abort(), timeout);
           try {
-            const response = await fetch(target, { signal: controller.signal, cache: 'no-store' });
+            const response = await fetch(target, {
+              signal: controller.signal,
+              cache: 'no-store',
+              headers: {
+                Accept: raw
+                  ? 'application/rss+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.7'
+                  : 'application/json, text/plain, */*'
+              }
+            });
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const text = await response.text();
             return raw ? text : JSON.parse(text);
@@ -950,12 +976,18 @@
           }
         };
 
-        const sources = [
+        const encodedUrl = encodeURIComponent(url);
+        const sanitized = url.replace(/^https?:\/\//, '');
+        const sources = Array.from(new Set([
           url,
           `https://cors.isomorphic-git.org/${url}`,
-          `https://corsproxy.io/?${encodeURIComponent(url)}`,
-          `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
-        ];
+          `https://r.jina.ai/${url}`,
+          `https://r.jina.ai/https://${sanitized}`,
+          `https://r.jina.ai/http://${sanitized}`,
+          `https://thingproxy.freeboard.io/fetch/${url}`,
+          `https://corsproxy.io/?url=${encodedUrl}`,
+          `https://api.allorigins.win/raw?url=${encodedUrl}`
+        ].filter(Boolean)));
 
         let lastError;
         for (const source of sources) {
@@ -1143,6 +1175,48 @@
         })).filter(candle => Number.isFinite(candle.close));
       };
 
+      const derivePriceMeta = (meta = {}, candles = []) => {
+        const latest = candles.at(-1) ?? null;
+        const previous = candles.length > 1 ? candles[candles.length - 2] : null;
+        const closes = candles.map(c => c.close).filter(Number.isFinite);
+        const lows = candles.map(c => c.low).filter(Number.isFinite);
+        const highs = candles.map(c => c.high).filter(Number.isFinite);
+
+        const result = { ...meta };
+
+        const fallbackPrice = Number.isFinite(result.regularMarketPrice) ? result.regularMarketPrice : latest?.close;
+        result.regularMarketPrice = Number.isFinite(fallbackPrice) ? fallbackPrice : null;
+
+        if (!Number.isFinite(result.regularMarketChange) && latest && previous) {
+          result.regularMarketChange = latest.close - previous.close;
+        }
+
+        if (!Number.isFinite(result.regularMarketChangePercent) && Number.isFinite(result.regularMarketChange) && previous?.close) {
+          result.regularMarketChangePercent = (result.regularMarketChange / previous.close) * 100;
+        }
+
+        if (!Number.isFinite(result.regularMarketPreviousClose)) {
+          const prevClose = previous?.close ?? (closes.length > 1 ? closes[closes.length - 2] : null);
+          result.regularMarketPreviousClose = Number.isFinite(prevClose) ? prevClose : null;
+        }
+
+        if (!Number.isFinite(result.regularMarketDayLow) && lows.length) {
+          result.regularMarketDayLow = Math.min(...lows);
+        }
+
+        if (!Number.isFinite(result.regularMarketDayHigh) && highs.length) {
+          result.regularMarketDayHigh = Math.max(...highs);
+        }
+
+        result.regularMarketChange = Number.isFinite(result.regularMarketChange) ? result.regularMarketChange : null;
+        result.regularMarketChangePercent = Number.isFinite(result.regularMarketChangePercent) ? result.regularMarketChangePercent : null;
+        result.regularMarketPreviousClose = Number.isFinite(result.regularMarketPreviousClose) ? result.regularMarketPreviousClose : null;
+        result.regularMarketDayLow = Number.isFinite(result.regularMarketDayLow) ? result.regularMarketDayLow : null;
+        result.regularMarketDayHigh = Number.isFinite(result.regularMarketDayHigh) ? result.regularMarketDayHigh : null;
+
+        return result;
+      };
+
       const updateChart = (candles) => {
         chartState.candles = computeEMA(candles);
         chartState.offset = Math.max(0, chartState.candles.length - Math.floor(chartState.candles.length / chartState.timeframeZoom));
@@ -1162,17 +1236,21 @@
           const { chart } = json;
           if (!chart?.result?.[0]) throw new Error('No chart result');
           const result = chart.result[0];
-          updatePriceUI(result.meta);
-          saveCache(STORAGE_KEYS.PRICE, { meta: result.meta, candles: result });
-          updateChart(parseChartData(result));
+          const candles = parseChartData(result);
+          const meta = derivePriceMeta(result.meta ?? {}, candles);
+          updatePriceUI(meta);
+          saveCache(STORAGE_KEYS.PRICE, { meta, candles: result });
+          updateChart(candles);
           showOffline(false);
         } catch (err) {
           console.warn('Price fetch failed', err);
           const cached = readCache(STORAGE_KEYS.PRICE, 1000 * 60 * 60);
           if (cached) {
             indicator('Using cached WTI intelligence', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 13l4 4L19 7"/><path d="M5 7l4-4"/><path d="M9 3h8v8"/></svg>');
-            updatePriceUI(cached.meta);
-            updateChart(parseChartData(cached.candles));
+            const candles = parseChartData(cached.candles);
+            const meta = derivePriceMeta(cached.meta ?? {}, candles);
+            updatePriceUI(meta);
+            updateChart(candles);
             showOffline(true);
             return;
           }
@@ -1183,34 +1261,61 @@
       };
 
       const parseRSS = (rssText) => {
-        const doc = new DOMParser().parseFromString(rssText, 'text/xml');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(rssText, 'text/xml');
         const entries = Array.from(doc.querySelectorAll('item'));
-        return entries.map(item => ({
-          title: item.querySelector('title')?.textContent?.trim(),
-          link: item.querySelector('link')?.textContent?.trim(),
-          description: item.querySelector('description')?.textContent?.replace(/<[^>]+>/g, '').trim(),
-          pubDate: item.querySelector('pubDate')?.textContent,
-          category: item.querySelector('category')?.textContent?.toLowerCase() ?? 'analysis',
-          author: item.querySelector('author')?.textContent ?? 'Energy Desk'
-        })).filter(item => item.title && item.link);
+        return entries.map(item => {
+          const title = item.querySelector('title')?.textContent?.trim();
+          const rawDescription = item.querySelector('description')?.textContent ?? '';
+          let summary = rawDescription;
+          let link = item.querySelector('link')?.textContent?.trim() ?? '';
+
+          if (rawDescription) {
+            const htmlDoc = parser.parseFromString(rawDescription, 'text/html');
+            const anchor = htmlDoc.querySelector('a');
+            const textContent = htmlDoc.body?.textContent?.trim();
+            if (anchor?.getAttribute('href')) {
+              link = anchor.getAttribute('href');
+            }
+            if (textContent) {
+              summary = textContent;
+            }
+          }
+
+          if (link?.startsWith('https://news.google.com/rss/')) {
+            link = link.replace('https://news.google.com/rss/', 'https://news.google.com/');
+          }
+
+          const description = summary.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+          const pubDate = item.querySelector('pubDate')?.textContent;
+          const category = item.querySelector('category')?.textContent?.toLowerCase() ?? '';
+          const author = item.querySelector('author, dc\\:creator, source')?.textContent?.trim() || 'Energy Desk';
+
+          return { title, link: link?.trim(), description, pubDate, category, author };
+        }).filter(item => item.title && item.link);
       };
 
-      const enrichNews = (items) => {
+      const enrichNews = (items, startIndex = 0) => {
         const categories = ['breaking', 'analysis', 'permian', 'global'];
-        return items.map((item, index) => ({
-          ...item,
-          id: `${item.link}-${index}`,
-          summary: item.description?.slice(0, 240) || 'Executive brief unavailable.',
-          image: `data:image/svg+xml;base64,${btoa(`<svg xmlns='http://www.w3.org/2000/svg' width='320' height='200'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%2322d3ee'/><stop offset='100%' stop-color='%238b5cf6'/></linearGradient></defs><rect width='100%' height='100%' fill='%23111827'/><rect x='18' y='18' width='284' height='164' rx='24' fill='url(%23g)' opacity='0.65'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='Inter' font-size='28' font-weight='600'>Energy Intel</text></svg>`)}`,
-          readTime: Math.max(3, Math.round((item.description?.length || 320) / 280)),
-          category: categories[index % categories.length]
-        }));
+        return items.map((item, index) => {
+          const normalizedCategory = categories.includes(item.category)
+            ? item.category
+            : categories[(index + startIndex) % categories.length];
+          return {
+            ...item,
+            id: `${item.link}-${index + startIndex}`,
+            summary: item.description?.slice(0, 240) || 'Executive brief unavailable.',
+            image: `data:image/svg+xml;base64,${btoa(`<svg xmlns='http://www.w3.org/2000/svg' width='320' height='200'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='%2322d3ee'/><stop offset='100%' stop-color='%238b5cf6'/></linearGradient></defs><rect width='100%' height='100%' fill='%23111827'/><rect x='18' y='18' width='284' height='164' rx='24' fill='url(%23g)' opacity='0.65'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='Inter' font-size='28' font-weight='600'>Energy Intel</text></svg>`)}`,
+            readTime: Math.max(3, Math.round((item.description?.length || 320) / 280)),
+            category: normalizedCategory
+          };
+        });
       };
 
       const NEWS_SOURCES = [
-        'https://www.reutersagency.com/feed/?best-topics=energy',
-        'https://feeds.marketwatch.com/marketwatch/commodities',
-        'https://www.eia.gov/rss/feeds/oil_market.rss'
+        'https://news.google.com/rss/search?q=WTI%20crude%20oil&hl=en-US&gl=US&ceid=US:en',
+        'https://news.google.com/rss/search?q=global%20energy%20markets&hl=en-US&gl=US&ceid=US:en',
+        'https://news.google.com/rss/search?q=permian%20basin%20production&hl=en-US&gl=US&ceid=US:en'
       ];
 
       const formatRelativeTime = (input) => {
@@ -1226,9 +1331,33 @@
         return rtf.format(-days, 'day');
       };
 
+      const renderEmptyState = (title, message) => {
+        newsGrid.innerHTML = '';
+        const container = document.createElement('div');
+        container.className = 'news-empty';
+        const heading = document.createElement('strong');
+        heading.textContent = title;
+        container.appendChild(heading);
+        if (message) {
+          const body = document.createElement('span');
+          body.textContent = message;
+          container.appendChild(body);
+        }
+        newsGrid.appendChild(container);
+        newsGrid.setAttribute('aria-busy', 'false');
+      };
+
       const renderNews = () => {
         newsGrid.innerHTML = '';
-        const filtered = newsState.category === 'all' ? newsState.items : newsState.items.filter(item => item.category === newsState.category);
+        const filtered = newsState.category === 'all'
+          ? newsState.items
+          : newsState.items.filter(item => item.category === newsState.category);
+
+        if (!filtered.length) {
+          renderEmptyState('No energy intelligence yet', 'Refresh the feed to pull the latest briefings.');
+          return;
+        }
+
         const limit = Math.max(newsState.page * newsState.pageSize, newsState.pageSize);
         filtered.slice(0, limit).forEach(item => {
           const article = document.createElement('article');
@@ -1255,11 +1384,20 @@
             </div>`;
           newsGrid.appendChild(article);
         });
+        newsGrid.setAttribute('aria-busy', 'false');
       };
 
       const loadNews = async (refresh = false) => {
         if (newsState.loading) return;
+        const totalPagesAvailable = newsState.items.length ? Math.ceil(newsState.items.length / newsState.pageSize) : 0;
+        if (!refresh && newsState.page < totalPagesAvailable) {
+          newsState.page += 1;
+          renderNews();
+          return;
+        }
+        const previousPage = newsState.page;
         newsState.loading = true;
+        newsGrid.setAttribute('aria-busy', 'true');
         if (refresh) {
           newsState.page = 0;
           newsState.items = [];
@@ -1267,22 +1405,56 @@
         try {
           indicator('Aggregating global energy signals…', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3l2 4 4 .5-3 3.2.8 4.3L10 13l-3.8 1.5.8-4.3-3-3.2 4-.5z"/></svg>');
           const results = await Promise.allSettled(NEWS_SOURCES.map(src => fetchWithFallback(src, { raw: true })));
-          const articles = results.flatMap(res => res.status === 'fulfilled' ? enrichNews(parseRSS(res.value)) : []);
-          if (!articles.length) throw new Error('No articles');
-          newsState.items = refresh ? articles : [...newsState.items, ...articles];
-          newsState.page += 1;
+          const parsedArticles = results.flatMap(res => (res.status === 'fulfilled' ? parseRSS(res.value) : []));
+          if (!parsedArticles.length) throw new Error('No articles');
+
+          const existingLinks = new Set(newsState.items.map(item => item.link));
+          const uniqueArticles = [];
+          for (const article of parsedArticles) {
+            const key = article.link || article.title;
+            if (!key || existingLinks.has(key)) continue;
+            existingLinks.add(key);
+            uniqueArticles.push(article);
+          }
+
+          if (!uniqueArticles.length) {
+            newsState.page = newsState.items.length ? Math.max(1, Math.ceil(newsState.items.length / newsState.pageSize)) : 0;
+            renderNews();
+            if (refresh) {
+              indicator('Briefing already up to date', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 11l3 3 9-9"/></svg>');
+            }
+            return;
+          }
+
+          uniqueArticles.sort((a, b) => new Date(b.pubDate || 0) - new Date(a.pubDate || 0));
+          const enriched = enrichNews(uniqueArticles, newsState.items.length);
+          newsState.items = refresh ? enriched : [...newsState.items, ...enriched];
+          const totalPages = newsState.items.length ? Math.ceil(newsState.items.length / newsState.pageSize) : 0;
+          if (!totalPages) {
+            newsState.page = 0;
+          } else if (refresh) {
+            newsState.page = 1;
+          } else {
+            newsState.page = Math.min(totalPages, previousPage + 1);
+          }
           saveCache(STORAGE_KEYS.NEWS, newsState.items);
           renderNews();
           indicator('Energy briefing refreshed', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 10l4 4 6-8"/></svg>');
         } catch (err) {
           console.warn('News fetch failed', err);
-          const cached = readCache(STORAGE_KEYS.NEWS, 1000 * 60 * 60 * 6);
-          if (cached) {
-            newsState.items = cached;
-            newsState.page = 1;
-            renderNews();
-            indicator('Loaded cached briefing dossier', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h12v12H4z"/><path d="M4 9h12"/><path d="M9 4v12"/></svg>');
-            showOffline(true);
+          if (!newsState.items.length || refresh) {
+            const cached = readCache(STORAGE_KEYS.NEWS, 1000 * 60 * 60 * 6);
+            if (cached?.length) {
+              newsState.items = cached;
+              const totalPages = newsState.items.length ? Math.ceil(newsState.items.length / newsState.pageSize) : 0;
+              newsState.page = totalPages ? 1 : 0;
+              renderNews();
+              indicator('Loaded cached briefing dossier', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h12v12H4z"/><path d="M4 9h12"/><path d="M9 4v12"/></svg>');
+              showOffline(true);
+            } else {
+              renderEmptyState('Unable to reach briefing feeds', 'Check your connection or try again later.');
+              indicator('Unable to reach briefing feeds', '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 3l7 12H3l7-12z"/><path d="M10 8v4"/><path d="M10 14h.01"/></svg>');
+            }
           }
         } finally {
           newsState.loading = false;
@@ -1513,13 +1685,16 @@ self.addEventListener('fetch', event => {
       const hydrateFromCache = () => {
         const cachedPrice = readCache(STORAGE_KEYS.PRICE, 1000 * 60 * 60);
         if (cachedPrice) {
-          updatePriceUI(cachedPrice.meta);
-          updateChart(parseChartData(cachedPrice.candles));
+          const candles = parseChartData(cachedPrice.candles);
+          const meta = derivePriceMeta(cachedPrice.meta ?? {}, candles);
+          updatePriceUI(meta);
+          updateChart(candles);
         }
         const cachedNews = readCache(STORAGE_KEYS.NEWS, 1000 * 60 * 60 * 6);
         if (cachedNews) {
           newsState.items = cachedNews;
-          newsState.page = 1;
+          const totalPages = newsState.items.length ? Math.ceil(newsState.items.length / newsState.pageSize) : 0;
+          newsState.page = totalPages ? 1 : 0;
           renderNews();
         }
       };
