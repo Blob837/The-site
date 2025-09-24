@@ -776,6 +776,198 @@
   </nav>
 
   <script>
+    (() => {
+      'use strict';
+
+      const $ = (selector, context = document) => context.querySelector(selector);
+      const qsa = (selector, context = document) => Array.from(context.querySelectorAll(selector));
+
+      const priceValueEl = $('#priceValue strong');
+      const priceChangeEl = $('#priceChange');
+      const metricsEl = $('#priceMetrics');
+      const marketStatusTitle = $('#marketStatusTitle');
+      const marketStatusMeta = $('#marketStatusMeta');
+      const marketStatusDot = $('#marketStatusDot');
+      const chartCanvas = document.getElementById('priceChart');
+      const ctx = chartCanvas ? chartCanvas.getContext('2d') : null;
+      const chartOverlay = document.getElementById('chartOverlay');
+      const newsGrid = document.getElementById('newsGrid');
+      const newsTabs = qsa('.news-tab');
+      const timeframeButtons = qsa('.timeframe-button');
+      const gestureNav = document.querySelector('.gesture-nav');
+      const floatingIndicators = document.querySelector('.floating-indicators');
+      const pullIndicator = document.querySelector('.pull-indicator');
+      const offlineBanner = document.querySelector('.offline-banner');
+
+      if (!priceValueEl || !priceChangeEl || !metricsEl || !marketStatusTitle || !marketStatusMeta || !marketStatusDot || !chartCanvas || !ctx || !chartOverlay || !newsGrid || !floatingIndicators || !pullIndicator || !gestureNav || !offlineBanner) {
+        console.warn('Quantum Crude Intelligence: required interface nodes missing');
+        return;
+      }
+
+      ctx.imageSmoothingEnabled = false;
+
+      const STORAGE_KEYS = Object.freeze({
+        PRICE: 'qci:price:v1',
+        NEWS: 'qci:news:v1'
+      });
+
+      const chartState = {
+        candles: [],
+        timeframe: { range: '1d', interval: '5m' },
+        timeframeZoom: 1.1,
+        offset: 0,
+        overlay: null
+      };
+
+      const chartInteraction = {
+        isPointerDown: false,
+        originX: 0,
+        startOffset: 0
+      };
+
+      const newsState = {
+        items: [],
+        page: 0,
+        pageSize: 6,
+        category: 'all',
+        loading: false
+      };
+
+      let isOffline = false;
+      let pullStart = null;
+
+      const formatNumber = (value, options = {}) => {
+        if (!Number.isFinite(value)) return '--';
+        return new Intl.NumberFormat('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+          ...options
+        }).format(value);
+      };
+
+      const formatPercent = (value) => {
+        if (!Number.isFinite(value)) return '--';
+        return new Intl.NumberFormat('en-US', {
+          style: 'percent',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(value / 100);
+      };
+
+      const indicator = (message, iconMarkup = '') => {
+        if (!floatingIndicators) return;
+        const indicatorEl = document.createElement('div');
+        indicatorEl.className = 'indicator';
+        if (iconMarkup) {
+          indicatorEl.insertAdjacentHTML('beforeend', iconMarkup);
+        }
+        const textSpan = document.createElement('span');
+        textSpan.textContent = message;
+        indicatorEl.appendChild(textSpan);
+        floatingIndicators.appendChild(indicatorEl);
+        while (floatingIndicators.children.length > 3) {
+          floatingIndicators.firstElementChild.remove();
+        }
+        setTimeout(() => {
+          indicatorEl.remove();
+        }, 4200);
+      };
+
+      const minutesToLabel = (minutes) => {
+        const hrs = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        if (hrs <= 0) return `${mins}m`;
+        return `${hrs}h ${mins}m`;
+      };
+
+      const getMarketSession = () => {
+        const now = new Date();
+        const ny = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+        const day = ny.getDay();
+        const isWeekend = day === 0 || day === 6;
+        const openTime = new Date(ny);
+        openTime.setHours(9, 30, 0, 0);
+        const closeTime = new Date(ny);
+        closeTime.setHours(16, 0, 0, 0);
+
+        const diffInMinutes = (target) => Math.max(0, Math.round((target - ny) / 60000));
+        const formatTime = (date) => date.toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          timeZone: 'America/New_York'
+        });
+
+        if (isWeekend) {
+          const nextOpen = new Date(openTime);
+          nextOpen.setDate(openTime.getDate() + (day === 6 ? 2 : 1));
+          return {
+            status: 'Standby',
+            message: 'Weekend maintenance',
+            open: false,
+            openIn: minutesToLabel(diffInMinutes(nextOpen))
+          };
+        }
+
+        if (ny < openTime) {
+          return {
+            status: 'Standby',
+            message: `Pre-market — opens ${formatTime(openTime)} ET`,
+            open: false,
+            openIn: minutesToLabel(diffInMinutes(openTime))
+          };
+        }
+
+        if (ny >= closeTime) {
+          const nextOpen = new Date(openTime);
+          nextOpen.setDate(openTime.getDate() + (day === 5 ? 3 : 1));
+          return {
+            status: 'Standby',
+            message: `Closed — resumes ${formatTime(nextOpen)} ET`,
+            open: false,
+            openIn: minutesToLabel(diffInMinutes(nextOpen))
+          };
+        }
+
+        return {
+          status: 'Live',
+          message: `Closes in ${minutesToLabel(diffInMinutes(closeTime))}`,
+          open: true,
+          openIn: ''
+        };
+      };
+
+      const fetchWithFallback = async (url, { raw = false, timeout = 9000 } = {}) => {
+        const attempt = async (target) => {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), timeout);
+          try {
+            const response = await fetch(target, { signal: controller.signal, cache: 'no-store' });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const text = await response.text();
+            return raw ? text : JSON.parse(text);
+          } finally {
+            clearTimeout(timer);
+          }
+        };
+
+        const sources = [
+          url,
+          `https://cors.isomorphic-git.org/${url}`,
+          `https://corsproxy.io/?${encodeURIComponent(url)}`,
+          `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+        ];
+
+        let lastError;
+        for (const source of sources) {
+          try {
+            return await attempt(source);
+          } catch (error) {
+            lastError = error;
+          }
+        }
+        throw lastError ?? new Error('Network request failed');
+      };
+
       const updateMarketStatus = () => {
         const session = getMarketSession();
         marketStatusTitle.textContent = `${session.status} — ${session.message}`;
