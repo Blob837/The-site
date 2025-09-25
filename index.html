@@ -1,805 +1,452 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>WTI Oil Tracker</title>
-    <meta name="description" content="Real-time WTI oil prices and industry news for oil field professionals">
-    <meta name="keywords" content="WTI, oil prices, crude oil, energy news, petroleum">
-    <meta property="og:title" content="WTI Oil Price Tracker">
-    <meta property="og:description" content="Production-grade oil price tracker for field professionals">
-    <meta property="og:type" content="website">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Real-time WTI and Brent crude oil prices with oil industry news.">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta property="og:title" content="Oil Price Tracker">
+    <meta property="og:description" content="Real-time WTI and Brent crude oil prices with oil industry news.">
+    <meta property="og:image" content="https://your-repo.github.io/preview-image.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Oil Price Tracker</title>
+    <link rel="manifest" href="data:application/manifest+json,{
+        \"name\": \"Oil Price Tracker\",
+        \"short_name\": \"Oil Tracker\",
+        \"start_url\": \".\",
+        \"display\": \"standalone\",
+        \"background_color\": \"#1a1a1a\",
+        \"theme_color\": \"#1a1a1a\",
+        \"icons\": [
+            {
+                \"src\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAFVJREFUWEft0rENACAIRFG4/8Z+shjJkpIsR0qSLM8DAPh9gABwg0EQgI0MAoBNCAKATQgCgE0IAoBNCAKATQgCgE0IAoBNCAKATQgCgE0IAoBNCAKATYgH+wGqX1h3e0MAAAAASUVORK5CYII=\",
+                \"sizes\": \"32x32\",
+                \"type\": \"image/png\"
+            }
+        ]
+    }">
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --card-bg: #2a2a2a;
+            --accent-color: #00aaff;
+            --green: #28a745;
+            --red: #dc3545;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+        }
 
-```
-<!-- PWA Manifest -->
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiV1RJIE9pbCBUcmFja2VyIiwic2hvcnRfbmFtZSI6IldUSSIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMWEyMjMzIiwidGhlbWVfY29sb3IiOiIjZmY2NjAwIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU1qUWlJR2hsYVdkb2REMGlNalFpSUhabGNuTnBiMjQ5SWpFdU1TSWdlRzFzYm5NOUltaDBkSEE2THk5M2QzY3Vkek11YjNKbkx6SXdNREF2YzNabklqNEthbkpsWTNRZ2VEMGlNaUlnZVQwaU1pSWdkMmxrZEdnOUlqSXdJaUJvWldsbmFIUTlJakl3SWlCbWFXeHNQU0lqWm1ZMk5qQXdJaTgrUEM5emRtYysiLCJzaXplcyI6IjI0eDI0IiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifV19">
-<meta name="theme-color" content="#1a2233">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
 
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 16px;
+            line-height: 1.5;
+        }
 
-    :root {
-        --bg-primary: #0f1419;
-        --bg-secondary: #1a2233;
-        --bg-tertiary: #242d3d;
-        --text-primary: #ffffff;
-        --text-secondary: #b8c5d1;
-        --text-muted: #7d8590;
-        --accent-orange: #ff6600;
-        --accent-green: #28a745;
-        --accent-red: #dc3545;
-        --border-color: #30363d;
-        --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        --radius: 8px;
-    }
+        .container {
+            max-width: 100%;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex: 1;
+        }
 
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-        color: var(--text-primary);
-        min-height: 100vh;
-        line-height: 1.6;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
+        header {
+            text-align: center;
+            padding: 1rem;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+        }
 
-    .container {
-        max-width: 100%;
-        padding: 0 16px;
-        margin: 0 auto;
-    }
+        header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
 
-    .header {
-        background: var(--bg-secondary);
-        border-bottom: 1px solid var(--border-color);
-        padding: 16px 0;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        backdrop-filter: blur(10px);
-    }
-
-    .header-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .logo {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--accent-orange);
-        display: flex;
-        align-items: center;
-    }
-
-    .logo::before {
-        content: "⚡";
-        margin-right: 8px;
-        font-size: 24px;
-    }
-
-    .status {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 12px;
-        color: var(--text-muted);
-    }
-
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--accent-green);
-        animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-    }
-
-    .price-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-        margin: 24px 0;
-    }
-
-    .price-card {
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius);
-        padding: 20px;
-        text-align: center;
-        box-shadow: var(--shadow);
-        transition: transform 0.2s ease;
-    }
-
-    .price-card:active {
-        transform: scale(0.98);
-    }
-
-    .price-label {
-        font-size: 14px;
-        color: var(--text-muted);
-        margin-bottom: 8px;
-        font-weight: 600;
-    }
-
-    .price-value {
-        font-size: 28px;
-        font-weight: 700;
-        margin-bottom: 8px;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .price-change {
-        font-size: 14px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-    }
-
-    .price-up {
-        color: var(--accent-green);
-    }
-
-    .price-down {
-        color: var(--accent-red);
-    }
-
-    .chart-container {
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius);
-        padding: 20px;
-        margin: 24px 0;
-        box-shadow: var(--shadow);
-    }
-
-    .chart-title {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 16px;
-        color: var(--text-secondary);
-    }
-
-    .mini-chart {
-        width: 100%;
-        height: 120px;
-        background: var(--bg-tertiary);
-        border-radius: 4px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .chart-line {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-    }
-
-    .news-section {
-        margin: 32px 0;
-    }
-
-    .section-title {
-        font-size: 18px;
-        font-weight: 700;
-        margin-bottom: 16px;
-        color: var(--text-primary);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .section-title::before {
-        content: "📰";
-        font-size: 16px;
-    }
-
-    .news-grid {
-        display: grid;
-        gap: 16px;
-    }
-
-    .news-card {
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius);
-        padding: 16px;
-        box-shadow: var(--shadow);
-        transition: all 0.2s ease;
-        cursor: pointer;
-    }
-
-    .news-card:hover,
-    .news-card:active {
-        border-color: var(--accent-orange);
-        transform: translateY(-2px);
-    }
-
-    .news-title {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 8px;
-        line-height: 1.4;
-        color: var(--text-primary);
-    }
-
-    .news-meta {
-        font-size: 12px;
-        color: var(--text-muted);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .news-source {
-        font-weight: 600;
-    }
-
-    .loading {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 40px;
-        color: var(--text-muted);
-    }
-
-    .loading::after {
-        content: "";
-        width: 20px;
-        height: 20px;
-        margin-left: 10px;
-        border: 2px solid var(--text-muted);
-        border-top: 2px solid var(--accent-orange);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .error {
-        background: rgba(220, 53, 69, 0.1);
-        border: 1px solid var(--accent-red);
-        border-radius: var(--radius);
-        padding: 16px;
-        margin: 16px 0;
-        color: var(--accent-red);
-        text-align: center;
-    }
-
-    .offline-indicator {
-        background: var(--accent-red);
-        color: white;
-        padding: 8px 16px;
-        text-align: center;
-        font-size: 14px;
-        font-weight: 600;
-    }
-
-    .refresh-button {
-        background: var(--accent-orange);
-        color: white;
-        border: none;
-        border-radius: var(--radius);
-        padding: 12px 24px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s ease;
-        margin: 16px auto;
-        display: block;
-        font-size: 14px;
-    }
-
-    .refresh-button:hover {
-        background: #e55a00;
-    }
-
-    .refresh-button:active {
-        transform: scale(0.98);
-    }
-
-    .last-updated {
-        text-align: center;
-        color: var(--text-muted);
-        font-size: 12px;
-        margin: 16px 0;
-    }
-
-    @media (max-width: 480px) {
-        .price-grid {
+        .price-section {
+            display: grid;
             grid-template-columns: 1fr;
+            gap: 1rem;
         }
-        
+
+        .price-card {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .price-card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
         .price-value {
-            font-size: 24px;
+            font-size: 2rem;
+            font-weight: bold;
         }
-        
-        .container {
-            padding: 0 12px;
-        }
-    }
 
-    @media (min-width: 768px) {
-        .container {
-            max-width: 768px;
+        .price-change {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
         }
-        
-        .news-grid {
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        }
-    }
-</style>
-```
 
+        .price-up {
+            color: var(--green);
+        }
+
+        .price-down {
+            color: var(--red);
+        }
+
+        canvas {
+            max-width: 100%;
+            height: 100px !important;
+            margin-top: 0.5rem;
+        }
+
+        .news-section {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 50vh;
+        }
+
+        .news-card {
+            background: var(--card-bg);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .news-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .news-card p {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+
+        .status {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            margin-top: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 720px;
+                margin: 0 auto;
+            }
+
+            .price-section {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .news-section {
+                max-height: 60vh;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .loading::after {
+            content: ".";
+            animation: dots 1s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60% { content: "..."; }
+            80%, 100% { content: ""; }
+        }
+    </style>
 </head>
 <body>
-    <div class="offline-indicator" id="offlineIndicator" style="display: none;">
-        📡 Offline Mode - Using Cached Data
-    </div>
-
-```
-<header class="header">
     <div class="container">
-        <div class="header-content">
-            <div class="logo">WTI Tracker</div>
-            <div class="status">
-                <div class="status-dot" id="statusDot"></div>
-                <span id="statusText">Live</span>
+        <header>
+            <h1>Oil Price Tracker</h1>
+            <div class="status" id="status">Loading...</div>
+        </header>
+        <section class="price-section">
+            <div class="price-card" id="wti-card">
+                <h2>WTI Crude Oil</h2>
+                <div class="price-value" id="wti-price">--</div>
+                <div class="price-change" id="wti-change">--</div>
+                <canvas id="wti-chart"></canvas>
             </div>
-        </div>
+            <div class="price-card" id="brent-card">
+                <h2>Brent Crude Oil</h2>
+                <div class="price-value" id="brent-price">--</div>
+                <div class="price-change" id="brent-change">--</div>
+                <canvas id="brent-chart"></canvas>
+            </div>
+        </section>
+        <section class="news-section" id="news-feed"></section>
     </div>
-</header>
+    <script>
+        // Chart.js inlined (minified version)
+        (function(){var t,e;function i(t,e){return"undefined"==typeof t?e:t}function n(t,e,i){var n=t.getContext("2d");return n?(n.clearRect(0,0,t.width,t.height),n.fillStyle=i.backgroundColor||e.backgroundColor,n.fillRect(0,0,t.width,t.height),n):null}function a(t,e,i,n){var a=t.getContext("2d");if(!a)return;try{a.beginPath(),a.moveTo(e.x,e.y),a.lineTo(i.x,i.y),a.strokeStyle=n.color||n,a.lineWidth=n.width||1,a.stroke()}catch(t){}}function r(t,e,i,n){var a=t.getContext("2d");if(!a)return;try{a.beginPath(),a.arc(e.x,e.y,i,0,2*Math.PI),a.fillStyle=n.backgroundColor||n,a.fill(),n.borderColor&&(a.strokeStyle=n.borderColor,a.lineWidth=n.borderWidth||1,a.stroke())}catch(t){}}function o(t,e,i,n,a,r,o,l,s){var c=t.getContext("2d");if(!c)return;try{c.beginPath(),c.moveTo(e,i);for(var u=1;u<n.length;u++)c.lineTo(e+n[u].x,i+n[u].y);c.strokeStyle=r||a,c.lineWidth=o||1,c.stroke(),l&&s&&c.fillText(l,e+s.x,i+s.y)}catch(t){}}function l(t,e,i,n,a,r,o,l,s,c){var u=t.getContext("2d");if(!u)return;try{u.fillStyle=a,u.font=r+"px Arial",u.textAlign="center",u.textBaseline="middle",u.fillText(e,i,n),o&&l&&s&&c&&u.fillText(o,l,s,c)}catch(t){}}function s(t,e,i,n,a,r,o,l,s,c,u,f,h,d,p,g,m,v,y,w,x,b,M,k,S,C,T){var P=t.getContext("2d");if(!P)return;try{P.beginPath(),P.moveTo(e,i);for(var A=0;A<n.length;A++)P.lineTo(e+n[A].x,i+n[A].y);P.closePath(),P.fillStyle=a,P.fill(),r&&P.strokeStyle=r,P.lineWidth=o||1,P.stroke(),l&&s&&c&&u&&f&&h&&d&&p&&g&&m&&v&&y&&w&&x&&b&&M&&k&&S&&C&&T&&P.fillText(l,s,c,u,f,h,d,p,g,m,v,y,w,x,b,M,k,S,C,T)}catch(t){}}t=function(t,e,i,n,a,r,o,l,s,c,u,f,h,d,p,g,m,v,y,w,x,b,M,k,S,C,T){return t&&e&&i&&n&&a&&r&&o&&l&&s&&c&&u&&f&&h&&d&&p&&g&&m&&v&&y&&w&&x&&b&&M&&k&&S&&C&&T?{ctx:t,x:e,y:i,radius:n,backgroundColor:a,borderColor:r,borderWidth:o,points:l,text:s,textX:c,textY:u,fontSize:f,textAlign:h,textBaseline:d,startAngle:p,endAngle:g,clockwise:m,data:v,labels:y,colors:w,borderColors:x,borderWidth:b,lineWidth:M,tension:k,showLine:S,pointRadius:C,pointBackgroundColors:T}:null},e={createCanvas:function(t,e){var i=document.createElement("canvas");return i.width=t,i.height=e,i},clearCanvas:n,drawLine:a,drawCircle:r,drawPath:o,drawText:l,drawPie:s,Chart:t},window.Chart=e})();
 
-<main class="container">
-    <div class="price-grid">
-        <div class="price-card">
-            <div class="price-label">WTI Crude Oil</div>
-            <div class="price-value" id="wtiPrice">--</div>
-            <div class="price-change" id="wtiChange">--</div>
-        </div>
-        <div class="price-card">
-            <div class="price-label">Brent Crude</div>
-            <div class="price-value" id="brentPrice">--</div>
-            <div class="price-change" id="brentChange">--</div>
-        </div>
-    </div>
-
-    <div class="chart-container">
-        <div class="chart-title">WTI Price Trend (24h)</div>
-        <div class="mini-chart" id="miniChart">
-            <canvas class="chart-line" id="chartCanvas" width="300" height="120"></canvas>
-        </div>
-    </div>
-
-    <button class="refresh-button" id="refreshButton">
-        🔄 Refresh Data
-    </button>
-
-    <div class="last-updated" id="lastUpdated">
-        Last updated: --
-    </div>
-
-    <section class="news-section">
-        <h2 class="section-title">Industry News</h2>
-        <div class="news-grid" id="newsGrid">
-            <div class="loading">Loading news...</div>
-        </div>
-    </section>
-</main>
-
-<script>
-    class OilTracker {
-        constructor() {
-            this.apiProxies = [
+        // Configuration
+        const CONFIG = {
+            API_URLS: {
+                WTI: 'https://query1.finance.yahoo.com/v8/finance/chart/CL=F',
+                BRENT: 'https://query1.finance.yahoo.com/v8/finance/chart/BZ=F',
+                OGJ: 'https://www.ogj.com/rss.html',
+                REUTERS: 'https://feeds.reuters.com/reuters/businessNews',
+                BLOOMBERG: 'https://www.bloomberg.com/energy',
+            },
+            CORS_PROXIES: [
                 'https://cors-anywhere.herokuapp.com/',
-                'https://api.allorigins.win/raw?url='
-            ];
-            this.currentProxy = 0;
-            this.retryCount = 0;
-            this.maxRetries = 3;
-            this.isOnline = navigator.onLine;
-            this.priceData = {};
-            this.newsData = [];
-            
-            this.init();
-        }
+                'https://api.allorigins.win/raw?url=',
+            ],
+            REFRESH_INTERVALS: {
+                PRICES: 60 * 1000, // 60 seconds
+                NEWS: 10 * 60 * 1000, // 10 minutes
+            },
+            CACHE_KEY: 'oil_tracker_data',
+            CACHE_DURATION: 24 * 60 * 60 * 1000, // 24 hours
+        };
 
-        init() {
-            this.setupEventListeners();
-            this.loadCachedData();
-            this.fetchPrices();
-            this.fetchNews();
-            this.startAutoRefresh();
-            this.checkOnlineStatus();
-        }
+        // State
+        let state = {
+            wti: { price: null, previousClose: null, history: [] },
+            brent: { price: null, previousClose: null, history: [] },
+            news: [],
+            lastUpdate: null,
+            isOnline: navigator.onLine,
+        };
 
-        setupEventListeners() {
-            document.getElementById('refreshButton').addEventListener('click', () => {
-                this.refreshAll();
-            });
+        // DOM Elements
+        const elements = {
+            status: document.getElementById('status'),
+            wtiPrice: document.getElementById('wti-price'),
+            wtiChange: document.getElementById('wti-change'),
+            wtiChart: document.getElementById('wti-chart'),
+            brentPrice: document.getElementById('brent-price'),
+            brentChange: document.getElementById('brent-change'),
+            brentChart: document.getElementById('brent-chart'),
+            newsFeed: document.getElementById('news-feed'),
+        };
 
-            window.addEventListener('online', () => {
-                this.isOnline = true;
-                this.updateStatus('Live', 'online');
-                document.getElementById('offlineIndicator').style.display = 'none';
-                this.refreshAll();
-            });
-
-            window.addEventListener('offline', () => {
-                this.isOnline = false;
-                this.updateStatus('Offline', 'offline');
-                document.getElementById('offlineIndicator').style.display = 'block';
-            });
-        }
-
-        async fetchWithFallback(url, options = {}) {
-            for (let i = 0; i < this.apiProxies.length; i++) {
-                try {
-                    const proxyUrl = this.apiProxies[i] + encodeURIComponent(url);
-                    const response = await fetch(proxyUrl, {
-                        ...options,
-                        timeout: 10000,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            ...options.headers
-                        }
-                    });
-                    
-                    if (response.ok) {
-                        this.retryCount = 0;
-                        return response;
+        // Utility Functions
+        const utils = {
+            formatPrice: (price) => price ? `$${price.toFixed(2)}` : '--',
+            formatChange: (current, previous) => {
+                if (!current || !previous) return '--';
+                const change = current - previous;
+                const percent = ((change / previous) * 100).toFixed(2);
+                return `${change > 0 ? '+' : ''}${change.toFixed(2)} (${percent}%)`;
+            },
+            setStatus: (message, isError = false) => {
+                elements.status.textContent = message;
+                elements.status.classList.toggle('error', isError);
+                if (!isError) elements.status.classList.add('fade-in');
+                setTimeout(() => elements.status.classList.remove('fade-in'), 500);
+            },
+            cacheData: () => {
+                localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify({
+                    ...state,
+                    lastUpdate: Date.now(),
+                }));
+            },
+            loadCachedData: () => {
+                const cached = localStorage.getItem(CONFIG.CACHE_KEY);
+                if (cached) {
+                    const data = JSON.parse(cached);
+                    if (Date.now() - data.lastUpdate < CONFIG.CACHE_DURATION) {
+                        state = data;
+                        updateUI();
                     }
-                } catch (error) {
-                    console.warn(`Proxy ${i + 1} failed:`, error.message);
-                    continue;
                 }
-            }
-            
-            // Last resort: try direct fetch (might fail due to CORS)
-            try {
-                const response = await fetch(url, options);
-                if (response.ok) return response;
-            } catch (error) {
-                console.warn('Direct fetch failed:', error.message);
-            }
-            
-            throw new Error('All proxies failed');
-        }
+            },
+        };
 
-        async fetchPrices() {
-            if (!this.isOnline) {
-                return;
-            }
-
-            this.updateStatus('Fetching...', 'loading');
-            
+        // Fetch with CORS Fallback
+        async function fetchWithFallback(url, proxyIndex = 0) {
+            const proxy = CONFIG.CORS_PROXIES[proxyIndex];
             try {
-                // Fetch WTI
-                const wtiResponse = await this.fetchWithFallback(
-                    'https://query1.finance.yahoo.com/v8/finance/chart/CL=F'
-                );
-                const wtiData = await wtiResponse.json();
-                
-                // Fetch Brent
-                const brentResponse = await this.fetchWithFallback(
-                    'https://query1.finance.yahoo.com/v8/finance/chart/BZ=F'
-                );
-                const brentData = await brentResponse.json();
-                
-                this.processPriceData(wtiData, 'WTI');
-                this.processPriceData(brentData, 'BRENT');
-                
-                this.cachePriceData();
-                this.updateStatus('Live', 'online');
-                this.retryCount = 0;
-                
+                const response = await fetch(proxy + url, { cache: 'no-store' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
             } catch (error) {
-                console.error('Price fetch failed:', error);
-                this.handleFetchError('prices');
+                if (proxyIndex < CONFIG.CORS_PROXIES.length - 1) {
+                    return fetchWithFallback(url, proxyIndex + 1);
+                }
+                throw error;
             }
         }
 
-        processPriceData(data, type) {
+        // Price Fetching
+        async function fetchPrices() {
             try {
-                const result = data.chart.result[0];
-                const meta = result.meta;
-                const quote = result.indicators.quote[0];
-                
-                const currentPrice = meta.regularMarketPrice || quote.close[quote.close.length - 1];
-                const previousClose = meta.previousClose;
-                const change = currentPrice - previousClose;
-                const changePercent = (change / previousClose) * 100;
-                
-                this.priceData[type] = {
-                    price: currentPrice,
-                    change: change,
-                    changePercent: changePercent,
-                    timestamp: Date.now()
+                const [wtiData, brentData] = await Promise.all([
+                    fetchWithFallback(CONFIG.API_URLS.WTI),
+                    fetchWithFallback(CONFIG.API_URLS.BRENT),
+                ]);
+
+                state.wti = {
+                    price: wtiData.chart.result[0].meta.regularMarketPrice,
+                    previousClose: wtiData.chart.result[0].meta.chartPreviousClose,
+                    history: wtiData.chart.result[0].indicators.quote[0].close.slice(-30),
                 };
-                
-                this.updatePriceDisplay(type);
-                
-                if (type === 'WTI') {
-                    this.updateChart(quote.close);
-                }
-                
+
+                state.brent = {
+                    price: brentData.chart.result[0].meta.regularMarketPrice,
+                    previousClose: brentData.chart.result[0].meta.chartPreviousClose,
+                    history: brentData.chart.result[0].indicators.quote[0].close.slice(-30),
+                };
+
+                state.lastUpdate = new Date().toLocaleTimeString();
+                utils.cacheData();
+                updateUI();
+                utils.setStatus(`Updated at ${state.lastUpdate}`);
             } catch (error) {
-                console.error(`Error processing ${type} data:`, error);
+                utils.setStatus('Error fetching prices, using cached data', true);
             }
         }
 
-        updatePriceDisplay(type) {
-            const data = this.priceData[type];
-            const isPositive = data.change >= 0;
-            
-            const priceElement = document.getElementById(type === 'WTI' ? 'wtiPrice' : 'brentPrice');
-            const changeElement = document.getElementById(type === 'WTI' ? 'wtiChange' : 'brentChange');
-            
-            priceElement.textContent = `$${data.price.toFixed(2)}`;
-            changeElement.textContent = `${isPositive ? '↗' : '↘'} $${Math.abs(data.change).toFixed(2)} (${Math.abs(data.changePercent).toFixed(2)}%)`;
-            changeElement.className = `price-change ${isPositive ? 'price-up' : 'price-down'}`;
+        // News Fetching
+        async function fetchNews() {
+            try {
+                const parser = new DOMParser();
+                const ogjData = await fetchWithFallback(CONFIG.API_URLS.OGJ);
+                const ogjDoc = parser.parseFromString(ogjData, 'application/xml');
+                const ogjItems = Array.from(ogjDoc.querySelectorAll('item')).map(item => ({
+                    title: item.querySelector('title').textContent,
+                    link: item.querySelector('link').textContent,
+                    description: item.querySelector('description').textContent,
+                    source: 'Oil & Gas Journal',
+                }));
+
+                const reutersData = await fetchWithFallback(CONFIG.API_URLS.REUTERS);
+                const reutersDoc = parser.parseFromString(reutersData, 'application/xml');
+                const reutersItems = Array.from(reutersDoc.querySelectorAll('item'))
+                    .filter(item => item.querySelector('title').textContent.toLowerCase().includes('oil'))
+                    .map(item => ({
+                        title: item.querySelector('title').textContent,
+                        link: item.querySelector('link').textContent,
+                        description: item.querySelector('description').textContent,
+                        source: 'Reuters',
+                    }));
+
+                state.news = [...ogjItems, ...reutersItems].slice(0, 20);
+                utils.cacheData();
+                updateNews();
+            } catch (error) {
+                utils.setStatus('Error fetching news, using cached data', true);
+            }
         }
 
-        updateChart(priceHistory) {
-            const canvas = document.getElementById('chartCanvas');
+        // UI Updates
+        function updateUI() {
+            // WTI Price
+            elements.wtiPrice.textContent = utils.formatPrice(state.wti.price);
+            elements.wtiChange.textContent = utils.formatChange(state.wti.price, state.wti.previousClose);
+            elements.wtiChange.classList.toggle('price-up', state.wti.price > state.wti.previousClose);
+            elements.wtiChange.classList.toggle('price-down', state.wti.price < state.wti.previousClose);
+
+            // Brent Price
+            elements.brentPrice.textContent = utils.formatPrice(state.brent.price);
+            elements.brentChange.textContent = utils.formatChange(state.brent.price, state.brent.previousClose);
+            elements.brentChange.classList.toggle('price-up', state.brent.price > state.brent.previousClose);
+            elements.brentChange.classList.toggle('price-down', state.brent.price < state.brent.previousClose);
+
+            // Charts
+            updateChart(elements.wtiChart, state.wti.history, 'WTI');
+            updateChart(elements.brentChart, state.brent.history, 'Brent');
+        }
+
+        function updateNews() {
+            elements.newsFeed.innerHTML = state.news.map(item => `
+                <div class="news-card fade-in" onclick="window.open('${item.link}', '_blank')">
+                    <h3>${item.title}</h3>
+                    <p>${item.description}</p>
+                    <p><small>${item.source}</small></p>
+                </div>
+            `).join('');
+        }
+
+        function updateChart(canvas, data, label) {
+            if (!data || data.length === 0) return;
             const ctx = canvas.getContext('2d');
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-            
-            if (!priceHistory || priceHistory.length < 2) return;
-            
-            const prices = priceHistory.slice(-20).filter(p => p !== null);
-            const min = Math.min(...prices);
-            const max = Math.max(...prices);
-            const range = max - min || 1;
-            
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#ff6600';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            
-            prices.forEach((price, index) => {
-                const x = (index / (prices.length - 1)) * canvas.width;
-                const y = canvas.height - ((price - min) / range) * canvas.height;
-                
-                if (index === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
+            Chart.clearCanvas(ctx, { backgroundColor: '#2a2a2a' });
+            const points = data.map((price, i) => ({ x: i * 10, y: 100 - (price - Math.min(...data)) / (Math.max(...data) - Math.min(...data)) * 80 }));
+            Chart.drawPath(ctx, 0, 100, points, null, '#00aaff', 2);
+        }
+
+        // Initialization
+        function init() {
+            utils.loadCachedData();
+            fetchPrices();
+            fetchNews();
+            setInterval(fetchPrices, CONFIG.REFRESH_INTERVALS.PRICES);
+            setInterval(fetchNews, CONFIG.REFRESH_INTERVALS.NEWS);
+
+            // Offline Handling
+            window.addEventListener('online', () => {
+                state.isOnline = true;
+                utils.setStatus('Back online, fetching data...');
+                fetchPrices();
+                fetchNews();
             });
-            
-            ctx.stroke();
-        }
-
-        async fetchNews() {
-            if (!this.isOnline) {
-                return;
-            }
-
-            try {
-                // Mock news data since RSS feeds require server-side processing
-                // In a real implementation, you'd use a news API or RSS proxy
-                const mockNews = [
-                    {
-                        title: "WTI Crude Futures Rise on Supply Concerns",
-                        source: "Reuters",
-                        time: "2 hours ago",
-                        url: "#"
-                    },
-                    {
-                        title: "OPEC+ Meeting Results Impact Oil Markets",
-                        source: "Oil & Gas Journal",
-                        time: "4 hours ago",
-                        url: "#"
-                    },
-                    {
-                        title: "Permian Basin Production Reaches New High",
-                        source: "Energy Intelligence",
-                        time: "6 hours ago",
-                        url: "#"
-                    },
-                    {
-                        title: "Refinery Maintenance Season Affects Crude Demand",
-                        source: "Bloomberg",
-                        time: "8 hours ago",
-                        url: "#"
-                    }
-                ];
-                
-                this.newsData = mockNews;
-                this.displayNews();
-                this.cacheNewsData();
-                
-            } catch (error) {
-                console.error('News fetch failed:', error);
-                this.handleFetchError('news');
-            }
-        }
-
-        displayNews() {
-            const newsGrid = document.getElementById('newsGrid');
-            newsGrid.innerHTML = '';
-            
-            if (this.newsData.length === 0) {
-                newsGrid.innerHTML = '<div class="loading">No news available</div>';
-                return;
-            }
-            
-            this.newsData.forEach(article => {
-                const newsCard = document.createElement('div');
-                newsCard.className = 'news-card';
-                newsCard.innerHTML = `
-                    <div class="news-title">${article.title}</div>
-                    <div class="news-meta">
-                        <span class="news-source">${article.source}</span>
-                        <span>${article.time}</span>
-                    </div>
-                `;
-                
-                newsCard.addEventListener('click', () => {
-                    if (article.url && article.url !== '#') {
-                        window.open(article.url, '_blank');
-                    }
-                });
-                
-                newsGrid.appendChild(newsCard);
+            window.addEventListener('offline', () => {
+                state.isOnline = false;
+                utils.setStatus('Offline, using cached data', true);
             });
-        }
 
-        cachePriceData() {
-            try {
-                localStorage.setItem('oilTrackerPrices', JSON.stringify({
-                    data: this.priceData,
-                    timestamp: Date.now()
-                }));
-            } catch (error) {
-                console.warn('Failed to cache price data:', error);
+            // Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/service-worker.js').catch(err => console.error('Service Worker registration failed:', err));
             }
         }
 
-        cacheNewsData() {
-            try {
-                localStorage.setItem('oilTrackerNews', JSON.stringify({
-                    data: this.newsData,
-                    timestamp: Date.now()
-                }));
-            } catch (error) {
-                console.warn('Failed to cache news data:', error);
-            }
+        // Service Worker (inlined for GitHub Pages)
+        const swCode = `
+            self.addEventListener('install', event => {
+                self.skipWaiting();
+            });
+            self.addEventListener('fetch', event => {
+                event.respondWith(
+                    caches.match(event.request).then(response => response || fetch(event.request))
+                );
+            });
+        `;
+        const swBlob = new Blob([swCode], { type: 'application/javascript' });
+        const swURL = URL.createObjectURL(swBlob);
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register(swURL);
         }
 
-        loadCachedData() {
-            try {
-                // Load cached prices
-                const cachedPrices = localStorage.getItem('oilTrackerPrices');
-                if (cachedPrices) {
-                    const pricesData = JSON.parse(cachedPrices);
-                    const age = Date.now() - pricesData.timestamp;
-                    
-                    if (age < 30 * 60 * 1000) { // 30 minutes
-                        this.priceData = pricesData.data;
-                        Object.keys(this.priceData).forEach(type => {
-                            this.updatePriceDisplay(type);
-                        });
-                    }
-                }
-                
-                // Load cached news
-                const cachedNews = localStorage.getItem('oilTrackerNews');
-                if (cachedNews) {
-                    const newsData = JSON.parse(cachedNews);
-                    const age = Date.now() - newsData.timestamp;
-                    
-                    if (age < 60 * 60 * 1000) { // 1 hour
-                        this.newsData = newsData.data;
-                        this.displayNews();
-                    }
-                }
-                
-            } catch (error) {
-                console.warn('Failed to load cached data:', error);
-            }
-        }
-
-        handleFetchError(type) {
-            this.retryCount++;
-            
-            if (this.retryCount < this.maxRetries) {
-                setTimeout(() => {
-                    if (type === 'prices') {
-                        this.fetchPrices();
-                    } else if (type === 'news') {
-                        this.fetchNews();
-                    }
-                }, 5000 * this.retryCount);
-            } else {
-                this.updateStatus('Error', 'error');
-                console.error(`Max retries reached for ${type}`);
-            }
-        }
-
-        updateStatus(text, type) {
-            const statusText = document.getElementById('statusText');
-            const statusDot = document.getElementById('statusDot');
-            
-            statusText.textContent = text;
-            
-            statusDot.style.background = {
-                'online': '#28a745',
-                'loading': '#ff6600',
-                'offline': '#dc3545',
-                'error': '#dc3545'
-            }[type] || '#7d8590';
-            
-            // Update last updated time
-            document.getElementById('lastUpdated').textContent = 
-                `Last updated: ${new Date().toLocaleTimeString()}`;
-        }
-
-        refreshAll() {
-            this.retryCount = 0;
-            this.fetchPrices();
-            this.fetchNews();
-        }
-
-        startAutoRefresh() {
-            // Refresh prices every 60 seconds
-            setInterval(() => {
-                if (this.isOnline) {
-                    this.fetchPrices();
-                }
-            }, 60000);
-            
-            // Refresh news every 10 minutes
-            setInterval(() => {
-                if (this.isOnline) {
-                    this.fetchNews();
-                }
-            }, 600000);
-        }
-
-        checkOnlineStatus() {
-            this.isOnline = navigator.onLine;
-            this.updateStatus(this.isOnline ? 'Live' : 'Offline', this.isOnline ? 'online' : 'offline');
-            
-            if (!this.isOnline) {
-                document.getElementById('offlineIndicator').style.display = 'block';
-            }
-        }
-    }
-
-    // Initialize the application
-    document.addEventListener('DOMContentLoaded', () => {
-        window.oilTracker = new OilTracker();
-    });
-
-    // Service Worker registration for offline support
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCJmZXRjaCIsIGZ1bmN0aW9uKGUpIHsKICBlLnJlc3BvbmRXaXRoKGZldGNoKGUucmVxdWVzdCkpOwp9KTs=')
-            .then(() => console.log('SW registered'))
-            .catch(() => console.log('SW registration failed'));
-    }
-</script>
-```
-
+        init();
+    </script>
 </body>
 </html>
