@@ -1,1685 +1,471 @@
+<!-- How to publish on GitHub Pages:
+1. Create a new repository on GitHub.
+2. Add this file as index.html to the repository.
+3. Go to Settings > Pages.
+4. Select 'main' branch and save.
+5. Wait a few minutes, then open the provided URL (e.g., https://username.github.io/repo).
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"/>
-  <title>UR NEWS - Stellar Intelligence</title>
-  <meta name="theme-color" content="#0a0e1a" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="Real-time intelligence terminal for breaking news and political analysis">
-  <style>
-    :root {
-      --bg-primary: #0a0e1a;
-      --bg-secondary: #121726;
-      --text-primary: #e0e4f5;
-      --text-secondary: #8a94b8;
-      --accent-primary: #5b6eff;
-      --accent-secondary: #00d1ff;
-      --success: #00e5a3;
-      --warning: #ffb74d;
-      --error: #ff4d6d;
-      --border: rgba(255,255,255,0.05);
-      --shadow-soft: 0 4px 12px rgba(0,0,0,0.2);
-      --shadow-deep: 0 8px 24px rgba(0,0,0,0.3);
-      --gradient-primary: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      --gradient-bg: radial-gradient(circle at top, rgba(18,23,38,1) 0%, rgba(10,14,26,1) 100%);
-      --tone-very-positive: #00e5a3;
-      --tone-positive: #4cd4ff;
-      --tone-neutral: #8a94b8;
-      --tone-negative: #ff8c4d;
-      --tone-very-negative: #ff4d6d;
-      --bias-left: #4c6eff;
-      --bias-left-soft: #6e8aff;
-      --bias-center: #8a94b8;
-      --bias-right-soft: #ff7a7a;
-      --bias-right: #ff4d4d;
-      --transition-fast: 0.15s ease;
-      --transition-smooth: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html, body {
-      height: 100%;
-      background: var(--gradient-bg);
-      color: var(--text-primary);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      font-size: 16px;
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      overflow-x: hidden;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      .smooth { transition: all var(--transition-smooth); }
-      .fade { transition: opacity var(--transition-fast); }
-      .scale { transition: transform var(--transition-smooth); }
-    }
-
-    .skeleton {
-      background: linear-gradient(90deg, var(--bg-secondary) 25%, rgba(255,255,255,0.05) 50%, var(--bg-secondary) 75%);
-      background-size: 200% 100%;
-      border-radius: 8px;
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      .skeleton { animation: shimmer 2s infinite linear; }
-    }
-
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(10,14,26,0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .bar {
-      display: flex;
-      align-items: center;
-      padding: 1rem;
-      gap: 1rem;
-    }
-
-    .title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--accent-primary);
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .blip {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--success);
-      box-shadow: 0 0 8px var(--success);
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      .blip { animation: pulse 1.5s infinite; }
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(1.2); }
-    }
-
-    .meta {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      font-weight: 500;
-    }
-
-    .meta.mood {
-      color: var(--tone-neutral);
-    }
-
-    .meta.mood.very-positive { color: var(--tone-very-positive); }
-    .meta.mood.positive { color: var(--tone-positive); }
-    .meta.mood.neutral { color: var(--tone-neutral); }
-    .meta.mood.negative { color: var(--tone-negative); }
-    .meta.mood.very-negative { color: var(--tone-very-negative); }
-
-    .filters {
-      display: flex;
-      gap: 0.5rem;
-      overflow-x: auto;
-      padding: 0.75rem 1rem;
-      scrollbar-width: none;
-    }
-
-    .filters::-webkit-scrollbar { display: none; }
-
-    .chip {
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      transition: all var(--transition-smooth);
-    }
-
-    .chip:hover {
-      background: var(--gradient-primary);
-      color: white;
-      box-shadow: var(--shadow-soft);
-      transform: translateY(-2px);
-    }
-
-    .chip.active {
-      background: var(--gradient-primary);
-      color: white;
-      box-shadow: var(--shadow-deep);
-    }
-
-    main {
-      padding: 1rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .card {
-      background: var(--bg-secondary);
-      border-radius: 16px;
-      overflow: hidden;
-      margin-bottom: 1rem;
-      box-shadow: var(--shadow-soft);
-      transition: all var(--transition-smooth);
-    }
-
-    .card:hover {
-      box-shadow: var(--shadow-deep);
-      transform: translateY(-4px);
-    }
-
-    .card.open {
-      box-shadow: 0 12px 32px rgba(91,110,255,0.2);
-    }
-
-    .card-head {
-      display: flex;
-      align-items: flex-start;
-      padding: 1rem;
-      gap: 1rem;
-      cursor: pointer;
-    }
-
-    .favicon {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background-size: cover;
-    }
-
-    .titleline {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .tag {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .badge {
-      padding: 0.25rem 0.75rem;
-      border-radius: 999px;
-      font-size: 0.7rem;
-      font-weight: 500;
-      background: rgba(255,255,255,0.05);
-      color: var(--text-secondary);
-    }
-
-    .badge.trending {
-      background: var(--gradient-primary);
-      color: white;
-    }
-
-    .badge.sentiment.very-positive { color: var(--tone-very-positive); }
-    .badge.sentiment.positive { color: var(--tone-positive); }
-    .badge.sentiment.neutral { color: var(--tone-neutral); }
-    .badge.sentiment.negative { color: var(--tone-negative); }
-    .badge.sentiment.very-negative { color: var(--tone-very-negative); }
-
-    .breaking-indicator {
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      background: var(--error);
-      color: white;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-
-    .time {
-      color: var(--text-secondary);
-    }
-
-    .expand-btn {
-      color: var(--text-secondary);
-      transition: transform var(--transition-smooth);
-    }
-
-    .card.open .expand-btn {
-      transform: rotate(180deg);
-      color: var(--accent-primary);
-    }
-
-    .card-body {
-      padding: 1rem;
-      display: none;
-      border-top: 1px solid var(--border);
-    }
-
-    .card.open .card-body {
-      display: block;
-    }
-
-    .bias-section {
-      margin-bottom: 1rem;
-    }
-
-    .bias-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .bias-title {
-      color: var(--text-secondary);
-    }
-
-    .bias-label.left { color: var(--bias-left); }
-    .bias-label.left-soft { color: var(--bias-left-soft); }
-    .bias-label.center { color: var(--bias-center); }
-    .bias-label.right-soft { color: var(--bias-right-soft); }
-    .bias-label.right { color: var(--bias-right); }
-
-    .bias-meter {
-      height: 8px;
-      background: linear-gradient(90deg, var(--bias-left) 0%, var(--bias-center) 50%, var(--bias-right) 100%);
-      border-radius: 999px;
-      position: relative;
-    }
-
-    .bias-indicator {
-      position: absolute;
-      top: -4px;
-      width: 16px;
-      height: 16px;
-      background: white;
-      border-radius: 50%;
-      transform: translateX(-50%);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .bias-score {
-      position: absolute;
-      top: -24px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.7rem;
-      background: var(--bg-secondary);
-      padding: 0.25rem 0.5rem;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-    }
-
-    .bias-scale-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.7rem;
-      color: var(--text-secondary);
-      margin-top: 0.5rem;
-    }
-
-    .card-actions {
-      display: flex;
-    }
-
-    .article-link {
-      padding: 0.75rem 1.5rem;
-      border-radius: 999px;
-      background: var(--gradient-primary);
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 0.8rem;
-      transition: all var(--transition-smooth);
-    }
-
-    .article-link:hover {
-      box-shadow: var(--shadow-deep);
-      transform: translateY(-2px);
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 1rem 2rem;
-      border-radius: 12px;
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      box-shadow: var(--shadow-deep);
-      z-index: 1000;
-    }
-
-    .toast.success { color: var(--success); }
-    .toast.error { color: var(--error); }
-
-    .btn.reset {
-      position: fixed;
-      bottom: 1rem;
-      right: 1rem;
-      padding: 0.75rem 1.5rem;
-      border-radius: 999px;
-      background: var(--warning);
-      color: white;
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 0.8rem;
-      border: none;
-      cursor: pointer;
-      box-shadow: var(--shadow-soft);
-      transition: all var(--transition-smooth);
-    }
-
-    .btn.reset:hover {
-      transform: scale(1.05);
-      box-shadow: var(--shadow-deep);
-    }
-
-    .src-grid {
-      display: flex;
-      gap: 0.5rem;
-      overflow-x: auto;
-      padding: 1rem 0;
-      scrollbar-width: none;
-    }
-
-    .src-grid::-webkit-scrollbar { display: none; }
-
-    .src {
-      padding: 0.5rem 1rem;
-      border-radius: 999px;
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      transition: all var(--transition-smooth);
-    }
-
-    .src:hover {
-      background: var(--gradient-primary);
-      color: white;
-    }
-
-    .src.on {
-      background: var(--gradient-primary);
-      color: white;
-    }
-
-    .empty {
-      text-align: center;
-      padding: 2rem;
-      background: var(--bg-secondary);
-      border-radius: 16px;
-      box-shadow: var(--shadow-soft);
-      color: var(--text-secondary);
-    }
-
-    .loading-card {
-      background: var(--bg-secondary);
-      border-radius: 16px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .loading-title {
-      height: 1.5rem;
-      width: 80%;
-      margin-bottom: 0.5rem;
-      border-radius: 4px;
-    }
-
-    .loading-meta {
-      height: 1rem;
-      width: 60%;
-      border-radius: 4px;
-    }
-
-    @media (min-width: 768px) {
-      .bar { padding: 1.25rem; }
-      .title { font-size: 1.5rem; }
-      .card-head { padding: 1.25rem; }
-      .titleline { font-size: 1.1rem; }
-      main { padding: 1.5rem; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bias Detector</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --accent-blue: #2196f3;
+            --accent-red: #f44336;
+            --neutral-gray: #808080;
+            --card-bg: #1e1e1e;
+            --input-bg: #2a2a2a;
+            --border-color: #333;
+            --glow: 0 0 5px rgba(255,255,255,0.1);
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            font-size: 16px;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+        header {
+            width: 100%;
+            max-width: 390px;
+            padding: 16px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        section {
+            width: 100%;
+            max-width: 390px;
+            padding: 16px;
+        }
+        input, textarea, button {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        button {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background: #1e88e5;
+        }
+        .accordion {
+            display: none;
+            margin-top: 8px;
+        }
+        .accordion.show {
+            display: block;
+        }
+        .result {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: var(--glow);
+            margin-bottom: 16px;
+            animation: fadeIn 0.5s ease;
+        }
+        .result.show {
+            display: block;
+        }
+        .gauge {
+            position: relative;
+            height: 20px;
+            background: linear-gradient(to right, var(--accent-blue), var(--neutral-gray), var(--accent-red));
+            border-radius: 10px;
+            margin: 16px 0;
+        }
+        .marker {
+            position: absolute;
+            top: -5px;
+            width: 4px;
+            height: 30px;
+            background: white;
+            border-radius: 2px;
+            box-shadow: var(--glow);
+            transition: left 0.5s ease;
+        }
+        .ticks {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .explanation {
+            margin-top: 16px;
+        }
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .chip {
+            background: var(--input-bg);
+            padding: 4px 8px;
+            border-radius: 16px;
+            font-size: 14px;
+        }
+        .history {
+            list-style: none;
+            padding: 0;
+        }
+        .history li {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            box-shadow: var(--glow);
+        }
+        .about {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: var(--glow);
+        }
+        .dev-panel {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            box-shadow: var(--glow);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <div class="bar">
-      <div class="title">
-        <span class="blip" aria-label="Live status"></span>UR NEWS
-        <span class="meta" id="lastUpdated">• INITIALIZING</span>
-        <span class="meta mood neutral" id="overallMood">• MOOD: CALM</span>
-      </div>
-    </div>
-    <div class="filters" id="filters" role="tablist" aria-label="Content filters">
-      <button class="chip active smooth" data-view="all" role="tab" aria-selected="true" tabindex="0">ALL</button>
-      <button class="chip smooth" data-view="popular" role="tab" aria-selected="false" tabindex="-1">🔥 TRENDING</button>
-      <button class="chip smooth" data-view="by-source" role="tab" aria-selected="false" tabindex="-1">BY SOURCE</button>
-      <button class="chip smooth" data-view="conservative" role="tab" aria-selected="false" tabindex="-1">CONSERVATIVE</button>
-      <button class="chip smooth" data-view="populist" role="tab" aria-selected="false" tabindex="-1">POPULIST</button>
-      <button class="chip smooth" data-view="breaking" role="tab" aria-selected="false" tabindex="-1">BREAKING</button>
-    </div>
-  </header>
+    <header>
+        <h1>Bias Detector</h1>
+    </header>
+    <section id="input-section">
+        <input type="url" id="url-input" placeholder="Paste news article URL" aria-label="Article URL">
+        <button id="analyze-btn">Analyze</button>
+        <div class="accordion" id="paste-accordion">
+            <p>CORS blocked fetch. Please paste the article text below:</p>
+            <textarea id="paste-text" rows="10" placeholder="Paste article text here" aria-label="Paste article text"></textarea>
+            <button id="analyze-paste-btn">Analyze Pasted Text</button>
+        </div>
+    </section>
+    <section id="result-section" class="result">
+        <h2>Bias Score: <span id="score"></span> (Confidence: <span id="confidence"></span>%)</h2>
+        <div class="gauge">
+            <div class="marker" id="marker"></div>
+        </div>
+        <div class="ticks">
+            <span>-100</span><span>-50</span><span>0</span><span>+50</span><span>+100</span>
+        </div>
+        <div class="explanation" id="explanation"></div>
+        <div class="chips" id="chips"></div>
+    </section>
+    <section id="history-section">
+        <h2>Recent Analyses</h2>
+        <ul class="history" id="history-list"></ul>
+    </section>
+    <section id="about-section" class="about">
+        <h2 id="about-title">About</h2>
+        <p>This app analyzes news articles for political bias using client-side lexicons and scoring. Scores range from -100 (left) to +100 (right). Method: lexicon-based counting with sentiment and outlet priors.</p>
+    </section>
+    <section id="dev-panel" class="dev-panel"></section>
 
-  <main>
-    <div class="src-grid" id="sourceToggles" role="group" aria-label="News sources"></div>
-    <div class="list" id="feedList" role="main" aria-live="polite"></div>
-    <div class="empty" id="emptyMsg" style="display:none;">
-      <h3>NO STORIES AVAILABLE</h3>
-      <p>Adjust filters or check back shortly.</p>
-    </div>
-  </main>
+    <script>
+        // Embedded data: lexicons and priors
+        // Left-leaning cues: words/phrases with weight (higher = stronger)
+        const leftCues = {
+            'progressive': 2, 'equity': 3, 'social justice': 4, 'climate change': 3, 'gun control': 2,
+            'universal healthcare': 4, 'abortion rights': 3, 'lgbtq': 2, 'diversity': 2, 'inclusion': 2,
+            'democrat': 1, 'biden': 1, 'aoc': 1, 'bernie': 1, 'msnbc': 2, 'cnn': 1
+        };
+        // Right-leaning cues
+        const rightCues = {
+            'conservative': 2, 'liberty': 3, 'free market': 4, 'climate hoax': 3, 'second amendment': 2,
+            'pro-life': 3, 'traditional values': 2, 'border security': 3, 'tax cuts': 2,
+            'republican': 1, 'trump': 1, 'mcconnell': 1, 'fox news': 2, 'breitbart': 2
+        };
+        // Loaded adjectives/adverbs with polarity (- for left bias, + for right)
+        const loadedWords = {
+            'extreme': {polarity: 1, weight: 1}, 'radical': {polarity: 1, weight: 2},
+            'oppressive': {polarity: -1, weight: 2}, 'empowering': {polarity: -1, weight: 1},
+            'dangerous': {polarity: 1, weight: 1}, 'inclusive': {polarity: -1, weight: 1}
+        };
+        // Hedging markers (reduce confidence if many)
+        const hedging = ['may', 'might', 'could', 'possibly', 'allegedly'];
+        // Political entities with orientation (- left, + right)
+        const entities = {
+            'democrats': -2, 'republicans': 2, 'biden': -1, 'trump': 1,
+            'aoc': -2, 'pelosi': -1, 'mcconnell': 1, 'cruz': 2
+        };
+        // Outlet priors: hostname to prior bias (-left, +right), weight low
+        const outletPriors = {
+            'cnn.com': {bias: -15, weight: 0.1},
+            'msnbc.com': {bias: -20, weight: 0.1},
+            'foxnews.com': {bias: 20, weight: 0.1},
+            'breitbart.com': {bias: 25, weight: 0.1},
+            'nytimes.com': {bias: -10, weight: 0.1},
+            'wsj.com': {bias: 10, weight: 0.1}
+        };
+        // Simple sentiment polarity lexicon
+        const sentimentLex = {
+            'good': 1, 'bad': -1, 'support': 1, 'oppose': -1, 'praise': 1, 'criticize': -1,
+            'success': 1, 'failure': -1, 'benefit': 1, 'harm': -1
+        };
 
-  <button class="btn reset smooth" id="resetBtn" title="Reset application">RESET</button>
+        // History storage
+        const HISTORY_KEY = 'bias_history_v1';
+        function loadHistory() {
+            try {
+                const data = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+                return Array.isArray(data) ? data.slice(0, 5) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+        function saveHistory(entry) {
+            let history = loadHistory();
+            history.unshift(entry);
+            history = history.slice(0, 5);
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        }
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = '';
+            loadHistory().forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${item.title || item.url}</strong><br>Score: ${item.score} (Conf: ${item.confidence}%)<br>${new Date(item.timestamp).toLocaleString()}`;
+                list.appendChild(li);
+            });
+        }
 
-  <script>
-    const SOURCES = [
-  { id: 'breitbart', name: 'Breitbart', url: 'https://www.breitbart.com/feed/', lane: 'populist' },
-  { id: 'federalist', name: 'The Federalist', url: 'https://thefederalist.com/feed/', lane: 'conservative' },
-  { id: 'dailywire', name: 'Daily Wire', url: 'https://www.dailywire.com/feeds/rss.xml', lane: 'conservative' },
-  { id: 'gateway', name: 'Gateway Pundit', url: 'https://www.thegatewaypundit.com/feed/', lane: 'populist' },
-  { id: 'infowars', name: 'InfoWars', url: 'https://www.infowars.com/rss.xml', lane: 'populist' },
-  { id: 'revolver', name: 'Revolver News', url: 'https://www.revolver.news/feed/', lane: 'populist' },
-  { id: 'natfile', name: 'National File', url: 'https://nationalfile.com/feed/', lane: 'populist' },
-  { id: 'tplvoice', name: "People's Voice", url: 'https://thepeoplesvoice.tv/feed/', lane: 'populist' },
-  { id: 'libertydaily', name: 'Liberty Daily', url: 'https://thelibertydaily.com/rss.xml', lane: 'populist' },
-  { id: 'naturalnews', name: 'Natural News', url: 'https://www.naturalnews.com/rss.xml', lane: 'populist' },
-  { id: 'dailycaller', name: 'Daily Caller', url: 'https://dailycaller.com/feed/', lane: 'conservative' },
-  { id: 'redstate', name: 'RedState', url: 'https://redstate.com/feed/', lane: 'conservative' },
-  { id: 'amgreat', name: 'AmGreatness', url: 'https://amgreatness.com/feed/', lane: 'conservative' },
-  { id: 'pjm', name: 'PJ Media', url: 'https://pjmedia.com/feeds/latest', lane: 'conservative' },
-  { id: 'nypost', name: 'NY Post', url: 'https://nypost.com/feed/', lane: 'populist' },
-  { id: 'townhall', name: 'Townhall', url: 'https://townhall.com/rss', lane: 'conservative' },
-  { id: 'foxnews', name: 'Fox News', url: 'https://feeds.foxnews.com/foxnews/latest', lane: 'conservative' },
-  { id: 'washexam', name: 'Washington Examiner', url: 'https://www.washingtonexaminer.com/feed', lane: 'conservative' },
-  { id: 'theblaze', name: 'The Blaze', url: 'https://www.theblaze.com/feeds/latest.rss', lane: 'conservative' },
-  { id: 'nbcnews', name: 'NBC News', url: 'https://feeds.nbcnews.com/nbcnews/public/news', lane: 'mainstream' },
-  { id: 'abcnews', name: 'ABC News', url: 'https://abcnews.go.com/abcnews/topstories', lane: 'mainstream' },
-  { id: 'cnn', name: 'CNN', url: 'https://rss.cnn.com/rss/cnn_topstories.rss', lane: 'mainstream' }
-];
-
-const persistedState = loadPersistedState();
-
-const STATE = {
-  items: [],
-  view: 'all',
-  loading: false,
-  lastFetch: 0,
-  cache: new Map(),
-  expandedCards: new Set(persistedState.expanded || []),
-  trendingKeywords: new Map(),
-  sourceFilter: persistedState.sourceFilter || null
-};
-
-if (STATE.sourceFilter && !SOURCES.some(source => source.id === STATE.sourceFilter)) {
-  STATE.sourceFilter = null;
-}
-
-const CACHE_TTL = 120000;
-const FETCH_TIMEOUT = 4000;
-
-const SENTIMENT_LEXICON = new Map([
-  ['victory', 4.5],
-  ['victories', 4.5],
-  ['landslide', 5],
-  ['triumph', 4],
-  ['triumphant', 4],
-  ['win', 3.5],
-  ['wins', 3.5],
-  ['won', 3.5],
-  ['winning', 3.2],
-  ['record', 3],
-  ['records', 3],
-  ['breakthrough', 4],
-  ['surge', 2.6],
-  ['surging', 2.6],
-  ['surged', 2.6],
-  ['boom', 3.1],
-  ['booming', 3.4],
-  ['boon', 2.5],
-  ['resilient', 2.2],
-  ['resilience', 2.2],
-  ['relief', 2.4],
-  ['stability', 2.1],
-  ['stabilize', 2.1],
-  ['stabilized', 2.1],
-  ['improves', 2.2],
-  ['improved', 2.2],
-  ['improving', 2.2],
-  ['progress', 2.5],
-  ['peace', 2.6],
-  ['peaceful', 2.6],
-  ['secure', 2.1],
-  ['secured', 2.1],
-  ['support', 2],
-  ['supports', 2],
-  ['praise', 2.5],
-  ['praised', 2.5],
-  ['optimism', 2.5],
-  ['optimistic', 2.5],
-  ['growth', 2.3],
-  ['grows', 2.3],
-  ['growing', 2.3],
-  ['rebound', 2.6],
-  ['rebounds', 2.6],
-  ['rebounded', 2.6],
-  ['strength', 2.4],
-  ['strengthen', 2.4],
-  ['strengthens', 2.4],
-  ['strengthened', 2.4],
-  ['crisis', -3.5],
-  ['crises', -3.5],
-  ['catastrophe', -5.5],
-  ['disaster', -5],
-  ['collapse', -4.5],
-  ['collapsed', -4.5],
-  ['collapsing', -4.5],
-  ['chaos', -3.5],
-  ['chaotic', -3],
-  ['shooting', -5],
-  ['shootings', -5],
-  ['attack', -3.5],
-  ['attacks', -3.5],
-  ['assault', -3],
-  ['massacre', -6],
-  ['tragedy', -5],
-  ['fatal', -4],
-  ['deadly', -4.5],
-  ['murder', -5],
-  ['murdered', -5],
-  ['violence', -4],
-  ['violent', -4],
-  ['threat', -3],
-  ['threats', -3],
-  ['warning', -2.5],
-  ['warnings', -2.5],
-  ['fear', -2.5],
-  ['fears', -2.5],
-  ['panic', -4],
-  ['emergency', -3.5],
-  ['fraud', -3],
-  ['scandal', -3.5],
-  ['scandals', -3.5],
-  ['corruption', -3.5],
-  ['corrupt', -3],
-  ['indicted', -4],
-  ['indictment', -4],
-  ['charged', -3],
-  ['charges', -3],
-  ['arrested', -3.5],
-  ['arrests', -3.5],
-  ['lawsuit', -2.5],
-  ['lawsuits', -2.5],
-  ['investigation', -2.2],
-  ['investigations', -2.2],
-  ['probe', -2.2],
-  ['probes', -2.2],
-  ['meltdown', -5],
-  ['shortage', -2.5],
-  ['shortages', -2.5],
-  ['decline', -2.5],
-  ['declines', -2.5],
-  ['plunge', -3.5],
-  ['plunges', -3.5],
-  ['slump', -3],
-  ['slumps', -3],
-  ['sanction', -2.5],
-  ['sanctions', -2.5],
-  ['ban', -2.5],
-  ['banned', -2.5],
-  ['outage', -2],
-  ['outages', -2],
-  ['breach', -3],
-  ['breaches', -3]
-]);
-
-const POSITIVE_WORDS = new Set([
-  'good', 'great', 'positive', 'upbeat', 'hope', 'hopes', 'hopeful', 'advance', 'advances',
-  'advancing', 'strong', 'stronger', 'sturdy', 'rescue', 'rescued', 'rescues', 'ally', 'allies',
-  'agreement', 'agreements', 'calm', 'steady', 'supportive', 'boost', 'boosts', 'benefit',
-  'benefits', 'recover', 'recovery', 'recovered', 'healing', 'relief', 'relieved', 'progressive',
-  'peaceful', 'stable', 'stability', 'balanced', 'constructive', 'diplomatic', 'unity', 'unite',
-  'unites', 'secured', 'security', 'resilient', 'cooperate', 'cooperation', 'truce', 'win-win'
-]);
-
-const NEGATIVE_WORDS = new Set([
-  'loss', 'losses', 'lost', 'defeat', 'defeated', 'risk', 'risks', 'concern', 'concerns', 'doubt',
-  'doubts', 'fear', 'fears', 'worry', 'worries', 'worried', 'drop', 'drops', 'fall', 'falls',
-  'fallen', 'negative', 'bad', 'threat', 'threaten', 'threatened', 'danger', 'dangerous', 'fraud',
-  'crash', 'crashes', 'collapsed', 'collapse', 'lawsuit', 'lawsuits', 'probe', 'probes', 'charge',
-  'charges', 'investigation', 'chaos', 'violent', 'violence', 'crime', 'crimes', 'criminal',
-  'riot', 'riots', 'riotous', 'storm', 'storms', 'hurricane', 'earthquake', 'wildfire', 'fire',
-  'fires', 'shooting', 'shootings', 'attack', 'attacks', 'murder', 'murdered', 'extremist',
-  'extremism', 'terror', 'terrorism', 'terrorist', 'scandal', 'panic', 'shortage', 'shortages',
-  'decline', 'declines', 'slump', 'slumps', 'collapse', 'opposition', 'backlash', 'controversy'
-]);
-
-const BOOSTER_WORDS = new Set(['very', 'extremely', 'highly', 'truly', 'deeply', 'major', 'massive', 'hugely', 'seriously', 'significantly']);
-const DAMPENER_WORDS = new Set(['slightly', 'barely', 'somewhat', 'mildly', 'modestly', 'partially']);
-const NEGATION_WORDS = new Set(['no', 'not', 'never', 'without', 'hardly', 'rarely', 'scarcely', 'neither']);
-
-const BIAS_RANGE = 10;
-
-const BIAS_PHRASES = [
-  { pattern: /climate (?:crisis|change)/i, weight: -2.4 },
-  { pattern: /carbon emissions/i, weight: -2.1 },
-  { pattern: /clean energy/i, weight: -1.8 },
-  { pattern: /green energy/i, weight: -2 },
-  { pattern: /renewable energy/i, weight: -2.2 },
-  { pattern: /gun control/i, weight: -2.6 },
-  { pattern: /racial justice/i, weight: -2.2 },
-  { pattern: /reproductive rights/i, weight: -2.5 },
-  { pattern: /abortion rights/i, weight: -2.4 },
-  { pattern: /medicare for all/i, weight: -3 },
-  { pattern: /universal health care/i, weight: -2.6 },
-  { pattern: /student loan (?:forgiveness|relief)/i, weight: -2.1 },
-  { pattern: /voting rights/i, weight: -1.7 },
-  { pattern: /police reform/i, weight: -1.8 },
-  { pattern: /criminal justice reform/i, weight: -1.8 },
-  { pattern: /lgbtq rights/i, weight: -2.1 },
-  { pattern: /trans rights/i, weight: -2.1 },
-  { pattern: /marriage equality/i, weight: -2 },
-  { pattern: /border security/i, weight: 2.5 },
-  { pattern: /border wall/i, weight: 3 },
-  { pattern: /illegal immigration/i, weight: 2.5 },
-  { pattern: /secure the border/i, weight: 2.8 },
-  { pattern: /america first/i, weight: 2.6 },
-  { pattern: /law and order/i, weight: 2.3 },
-  { pattern: /second amendment/i, weight: 3 },
-  { pattern: /gun rights/i, weight: 2.4 },
-  { pattern: /right to life/i, weight: 2.4 },
-  { pattern: /pro-life/i, weight: 2.2 },
-  { pattern: /religious liberty/i, weight: 2 },
-  { pattern: /parental rights/i, weight: 2.1 },
-  { pattern: /school choice/i, weight: 2.2 },
-  { pattern: /limited government/i, weight: 2.2 },
-  { pattern: /small government/i, weight: 2.2 },
-  { pattern: /tax (?:cuts|cut)/i, weight: 1.8 },
-  { pattern: /energy independence/i, weight: 1.7 },
-  { pattern: /anti-woke/i, weight: 2 },
-  { pattern: /woke agenda/i, weight: 2.1 }
-];
-
-const BIAS_KEYWORDS = new Map([
-  ['progressive', -1.6],
-  ['progressives', -1.6],
-  ['liberal', -1.4],
-  ['liberals', -1.4],
-  ['democrat', -1.1],
-  ['democrats', -1.1],
-  ['biden', -0.8],
-  ['harris', -0.7],
-  ['climate', -1.3],
-  ['emissions', -1.2],
-  ['renewable', -1.1],
-  ['sustainable', -1],
-  ['equity', -1.3],
-  ['diversity', -1.2],
-  ['inclusion', -1.1],
-  ['inclusive', -1],
-  ['lgbtq', -1.4],
-  ['transgender', -1.5],
-  ['abortion', -0.9],
-  ['reproductive', -1.3],
-  ['union', -1],
-  ['unions', -1],
-  ['conservative', 1.5],
-  ['conservatives', 1.5],
-  ['republican', 1.2],
-  ['republicans', 1.2],
-  ['trump', 1.2],
-  ['desantis', 1],
-  ['patriot', 1.8],
-  ['patriots', 1.6],
-  ['liberty', 1.2],
-  ['freedom', 1],
-  ['border', 1.4],
-  ['woke', 1.6],
-  ['christian', 1.2],
-  ['faith', 0.9],
-  ['gun', 0.8],
-  ['guns', 0.8],
-  ['patriotic', 1.4],
-  ['nationalist', 1.6],
-  ['sovereignty', 1.3]
-]);
-
-const CLICKBAIT_PATTERNS = [
-  /you won't believe/i,
-  /you will not believe/i,
-  /jaw[-\s]?dropping/i,
-  /what happens next/i,
-  /this is why/i,
-  /must see/i,
-  /can't miss/i,
-  /goes viral/i,
-  /internet reacts/i,
-  /breaks the internet/i,
-  /things get/i,
-  /shocking/i,
-  /insane/i,
-  /crazy/i,
-  /epic/i,
-  /unbelievable/i,
-  /life[-\s]?changing/i,
-  /top \d+ (things|reasons|ways|tricks|hacks)/i,
-  /mind[-\s]?blowing/i,
-  /game[-\s]?changer/i,
-  /bombshell/i,
-  /one weird trick/i,
-  /this changes everything/i,
-  /must[-\s]?read/i,
-  /must[-\s]?watch/i,
-  /can't believe/i,
-  /mic drop/i,
-  /claps? back/i,
-  /goes off on/i,
-  /freaks out/i,
-  /meltdown/i,
-  /epic fail/i
-];
-
-const NON_NEWS_PATTERNS = [
-  /^watch:/i,
-  /^listen:/i,
-  /^video:/i,
-  /\bopinion\b/i,
-  /\bcommentary\b/i,
-  /\bcolumn\b/i,
-  /\beditorial\b/i,
-  /\bpodcast\b/i,
-  /\bnewsletter\b/i,
-  /\brecap\b/i,
-  /\bhow to\b/i,
-  /\bhow-to\b/i,
-  /\bexplainer\b/i,
-  /\breview\b/i,
-  /\bsponsored\b/i,
-  /\badvertis/i,
-  /\bdeal\b/i,
-  /\bdeals\b/i,
-  /\bdiscount\b/i,
-  /\bsale\b/i,
-  /\bmerch\b/i,
-  /\bshop\b/i,
-  /\bcelebrity\b/i,
-  /\bsubscribe\b/i,
-  /click here/i
-];
-
-const NON_NEWS_PATH_FRAGMENTS = [
-  '/video',
-  '/videos',
-  '/podcast',
-  '/opinion',
-  '/commentary',
-  '/column',
-  '/blog',
-  '/sponsored',
-  '/commerce',
-  '/shopping',
-  '/lifestyle',
-  '/entertainment'
-];
-
-const ESCAPE_MAP = {
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  "'": '&#39;'
-};
-
-let domUpdates = [];
-
-function loadPersistedState() {
-  try {
-    const expanded = JSON.parse(localStorage.getItem('urnews.expanded'));
-    const storedSource = localStorage.getItem('urnews.sourceFilter');
-    return {
-      expanded: Array.isArray(expanded) ? expanded : null,
-      sourceFilter: storedSource || null
-    };
-  } catch (error) {
-    return { expanded: null, sourceFilter: null };
-  }
-}
-
-function persistState() {
-  try {
-    localStorage.setItem('urnews.expanded', JSON.stringify([...STATE.expandedCards]));
-    if (STATE.sourceFilter) {
-      localStorage.setItem('urnews.sourceFilter', STATE.sourceFilter);
-    } else {
-      localStorage.removeItem('urnews.sourceFilter');
-    }
-  } catch (error) {
-    console.warn('Storage failed:', error);
-  }
-}
-
-function batchDOM(fn) {
-  domUpdates.push(fn);
-  if (domUpdates.length === 1) {
-    requestAnimationFrame(() => {
-      domUpdates.forEach(update => update());
-      domUpdates = [];
-    });
-  }
-}
-
-function getCached(url) {
-  const cached = STATE.cache.get(url);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
-  }
-  return null;
-}
-
-function setCached(url, data) {
-  STATE.cache.set(url, { data, timestamp: Date.now() });
-}
-
-function fetchProxy(url) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
-
-  const promise = fetch(url, { signal: controller.signal }).then(response => {
-    clearTimeout(timer);
-    if (!response.ok) {
-      throw new Error('Bad response');
-    }
-    return response;
-  }).catch(error => {
-    clearTimeout(timer);
-    throw error;
-  });
-
-  return {
-    promise,
-    cancel() {
-      clearTimeout(timer);
-      controller.abort();
-    }
-  };
-}
-
-function firstSuccessful(promises) {
-  return new Promise((resolve, reject) => {
-    let remaining = promises.length;
-    const errors = [];
-
-    promises.forEach((promise, index) => {
-      promise
-        .then(value => resolve({ value, index }))
-        .catch(error => {
-          errors.push(error);
-          remaining -= 1;
-          if (remaining === 0) {
-            reject(errors[errors.length - 1] || new Error('All proxies failed'));
-          }
+        // Dev panel toggle
+        let tapCount = 0;
+        document.getElementById('about-title').addEventListener('click', () => {
+            tapCount++;
+            if (tapCount >= 5) {
+                document.getElementById('dev-panel').style.display = 'block';
+                tapCount = 0;
+            }
         });
-    });
-  });
-}
 
-async function fetchFast(url) {
-  const cached = getCached(url);
-  if (cached) {
-    return cached;
-  }
+        // Main analysis
+        async function analyze(urlOrText, isUrl = true) {
+            let text, title = '', hostname = '';
+            let fetchQuality = 1; // 1 full, 0.5 partial
+            try {
+                if (isUrl) {
+                    const response = await fetch(urlOrText, { timeout: 5000 });
+                    if (!response.ok) throw new Error('Fetch failed');
+                    text = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(text, 'text/html');
+                    title = doc.querySelector('title')?.textContent || urlOrText;
+                    text = doc.querySelector('body')?.innerText || '';
+                    hostname = new URL(urlOrText).hostname;
+                } else {
+                    text = urlOrText;
+                    fetchQuality = 0.8; // Pasted, slightly lower
+                }
+                // Normalize text
+                text = text.replace(/\s+/g, ' ').trim().toLowerCase();
+                // Simple de-dupe: remove repeated phrases (nav/footer)
+                const sentences = text.split(/[.!?]+/).map(s => s.trim()).filter(s => s);
+                const uniqueSentences = [...new Set(sentences)];
+                text = uniqueSentences.slice(0, 2500 / 10).join('. '); // Approx words
+                // Headline: assume first sentence or title
+                const headline = title.toLowerCase() || sentences[0] || '';
+            } catch (e) {
+                if (isUrl) {
+                    document.getElementById('paste-accordion').classList.add('show');
+                    return;
+                } else {
+                    text = '';
+                    fetchQuality = 0;
+                }
+            }
 
-  const targets = [
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-    `https://corsproxy.io/?${encodeURIComponent(url)}`
-  ].map(fetchProxy);
+            if (text.length < 100) {
+                alert('Text too short for analysis.');
+                return;
+            }
 
-  try {
-    const { value: response, index } = await firstSuccessful(targets.map(target => target.promise));
-    const text = await response.text();
-    targets.forEach((target, idx) => {
-      if (idx !== index) {
-        target.cancel();
-      }
-    });
-    if (!text || text.length < 100) {
-      throw new Error('Empty feed');
-    }
-    setCached(url, text);
-    return text;
-  } finally {
-    targets.forEach(target => target.cancel());
-  }
-}
+            // Pipeline
+            const words = text.split(/\s+/);
+            const tokenCount = words.length;
+            let leftScore = 0, rightScore = 0;
+            let contributions = {}; // ngram: signed contrib
+            let politicalSentences = 0;
 
-function calculateTrending(items) {
-  const keywords = new Map();
-  const now = Date.now();
+            // Lexicon features
+            Object.entries(leftCues).forEach(([cue, weight]) => {
+                const count = (text.match(new RegExp(cue, 'g')) || []).length;
+                if (count > 0) {
+                    const contrib = Math.log(1 + count) * weight;
+                    leftScore += contrib;
+                    contributions[cue] = -contrib; // Left is negative
+                }
+            });
+            Object.entries(rightCues).forEach(([cue, weight]) => {
+                const count = (text.match(new RegExp(cue, 'g')) || []).length;
+                if (count > 0) {
+                    const contrib = Math.log(1 + count) * weight;
+                    rightScore += contrib;
+                    contributions[cue] = contrib;
+                }
+            });
 
-  items.forEach(item => {
-    const ageHours = (now - new Date(item.pubDate)) / (1000 * 60 * 60);
-    if (ageHours > 24) {
-      return;
-    }
+            // Loaded words
+            Object.entries(loadedWords).forEach(([word, {polarity, weight}]) => {
+                const count = (text.match(new RegExp(word, 'g')) || []).length;
+                if (count > 0) {
+                    const contrib = Math.log(1 + count) * weight;
+                    if (polarity < 0) leftScore += contrib;
+                    else rightScore += contrib;
+                    contributions[word] = polarity * contrib;
+                }
+            });
 
-    const text = `${item.title} ${item.desc}`.toLowerCase();
-    const words = text.match(/\b[a-z]{4,}\b/g) || [];
+            // Entity sentiment
+            sentences.forEach(sentence => {
+                let hasEntity = false;
+                let sentScore = 0;
+                Object.keys(entities).forEach(ent => {
+                    if (sentence.includes(ent)) {
+                        hasEntity = true;
+                        Object.entries(sentimentLex).forEach(([word, pol]) => {
+                            if (sentence.includes(word)) sentScore += pol;
+                        });
+                    }
+                });
+                if (hasEntity) {
+                    politicalSentences++;
+                    const entityBias = Object.entries(entities).reduce((sum, [ent, bias]) => sentence.includes(ent) ? sum + bias : sum, 0);
+                    const adjust = sentScore * 0.5 * (entityBias > 0 ? 1 : -1); // Small weight
+                    if (adjust > 0) rightScore += adjust;
+                    else leftScore -= adjust; // Left increases with negative adjust
+                    contributions[`sent_${sentence.slice(0,20)}`] = adjust;
+                }
+            });
 
-    words.forEach(word => {
-      if (!/^(with|that|this|from|have|were|been|their|about|would|could|should)$/.test(word)) {
-        const current = keywords.get(word) || 0;
-        keywords.set(word, current + (1 / Math.max(1, ageHours / 6)));
-      }
-    });
-  });
+            // Headline weighting
+            let headlineLeft = 0, headlineRight = 0;
+            Object.entries(leftCues).forEach(([cue, w]) => headlineLeft += headline.includes(cue) ? w * 1.5 : 0);
+            Object.entries(rightCues).forEach(([cue, w]) => headlineRight += headline.includes(cue) ? w * 1.5 : 0);
+            leftScore += headlineLeft;
+            rightScore += headlineRight;
 
-  STATE.trendingKeywords = keywords;
+            // Outlet prior
+            let priorBias = 0;
+            if (hostname && outletPriors[hostname]) {
+                priorBias = outletPriors[hostname].bias * outletPriors[hostname].weight;
+                contributions[`outlet_${hostname}`] = priorBias;
+            }
 
-  items.forEach(item => {
-    const text = `${item.title} ${item.desc}`.toLowerCase();
-    let score = 0;
-    keywords.forEach((weight, word) => {
-      if (text.includes(word)) {
-        score += weight;
-      }
-    });
-    item.trendingScore = score;
-  });
-}
+            // Aggregate
+            let raw = rightScore - leftScore + priorBias;
+            // Normalize to [-100,100]: heuristic cap at 50 raw max
+            const maxRaw = 50; // Based on lexicon sizes
+            let score = (raw / maxRaw) * 100;
+            score = Math.max(-100, Math.min(100, score));
 
-function scoreTokens(tokens, scale = 1) {
-  let total = 0;
+            // Confidence
+            const effTokens = Math.min(tokenCount, 2500) / 2500;
+            const polShare = politicalSentences / sentences.length;
+            const featureAgree = Math.abs(leftScore - rightScore) / (leftScore + rightScore + 1);
+            let confidence = (effTokens * 0.4 + polShare * 0.3 + featureAgree * 0.2 + fetchQuality * 0.1) * 100;
+            confidence = Math.round(Math.max(0, Math.min(100, confidence)));
 
-  for (let i = 0; i < tokens.length; i += 1) {
-    const word = tokens[i];
-    let weight = 0;
+            // Explanation
+            const topContribs = Object.entries(contributions)
+                .sort((a,b) => Math.abs(b[1]) - Math.abs(a[1]))
+                .slice(0,5)
+                .map(([key, val]) => `${key}: ${val.toFixed(2)}`);
 
-    if (SENTIMENT_LEXICON.has(word)) {
-      weight = SENTIMENT_LEXICON.get(word);
-    } else if (POSITIVE_WORDS.has(word)) {
-      weight = 1;
-    } else if (NEGATIVE_WORDS.has(word)) {
-      weight = -1;
-    }
+            // Render
+            document.getElementById('score').textContent = Math.round(score);
+            document.getElementById('confidence').textContent = confidence;
+            document.getElementById('explanation').innerHTML = `Explanation: ${topContribs.join('<br>')}${priorBias ? `<br>Outlet prior: ${priorBias.toFixed(2)}` : ''}`;
+            const chipsEl = document.getElementById('chips');
+            chipsEl.innerHTML = '';
+            topContribs.forEach(c => {
+                const chip = document.createElement('div');
+                chip.className = 'chip';
+                chip.textContent = c;
+                chipsEl.appendChild(chip);
+            });
+            const marker = document.getElementById('marker');
+            const pos = ((score + 100) / 200) * 100;
+            marker.style.left = `${pos}%`;
+            document.getElementById('result-section').classList.add('show');
 
-    if (weight !== 0) {
-      const previous = tokens[i - 1];
-      if (previous && NEGATION_WORDS.has(previous)) {
-        weight *= -1;
-      }
-      if (previous && BOOSTER_WORDS.has(previous)) {
-        weight *= 1.4;
-      } else if (previous && DAMPENER_WORDS.has(previous)) {
-        weight *= 0.5;
-      }
+            // Save history
+            saveHistory({
+                timestamp: Date.now(),
+                url: isUrl ? urlOrText : '',
+                title,
+                score: Math.round(score),
+                confidence
+            });
+            renderHistory();
 
-      total += weight * scale;
-    }
-  }
-
-  return total;
-}
-
-function describeSentiment(score) {
-  if (score >= 6) {
-    return { label: 'ELECTRIC', tone: 'very-positive' };
-  }
-  if (score >= 3) {
-    return { label: 'OPTIMISTIC', tone: 'positive' };
-  }
-  if (score > -2) {
-    return { label: 'STEADY', tone: 'neutral' };
-  }
-  if (score > -5) {
-    return { label: 'WARY', tone: 'negative' };
-  }
-  return { label: 'ALARMED', tone: 'very-negative' };
-}
-
-function formatSentimentScore(score = 0) {
-  if (typeof score !== 'number' || Number.isNaN(score)) {
-    return '0.0';
-  }
-  const rounded = Math.round(score * 10) / 10;
-  return `${rounded > 0 ? '+' : ''}${rounded.toFixed(1)}`;
-}
-
-function analyzeSentiment(item) {
-  const titleTokens = (item.title || '').toLowerCase().match(/\b[a-z'-]+\b/g) || [];
-  const descTokens = (item.desc || '').toLowerCase().match(/\b[a-z'-]+\b/g) || [];
-
-  let score = 0;
-  score += scoreTokens(titleTokens, 1.4);
-  score += scoreTokens(descTokens, 0.8);
-
-  const exclamations = (item.title.match(/!/g) || []).length;
-  if (exclamations > 1) {
-    score -= (exclamations - 1) * 0.6;
-  }
-
-  score = Math.max(-12, Math.min(12, score));
-
-  const descriptor = describeSentiment(score);
-
-  return { label: descriptor.label, tone: descriptor.tone, score };
-}
-
-function describeBias(score) {
-  if (score <= -4.5) {
-    return { label: 'Leans Left', className: 'left' };
-  }
-  if (score < -1.5) {
-    return { label: 'Left of Center', className: 'left-soft' };
-  }
-  if (score <= 1.5) {
-    return { label: 'Center', className: 'center' };
-  }
-  if (score < 4.5) {
-    return { label: 'Right of Center', className: 'right-soft' };
-  }
-  return { label: 'Leans Right', className: 'right' };
-}
-
-function formatBiasScore(score = 0) {
-  if (typeof score !== 'number' || Number.isNaN(score)) {
-    return '0.0';
-  }
-  const rounded = Math.round(score * 10) / 10;
-  return `${rounded > 0 ? '+' : ''}${rounded.toFixed(1)}`;
-}
-
-function biasScoreToPercent(score = 0) {
-  const normalized = ((score + BIAS_RANGE) / (BIAS_RANGE * 2)) * 100;
-  return Math.max(0, Math.min(100, normalized));
-}
-
-function analyzeBias(item) {
-  const text = `${item.title || ''} ${item.desc || ''}`.toLowerCase();
-  let score = 0;
-
-  BIAS_PHRASES.forEach(({ pattern, weight }) => {
-    if (pattern.test(text)) {
-      score += weight;
-    }
-  });
-
-  const tokens = new Set(text.match(/\b[a-z]{3,}\b/g) || []);
-  tokens.forEach(token => {
-    if (BIAS_KEYWORDS.has(token)) {
-      score += BIAS_KEYWORDS.get(token);
-    }
-  });
-
-  if (/fact[-\s]?check/i.test(text)) {
-    score -= 1.4;
-  }
-
-  if (/hunter biden/i.test(text)) {
-    score += 1.4;
-  }
-
-  if (/white house/i.test(text)) {
-    score -= 0.4;
-  }
-
-  const bounded = Math.max(-BIAS_RANGE, Math.min(BIAS_RANGE, score));
-  const descriptor = describeBias(bounded);
-  const displayScore = Number(bounded.toFixed(2));
-  const percent = Math.min(98, Math.max(2, biasScoreToPercent(displayScore)));
-
-  return {
-    score: displayScore,
-    label: descriptor.label,
-    className: descriptor.className,
-    percent
-  };
-}
-
-function createCardId(link) {
-  let hash = 0;
-  for (let i = 0; i < link.length; i += 1) {
-    hash = (hash << 5) - hash + link.charCodeAt(i);
-    hash |= 0;
-  }
-  return `card-${Math.abs(hash)}`;
-}
-
-function parseRSS(xmlString, source) {
-  const doc = new DOMParser().parseFromString(xmlString, 'text/xml');
-  if (doc.getElementsByTagName('parsererror')[0]) {
-    return [];
-  }
-
-  return Array.from(doc.querySelectorAll('item, entry'))
-    .slice(0, 15)
-    .map(entry => {
-      const title = (entry.querySelector('title')?.textContent || '').trim();
-      const link = (entry.querySelector('link')?.getAttribute('href') || entry.querySelector('link')?.textContent || '').trim();
-      const pubDate = (entry.querySelector('pubDate, updated, published')?.textContent || '').trim();
-      const desc = (entry.querySelector('description, summary')?.textContent || '').trim();
-
-      return {
-        title,
-        link,
-        pubDate: pubDate || new Date().toISOString(),
-        source: source.name,
-        lane: source.lane,
-        id: source.id,
-        desc: stripHTML(desc).slice(0, 250),
-        isBreaking: /breaking|urgent|just in|developing|exclusive/i.test(title),
-        trendingScore: 0
-      };
-    })
-    .filter(item => item.title && item.link && item.title.length > 15);
-}
-
-function stripHTML(html) {
-  const temp = document.createElement('div');
-  temp.innerHTML = html;
-  return temp.textContent.replace(/\s+/g, ' ').trim();
-}
-
-function isLikelyNews(item) {
-  const title = (item.title || '').trim();
-  if (!title) {
-    return false;
-  }
-
-  const description = (item.desc || '').trim();
-  const combined = `${title} ${description}`.toLowerCase();
-
-  if (/\?{2,}/.test(title) || /!{2,}/.test(title)) {
-    return false;
-  }
-
-  if (CLICKBAIT_PATTERNS.some(pattern => pattern.test(combined))) {
-    return false;
-  }
-
-  if (NON_NEWS_PATTERNS.some(pattern => pattern.test(title)) || NON_NEWS_PATTERNS.some(pattern => pattern.test(description))) {
-    return false;
-  }
-
-  try {
-    const url = new URL(item.link);
-    const path = `${url.pathname}${url.search}`.toLowerCase();
-    if (NON_NEWS_PATH_FRAGMENTS.some(fragment => path.includes(fragment))) {
-      return false;
-    }
-  } catch (error) {
-    const fallback = (item.link || '').toLowerCase();
-    if (NON_NEWS_PATH_FRAGMENTS.some(fragment => fallback.includes(fragment))) {
-      return false;
-    }
-  }
-
-  const exclamationCount = (title.match(/!/g) || []).length;
-  if (exclamationCount > 2) {
-    return false;
-  }
-
-  return true;
-}
-
-function showLoading() {
-  const feedList = document.getElementById('feedList');
-  feedList.innerHTML = '';
-  const fragment = document.createDocumentFragment();
-
-  for (let i = 0; i < 8; i += 1) {
-    const skeleton = document.createElement('div');
-    skeleton.className = 'loading-card skeleton';
-    skeleton.innerHTML = `
-      <div class="skeleton loading-title"></div>
-      <div class="skeleton loading-meta"></div>
-    `;
-    fragment.appendChild(skeleton);
-  }
-
-  feedList.appendChild(fragment);
-}
-
-async function loadFeeds() {
-  if (STATE.loading) {
-    return;
-  }
-
-  STATE.loading = true;
-  STATE.lastFetch = Date.now();
-  showLoading();
-
-  try {
-    const fetches = SOURCES.map(source =>
-      fetchFast(source.url)
-        .then(text => parseRSS(text, source))
-        .catch(error => {
-          console.warn('Feed failed:', source.name, error);
-          return [];
-        })
-    );
-
-    const results = await Promise.all(fetches);
-    const allItems = results.flat();
-
-    const deduped = [];
-    const seen = new Set();
-
-    allItems
-      .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
-      .forEach(item => {
-        if (!seen.has(item.link)) {
-          seen.add(item.link);
-          deduped.push(item);
+            // Dev panel
+            const dev = document.getElementById('dev-panel');
+            dev.innerHTML = `
+                <h3>Dev Info</h3>
+                Left Score: ${leftScore.toFixed(2)}<br>
+                Right Score: ${rightScore.toFixed(2)}<br>
+                Raw: ${raw.toFixed(2)}<br>
+                Prior: ${priorBias.toFixed(2)}<br>
+                Pol Sentences: ${politicalSentences}/${sentences.length}<br>
+                Tokens: ${tokenCount}
+            `;
         }
-      });
 
-    const curated = deduped.filter(isLikelyNews);
-    STATE.items = curated.slice(0, 100);
-    calculateTrending(STATE.items);
-    STATE.items.forEach(item => {
-      const sentiment = analyzeSentiment(item);
-      item.sentimentScore = Number(sentiment.score.toFixed(2));
-      item.sentimentLabel = sentiment.label;
-      item.sentimentTone = sentiment.tone;
-
-      const bias = analyzeBias(item);
-      item.biasScore = bias.score;
-      item.biasLabel = bias.label;
-      item.biasClass = bias.className;
-      item.biasPercent = bias.percent;
-    });
-
-    render();
-    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    document.getElementById('lastUpdated').textContent = `• ${timestamp}`;
-    const reportMessage = STATE.items.length ? `${STATE.items.length} reports ready` : 'Feed refreshed';
-    toast(reportMessage, 'success');
-  } catch (error) {
-    console.error('Failed:', error);
-    document.getElementById('lastUpdated').textContent = '• RETRY';
-    updateMoodIndicator([]);
-    toast('Loading failed', 'error');
-  } finally {
-    STATE.loading = false;
-  }
-}
-
-function createCard(item) {
-  const cardId = createCardId(item.link);
-  const isExpanded = STATE.expandedCards.has(cardId);
-  const isTrending = item.trendingScore > 5;
-  const article = document.createElement('article');
-  article.className = `card smooth${isExpanded ? ' open' : ''}${isTrending ? ' popular' : ''}`;
-  article.dataset.cardId = cardId;
-
-  let hostname = '';
-  try {
-    hostname = new URL(item.link).hostname;
-  } catch (error) {
-    hostname = '';
-  }
-
-  const timeString = fmtTime(item.pubDate);
-  const sentimentBadge = item.sentimentLabel
-    ? `<span class="badge sentiment ${item.sentimentTone}" title="Sentiment score ${formatSentimentScore(item.sentimentScore)}">${escapeHTML(item.sentimentLabel)} • ${formatSentimentScore(item.sentimentScore)}</span>`
-    : '';
-  const biasLabel = item.biasLabel || 'Center';
-  const biasClass = item.biasClass || 'center';
-  const biasScore = typeof item.biasScore === 'number' && !Number.isNaN(item.biasScore) ? item.biasScore : 0;
-  const biasScoreFormatted = formatBiasScore(biasScore);
-  const biasPercent = Number.isFinite(item.biasPercent) ? item.biasPercent : 50;
-  const biasPosition = Math.max(2, Math.min(98, Math.round(biasPercent * 10) / 10));
-  const biasLabelSafe = escapeHTML(biasLabel);
-  const biasAriaText = `Political lean ${biasLabel} with score ${biasScoreFormatted}`;
-  const biasAria = escapeHTML(biasAriaText);
-
-  article.innerHTML = `
-    <div class="card-head" tabindex="0" role="button" aria-expanded="${isExpanded}" aria-controls="body-${cardId}">
-      <span class="favicon" style="background-image:url('https://www.google.com/s2/favicons?domain=${hostname}&sz=64');" aria-hidden="true"></span>
-      <div>
-        <div class="titleline">
-          ${escapeHTML(item.title)}
-          ${item.isBreaking ? '<span class="breaking-indicator">BREAKING</span>' : ''}
-        </div>
-        <div class="tag">
-          ${escapeHTML(item.source)} • <span class="time">${timeString}</span>
-          ${isTrending ? '<span class="badge trending">TRENDING</span>' : ''}
-          ${sentimentBadge}
-        </div>
-      </div>
-      <div class="expand-btn" aria-hidden="true">${isExpanded ? '▼' : '▶'}</div>
-    </div>
-    <div class="card-body" id="body-${cardId}" role="region">
-      <div class="bias-section" aria-label="${biasAria}">
-        <div class="bias-header">
-          <span class="bias-title">Political Lean</span>
-          <span class="bias-label ${biasClass}">${biasLabelSafe}</span>
-        </div>
-        <div class="bias-meter" role="img" aria-label="${biasAria}">
-          <div class="bias-indicator" style="left:${biasPosition}%;">
-            <span class="bias-score" aria-hidden="true">${biasScoreFormatted}</span>
-          </div>
-          <span class="sr-only">${biasAria}</span>
-        </div>
-        <div class="bias-scale-labels" aria-hidden="true">
-          <span>LEFT</span>
-          <span>CENTER</span>
-          <span>RIGHT</span>
-        </div>
-      </div>
-      <div>${escapeHTML(item.desc || 'No summary available.')}</div>
-      <div class="card-actions">
-        <a href="${escapeHTML(item.link)}" target="_blank" rel="noopener" class="article-link smooth">
-          OPEN ARTICLE
-        </a>
-      </div>
-    </div>
-  `;
-
-  const header = article.querySelector('.card-head');
-  const expandBtn = article.querySelector('.expand-btn');
-
-  const toggleCard = () => {
-    const isOpen = article.classList.toggle('open');
-    expandBtn.textContent = isOpen ? '▼' : '▶';
-    header.setAttribute('aria-expanded', String(isOpen));
-
-    if (isOpen) {
-      STATE.expandedCards.add(cardId);
-      document.querySelectorAll('.card.open').forEach(card => {
-        if (card !== article) {
-          card.classList.remove('open');
-          const otherBtn = card.querySelector('.expand-btn');
-          const otherHeader = card.querySelector('.card-head');
-          if (otherBtn) {
-            otherBtn.textContent = '▶';
-          }
-          if (otherHeader) {
-            otherHeader.setAttribute('aria-expanded', 'false');
-          }
-          STATE.expandedCards.delete(card.dataset.cardId);
-        }
-      });
-    } else {
-      STATE.expandedCards.delete(cardId);
-    }
-
-    persistState();
-  };
-
-  header.addEventListener('click', toggleCard);
-  header.addEventListener('keydown', event => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      toggleCard();
-    }
-  });
-
-  return article;
-}
-
-function updateMoodIndicator(items) {
-  const moodEl = document.getElementById('overallMood');
-  if (!moodEl) {
-    return;
-  }
-
-  if (!Array.isArray(items) || items.length === 0) {
-    moodEl.textContent = '• MOOD: QUIET';
-    moodEl.className = 'meta mood neutral';
-    return;
-  }
-
-  const total = items.reduce((sum, item) => sum + (item.sentimentScore || 0), 0);
-  const average = total / items.length;
-  const descriptor = describeSentiment(average);
-
-  moodEl.textContent = `• MOOD: ${descriptor.label}`;
-  moodEl.className = `meta mood ${descriptor.tone}`;
-}
-
-function render() {
-  const feedList = document.getElementById('feedList');
-  const emptyMsg = document.getElementById('emptyMsg');
-
-  batchDOM(() => {
-    feedList.innerHTML = '';
-    let filtered = STATE.items.slice();
-
-    if (STATE.sourceFilter) {
-      filtered = filtered.filter(item => item.id === STATE.sourceFilter);
-    }
-
-    let viewItems;
-
-    switch (STATE.view) {
-      case 'popular':
-        viewItems = filtered
-          .slice()
-          .sort((a, b) => b.trendingScore - a.trendingScore)
-          .slice(0, 30);
-        break;
-      case 'conservative':
-        viewItems = filtered.filter(item => item.lane === 'conservative');
-        break;
-      case 'populist':
-        viewItems = filtered.filter(item => item.lane === 'populist');
-        break;
-      case 'breaking':
-        viewItems = filtered.filter(item => item.isBreaking);
-        break;
-      case 'by-source':
-        viewItems = filtered.slice();
-        break;
-      default:
-        viewItems = filtered.slice(0, 60);
-    }
-
-    updateMoodIndicator(viewItems);
-
-    if (viewItems.length === 0) {
-      emptyMsg.style.display = 'block';
-      return;
-    }
-
-    emptyMsg.style.display = 'none';
-
-    if (STATE.view === 'by-source') {
-      const grouped = new Map();
-      viewItems.forEach(item => {
-        if (!grouped.has(item.source)) {
-          grouped.set(item.source, []);
-        }
-        grouped.get(item.source).push(item);
-      });
-
-      const fragment = document.createDocumentFragment();
-      Array.from(grouped.keys()).sort().forEach(sourceName => {
-        const header = document.createElement('div');
-        header.className = 'source-header';
-        header.textContent = sourceName;
-        fragment.appendChild(header);
-        grouped.get(sourceName).forEach(article => {
-          fragment.appendChild(createCard(article));
+        // Event listeners
+        document.getElementById('analyze-btn').addEventListener('click', () => {
+            const url = document.getElementById('url-input').value.trim();
+            if (!url) return alert('Enter a URL');
+            if (!url.startsWith('http')) return alert('Invalid URL');
+            analyze(url);
         });
-      });
+        document.getElementById('analyze-paste-btn').addEventListener('click', () => {
+            const text = document.getElementById('paste-text').value.trim();
+            if (!text) return alert('Paste text');
+            analyze(text, false);
+        });
 
-      feedList.appendChild(fragment);
-      return;
-    }
-
-    const fragment = document.createDocumentFragment();
-    viewItems.forEach(item => {
-      fragment.appendChild(createCard(item));
-    });
-    feedList.appendChild(fragment);
-  });
-}
-
-function buildSourceToggles() {
-  const container = document.getElementById('sourceToggles');
-  container.innerHTML = '';
-  const fragment = document.createDocumentFragment();
-
-  SOURCES.forEach(source => {
-    const isActive = STATE.sourceFilter === source.id;
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = `src smooth${isActive ? ' on' : ''}`;
-    button.dataset.sourceId = source.id;
-    button.textContent = source.name;
-    button.setAttribute('aria-pressed', String(isActive));
-
-    button.addEventListener('click', () => {
-      STATE.sourceFilter = STATE.sourceFilter === source.id ? null : source.id;
-      persistState();
-
-      container.querySelectorAll('.src').forEach(control => {
-        const active = STATE.sourceFilter === control.dataset.sourceId;
-        control.classList.toggle('on', active);
-        control.setAttribute('aria-pressed', String(active));
-      });
-
-      render();
-    });
-
-    fragment.appendChild(button);
-  });
-
-  container.appendChild(fragment);
-}
-
-function initFilterNavigation() {
-  const filters = document.getElementById('filters');
-  const chips = filters.querySelectorAll('.chip');
-
-  filters.addEventListener('keydown', event => {
-    const current = document.activeElement;
-    const currentIndex = Array.from(chips).indexOf(current);
-    let nextIndex = currentIndex;
-
-    switch (event.key) {
-      case 'ArrowRight':
-        nextIndex = (currentIndex + 1) % chips.length;
-        break;
-      case 'ArrowLeft':
-        nextIndex = (currentIndex - 1 + chips.length) % chips.length;
-        break;
-      case 'Home':
-        nextIndex = 0;
-        break;
-      case 'End':
-        nextIndex = chips.length - 1;
-        break;
-      default:
-        return;
-    }
-
-    event.preventDefault();
-    chips[nextIndex].focus();
-  });
-}
-
-function fmtTime(ts) {
-  const date = new Date(ts);
-  const diffSeconds = (Date.now() - date.getTime()) / 1000;
-  if (diffSeconds < 60) {
-    return 'NOW';
-  }
-  if (diffSeconds < 3600) {
-    return `${Math.floor(diffSeconds / 60)}m`;
-  }
-  if (diffSeconds < 86400) {
-    return `${Math.floor(diffSeconds / 3600)}h`;
-  }
-  return `${Math.floor(diffSeconds / 86400)}d`;
-}
-
-function toast(msg, type = 'info') {
-  const el = document.createElement('div');
-  el.className = `toast ${type} fade`;
-  el.textContent = msg;
-  el.setAttribute('role', 'alert');
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2500);
-  return el;
-}
-
-function escapeHTML(str = '') {
-  if (typeof str !== 'string') {
-    str = String(str || '');
-  }
-  return str.replace(/[&<>"']/g, char => ESCAPE_MAP[char]);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  buildSourceToggles();
-  initFilterNavigation();
-
-  const filters = document.getElementById('filters');
-  filters.addEventListener('click', event => {
-    const chip = event.target.closest('.chip');
-    if (!chip) {
-      return;
-    }
-
-    filters.querySelectorAll('.chip').forEach(element => {
-      element.classList.remove('active');
-      element.setAttribute('aria-selected', 'false');
-      element.tabIndex = -1;
-    });
-
-    chip.classList.add('active');
-    chip.setAttribute('aria-selected', 'true');
-    chip.tabIndex = 0;
-
-    STATE.view = chip.dataset.view;
-    render();
-  });
-
-  document.getElementById('resetBtn').addEventListener('click', () => {
-    if (confirm('Reset all settings and data?')) {
-      localStorage.clear();
-      location.reload();
-    }
-  });
-
-  setInterval(() => {
-    if (!STATE.loading && Date.now() - STATE.lastFetch > 120000) {
-      loadFeeds();
-    }
-  }, 30000);
-
-  loadFeeds();
-});
-  </script>
+        // Init
+        renderHistory();
+    </script>
 </body>
 </html>
