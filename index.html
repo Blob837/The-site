@@ -1,1 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Mobile-first crude oil price tracker with offline support and alerts." />
+    <meta http-equiv="Cache-Control" content="max-age=300, must-revalidate" />
+    <meta name="theme-color" content="#0b1b2b" />
+    <title>Crude Oil Price Tracker</title>
+    <style>
+      :root{color-scheme:dark light;--bg:#0b1b2b;--bg-alt:#11253a;--card:#142a40;--accent:#1f8a70;--accent-soft:#28b487;--danger:#c0392b;--text:#f5f7fa;--muted:#8da3bc;--shadow:0 18px 32px rgba(9,22,37,.35);--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);--safe-right:env(safe-area-inset-right,0px);font-size:16px}
+      *{box-sizing:border-box;margin:0;padding:0}
+      html{min-height:100%;background:linear-gradient(160deg,var(--bg),#07121f);background-attachment:fixed}
+      body{font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:inherit;color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:stretch;-webkit-font-smoothing:antialiased;position:relative;padding:0}
+      body::before,body::after{content:"";position:fixed;left:0;right:0;background:inherit;pointer-events:none;z-index:-1}
+      body::before{top:0;height:var(--safe-top)}
+      body::after{bottom:0;height:var(--safe-bottom)}
+      header{padding:calc(1.25rem + var(--safe-top)) calc(1.5rem + var(--safe-right)) 1rem calc(1.5rem + var(--safe-left));display:flex;flex-direction:column;gap:.5rem;background:rgba(8,18,33,.8);backdrop-filter:blur(14px);position:sticky;top:calc(-1 * var(--safe-top));margin-top:calc(-1 * var(--safe-top));z-index:10;box-shadow:0 12px 30px rgba(6,12,20,.25)}
+      header h1{font-size:1.65rem;font-weight:700;letter-spacing:.02em}
+      header p{color:var(--muted);font-size:.95rem;line-height:1.4}
+      main{flex:1;display:flex;flex-direction:column;gap:1.25rem;padding:1rem calc(1.25rem + var(--safe-right)) calc(4rem + var(--safe-bottom)) calc(1.25rem + var(--safe-left))}
+      .grid{display:grid;gap:1rem}
+      .price-board{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+      .card{background:linear-gradient(145deg,var(--card),rgba(20,42,64,.85));border-radius:20px;padding:1.1rem 1.25rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.75rem;position:relative;overflow:hidden}
+      .card::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(40,180,135,.18),transparent 55%);pointer-events:none}
+      .card h2{font-size:1.1rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+      .price{font-size:2.25rem;font-weight:700}
+      .price small{font-size:1rem;color:var(--muted);font-weight:500;margin-left:.35rem}
+      .delta{display:flex;gap:.75rem;align-items:center;font-weight:600}
+      .delta span{display:flex;align-items:center;gap:.4rem;padding:.35rem .65rem;border-radius:999px;background:rgba(255,255,255,.08);font-size:.9rem}
+      .delta span.positive{color:var(--accent-soft)}
+      .delta span.negative{color:var(--danger)}
+      .delta span.neutral{color:var(--muted)}
+      .status{display:flex;align-items:center;gap:.45rem;font-size:.9rem}
+      .status-indicator{width:.75rem;height:.75rem;border-radius:50%;background:var(--danger);box-shadow:0 0 0 6px rgba(192,57,43,.18)}
+      .status-indicator.open{background:var(--accent-soft);box-shadow:0 0 0 6px rgba(40,180,135,.18)}
+      .timestamp{font-size:.85rem;color:var(--muted)}
+      .chart-card{padding:1rem}
+      .chart-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem}
+      .chart-header h3{font-size:1.05rem;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+      .range-toggle{display:flex;border-radius:14px;background:rgba(255,255,255,.05);padding:.3rem;gap:.35rem}
+      .range-toggle button{border:none;background:transparent;color:var(--muted);font-size:.85rem;font-weight:600;padding:.45rem .9rem;border-radius:12px;transition:background .2s,color .2s;cursor:pointer}
+      .range-toggle button.active{background:rgba(40,180,135,.2);color:var(--text)}
+      canvas{width:100%;max-width:100%}
+      .alerts-list{display:flex;flex-direction:column;gap:.75rem}
+      .field{display:flex;flex-direction:column;gap:.45rem}
+      .field label{font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+      .field input[type="number"],.field input[type="time"],.field select{background:rgba(9,22,37,.55);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:.6rem .75rem;color:var(--text);font-size:1rem}
+      .toggle{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+      .toggle button{border:none;border-radius:999px;padding:.35rem;width:4.5rem;background:rgba(255,255,255,.08);cursor:pointer;transition:background .2s;display:flex;align-items:center}
+      .toggle button span{display:inline-flex;align-items:center;justify-content:center;width:2.4rem;height:2.4rem;border-radius:50%;transition:transform .2s;background:rgba(255,255,255,.12)}
+      .toggle button.active span{transform:translateX(100%);background:var(--accent-soft)}
+      .toggle button.active{background:rgba(40,180,135,.25)}
+      .helper{font-size:.8rem;color:var(--muted)}
+      .notice{font-size:.85rem;color:var(--muted);line-height:1.45}
+      .loading{display:flex;align-items:center;gap:.75rem;font-size:.95rem;color:var(--muted)}
+      .loading span{width:1.1rem;height:1.1rem;border-radius:50%;background:rgba(255,255,255,.2);position:relative;overflow:hidden}
+      .loading span::after{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--accent-soft);animation:pulse 1.2s ease-in-out infinite}
+      @keyframes pulse{0%{transform:scale(.3);opacity:.8}70%{transform:scale(1);opacity:.15}100%{transform:scale(.3);opacity:.8}}
+      .error-banner{background:rgba(192,57,43,.18);border:1px solid rgba(192,57,43,.45);color:#f8d7da;padding:.75rem 1rem;border-radius:12px;font-size:.9rem;display:none}
+      .error-banner.active{display:block}
+      footer{padding:1.5rem calc(1.5rem + var(--safe-right)) calc(1.5rem + var(--safe-bottom)) calc(1.5rem + var(--safe-left));text-align:center;color:var(--muted);font-size:.78rem}
+      .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+      @media (min-width:900px){header{flex-direction:row;align-items:flex-end;justify-content:space-between}header h1{font-size:2rem}main{padding:1.5rem calc(2rem + var(--safe-right)) calc(4rem + var(--safe-bottom)) calc(2rem + var(--safe-left))}.grid.price-board{grid-template-columns:repeat(2, minmax(280px,1fr))}.chart-card{padding:1.35rem}}
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js" integrity="sha384-gTq4CPGK/c/pdwV61TezKDgxKDsNmptBPR6jI+IvAxdajmFK2umrQ06+ObBuAz7j" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" integrity="sha384-fcPTLnRuW01WmvuyDNYOR1c9ZftYuAP92mTTrKPpQhc5EjcN0NPpTivYS/sx5Rn1" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.umd.min.js" integrity="sha384-vI3S9jY+mjJB4rx39oqPfJih2GjR9v5sx0hYLHTjPFWxFCykptAb8uP32MkJGyXm" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Crude Oil Price Tracker</h1>
+        <p>Live WTI &amp; Brent crude pricing, interactive history, and intelligent alerts in a single offline-ready dashboard.</p>
+      </div>
+      <div class="status">
+        <span class="status-indicator" id="marketStatus" aria-hidden="true"></span>
+        <span id="marketStatusLabel">Market closed</span>
+      </div>
+    </header>
+    <main>
+      <div class="error-banner" role="alert" id="errorBanner">Unable to refresh pricing. We'll retry automatically.</div>
+      <section aria-label="Current crude oil prices" class="grid price-board">
+        <article class="card" id="wtiCard">
+          <div>
+            <h2>WTI Crude</h2>
+            <p class="price" id="wtiPrice">--<small>USD</small></p>
+          </div>
+          <div class="delta">
+            <span id="wtiChange" class="neutral">--</span>
+            <span id="wtiChangePct" class="neutral">--</span>
+          </div>
+          <p class="timestamp" id="wtiUpdated">Last updated: --</p>
+        </article>
+        <article class="card" id="brentCard">
+          <div>
+            <h2>Brent Crude</h2>
+            <p class="price" id="brentPrice">--<small>USD</small></p>
+          </div>
+          <div class="delta">
+            <span id="brentChange" class="neutral">--</span>
+            <span id="brentChangePct" class="neutral">--</span>
+          </div>
+          <p class="timestamp" id="brentUpdated">Last updated: --</p>
+        </article>
+      </section>
+      <section class="card chart-card" aria-label="Price history charts">
+        <div class="chart-header">
+          <h3>Price history</h3>
+          <div class="range-toggle" role="group" aria-label="Time range">
+            <button type="button" data-range="1d" class="active">1D</button>
+            <button type="button" data-range="7d">7D</button>
+            <button type="button" data-range="30d">30D</button>
+          </div>
+        </div>
+        <div class="loading" id="chartLoading" aria-live="polite"><span></span>Preparing chart…</div>
+        <div class="grid" style="margin-top:1rem;gap:2rem">
+          <figure aria-labelledby="wtiChartLabel">
+            <figcaption id="wtiChartLabel" class="sr-only">WTI crude price history chart</figcaption>
+            <canvas id="wtiChart" height="280"></canvas>
+          </figure>
+          <figure aria-labelledby="brentChartLabel">
+            <figcaption id="brentChartLabel" class="sr-only">Brent crude price history chart</figcaption>
+            <canvas id="brentChart" height="280"></canvas>
+          </figure>
+        </div>
+      </section>
+      <section class="card" aria-label="Alert configuration">
+        <h2>Alerts &amp; Notifications</h2>
+        <p class="notice">Set personalized price alerts and daily summaries. Notifications run locally in your browser and respect your privacy.</p>
+        <div class="alerts-list" id="alertsForm">
+          <div class="field">
+            <label for="wtiAlert">WTI price threshold (USD)</label>
+            <input id="wtiAlert" name="wtiAlert" type="number" step="0.01" min="0" placeholder="e.g. 90" />
+          </div>
+          <div class="field">
+            <label for="brentAlert">Brent price threshold (USD)</label>
+            <input id="brentAlert" name="brentAlert" type="number" step="0.01" min="0" placeholder="e.g. 95" />
+          </div>
+          <div class="field">
+            <label for="alertDirection">Notify me when price</label>
+            <select id="alertDirection">
+              <option value="above">goes above threshold</option>
+              <option value="below">drops below threshold</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="summaryTime">Daily summary time (local)</label>
+            <input id="summaryTime" name="summaryTime" type="time" value="17:00" />
+            <p class="helper">We’ll send a brief recap once per day when data is available.</p>
+          </div>
+          <div class="toggle">
+            <span>Enable browser notifications</span>
+            <button type="button" id="notificationsToggle" aria-pressed="false" aria-label="Enable notifications"><span></span></button>
+          </div>
+          <p class="notice" id="notificationStatus" role="status"></p>
+        </div>
+      </section>
+    </main>
+    <footer>&copy; <span id="year"></span> Crude Oil Tracker. Data via Yahoo Finance. Refreshes automatically every 15 minutes during market hours.</footer>
+    <script>
+      const STORAGE_KEYS={quotes:"cot_quotes_v1",history:"cot_history_v1",prefs:"cot_prefs_v1"};
+      const SYMBOLS={wti:"CL=F",brent:"BZ=F"};
+      const RANGE_CONFIG={"1d":{label:"1D",range:"1d",interval:"30m"},"7d":{label:"7D",range:"7d",interval:"2h"},"30d":{label:"30D",range:"1mo",interval:"1d"}};
+      const YAHOO_HOSTS=["https://query1.finance.yahoo.com","https://query2.finance.yahoo.com"];
+      const PROXY_WRAPPERS=["https://cors.isomorphic-git.org/"];
+      const JSON_HEADERS={accept:"application/json","x-requested-with":"XMLHttpRequest"};
+      const FIFTEEN_MIN=9e5;const MARKET_OPEN_UTC=13;const MARKET_CLOSE_UTC=23;
+      const state={charts:{},currentRange:"1d",historyCache:{},quotes:null,prefs:{}};
 
+      const fmt=new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2});
+      const fmtDelta=new Intl.NumberFormat("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+      const fmtPercent=new Intl.NumberFormat("en-US",{style:"percent",minimumFractionDigits:2,maximumFractionDigits:2});
+      const fmtDate=new Intl.DateTimeFormat(undefined,{dateStyle:"medium",timeStyle:"short"});
+
+      const $=selector=>document.querySelector(selector);
+
+      function buildYahooUrls(path){
+        const normalized=path.startsWith("/")?path:`/${path}`;
+        const urls=[];
+        YAHOO_HOSTS.forEach(host=>urls.push(`${host}${normalized}`));
+        YAHOO_HOSTS.forEach(host=>{
+          PROXY_WRAPPERS.forEach(proxy=>urls.push(`${proxy}${host}${normalized}`));
+        });
+        return urls;
+      }
+
+      async function fetchJsonWithFallbacks(urls){
+        let lastError=null;
+        for(const url of urls){
+          try{
+            const response=await fetch(url,{mode:"cors",cache:"no-store",headers:JSON_HEADERS});
+            if(!response.ok)throw new Error(`Request failed: ${response.status}`);
+            const text=await response.text();
+            if(!text)throw new Error("Empty response");
+            try{
+              const parsed=JSON.parse(text);
+              if(parsed===null)throw new Error("Null response");
+              return parsed;
+            }catch(parseErr){
+              throw new Error("Invalid JSON payload");
+            }
+          }catch(err){
+            lastError=err;
+          }
+        }
+        throw lastError||new Error("All sources failed");
+      }
+
+      function isMarketOpen(now=new Date()){
+        const utcHour=now.getUTCHours();
+        const day=now.getUTCDay();
+        const isWeekend=day===0||day===6;
+        return !isWeekend&&utcHour>=MARKET_OPEN_UTC&&utcHour<MARKET_CLOSE_UTC;
+      }
+
+      function setStatus(open){
+        const indicator=$("#marketStatus");
+        const label=$("#marketStatusLabel");
+        indicator.classList.toggle("open",open);
+        label.textContent=open?"Market open":"Market closed";
+      }
+
+      async function fetchQuotes(){
+        const symbols=[SYMBOLS.wti,SYMBOLS.brent].map(encodeURIComponent).join(",");
+        const urls=buildYahooUrls(`/v7/finance/quote?symbols=${symbols}`);
+        const data=await fetchJsonWithFallbacks(urls);
+        const result=data?.quoteResponse?.result||[];
+        if(result.length<2)throw new Error("Incomplete quote data");
+        const [wtiData,brentData]=SYMBOLS.wti===result[0].symbol?[result[0],result[1]]:[result[1],result[0]];
+        const mapped={
+          fetchedAt:Date.now(),
+          wti:mapQuote(wtiData),
+          brent:mapQuote(brentData)
+        };
+        localStorage.setItem(STORAGE_KEYS.quotes,JSON.stringify(mapped));
+        return mapped;
+      }
+
+      function mapQuote(q){
+        return {
+          price:q.regularMarketPrice??null,
+          change:q.regularMarketChange??0,
+          changePercent:q.regularMarketChangePercent??0,
+          previousClose:q.regularMarketPreviousClose??null,
+          exchangeTime:q.regularMarketTime?new Date(q.regularMarketTime*1e3).toISOString():null
+        };
+      }
+
+      async function fetchHistory(symbol,rangeKey){
+        const cfg=RANGE_CONFIG[rangeKey];
+        const qs=new URLSearchParams({range:cfg.range,interval:cfg.interval,includePrePost:"false",corsDomain:"finance.yahoo.com"});
+        const path=`/v8/finance/chart/${encodeURIComponent(symbol)}?${qs.toString()}`;
+        const payload=await fetchJsonWithFallbacks(buildYahooUrls(path));
+        const chart=payload?.chart?.result?.[0];
+        if(!chart||!Array.isArray(chart.timestamp))throw new Error("Invalid history data");
+        const prices=chart.indicators?.quote?.[0]?.close||[];
+        const points=chart.timestamp.map((ts,idx)=>({t:new Date(ts*1e3),v:prices[idx]??null})).filter(point=>point.v!==null);
+        const entry={symbol,range:rangeKey,fetchedAt:Date.now(),points};
+        cacheHistory(entry);
+        return entry;
+      }
+
+      function cacheHistory(entry){
+        const cache=loadHistoryCache();
+        const key=`${entry.symbol}_${entry.range}`;
+        cache[key]=entry;
+        localStorage.setItem(STORAGE_KEYS.history,JSON.stringify(cache));
+        state.historyCache=cache;
+      }
+
+      function loadHistoryCache(){
+        if(state.historyCache&&Object.keys(state.historyCache).length)return state.historyCache;
+        try{
+          const raw=localStorage.getItem(STORAGE_KEYS.history);
+          if(!raw)return{};
+          state.historyCache=JSON.parse(raw)||{};
+          return state.historyCache;
+        }catch(err){
+          console.error("Failed to read history cache",err);
+          return{};
+        }
+      }
+
+      function loadCachedQuotes(){
+        try{
+          const raw=localStorage.getItem(STORAGE_KEYS.quotes);
+          if(!raw)return null;
+          return JSON.parse(raw);
+        }catch(err){
+          console.error("Failed to parse quote cache",err);
+          return null;
+        }
+      }
+
+      function applyQuotes(quotes){
+        if(!quotes)return;
+        state.quotes=quotes;
+        const {wti,brent,fetchedAt}=quotes;
+        updateCard("wti",wti,fetchedAt);
+        updateCard("brent",brent,fetchedAt);
+      }
+
+      function updateCard(key,data,fetchedAt){
+        const priceEl=$(`#${key}Price`);
+        const changeEl=$(`#${key}Change`);
+        const changePctEl=$(`#${key}ChangePct`);
+        const updatedEl=$(`#${key}Updated`);
+        if(typeof data.price==="number")priceEl.innerHTML=`${fmt.format(data.price)}<small>USD</small>`;else priceEl.innerHTML=`--<small>USD</small>`;
+        const changeClass=data.change>0?"positive":data.change<0?"negative":"neutral";
+        changeEl.className=changeClass;changePctEl.className=changeClass;
+        changeEl.textContent=typeof data.change==="number"?`${data.change>=0?"+":""}${fmtDelta.format(data.change||0)} USD`:"--";
+        changePctEl.textContent=typeof data.changePercent==="number"?`${data.changePercent>=0?"+":""}${fmtPercent.format((data.changePercent||0)/100)}`:"--";
+        const ts=data.exchangeTime?fmtDate.format(new Date(data.exchangeTime)):fmtDate.format(new Date(fetchedAt));
+        updatedEl.textContent=`Last updated: ${ts}`;
+      }
+
+      function createChart(ctx,label){
+        return new Chart(ctx,{type:"line",data:{labels:[],datasets:[{label,fill:false,data:[],borderColor:"rgba(40,180,135,0.85)",borderWidth:2.2,pointRadius:0,tension:.25}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:"index",intersect:false,callbacks:{label:ctx=>`${fmt.format(ctx.parsed.y)}`}},zoom:{},},interaction:{mode:"index",intersect:false},scales:{x:{type:"time",ticks:{color:"#aab9cf"},grid:{color:"rgba(255,255,255,.05)"}},y:{ticks:{color:"#aab9cf"},grid:{color:"rgba(255,255,255,.05)"}}},elements:{point:{radius:0}},animation:{duration:350}}});
+      }
+
+      function registerZoom(chart){
+        chart.options.plugins.zoom={zoom:{wheel:{enabled:true},pinch:{enabled:true},mode:"x"},pan:{enabled:true,mode:"x",modifierKey:"shift"}};
+        chart.update();
+      }
+
+      async function ensureChartsReady(){
+        if(window.Chart&&window.Chart.registry.plugins.get("zoom"))return;
+        await new Promise((resolve,reject)=>{
+          const start=performance.now();
+          const limit=9e3;
+          const check=()=>{
+            if(window.Chart&&window.Chart.registry.plugins.get("zoom")){
+              resolve();
+              return;
+            }
+            if(performance.now()-start>limit){
+              reject(new Error("Chart libraries not available"));
+              return;
+            }
+            requestAnimationFrame(check);
+          };
+          check();
+        });
+      }
+
+      async function renderHistory(rangeKey){
+        state.currentRange=rangeKey;
+        toggleRangeButtons(rangeKey);
+        const loader=$("#chartLoading");
+        loader.style.display="flex";
+        loader.textContent="Preparing chart…";
+        const buttons=[...document.querySelectorAll(".range-toggle button")];
+        buttons.forEach(btn=>btn.disabled=true);
+        try{
+          await ensureChartsReady();
+          const datasets=await Promise.all([loadHistory(SYMBOLS.wti,rangeKey),loadHistory(SYMBOLS.brent,rangeKey)]);
+          const [wtiHistory,brentHistory]=datasets;
+          upsertChart("wti",wtiHistory);
+          upsertChart("brent",brentHistory);
+          if((wtiHistory.points?.length||0)===0&&(brentHistory.points?.length||0)===0){
+            loader.style.display="flex";
+            loader.textContent="No chart data available for this range.";
+          }else{
+            loader.style.display="none";
+          }
+        }catch(err){
+          console.error("History render failed",err);
+          loader.style.display="flex";
+          loader.textContent="Unable to load chart data.";
+        }finally{
+          buttons.forEach(btn=>btn.disabled=false);
+        }
+      }
+
+      async function loadHistory(symbol,rangeKey){
+        const cache=loadHistoryCache();
+        const key=`${symbol}_${rangeKey}`;
+        const cached=cache[key];
+        if(cached&&Date.now()-cached.fetchedAt<6*FIFTEEN_MIN)return cached;
+        try{
+          return await fetchHistory(symbol,rangeKey);
+        }catch(err){
+          console.error("History fetch failed",err);
+          if(cached)return cached;
+          throw err;
+        }
+      }
+
+      function upsertChart(id,history){
+        const ctx=document.getElementById(`${id}Chart`).getContext("2d");
+        if(!state.charts[id]){
+          state.charts[id]=createChart(ctx,id==="wti"?"WTI" : "Brent");
+          registerZoom(state.charts[id]);
+        }
+        const chart=state.charts[id];
+        chart.data.labels=history.points.map(p=>p.t);
+        chart.data.datasets[0].data=history.points.map(p=>({x:p.t,y:p.v}));
+        chart.update("none");
+      }
+
+      function toggleRangeButtons(activeRange){
+        document.querySelectorAll(".range-toggle button").forEach(btn=>{
+          const isActive=btn.dataset.range===activeRange;
+          btn.classList.toggle("active",isActive);
+        });
+      }
+
+      async function refreshQuotes(){
+        try{
+          const quotes=await fetchQuotes();
+          applyQuotes(quotes);
+          setError(false);
+          evaluateAlerts();
+        }catch(err){
+          console.error("Quote refresh failed",err);
+          const cached=loadCachedQuotes();
+          if(cached){
+            applyQuotes(cached);
+            setError(true,"Live pricing temporarily unavailable. Displaying last saved data.");
+          }else{
+            setError(true,"Unable to refresh pricing. We'll retry automatically.");
+          }
+        }
+      }
+
+      function setError(hasError,message){
+        const banner=$("#errorBanner");
+        if(!banner)return;
+        if(hasError&&message)banner.textContent=message;
+        banner.classList.toggle("active",hasError);
+      }
+
+      function scheduleRefresh(){
+        const now=new Date();
+        const open=isMarketOpen(now);
+        setStatus(open);
+        if(open){
+          refreshQuotes();
+        }
+        const delay=open?FIFTEEN_MIN:timeUntilOpen(now);
+        window.clearTimeout(scheduleRefresh.timer);
+        scheduleRefresh.timer=window.setTimeout(scheduleRefresh,delay);
+      }
+
+      function timeUntilOpen(now){
+        const target=new Date(now);
+        target.setUTCHours(MARKET_OPEN_UTC,0,0,0);
+        if(target<=now)target.setUTCDate(target.getUTCDate()+1);
+        while(target.getUTCDay()===0||target.getUTCDay()===6){
+          target.setUTCDate(target.getUTCDate()+1);
+        }
+        return target-now;
+      }
+
+      function hydrateFromCache(){
+        const cached=loadCachedQuotes();
+        if(cached)applyQuotes(cached);
+      }
+
+      function initRangeButtons(){
+        document.querySelectorAll(".range-toggle button").forEach(btn=>{
+          btn.addEventListener("click",()=>{
+            const range=btn.dataset.range;
+            if(range!==state.currentRange){
+              renderHistory(range);
+            }
+          });
+        });
+      }
+
+      function loadPrefs(){
+        try{
+          const raw=localStorage.getItem(STORAGE_KEYS.prefs);
+          state.prefs=raw?JSON.parse(raw):{};
+        }catch(err){
+          console.error("Failed to parse prefs",err);
+          state.prefs={};
+        }
+        const {wtiAlert,brentAlert,alertDirection="above",summaryTime="17:00",notificationsEnabled=false}=state.prefs;
+        if(wtiAlert)$("#wtiAlert").value=wtiAlert;
+        if(brentAlert)$("#brentAlert").value=brentAlert;
+        $("#alertDirection").value=alertDirection;
+        $("#summaryTime").value=summaryTime;
+        const supported=("Notification" in window);
+        const enabled=supported&&notificationsEnabled;
+        updateToggle(enabled);
+        state.prefs.notificationsEnabled=enabled;
+        if(enabled!==notificationsEnabled){
+          localStorage.setItem(STORAGE_KEYS.prefs,JSON.stringify(state.prefs));
+        }
+        updateNotificationStatus();
+      }
+
+      function persistPrefs(){
+        const prefs={
+          wtiAlert:parseFloat($("#wtiAlert").value)||null,
+          brentAlert:parseFloat($("#brentAlert").value)||null,
+          alertDirection:$("#alertDirection").value,
+          summaryTime:$("#summaryTime").value,
+          notificationsEnabled:$("#notificationsToggle").classList.contains("active")
+        };
+        state.prefs={...state.prefs,...prefs};
+        localStorage.setItem(STORAGE_KEYS.prefs,JSON.stringify(state.prefs));
+      }
+
+      function bindPrefs(){
+        ["#wtiAlert","#brentAlert","#alertDirection","#summaryTime"].forEach(sel=>{
+          $(sel).addEventListener("change",()=>{
+            persistPrefs();
+            evaluateAlerts();
+            scheduleDailySummary();
+          });
+        });
+        $("#notificationsToggle").addEventListener("click",async()=>{
+          const enabled=$("#notificationsToggle").classList.toggle("active");
+          $("#notificationsToggle").setAttribute("aria-pressed",String(enabled));
+          if(enabled){
+            const permission=await requestNotificationPermission();
+            if(permission!="granted"){
+              updateToggle(false);
+            }
+          }
+          persistPrefs();
+          updateNotificationStatus();
+          scheduleDailySummary();
+        });
+      }
+
+      function updateToggle(stateOn){
+        const toggle=$("#notificationsToggle");
+        toggle.classList.toggle("active",stateOn);
+        toggle.setAttribute("aria-pressed",String(stateOn));
+      }
+
+      function updateNotificationStatus(){
+        const status=$("#notificationStatus");
+        if(!("Notification" in window)){
+          updateToggle(false);
+          status.textContent="Notifications are not supported in this browser.";
+          return;
+        }
+        const permission=Notification.permission;
+        if(permission==="denied"){
+          status.textContent="Notifications blocked. Enable them in your browser settings to receive alerts.";
+          updateToggle(false);
+          return;
+        }
+        status.textContent=$("#notificationsToggle").classList.contains("active")?"Notifications enabled. We'll alert you when conditions are met.":"Notifications disabled.";
+      }
+
+      async function requestNotificationPermission(){
+        if(!("Notification" in window)){
+          $("#notificationStatus").textContent="This browser does not support notifications.";
+          return "denied";
+        }
+        if(Notification.permission!=="granted"){
+          try{
+            const permission=await Notification.requestPermission();
+            return permission;
+          }catch(err){
+            console.error("Notification permission error",err);
+            return "denied";
+          }
+        }
+        return Notification.permission;
+      }
+
+      function evaluateAlerts(){
+        if(!state.quotes)return;
+        const {notificationsEnabled,wtiAlert,brentAlert,alertDirection}=state.prefs;
+        if(!notificationsEnabled||!("Notification" in window)||Notification.permission!=="granted")return;
+        const thresholds=[{symbol:"WTI",value:wtiAlert,price:state.quotes.wti?.price},{symbol:"Brent",value:brentAlert,price:state.quotes.brent?.price}];
+        let mutated=false;
+        thresholds.forEach(({symbol,value,price})=>{
+          if(!value||typeof price!=="number")return;
+          const crossed=alertDirection==="above"?price>=value:price<=value;
+          const key=`alert_${symbol}`;
+          if(crossed&&!state.prefs[key]){
+            spawnNotification(`${symbol} alert`,`${symbol} crude is ${fmt.format(price)} which is ${alertDirection} ${fmt.format(value)}.`);
+            state.prefs[key]=true;
+            mutated=true;
+          }
+          if(!crossed&&state.prefs[key]){
+            state.prefs[key]=false;
+            mutated=true;
+          }
+        });
+        if(mutated)localStorage.setItem(STORAGE_KEYS.prefs,JSON.stringify(state.prefs));
+      }
+
+      function spawnNotification(title,body){
+        try{
+          new Notification(title,{body,tag:title,icon:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='8' fill='%231f8a70'/%3E%3Cpath fill='white' d='M24 13c-.9 0-1.7.8-1.7 1.7v9.8l-5.6 5.6c-.7.7-.7 1.7 0 2.4.7.6 1.7.6 2.4 0l6.2-6.2c.3-.3.5-.7.5-1.2v-10.4c0-.9-.8-1.7-1.8-1.7z'/%3E%3C/svg%3E"});
+        }catch(err){
+          console.error("Notification failed",err);
+        }
+      }
+
+      function scheduleDailySummary(){
+        window.clearTimeout(scheduleDailySummary.timer);
+        if(!state.prefs.notificationsEnabled)return;
+        const time=state.prefs.summaryTime||"17:00";
+        const [hours,minutes]=time.split(":").map(Number);
+        const now=new Date();
+        const target=new Date();
+        target.setHours(hours,minutes,0,0);
+        if(target<=now)target.setDate(target.getDate()+1);
+        const delay=target-now;
+        scheduleDailySummary.timer=window.setTimeout(()=>{
+          sendDailySummary();
+          scheduleDailySummary();
+        },delay);
+      }
+
+      function sendDailySummary(){
+        if(!("Notification" in window))return;
+        if(!(Notification.permission==="granted"&&state.prefs.notificationsEnabled&&state.quotes))return;
+        const {wti,brent}=state.quotes;
+        spawnNotification("Daily crude summary",`WTI: ${fmt.format(wti.price)} (${fmtDelta.format(wti.change)} / ${fmtPercent.format((wti.changePercent||0)/100)})\nBrent: ${fmt.format(brent.price)} (${fmtDelta.format(brent.change)} / ${fmtPercent.format((brent.changePercent||0)/100)})`);
+      }
+
+      function initServiceWorker(){
+        if(!("serviceWorker" in navigator))return;
+        const apiHostsJson=JSON.stringify(["query1.finance.yahoo.com","query2.finance.yahoo.com","cors.isomorphic-git.org"]);
+        const swCode=`const API_HOSTS=${apiHostsJson};self.addEventListener('install',e=>{e.waitUntil(caches.open('cot-static-v1').then(cache=>cache.addAll(['./','./index.html'])));self.skipWaiting();});self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>!['cot-static-v1'].includes(k)).map(k=>caches.delete(k)))));self.clients.claim();});self.addEventListener('fetch',event=>{const {request}=event;if(request.method!=='GET')return;const isAPI=API_HOSTS.some(host=>request.url.includes(host));if(isAPI){event.respondWith(fetch(request).then(resp=>{const clone=resp.clone();caches.open('cot-api-v1').then(cache=>cache.put(request,clone));return resp;}).catch(()=>caches.open('cot-api-v1').then(cache=>cache.match(request)).then(resp=>resp||new Response(JSON.stringify({error:'offline'}),{status:503,headers:{'Content-Type':'application/json'}}))));return;}event.respondWith(caches.match(request).then(cacheResp=>cacheResp||fetch(request).then(resp=>{const clone=resp.clone();caches.open('cot-static-v1').then(cache=>cache.put(request,clone));return resp;}).catch(()=>cacheResp)));});`;
+        const blob=new Blob([swCode],{type:"application/javascript"});
+        const swUrl=URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl).catch(err=>console.error("SW registration failed",err));
+      }
+
+      function lazyInitialize(){
+        initServiceWorker();
+        initRangeButtons();
+        renderHistory(state.currentRange);
+        scheduleRefresh();
+        scheduleDailySummary();
+      }
+
+      function init(){
+        document.addEventListener("visibilitychange",()=>{
+          if(document.visibilityState==="visible"&&isMarketOpen()){
+            refreshQuotes();
+          }
+        });
+        hydrateFromCache();
+        setStatus(isMarketOpen());
+        loadPrefs();
+        bindPrefs();
+        window.setTimeout(lazyInitialize,600);
+        refreshQuotes();
+        $("#year").textContent=new Date().getFullYear();
+      }
+
+      window.addEventListener("load",init);
+    </script>
+  </body>
+</html>
