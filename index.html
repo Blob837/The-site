@@ -249,16 +249,16 @@
 </head>
 <body>
     <header>
-        <h1>Bias Detector</h1>
+        <h1>Bias Detector v3</h1>
     </header>
     <section id="input-section">
         <input type="url" id="url-input" placeholder="Paste news article URL" aria-label="Article URL">
         <button id="analyze-btn"><span>Analyze</span><div class="loader"></div></button>
+        <div id="error-msg" class="error-msg"></div>
         <div class="accordion" id="paste-accordion">
             <p>Fetch issue detected. Please paste the article text below:</p>
             <textarea id="paste-text" rows="10" placeholder="Paste article text here" aria-label="Paste article text"></textarea>
             <button id="analyze-paste-btn"><span>Analyze Pasted Text</span><div class="loader"></div></button>
-            <div id="error-msg" class="error-msg"></div>
         </div>
     </section>
     <section id="result-section" class="result">
@@ -377,9 +377,10 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(text, 'text/html');
                     title = doc.querySelector('title')?.textContent || urlOrText;
-                    const article = doc.querySelector('article') || doc.querySelector('body');
+                    const article = doc.querySelector('article') || doc.body;
                     text = article ? article.innerText : '';
                     hostname = new URL(urlOrText).hostname;
+                    if (!text.trim()) throw new Error('No content extracted from page.');
                 } else {
                     text = urlOrText;
                     fetchQuality = 0.8;
@@ -392,18 +393,19 @@
                 const headline = title.toLowerCase() || sentences[0] || '';
             } catch (e) {
                 analyzeBtn.classList.remove('loading');
+                errorEl.textContent = `Error: ${e.message}.`;
                 if (isUrl) {
                     document.getElementById('paste-accordion').classList.add('show');
-                    errorEl.textContent = `Error fetching: ${e.message}. Try pasting text.`;
-                } else {
-                    errorEl.textContent = `Error: ${e.message}`;
+                    errorEl.textContent += ' Try pasting the article text manually.';
                 }
+                console.error(e);
                 return;
             }
 
             if (text.length < 100) {
                 analyzeBtn.classList.remove('loading');
-                errorEl.textContent = 'Text too short for analysis.';
+                errorEl.textContent = 'Text too short for analysis. If this is unexpected, try pasting manually.';
+                if (isUrl) document.getElementById('paste-accordion').classList.add('show');
                 return;
             }
 
@@ -523,7 +525,8 @@
                 Raw Score: ${raw.toFixed(2)}<br>
                 Prior Bias: ${priorBias.toFixed(2)}<br>
                 Political Sentences: ${politicalSentences}/${sentences.length}<br>
-                Token Count: ${tokenCount}
+                Token Count: ${tokenCount}<br>
+                Extracted Text Length: ${text.length}
             `;
 
             analyzeBtn.classList.remove('loading');
