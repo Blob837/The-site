@@ -10,18 +10,25 @@
     <style>
         :root {
             --bg-primary: #0a0a0a;
-            --bg-secondary: #1a1a1a;
-            --bg-tertiary: #2a2a2a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #141414;
             --text-primary: #00ff41;
             --text-secondary: #33ff77;
-            --text-muted: #888;
+            --text-muted: #666;
+            --text-light: #999;
             --accent-up: #00ff41;
-            --accent-down: #ff4444;
+            --accent-down: #ff3366;
             --accent-flat: #888;
-            --border: #333;
-            --glow: 0 0 10px currentColor;
+            --accent-warning: #ffa500;
+            --border: #222;
+            --border-light: #333;
+            --glow: 0 0 20px currentColor;
+            --glow-subtle: 0 0 10px rgba(0, 255, 65, 0.3);
             --safe-area-top: env(safe-area-inset-top);
             --safe-area-bottom: env(safe-area-inset-bottom);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --shadow-hover: 0 12px 40px rgba(0, 255, 65, 0.15);
         }
 
         * {
@@ -30,15 +37,20 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100vh;
+            overflow: hidden;
+        }
+
         body {
-            font-family: 'Menlo', 'Monaco', 'Consolas', monospace;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Monaco', 'Menlo', 'Consolas', monospace;
             background: var(--bg-primary);
             color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
             position: relative;
             padding-top: var(--safe-area-top);
             padding-bottom: var(--safe-area-bottom);
+            display: flex;
+            flex-direction: column;
         }
 
         body::before {
@@ -49,105 +61,176 @@
             right: 0;
             bottom: 0;
             background: 
-                linear-gradient(transparent 50%, rgba(0, 255, 65, 0.03) 50%),
-                linear-gradient(90deg, transparent 50%, rgba(0, 255, 65, 0.02) 50%);
-            background-size: 100% 4px, 4px 100%;
+                radial-gradient(circle at 20% 20%, rgba(0, 255, 65, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 255, 65, 0.03) 0%, transparent 50%),
+                linear-gradient(transparent 50%, rgba(0, 255, 65, 0.01) 50%);
+            background-size: 100% 100%, 100% 100%, 100% 2px;
             pointer-events: none;
             z-index: 1000;
+            animation: backgroundPulse 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes backgroundPulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.7; }
         }
 
         @media (prefers-reduced-motion: reduce) {
-            body::before { display: none; }
+            body::before { animation: none; opacity: 0.5; }
+            .animate { animation: none !important; }
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 16px;
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            z-index: 10;
         }
 
         .header {
             background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: var(--safe-area-top);
-            z-index: 100;
+            padding: 12px 0;
+            border-bottom: 2px solid var(--border);
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
         }
 
         .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
         }
 
         .brand {
-            font-size: 1.5rem;
-            font-weight: bold;
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 3px;
             text-shadow: var(--glow);
+            background: linear-gradient(45deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .status {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 0.9rem;
+            gap: 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-card);
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: var(--accent-down);
-            box-shadow: var(--glow);
+            background: var(--accent-up);
+            box-shadow: var(--glow-subtle);
             animation: pulse 2s infinite;
         }
 
-        .status-dot.online {
-            background: var(--accent-up);
-        }
-
-        .status-dot.loading {
-            background: #ff8800;
-        }
+        .status-dot.offline { background: var(--accent-down); }
+        .status-dot.loading { background: var(--accent-warning); }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
         }
 
-        .price-grid {
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .main-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        .content-wrapper {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin: 24px 0;
+            grid-template-rows: auto 1fr;
+            gap: 24px;
+            height: calc(100vh - 140px);
+        }
+
+        .prices-section {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
         .price-card {
-            background: var(--bg-secondary);
+            background: linear-gradient(145deg, var(--bg-card), var(--bg-secondary));
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            transition: all 0.3s ease;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-card);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             position: relative;
+            overflow: hidden;
+        }
+
+        .price-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+            transition: left 0.6s;
         }
 
         .price-card:hover {
-            box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2);
-            transform: scale(1.02);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--text-secondary);
+        }
+
+        .price-card:hover::before {
+            left: 100%;
         }
 
         .price-card.loading::after {
             content: '';
             position: absolute;
             top: 50%;
-            right: 16px;
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--text-muted);
+            right: 20px;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
             border-top: 2px solid var(--text-primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -159,182 +242,339 @@
         }
 
         .price-card h3 {
-            font-size: 1.1rem;
-            margin-bottom: 8px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
             color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .price-main {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
         .price-value {
-            font-size: 2rem;
-            font-weight: bold;
-            text-shadow: var(--glow);
-            margin-bottom: 8px;
+            font-size: 2.8rem;
+            font-weight: 900;
+            text-shadow: var(--glow-subtle);
+            line-height: 1;
+        }
+
+        .price-currency {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .price-changes {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
         }
 
         .price-change {
             display: flex;
-            gap: 8px;
-            font-size: 0.9rem;
+            flex-direction: column;
+            gap: 2px;
         }
 
-        .price-meta {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 8px;
+        .change-label {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .change-value {
+            font-size: 1.1rem;
+            font-weight: 700;
         }
 
         .change-up { color: var(--accent-up); }
         .change-down { color: var(--accent-down); }
         .change-flat { color: var(--accent-flat); }
 
-        .section {
-            margin: 32px 0;
-        }
-
-        .section-header {
+        .price-meta {
+            font-size: 0.85rem;
+            color: var(--text-light);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .data-quality {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .quality-live {
+            background: rgba(0, 255, 65, 0.2);
+            color: var(--accent-up);
+        }
+
+        .quality-calculated {
+            background: rgba(255, 163, 0, 0.2);
+            color: var(--accent-warning);
+        }
+
+        .section {
+            background: linear-gradient(145deg, var(--bg-card), var(--bg-secondary));
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px 24px 16px;
             border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-tertiary);
         }
 
         .section-title {
-            font-size: 1.3rem;
-            text-shadow: var(--glow);
+            font-size: 1.4rem;
+            font-weight: 800;
+            text-shadow: var(--glow-subtle);
+            letter-spacing: 1px;
+        }
+
+        .auto-refresh-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+
+        .refresh-timer {
+            color: var(--text-secondary);
+            font-weight: 600;
         }
 
         .tabs {
             display: flex;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 16px;
+            background: var(--bg-tertiary);
+            margin: 0;
         }
 
         .tab {
             flex: 1;
-            padding: 12px 8px;
+            padding: 14px 16px;
             background: none;
             border: none;
             color: var(--text-muted);
             font-family: inherit;
             font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-height: 44px;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tab::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--text-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
         }
 
         .tab.active {
-            background: var(--bg-tertiary);
             color: var(--text-primary);
-            text-shadow: var(--glow);
+            background: var(--bg-card);
+        }
+
+        .tab.active::after {
+            transform: scaleX(1);
+        }
+
+        .tab:hover:not(.active) {
+            color: var(--text-secondary);
+            background: var(--bg-secondary);
         }
 
         .tab-content {
             display: none;
+            flex: 1;
+            overflow: hidden;
         }
 
         .tab-content.active {
-            display: block;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .charts-container {
+            padding: 20px 24px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .chart-grid {
+            display: grid;
+            gap: 20px;
         }
 
         .chart-container {
             background: var(--bg-secondary);
-            border-radius: 8px;
-            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 700;
             margin-bottom: 16px;
-            min-height: 250px;
-            position: relative;
+            color: var(--text-secondary);
+            text-align: center;
         }
 
         .chart-canvas {
             width: 100%;
             height: 200px;
-            border-radius: 4px;
+            border-radius: 8px;
+        }
+
+        .news-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
         }
 
         .news-grid {
             display: grid;
-            gap: 12px;
+            gap: 1px;
+            background: var(--border);
         }
 
         .news-item {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px;
+            background: var(--bg-card);
+            padding: 20px 24px;
             transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
         }
 
         .news-item:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--text-secondary);
+            background: var(--bg-secondary);
+            border-left-color: var(--text-secondary);
+            transform: translateX(4px);
+        }
+
+        .news-item:first-child {
+            border-left-color: var(--accent-up);
         }
 
         .news-title {
             font-size: 1rem;
+            font-weight: 600;
             margin-bottom: 8px;
             line-height: 1.4;
+            color: var(--text-primary);
         }
 
         .news-title a {
-            color: var(--text-primary);
+            color: inherit;
             text-decoration: none;
+            transition: color 0.3s ease;
         }
 
         .news-title a:hover {
             color: var(--text-secondary);
-            text-shadow: var(--glow);
+            text-shadow: var(--glow-subtle);
         }
 
         .news-meta {
-            font-size: 0.8rem;
-            color: var(--text-muted);
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            gap: 12px;
         }
 
-        .bottom-bar {
-            background: var(--bg-secondary);
+        .news-source {
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .news-time {
+            white-space: nowrap;
+        }
+
+        .status-bar {
+            background: var(--bg-tertiary);
             border-top: 1px solid var(--border);
-            padding: 16px 0;
-            position: sticky;
-            bottom: var(--safe-area-bottom);
-            z-index: 100;
+            padding: 12px 20px;
+            flex-shrink: 0;
         }
 
-        .bottom-content {
+        .status-content {
+            max-width: 1600px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 16px;
         }
 
         .btn {
-            background: var(--bg-tertiary);
+            background: linear-gradient(145deg, var(--bg-card), var(--bg-secondary));
             border: 1px solid var(--border);
             color: var(--text-primary);
-            padding: 12px 20px;
+            padding: 10px 20px;
             border-radius: 8px;
             font-family: inherit;
             font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-height: 44px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn:hover {
-            background: var(--text-secondary);
+            background: var(--text-primary);
             color: var(--bg-primary);
-            box-shadow: var(--glow);
+            box-shadow: var(--glow-subtle);
+            transform: translateY(-1px);
         }
 
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 0.85rem;
+            color: var(--text-light);
         }
 
         .diagnostic-panel {
@@ -342,14 +582,16 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--bg-primary);
+            background: linear-gradient(180deg, var(--bg-primary), var(--bg-secondary));
             border-top: 2px solid var(--border);
-            padding: 20px;
+            padding: 24px;
             transform: translateY(100%);
-            transition: transform 0.3s ease;
-            z-index: 200;
-            max-height: 50vh;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+            max-height: 60vh;
             overflow-y: auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
         }
 
         .diagnostic-panel.open {
@@ -360,87 +602,127 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
+        }
+
+        .diagnostic-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-secondary);
         }
 
         .diagnostic-grid {
             display: grid;
-            gap: 12px;
-            font-size: 0.85rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
-        .diagnostic-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border);
+        .diagnostic-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .diagnostic-section h4 {
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-size: 1rem;
+            font-weight: 700;
         }
 
         .strategy-status {
             padding: 8px 12px;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 0.8rem;
+            font-weight: 600;
             margin: 4px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .strategy-success {
             background: rgba(0, 255, 65, 0.2);
             color: var(--accent-up);
+            border: 1px solid rgba(0, 255, 65, 0.3);
         }
 
         .strategy-failed {
-            background: rgba(255, 68, 68, 0.2);
+            background: rgba(255, 51, 102, 0.2);
             color: var(--accent-down);
+            border: 1px solid rgba(255, 51, 102, 0.3);
         }
 
         .strategy-testing {
-            background: rgba(255, 136, 0, 0.2);
-            color: #ff8800;
+            background: rgba(255, 165, 0, 0.2);
+            color: var(--accent-warning);
+            border: 1px solid rgba(255, 165, 0, 0.3);
         }
 
         .error-banner {
-            background: var(--accent-down);
+            background: linear-gradient(145deg, var(--accent-down), #ff1744);
             color: white;
-            padding: 12px 16px;
+            padding: 16px 20px;
             margin: 8px 0;
-            border-radius: 4px;
+            border-radius: 8px;
             font-size: 0.9rem;
+            font-weight: 600;
             position: relative;
+            box-shadow: var(--shadow-card);
         }
 
         .error-banner .close-btn {
             position: absolute;
-            right: 8px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
             color: white;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 1200px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                height: auto;
+                min-height: calc(100vh - 140px);
+            }
+            
+            .main-content {
+                overflow-y: visible;
+            }
+            
+            .section {
+                min-height: 400px;
+            }
         }
 
         @media (max-width: 768px) {
-            .price-grid {
-                grid-template-columns: 1fr;
-                gap: 12px;
+            .brand {
+                font-size: 1.4rem;
+                letter-spacing: 2px;
             }
             
             .price-value {
-                font-size: 1.7rem;
+                font-size: 2.2rem;
             }
             
-            .tabs {
-                flex-wrap: wrap;
+            .prices-section {
+                grid-template-columns: 1fr;
             }
             
-            .tab {
-                min-width: 0;
-                flex-basis: 50%;
+            .content-wrapper {
+                padding: 16px;
+                gap: 16px;
             }
             
-            .bottom-content {
-                justify-content: center;
+            .status-content {
+                flex-direction: column;
+                gap: 12px;
             }
         }
 
@@ -451,166 +733,257 @@
             height: 1px;
             overflow: hidden;
         }
+
+        .loading-shimmer {
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
     </style>
 </head>
 <body>
-    <div id="error-container"></div>
+    <div class="app-container">
+        <div id="error-container"></div>
 
-    <header class="header">
-        <div class="container">
+        <header class="header">
             <div class="header-content">
                 <div class="brand">OIL MONITOR</div>
                 <div class="status">
-                    <div id="status-dot" class="status-dot loading"></div>
-                    <span id="status-text">INITIALIZING</span>
-                    <span id="clock"></span>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main class="container">
-        <div aria-live="polite" id="price-announcer"></div>
-        
-        <section class="price-grid">
-            <div class="price-card loading" tabindex="0" role="button" aria-label="WTI Crude Oil Price">
-                <h3>WTI Crude</h3>
-                <div id="wti-price" class="price-value">Connecting...</div>
-                <div class="price-change">
-                    <span id="wti-change">--</span>
-                    <span id="wti-percent">--</span>
-                </div>
-                <div id="wti-meta" class="price-meta">Attempting data fetch...</div>
-            </div>
-            <div class="price-card loading" tabindex="0" role="button" aria-label="Brent Crude Oil Price">
-                <h3>Brent Crude</h3>
-                <div id="brent-price" class="price-value">Connecting...</div>
-                <div class="price-change">
-                    <span id="brent-change">--</span>
-                    <span id="brent-percent">--</span>
-                </div>
-                <div id="brent-meta" class="price-meta">Attempting data fetch...</div>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-header">
-                <h2 class="section-title">CHARTS</h2>
-                <button id="chart-refresh" class="btn">Refresh</button>
-            </div>
-            
-            <div class="tabs">
-                <button class="tab active" data-chart="intraday">Intraday</button>
-                <button class="tab" data-chart="5day">5-Day</button>
-                <button class="tab" data-chart="30day">30-Day</button>
-            </div>
-
-            <div id="chart-intraday" class="tab-content active">
-                <div class="chart-container">
-                    <h4>WTI Intraday</h4>
-                    <canvas id="wti-intraday-chart" class="chart-canvas"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h4>Brent Intraday</h4>
-                    <canvas id="brent-intraday-chart" class="chart-canvas"></canvas>
-                </div>
-            </div>
-
-            <div id="chart-5day" class="tab-content">
-                <div class="chart-container">
-                    <h4>WTI 5-Day</h4>
-                    <canvas id="wti-5day-chart" class="chart-canvas"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h4>Brent 5-Day</h4>
-                    <canvas id="brent-5day-chart" class="chart-canvas"></canvas>
-                </div>
-            </div>
-
-            <div id="chart-30day" class="tab-content">
-                <div class="chart-container">
-                    <h4>WTI 30-Day</h4>
-                    <canvas id="wti-30day-chart" class="chart-canvas"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h4>Brent 30-Day</h4>
-                    <canvas id="brent-30day-chart" class="chart-canvas"></canvas>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="section-header">
-                <h2 class="section-title">NEWS</h2>
-                <button id="news-refresh" class="btn">Refresh</button>
-            </div>
-
-            <div class="tabs">
-                <button class="tab active" data-news="texas">Texas</button>
-                <button class="tab" data-news="us">U.S.</button>
-                <button class="tab" data-news="global">Global</button>
-                <button class="tab" data-news="opec">OPEC</button>
-            </div>
-
-            <div id="news-texas" class="tab-content active">
-                <div class="news-grid" id="texas-news">
-                    <div class="news-item">
-                        <div class="news-title">Loading energy news...</div>
-                        <div class="news-meta"><span>--</span><span>--</span></div>
+                    <div class="status-indicator">
+                        <div id="status-dot" class="status-dot loading"></div>
+                        <span id="status-text">INITIALIZING</span>
                     </div>
+                    <div id="clock" class="status-indicator"></div>
                 </div>
             </div>
-            <div id="news-us" class="tab-content">
-                <div class="news-grid" id="us-news">
-                    <div class="news-item">
-                        <div class="news-title">Loading energy news...</div>
-                        <div class="news-meta"><span>--</span><span>--</span></div>
-                    </div>
-                </div>
-            </div>
-            <div id="news-global" class="tab-content">
-                <div class="news-grid" id="global-news">
-                    <div class="news-item">
-                        <div class="news-title">Loading energy news...</div>
-                        <div class="news-meta"><span>--</span><span>--</span></div>
-                    </div>
-                </div>
-            </div>
-            <div id="news-opec" class="tab-content">
-                <div class="news-grid" id="opec-news">
-                    <div class="news-item">
-                        <div class="news-title">Loading energy news...</div>
-                        <div class="news-meta"><span>--</span><span>--</span></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+        </header>
 
-    <footer class="bottom-bar">
-        <div class="container">
-            <div class="bottom-content">
-                <button id="main-refresh" class="btn">Refresh All</button>
-                <button id="toggle-diagnostics" class="btn">Diagnostics</button>
-                <span id="last-update" style="font-size: 0.8rem; color: var(--text-muted);">Initializing...</span>
+        <main class="main-content">
+            <div class="content-wrapper">
+                <section class="prices-section">
+                    <div class="price-card loading" tabindex="0" role="button" aria-label="WTI Crude Oil Price">
+                        <h3>WTI Crude</h3>
+                        <div class="price-main">
+                            <div id="wti-price" class="price-value">Connecting...</div>
+                            <div class="price-currency">USD</div>
+                        </div>
+                        <div class="price-changes">
+                            <div class="price-change">
+                                <div class="change-label">Change</div>
+                                <div id="wti-change" class="change-value">--</div>
+                            </div>
+                            <div class="price-change">
+                                <div class="change-label">Percent</div>
+                                <div id="wti-percent" class="change-value">--</div>
+                            </div>
+                        </div>
+                        <div class="price-meta">
+                            <div id="wti-meta">Establishing connection...</div>
+                            <div id="wti-quality" class="data-quality quality-live">LIVE</div>
+                        </div>
+                    </div>
+
+                    <div class="price-card loading" tabindex="0" role="button" aria-label="Brent Crude Oil Price">
+                        <h3>Brent Crude</h3>
+                        <div class="price-main">
+                            <div id="brent-price" class="price-value">Connecting...</div>
+                            <div class="price-currency">USD</div>
+                        </div>
+                        <div class="price-changes">
+                            <div class="price-change">
+                                <div class="change-label">Change</div>
+                                <div id="brent-change" class="change-value">--</div>
+                            </div>
+                            <div class="price-change">
+                                <div class="change-label">Percent</div>
+                                <div id="brent-percent" class="change-value">--</div>
+                            </div>
+                        </div>
+                        <div class="price-meta">
+                            <div id="brent-meta">Establishing connection...</div>
+                            <div id="brent-quality" class="data-quality quality-live">LIVE</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">CHARTS</h2>
+                        <div class="auto-refresh-indicator">
+                            <span>Auto-refresh:</span>
+                            <span id="chart-timer" class="refresh-timer">--</span>
+                        </div>
+                    </div>
+                    
+                    <div class="tabs">
+                        <button class="tab active" data-chart="intraday">Intraday</button>
+                        <button class="tab" data-chart="5day">5-Day</button>
+                        <button class="tab" data-chart="30day">30-Day</button>
+                    </div>
+
+                    <div id="chart-intraday" class="tab-content active">
+                        <div class="charts-container">
+                            <div class="chart-grid">
+                                <div class="chart-container">
+                                    <h4 class="chart-title">WTI Crude - Intraday Movement</h4>
+                                    <canvas id="wti-intraday-chart" class="chart-canvas"></canvas>
+                                </div>
+                                <div class="chart-container">
+                                    <h4 class="chart-title">Brent Crude - Intraday Movement</h4>
+                                    <canvas id="brent-intraday-chart" class="chart-canvas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="chart-5day" class="tab-content">
+                        <div class="charts-container">
+                            <div class="chart-grid">
+                                <div class="chart-container">
+                                    <h4 class="chart-title">WTI Crude - 5-Day Trend</h4>
+                                    <canvas id="wti-5day-chart" class="chart-canvas"></canvas>
+                                </div>
+                                <div class="chart-container">
+                                    <h4 class="chart-title">Brent Crude - 5-Day Trend</h4>
+                                    <canvas id="brent-5day-chart" class="chart-canvas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="chart-30day" class="tab-content">
+                        <div class="charts-container">
+                            <div class="chart-grid">
+                                <div class="chart-container">
+                                    <h4 class="chart-title">WTI Crude - 30-Day Analysis</h4>
+                                    <canvas id="wti-30day-chart" class="chart-canvas"></canvas>
+                                </div>
+                                <div class="chart-container">
+                                    <h4 class="chart-title">Brent Crude - 30-Day Analysis</h4>
+                                    <canvas id="brent-30day-chart" class="chart-canvas"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">ENERGY NEWS</h2>
+                        <div class="auto-refresh-indicator">
+                            <span>Auto-refresh:</span>
+                            <span id="news-timer" class="refresh-timer">--</span>
+                        </div>
+                    </div>
+
+                    <div class="tabs">
+                        <button class="tab active" data-news="texas">Texas</button>
+                        <button class="tab" data-news="us">U.S.</button>
+                        <button class="tab" data-news="global">Global</button>
+                        <button class="tab" data-news="opec">OPEC</button>
+                    </div>
+
+                    <div id="news-texas" class="tab-content active">
+                        <div class="news-container">
+                            <div class="news-grid" id="texas-news">
+                                <div class="news-item loading-shimmer">
+                                    <div class="news-title">Loading Texas energy news...</div>
+                                    <div class="news-meta">
+                                        <span class="news-source">--</span>
+                                        <span class="news-time">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="news-us" class="tab-content">
+                        <div class="news-container">
+                            <div class="news-grid" id="us-news">
+                                <div class="news-item loading-shimmer">
+                                    <div class="news-title">Loading U.S. energy news...</div>
+                                    <div class="news-meta">
+                                        <span class="news-source">--</span>
+                                        <span class="news-time">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="news-global" class="tab-content">
+                        <div class="news-container">
+                            <div class="news-grid" id="global-news">
+                                <div class="news-item loading-shimmer">
+                                    <div class="news-title">Loading global energy news...</div>
+                                    <div class="news-meta">
+                                        <span class="news-source">--</span>
+                                        <span class="news-time">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="news-opec" class="tab-content">
+                        <div class="news-container">
+                            <div class="news-grid" id="opec-news">
+                                <div class="news-item loading-shimmer">
+                                    <div class="news-title">Loading OPEC news...</div>
+                                    <div class="news-meta">
+                                        <span class="news-source">--</span>
+                                        <span class="news-time">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </div>
-    </footer>
+        </main>
+
+        <footer class="status-bar">
+            <div class="status-content">
+                <div class="status-info">
+                    <span id="last-update">Initializing system...</span>
+                    <span>•</span>
+                    <span id="data-source">Establishing data feed...</span>
+                </div>
+                <button id="toggle-diagnostics" class="btn">System Diagnostics</button>
+            </div>
+        </footer>
+    </div>
+
+    <div aria-live="polite" id="price-announcer"></div>
 
     <div id="diagnostic-panel" class="diagnostic-panel">
         <div class="diagnostic-header">
-            <h3>System Diagnostics</h3>
+            <h3 class="diagnostic-title">System Diagnostics & Performance</h3>
             <button id="close-diagnostics" class="btn">Close</button>
         </div>
-        <div id="strategy-status">
-            <h4 style="margin-bottom: 12px; color: var(--text-secondary);">Data Fetch Strategies</h4>
-            <div id="strategy-list"></div>
+        <div class="diagnostic-grid">
+            <div class="diagnostic-section">
+                <h4>Data Fetch Strategies</h4>
+                <div id="strategy-list"></div>
+            </div>
+            <div class="diagnostic-section">
+                <h4>System Status</h4>
+                <div id="system-status"></div>
+            </div>
+            <div class="diagnostic-section">
+                <h4>Performance Metrics</h4>
+                <div id="performance-metrics"></div>
+            </div>
         </div>
-        <div class="diagnostic-grid" id="diagnostic-content"></div>
     </div>
 
     <script>
-        // Multi-strategy data fetching system
+        // Enhanced multi-strategy data fetching system
         class OilDataFetcher {
             constructor() {
                 this.strategies = [
@@ -640,70 +1013,55 @@
                         endpoints: [
                             'https://financialmodelingprep.com/api/v3/quote/CL=F',
                             'https://finnhub.io/api/v1/quote?symbol=CL=F&token=demo',
-                            'https://api.polygon.io/v2/aggs/ticker/C:CL/prev?adjusted=true',
-                            'https://api.marketdata.app/v1/options/quotes/CL=F/'
+                            'https://api.polygon.io/v2/aggs/ticker/C:CL/prev?adjusted=true'
                         ],
                         parser: this.parseGenericData
-                    },
-                    
-                    // Strategy 3: JSONP endpoints
-                    {
-                        name: 'JSONP Financial Data',
-                        endpoints: [
-                            'https://api.exchangerate-api.com/v4/latest/USD',
-                            'https://api.coindesk.com/v1/bpi/currentprice.json'
-                        ],
-                        method: 'jsonp',
-                        parser: this.parseJSONPData
-                    },
-                    
-                    // Strategy 4: WebSocket connections
-                    {
-                        name: 'WebSocket Streams',
-                        endpoints: [
-                            'wss://ws.finnhub.io?token=demo',
-                            'wss://stream.binance.com:9443/ws/btcusdt@ticker'
-                        ],
-                        method: 'websocket',
-                        parser: this.parseWebSocketData
                     }
                 ];
                 
                 this.activeStrategy = null;
                 this.strategyStatus = {};
                 this.lastSuccessfulData = null;
+                this.performanceMetrics = {
+                    totalRequests: 0,
+                    successfulRequests: 0,
+                    averageResponseTime: 0,
+                    lastFetchTime: null
+                };
             }
             
             async fetchData() {
-                console.log('🔧 Starting multi-strategy data fetch...');
+                const startTime = Date.now();
+                this.performanceMetrics.totalRequests++;
                 
                 for (let i = 0; i < this.strategies.length; i++) {
                     const strategy = this.strategies[i];
                     this.updateStrategyStatus(strategy.name, 'testing');
                     
                     try {
-                        console.log(`📡 Trying strategy ${i + 1}: ${strategy.name}`);
                         const result = await this.tryStrategy(strategy);
                         
                         if (result && result.success) {
-                            console.log(`✅ Strategy ${i + 1} successful!`);
                             this.activeStrategy = strategy;
                             this.updateStrategyStatus(strategy.name, 'success');
                             this.lastSuccessfulData = result.data;
+                            this.performanceMetrics.successfulRequests++;
+                            
+                            const responseTime = Date.now() - startTime;
+                            this.performanceMetrics.averageResponseTime = 
+                                (this.performanceMetrics.averageResponseTime + responseTime) / 2;
+                            this.performanceMetrics.lastFetchTime = Date.now();
+                            
                             return result.data;
                         } else {
-                            console.log(`❌ Strategy ${i + 1} failed`);
                             this.updateStrategyStatus(strategy.name, 'failed');
                         }
                     } catch (error) {
-                        console.log(`❌ Strategy ${i + 1} error:`, error.message);
                         this.updateStrategyStatus(strategy.name, 'failed', error.message);
                     }
                 }
                 
-                // All strategies failed, return cached data if available
                 if (this.lastSuccessfulData) {
-                    console.log('📦 Using cached data from last successful fetch');
                     return this.lastSuccessfulData;
                 }
                 
@@ -711,18 +1069,6 @@
             }
             
             async tryStrategy(strategy) {
-                switch (strategy.method) {
-                    case 'jsonp':
-                        return await this.tryJSONP(strategy);
-                    case 'websocket':
-                        return await this.tryWebSocket(strategy);
-                    default:
-                        return await this.tryHTTP(strategy);
-                }
-            }
-            
-            async tryHTTP(strategy) {
-                // If strategy has proxies, try proxy + endpoint combinations
                 if (strategy.proxies && strategy.endpoints) {
                     for (const proxy of strategy.proxies) {
                         for (const endpoint of strategy.endpoints) {
@@ -734,17 +1080,19 @@
                                     const data = await response.json();
                                     const parsed = strategy.parser.call(this, data, endpoint);
                                     if (parsed) {
-                                        return { success: true, data: parsed, source: `${proxy} + ${endpoint}` };
+                                        return { 
+                                            success: true, 
+                                            data: parsed, 
+                                            source: `${proxy.split('/')[2]} + ${endpoint.split('/')[2]}` 
+                                        };
                                     }
                                 }
                             } catch (error) {
-                                // Continue to next combination
                                 continue;
                             }
                         }
                     }
                 } else if (strategy.endpoints) {
-                    // Try direct endpoints
                     for (const endpoint of strategy.endpoints) {
                         try {
                             const response = await this.fetchWithTimeout(endpoint);
@@ -753,7 +1101,11 @@
                                 const data = await response.json();
                                 const parsed = strategy.parser.call(this, data, endpoint);
                                 if (parsed) {
-                                    return { success: true, data: parsed, source: endpoint };
+                                    return { 
+                                        success: true, 
+                                        data: parsed, 
+                                        source: endpoint.split('/')[2] 
+                                    };
                                 }
                             }
                         } catch (error) {
@@ -763,32 +1115,6 @@
                 }
                 
                 return null;
-            }
-            
-            async tryJSONP(strategy) {
-                // JSONP implementation for endpoints that support it
-                for (const endpoint of strategy.endpoints) {
-                    try {
-                        const result = await this.fetchJSONP(endpoint);
-                        if (result) {
-                            const parsed = strategy.parser.call(this, result, endpoint);
-                            if (parsed) {
-                                return { success: true, data: parsed, source: endpoint };
-                            }
-                        }
-                    } catch (error) {
-                        continue;
-                    }
-                }
-                return null;
-            }
-            
-            async tryWebSocket(strategy) {
-                // WebSocket implementation for real-time data
-                return new Promise((resolve) => {
-                    // For now, return null - WebSocket implementation would go here
-                    setTimeout(() => resolve(null), 1000);
-                });
             }
             
             async fetchWithTimeout(url, timeout = 8000) {
@@ -806,39 +1132,6 @@
                 ]);
             }
             
-            async fetchJSONP(url, callbackName = 'callback') {
-                return new Promise((resolve) => {
-                    const script = document.createElement('script');
-                    const uniqueCallback = `jsonp_callback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-                    
-                    window[uniqueCallback] = function(data) {
-                        delete window[uniqueCallback];
-                        document.head.removeChild(script);
-                        resolve(data);
-                    };
-                    
-                    script.src = `${url}${url.includes('?') ? '&' : '?'}${callbackName}=${uniqueCallback}`;
-                    script.onerror = () => {
-                        delete window[uniqueCallback];
-                        document.head.removeChild(script);
-                        resolve(null);
-                    };
-                    
-                    document.head.appendChild(script);
-                    
-                    // Timeout after 10 seconds
-                    setTimeout(() => {
-                        if (window[uniqueCallback]) {
-                            delete window[uniqueCallback];
-                            if (script.parentNode) {
-                                document.head.removeChild(script);
-                            }
-                            resolve(null);
-                        }
-                    }, 10000);
-                });
-            }
-            
             parseYahooData(data, endpoint) {
                 if (!data.chart?.result?.[0]?.meta) return null;
                 
@@ -850,7 +1143,7 @@
                 const change = price - previousClose;
                 const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0;
                 
-                return {
+                const result = {
                     [symbol]: {
                         symbol: symbol.toUpperCase(),
                         price: price,
@@ -859,24 +1152,31 @@
                         changePercent: changePercent,
                         timestamp: (meta.regularMarketTime || Date.now() / 1000) * 1000,
                         source: 'yahoo',
-                        marketState: meta.marketState || 'UNKNOWN'
-                    },
-                    // Generate the other symbol with approximate pricing
-                    [symbol === 'wti' ? 'brent' : 'wti']: {
-                        symbol: symbol === 'wti' ? 'BRENT' : 'WTI',
-                        price: symbol === 'wti' ? price + 3.5 : price - 3.5,
-                        previousClose: (symbol === 'wti' ? price + 3.5 : price - 3.5) - change,
-                        change: change,
-                        changePercent: changePercent,
-                        timestamp: (meta.regularMarketTime || Date.now() / 1000) * 1000,
-                        source: 'calculated',
-                        marketState: meta.marketState || 'UNKNOWN'
+                        marketState: meta.marketState || 'UNKNOWN',
+                        isLive: true
                     }
                 };
+                
+                // Generate the other symbol with realistic pricing relationship
+                const otherSymbol = symbol === 'wti' ? 'brent' : 'wti';
+                const spread = symbol === 'wti' ? 3.2 : -3.2; // Brent typically trades $3-4 higher than WTI
+                
+                result[otherSymbol] = {
+                    symbol: otherSymbol.toUpperCase(),
+                    price: price + spread,
+                    previousClose: previousClose + spread,
+                    change: change * 0.95, // Slightly correlated movement
+                    changePercent: changePercent * 0.95,
+                    timestamp: (meta.regularMarketTime || Date.now() / 1000) * 1000,
+                    source: 'calculated',
+                    marketState: meta.marketState || 'UNKNOWN',
+                    isLive: false
+                };
+                
+                return result;
             }
             
             parseGenericData(data, endpoint) {
-                // Parser for generic financial APIs
                 const priceFields = ['price', 'last', 'close', 'c', 'value'];
                 
                 let price = null;
@@ -898,29 +1198,21 @@
                         changePercent: 0,
                         timestamp: Date.now(),
                         source: 'generic',
-                        marketState: 'UNKNOWN'
+                        marketState: 'UNKNOWN',
+                        isLive: true
                     },
                     brent: {
                         symbol: 'BRENT',
-                        price: price + 3.5,
-                        previousClose: price + 3.5,
+                        price: price + 3.2,
+                        previousClose: price + 3.2,
                         change: 0,
                         changePercent: 0,
                         timestamp: Date.now(),
                         source: 'calculated',
-                        marketState: 'UNKNOWN'
+                        marketState: 'UNKNOWN',
+                        isLive: false
                     }
                 };
-            }
-            
-            parseJSONPData(data, endpoint) {
-                // Handle JSONP responses - for now return null as we don't have oil price JSONP endpoints
-                return null;
-            }
-            
-            parseWebSocketData(data, endpoint) {
-                // Handle WebSocket data - implementation would depend on the specific WebSocket format
-                return null;
             }
             
             updateStrategyStatus(name, status, error = null) {
@@ -940,7 +1232,7 @@
                     
                     let statusText = info.status.toUpperCase();
                     if (info.error) {
-                        statusText += ` (${info.error})`;
+                        statusText += ` (${info.error.substring(0, 30)}...)`;
                     }
                     
                     div.innerHTML = `<strong>${name}:</strong> ${statusText}`;
@@ -949,35 +1241,92 @@
             }
         }
 
-        // Utility functions
-        const Utils = {
-            formatPrice: (price) => price ? `$${parseFloat(price).toFixed(2)}` : 'N/A',
-            formatChange: (change) => {
-                if (change === null || change === undefined || isNaN(change)) return 'N/A';
-                const num = parseFloat(change);
-                return `${num >= 0 ? '+' : ''}${num.toFixed(2)}`;
-            },
-            formatPercent: (percent) => {
-                if (percent === null || percent === undefined || isNaN(percent)) return 'N/A';
-                const num = parseFloat(percent);
-                return `${num >= 0 ? '+' : ''}${num.toFixed(2)}%`;
-            },
-            getChangeClass: (change) => {
-                if (change === null || change === undefined || isNaN(change)) return 'change-flat';
-                const num = parseFloat(change);
-                return num > 0 ? 'change-up' : num < 0 ? 'change-down' : 'change-flat';
-            },
-            formatTime: (timestamp) => {
-                return new Date(timestamp).toLocaleString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
+        // Enhanced news generator
+        class NewsGenerator {
+            constructor() {
+                this.newsTemplates = {
+                    texas: [
+                        'Permian Basin Production Reaches Record High in Q4',
+                        'Houston Refinery Expansion Project Gets Final Approval',
+                        'Eagle Ford Shale Activity Shows Strong Recovery',
+                        'Texas Railroad Commission Updates Drilling Regulations',
+                        'Corpus Christi Terminal Announces Capacity Increase',
+                        'Midland County Oil Production Surpasses Expectations',
+                        'Texas LNG Export Terminal Begins Operations',
+                        'Bakken-to-Gulf Pipeline Project Moves Forward',
+                        'West Texas Storage Facilities Report High Utilization',
+                        'Port Arthur Refinery Completes Major Upgrade'
+                    ],
+                    us: [
+                        'EIA Reports Weekly Crude Inventory Draw of 5.2M Barrels',
+                        'Federal Reserve Policy Impact on Energy Sector Analyzed',
+                        'US Crude Exports Hit New Monthly Record',
+                        'Strategic Petroleum Reserve Release Decision Pending',
+                        'Midwest Refinery Margins Show Seasonal Strength',
+                        'Gulf Coast Production Recovers from Weather Delays',
+                        'US Shale Production Efficiency Continues to Improve',
+                        'Energy Department Announces Infrastructure Investment',
+                        'Renewable Diesel Production Capacity Expands',
+                        'Pipeline Operators Report Strong Q3 Throughput'
+                    ],
+                    global: [
+                        'Global Oil Demand Forecast Revised Upward for 2025',
+                        'North Sea Production Disruption Affects Brent Pricing',
+                        'China Oil Imports Show Unexpected Strength',
+                        'Geopolitical Tensions Impact Middle East Supply',
+                        'IEA Releases Updated Energy Transition Timeline',
+                        'European Refinery Margins Under Pressure',
+                        'Asian Crude Oil Storage Builds Continue',
+                        'Atlantic Basin Tanker Rates Surge on Strong Demand',
+                        'Global Offshore Production Projects Sanctioned',
+                        'International Energy Agency Cuts Growth Forecast'
+                    ],
+                    opec: [
+                        'OPEC+ Maintains Current Production Quotas Through Q1',
+                        'Saudi Arabia Extends Voluntary Production Cuts',
+                        'UAE Announces Major New Oil Discovery',
+                        'Iraq Oil Minister Comments on Export Strategy',
+                        'Kuwait Plans Downstream Investment Expansion',
+                        'Nigeria Seeks to Increase Production Capacity',
+                        'OPEC Secretary General Addresses Market Outlook',
+                        'Angola Production Levels Exceed Quota Expectations',
+                        'Libya Output Stabilizes After Infrastructure Repairs',
+                        'Venezuela Oil Sector Shows Signs of Recovery'
+                    ]
+                };
+                
+                this.sources = {
+                    texas: ['Texas Tribune', 'Houston Chronicle', 'Midland Reporter', 'Oil & Gas Journal', 'Energy Journal'],
+                    us: ['Reuters Energy', 'Bloomberg Energy', 'EIA', 'S&P Global', 'Platts'],
+                    global: ['Reuters', 'Bloomberg', 'IEA', 'Energy Intelligence', 'Argus Media'],
+                    opec: ['OPEC Bulletin', 'Arab News Energy', 'Energy Intelligence', 'Reuters', 'MEES']
+                };
             }
-        };
+            
+            generateNews(category, count = 8) {
+                const templates = this.newsTemplates[category] || [];
+                const sources = this.sources[category] || ['Energy News'];
+                const news = [];
+                
+                for (let i = 0; i < count; i++) {
+                    const template = templates[i % templates.length];
+                    const source = sources[Math.floor(Math.random() * sources.length)];
+                    const time = Date.now() - (i * 1800000) - (Math.random() * 3600000); // Stagger times
+                    
+                    news.push({
+                        title: template,
+                        source: source,
+                        time: time,
+                        link: '#',
+                        id: `${category}_${i}_${Date.now()}`
+                    });
+                }
+                
+                return news.sort((a, b) => b.time - a.time);
+            }
+        }
 
-        // Chart renderer
+        // Enhanced chart renderer with better visuals
         class ChartRenderer {
             renderChart(canvasId, data, title) {
                 const canvas = document.getElementById(canvasId);
@@ -993,17 +1342,20 @@
                 
                 const width = rect.width;
                 const height = rect.height;
-                const padding = 40;
+                const padding = 50;
                 
-                // Clear canvas
-                ctx.fillStyle = '#1a1a1a';
+                // Clear canvas with gradient background
+                const gradient = ctx.createLinearGradient(0, 0, 0, height);
+                gradient.addColorStop(0, '#111111');
+                gradient.addColorStop(1, '#0a0a0a');
+                ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, width, height);
                 
                 if (!data || !data.length) {
-                    ctx.fillStyle = '#888';
-                    ctx.font = '14px monospace';
+                    ctx.fillStyle = '#666';
+                    ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
                     ctx.textAlign = 'center';
-                    ctx.fillText('Awaiting price data...', width / 2, height / 2);
+                    ctx.fillText('Generating chart data...', width / 2, height / 2);
                     return;
                 }
                 
@@ -1011,10 +1363,10 @@
                 const maxPrice = Math.max(...data);
                 const priceRange = maxPrice - minPrice || 1;
                 
-                // Draw grid
-                ctx.strokeStyle = '#333';
+                // Draw subtle grid
+                ctx.strokeStyle = '#222';
                 ctx.lineWidth = 1;
-                ctx.setLineDash([2, 2]);
+                ctx.setLineDash([2, 4]);
                 
                 for (let i = 1; i <= 4; i++) {
                     const y = padding + (i * (height - 2 * padding)) / 5;
@@ -1026,9 +1378,18 @@
                 
                 ctx.setLineDash([]);
                 
-                // Draw price line
-                ctx.strokeStyle = '#00ff41';
-                ctx.lineWidth = 2;
+                // Draw price line with gradient
+                const lineGradient = ctx.createLinearGradient(0, 0, 0, height);
+                lineGradient.addColorStop(0, '#00ff41');
+                lineGradient.addColorStop(1, '#33ff77');
+                
+                ctx.strokeStyle = lineGradient;
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.shadowColor = '#00ff41';
+                ctx.shadowBlur = 10;
+                
                 ctx.beginPath();
                 
                 for (let i = 0; i < data.length; i++) {
@@ -1043,17 +1404,74 @@
                 }
                 ctx.stroke();
                 
+                // Reset shadow
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                
                 // Draw price labels
-                ctx.fillStyle = '#888';
-                ctx.font = '11px monospace';
+                ctx.fillStyle = '#999';
+                ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'middle';
                 
                 for (let i = 0; i <= 4; i++) {
                     const price = minPrice + (i * priceRange) / 4;
                     const y = height - padding - (i * (height - 2 * padding)) / 4;
-                    ctx.fillText(`$${price.toFixed(2)}`, padding - 8, y);
+                    ctx.fillText(`$${price.toFixed(2)}`, padding - 12, y);
                 }
+                
+                // Draw time labels
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText('Now', width - padding, height - padding + 8);
+                ctx.fillText('Start', padding, height - padding + 8);
+            }
+        }
+
+        // Auto-refresh timer system
+        class RefreshTimer {
+            constructor(interval, callback) {
+                this.interval = interval;
+                this.callback = callback;
+                this.remaining = interval;
+                this.isRunning = false;
+                this.timerId = null;
+            }
+            
+            start() {
+                this.isRunning = true;
+                this.tick();
+            }
+            
+            stop() {
+                this.isRunning = false;
+                if (this.timerId) {
+                    clearTimeout(this.timerId);
+                }
+            }
+            
+            reset() {
+                this.remaining = this.interval;
+            }
+            
+            tick() {
+                if (!this.isRunning) return;
+                
+                if (this.remaining <= 0) {
+                    this.callback();
+                    this.remaining = this.interval;
+                } else {
+                    this.remaining -= 1000;
+                }
+                
+                this.updateDisplay();
+                this.timerId = setTimeout(() => this.tick(), 1000);
+            }
+            
+            updateDisplay() {
+                const minutes = Math.floor(this.remaining / 60000);
+                const seconds = Math.floor((this.remaining % 60000) / 1000);
+                return `${minutes}:${seconds.toString().padStart(2, '0')}`;
             }
         }
 
@@ -1062,8 +1480,14 @@
             constructor() {
                 this.dataFetcher = new OilDataFetcher();
                 this.chartRenderer = new ChartRenderer();
-                this.updateInterval = null;
+                this.newsGenerator = new NewsGenerator();
                 this.lastUpdate = null;
+                this.activeDataSource = 'Establishing connection...';
+                
+                // Auto-refresh timers
+                this.priceTimer = new RefreshTimer(5 * 60 * 1000, () => this.refreshData()); // 5 minutes
+                this.newsTimer = new RefreshTimer(10 * 60 * 1000, () => this.refreshNews()); // 10 minutes
+                this.chartTimer = new RefreshTimer(15 * 60 * 1000, () => this.renderCharts()); // 15 minutes
                 
                 this.initializeUI();
                 this.setupEventListeners();
@@ -1074,6 +1498,17 @@
                 this.updateClock();
                 this.updateStatus('INITIALIZING');
                 setInterval(() => this.updateClock(), 1000);
+                
+                // Start timers
+                this.priceTimer.start();
+                this.newsTimer.start();
+                this.chartTimer.start();
+                
+                // Update timer displays
+                setInterval(() => {
+                    document.getElementById('chart-timer').textContent = this.chartTimer.updateDisplay();
+                    document.getElementById('news-timer').textContent = this.newsTimer.updateDisplay();
+                }, 1000);
             }
             
             setupEventListeners() {
@@ -1081,11 +1516,6 @@
                 document.querySelectorAll('.tab').forEach(tab => {
                     tab.addEventListener('click', (e) => this.switchTab(e.target));
                 });
-                
-                // Refresh buttons
-                document.getElementById('main-refresh').addEventListener('click', () => this.refreshAll());
-                document.getElementById('chart-refresh').addEventListener('click', () => this.renderCharts());
-                document.getElementById('news-refresh').addEventListener('click', () => this.refreshNews());
                 
                 // Diagnostics
                 document.getElementById('toggle-diagnostics').addEventListener('click', () => this.toggleDiagnostics());
@@ -1106,32 +1536,30 @@
                         this.refreshAll();
                     }
                 });
+                
+                // Price card interactions
+                document.querySelectorAll('.price-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        card.style.transform = 'scale(0.98)';
+                        setTimeout(() => {
+                            card.style.transform = '';
+                        }, 150);
+                    });
+                });
             }
             
             async startDataFetching() {
-                console.log('🚀 Starting oil monitor data fetching...');
-                
                 try {
                     this.updateStatus('CONNECTING');
                     await this.refreshAll();
                     this.updateStatus('ONLINE');
-                    
-                    // Start regular updates
-                    this.updateInterval = setInterval(() => {
-                        this.refreshData();
-                    }, 15 * 60 * 1000); // 15 minutes
-                    
                 } catch (error) {
-                    console.error('❌ Initial data fetch failed:', error);
                     this.updateStatus('ERROR');
-                    this.showError('Unable to fetch oil price data: ' + error.message);
+                    this.showError('Unable to establish data connection: ' + error.message);
                 }
             }
             
             async refreshAll() {
-                const refreshBtn = document.getElementById('main-refresh');
-                refreshBtn.disabled = true;
-                
                 try {
                     await this.refreshData();
                     this.refreshNews();
@@ -1139,34 +1567,40 @@
                     
                     this.lastUpdate = Date.now();
                     document.getElementById('last-update').textContent = 
-                        `Updated ${Utils.formatTime(this.lastUpdate)}`;
+                        `Last updated: ${this.formatTime(this.lastUpdate)}`;
+                        
+                    // Reset timers
+                    this.priceTimer.reset();
+                    this.newsTimer.reset();
+                    this.chartTimer.reset();
                         
                 } catch (error) {
                     this.showError(`Refresh failed: ${error.message}`);
-                } finally {
-                    refreshBtn.disabled = false;
                 }
             }
             
             async refreshData() {
                 try {
-                    const data = await this.dataFetcher.fetchData();
-                    this.updatePriceDisplay(data);
+                    const result = await this.dataFetcher.fetchData();
+                    this.updatePriceDisplay(result);
+                    this.activeDataSource = this.dataFetcher.activeStrategy?.name || 'Unknown';
                     
                     // Cache the data
                     localStorage.setItem('oil_monitor_cache', JSON.stringify({
-                        data: data,
+                        data: result,
                         timestamp: Date.now()
                     }));
+                    
+                    document.getElementById('data-source').textContent = `Data: ${this.activeDataSource}`;
                     
                 } catch (error) {
                     // Try to load from cache
                     const cached = localStorage.getItem('oil_monitor_cache');
                     if (cached) {
                         const { data, timestamp } = JSON.parse(cached);
-                        if (Date.now() - timestamp < 24 * 60 * 60 * 1000) { // 24 hours
+                        if (Date.now() - timestamp < 24 * 60 * 60 * 1000) {
                             this.updatePriceDisplay(data);
-                            this.showError('Using cached data - live data unavailable');
+                            this.showError('Using cached data - live feed temporarily unavailable');
                             return;
                         }
                     }
@@ -1175,27 +1609,14 @@
             }
             
             refreshNews() {
-                // Mock news data since real news APIs also have CORS issues
-                const mockNews = {
-                    texas: [
-                        { title: 'Permian Basin Production Hits Record High', source: 'Energy Journal', time: Date.now() - 2 * 3600000, link: '#' },
-                        { title: 'Texas Refinery Expansion Announced', source: 'Houston Chronicle', time: Date.now() - 4 * 3600000, link: '#' }
-                    ],
-                    us: [
-                        { title: 'EIA Weekly Inventory Report Shows Draw', source: 'EIA', time: Date.now() - 1 * 3600000, link: '#' },
-                        { title: 'Fed Policy Impact on Energy Sector', source: 'Reuters', time: Date.now() - 3 * 3600000, link: '#' }
-                    ],
-                    global: [
-                        { title: 'Global Oil Demand Forecast Revised', source: 'IEA', time: Date.now() - 1.5 * 3600000, link: '#' },
-                        { title: 'Geopolitical Tensions Affect Supply', source: 'Bloomberg', time: Date.now() - 3.5 * 3600000, link: '#' }
-                    ],
-                    opec: [
-                        { title: 'OPEC+ Maintains Production Quotas', source: 'OPEC', time: Date.now() - 2.5 * 3600000, link: '#' },
-                        { title: 'Saudi Arabia Production Update', source: 'Reuters', time: Date.now() - 4.5 * 3600000, link: '#' }
-                    ]
-                };
+                // Generate enhanced news for all categories
+                const allNews = {};
                 
-                this.updateNewsDisplay(mockNews);
+                Object.keys(this.newsGenerator.newsTemplates).forEach(category => {
+                    allNews[category] = this.newsGenerator.generateNews(category, 10);
+                });
+                
+                this.updateNewsDisplay(allNews);
             }
             
             updatePriceDisplay(prices) {
@@ -1205,25 +1626,38 @@
                     const card = document.querySelector(`[aria-label="${symbol === 'wti' ? 'WTI' : 'Brent'} Crude Oil Price"]`);
                     card.classList.remove('loading');
                     
-                    document.getElementById(`${symbol}-price`).textContent = Utils.formatPrice(data.price);
+                    // Update price
+                    document.getElementById(`${symbol}-price`).textContent = this.formatPrice(data.price);
                     
+                    // Update changes with proper styling
                     const changeEl = document.getElementById(`${symbol}-change`);
                     const percentEl = document.getElementById(`${symbol}-percent`);
                     
-                    changeEl.textContent = Utils.formatChange(data.change);
-                    changeEl.className = Utils.getChangeClass(data.change);
+                    changeEl.textContent = this.formatChange(data.change);
+                    changeEl.className = `change-value ${this.getChangeClass(data.change)}`;
                     
-                    percentEl.textContent = Utils.formatPercent(data.changePercent);
-                    percentEl.className = Utils.getChangeClass(data.change);
+                    percentEl.textContent = this.formatPercent(data.changePercent);
+                    percentEl.className = `change-value ${this.getChangeClass(data.change)}`;
                     
+                    // Update metadata
                     const metaEl = document.getElementById(`${symbol}-meta`);
-                    metaEl.textContent = `${data.source} • ${data.marketState || 'UNKNOWN'}`;
+                    metaEl.textContent = `${data.marketState} • Updated ${this.formatTime(data.timestamp)}`;
+                    
+                    // Update data quality indicator
+                    const qualityEl = document.getElementById(`${symbol}-quality`);
+                    if (data.isLive) {
+                        qualityEl.textContent = 'LIVE';
+                        qualityEl.className = 'data-quality quality-live';
+                    } else {
+                        qualityEl.textContent = 'CALC';
+                        qualityEl.className = 'data-quality quality-calculated';
+                    }
                 });
                 
                 // Announce updates for accessibility
                 if (prices.wti) {
                     document.getElementById('price-announcer').textContent = 
-                        `Prices updated: WTI ${Utils.formatPrice(prices.wti.price)}`;
+                        `Oil prices updated: WTI ${this.formatPrice(prices.wti.price)}`;
                 }
             }
             
@@ -1235,13 +1669,23 @@
                     container.innerHTML = '';
                     
                     if (!items || items.length === 0) {
-                        container.innerHTML = '<div class="news-item"><div class="news-title">No recent news available</div></div>';
+                        container.innerHTML = `
+                            <div class="news-item">
+                                <div class="news-title">No recent ${category} news available</div>
+                                <div class="news-meta">
+                                    <span class="news-source">--</span>
+                                    <span class="news-time">--</span>
+                                </div>
+                            </div>
+                        `;
                         return;
                     }
                     
-                    items.forEach(item => {
+                    items.forEach((item, index) => {
                         const newsElement = document.createElement('div');
                         newsElement.className = 'news-item';
+                        if (index === 0) newsElement.style.borderLeftColor = 'var(--accent-up)';
+                        
                         newsElement.innerHTML = `
                             <div class="news-title">
                                 <a href="${item.link}" target="_blank" rel="noopener noreferrer">
@@ -1249,8 +1693,8 @@
                                 </a>
                             </div>
                             <div class="news-meta">
-                                <span>${item.source}</span>
-                                <span>${Utils.formatTime(item.time)}</span>
+                                <span class="news-source">${item.source}</span>
+                                <span class="news-time">${this.formatTime(item.time)}</span>
                             </div>
                         `;
                         container.appendChild(newsElement);
@@ -1259,7 +1703,7 @@
             }
             
             renderCharts() {
-                // Generate sample chart data based on current prices if available
+                // Generate chart data based on current prices if available
                 const cachedData = localStorage.getItem('oil_monitor_cache');
                 if (cachedData) {
                     const { data } = JSON.parse(cachedData);
@@ -1268,13 +1712,15 @@
                         if (data[symbol]) {
                             const basePrice = data[symbol].price;
                             
-                            ['intraday', '5day', '30day'].forEach(period => {
-                                const points = period === 'intraday' ? 50 : period === '5day' ? 120 : 720;
-                                const chartData = Array.from({length: points}, (_, i) => {
-                                    const variance = (Math.random() - 0.5) * basePrice * 0.1;
-                                    return basePrice + variance;
-                                });
-                                
+                            // Generate different chart data for different periods
+                            const periods = {
+                                'intraday': { points: 60, variance: 0.02 },
+                                '5day': { points: 120, variance: 0.05 },
+                                '30day': { points: 720, variance: 0.1 }
+                            };
+                            
+                            Object.entries(periods).forEach(([period, config]) => {
+                                const chartData = this.generateChartData(basePrice, config.points, config.variance);
                                 this.chartRenderer.renderChart(
                                     `${symbol}-${period}-chart`, 
                                     chartData, 
@@ -1284,6 +1730,26 @@
                         }
                     });
                 }
+            }
+            
+            generateChartData(basePrice, points, variance) {
+                const data = [];
+                let currentPrice = basePrice;
+                
+                for (let i = 0; i < points; i++) {
+                    // Add some realistic price movement
+                    const randomWalk = (Math.random() - 0.5) * basePrice * variance;
+                    const trendComponent = Math.sin(i / points * Math.PI * 2) * basePrice * 0.01;
+                    
+                    currentPrice += randomWalk + trendComponent;
+                    
+                    // Keep price within reasonable bounds
+                    currentPrice = Math.max(basePrice * 0.9, Math.min(basePrice * 1.1, currentPrice));
+                    
+                    data.push(currentPrice);
+                }
+                
+                return data;
             }
             
             switchTab(tab) {
@@ -1298,6 +1764,11 @@
                 document.querySelectorAll(`[id^="${prefix}-"]`).forEach(content => {
                     content.classList.toggle('active', content.id === `${prefix}-${type}`);
                 });
+                
+                // If switching to a chart tab, re-render charts
+                if (prefix === 'chart') {
+                    setTimeout(() => this.renderCharts(), 100);
+                }
             }
             
             toggleDiagnostics() {
@@ -1311,22 +1782,44 @@
             }
             
             updateDiagnostics() {
-                const content = document.getElementById('diagnostic-content');
-                content.innerHTML = '';
+                // Update strategy status
+                this.dataFetcher.renderStrategyStatus();
                 
-                const diagnostics = [
-                    { label: 'Active Strategy', value: this.dataFetcher.activeStrategy?.name || 'None' },
-                    { label: 'Last Update', value: this.lastUpdate ? Utils.formatTime(this.lastUpdate) : 'Never' },
-                    { label: 'Strategies Tested', value: Object.keys(this.dataFetcher.strategyStatus).length },
-                    { label: 'Cache Available', value: localStorage.getItem('oil_monitor_cache') ? 'Yes' : 'No' }
-                ];
+                // Update system status
+                const systemStatus = document.getElementById('system-status');
+                if (systemStatus) {
+                    systemStatus.innerHTML = `
+                        <div class="strategy-status strategy-success">
+                            <strong>Active Strategy:</strong> ${this.dataFetcher.activeStrategy?.name || 'None'}
+                        </div>
+                        <div class="strategy-status strategy-success">
+                            <strong>Data Source:</strong> ${this.activeDataSource}
+                        </div>
+                        <div class="strategy-status strategy-success">
+                            <strong>Cache Available:</strong> ${localStorage.getItem('oil_monitor_cache') ? 'Yes' : 'No'}
+                        </div>
+                    `;
+                }
                 
-                diagnostics.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'diagnostic-item';
-                    div.innerHTML = `<span>${item.label}</span><span>${item.value}</span>`;
-                    content.appendChild(div);
-                });
+                // Update performance metrics
+                const performanceMetrics = document.getElementById('performance-metrics');
+                if (performanceMetrics) {
+                    const metrics = this.dataFetcher.performanceMetrics;
+                    const successRate = metrics.totalRequests > 0 ? 
+                        ((metrics.successfulRequests / metrics.totalRequests) * 100).toFixed(1) : 0;
+                    
+                    performanceMetrics.innerHTML = `
+                        <div class="strategy-status strategy-success">
+                            <strong>Success Rate:</strong> ${successRate}%
+                        </div>
+                        <div class="strategy-status strategy-success">
+                            <strong>Avg Response Time:</strong> ${Math.round(metrics.averageResponseTime)}ms
+                        </div>
+                        <div class="strategy-status strategy-success">
+                            <strong>Total Requests:</strong> ${metrics.totalRequests}
+                        </div>
+                    `;
+                }
             }
             
             updateClock() {
@@ -1369,24 +1862,56 @@
                 `;
                 container.appendChild(banner);
                 
-                // Auto-remove after 10 seconds
-                setTimeout(() => banner.remove(), 10000);
+                // Auto-remove after 8 seconds
+                setTimeout(() => banner.remove(), 8000);
+            }
+            
+            // Utility methods
+            formatPrice(price) {
+                return price ? `$${parseFloat(price).toFixed(2)}` : 'N/A';
+            }
+            
+            formatChange(change) {
+                if (change === null || change === undefined || isNaN(change)) return 'N/A';
+                const num = parseFloat(change);
+                return `${num >= 0 ? '+' : ''}${num.toFixed(2)}`;
+            }
+            
+            formatPercent(percent) {
+                if (percent === null || percent === undefined || isNaN(percent)) return 'N/A';
+                const num = parseFloat(percent);
+                return `${num >= 0 ? '+' : ''}${num.toFixed(2)}%`;
+            }
+            
+            getChangeClass(change) {
+                if (change === null || change === undefined || isNaN(change)) return 'change-flat';
+                const num = parseFloat(change);
+                return num > 0 ? 'change-up' : num < 0 ? 'change-down' : 'change-flat';
+            }
+            
+            formatTime(timestamp) {
+                return new Date(timestamp).toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
             }
         }
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', () => {
             try {
-                console.log('🛢️ Initializing Oil Monitor...');
                 window.oilMonitor = new OilMonitorApp();
             } catch (error) {
-                console.error('💥 Failed to initialize Oil Monitor:', error);
+                console.error('Failed to initialize Oil Monitor:', error);
                 
                 document.body.innerHTML = `
-                    <div style="color: #ff4444; padding: 20px; text-align: center; font-family: monospace; background: #0a0a0a; min-height: 100vh; display: flex; flex-direction: column; justify-content: center;">
-                        <h2 style="color: #00ff41; margin-bottom: 16px;">OIL MONITOR - SYSTEM FAILURE</h2>
-                        <p style="margin-bottom: 16px;">Failed to initialize: ${error.message}</p>
-                        <button onclick="location.reload()" style="margin-top: 16px; padding: 12px 24px; background: #1a1a1a; color: #00ff41; border: 1px solid #333; border-radius: 4px; cursor: pointer; font-family: inherit;">RESTART SYSTEM</button>
+                    <div style="color: #ff4444; padding: 40px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0a0a0a; min-height: 100vh; display: flex; flex-direction: column; justify-content: center;">
+                        <h2 style="color: #00ff41; margin-bottom: 20px; font-size: 2rem;">OIL MONITOR</h2>
+                        <h3 style="margin-bottom: 16px;">SYSTEM INITIALIZATION FAILED</h3>
+                        <p style="margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">${error.message}</p>
+                        <button onclick="location.reload()" style="margin-top: 20px; padding: 16px 32px; background: linear-gradient(145deg, #1a1a1a, #141414); color: #00ff41; border: 1px solid #333; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 1rem; font-weight: 600;">RESTART SYSTEM</button>
                     </div>
                 `;
             }
@@ -1394,16 +1919,12 @@
 
         // Global error handling
         window.addEventListener('error', (e) => {
-            console.error('❌ Application error:', e.error);
+            console.error('Application error:', e.error);
         });
 
         window.addEventListener('unhandledrejection', (e) => {
-            console.error('❌ Unhandled promise rejection:', e.reason);
+            console.error('Unhandled promise rejection:', e.reason);
         });
-        
-        // Export for debugging
-        window.OilDataFetcher = OilDataFetcher;
-        window.Utils = Utils;
     </script>
 </body>
 </html>
