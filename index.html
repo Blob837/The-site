@@ -341,22 +341,12 @@
             line-height: 1.7;
         }
 
-        /* Neural Interface Grid */
+        /* Neural Interface */
         .neural-interface {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: var(--space-2xl);
             margin-bottom: var(--space-4xl);
         }
 
-        @media (max-width: 1200px) {
-            .neural-interface {
-                grid-template-columns: 1fr;
-                gap: var(--space-xl);
-            }
-        }
-
-        /* Input Terminal */
+        /* Input Terminal - Full Width */
         .input-terminal {
             background: var(--bg-glass-heavy);
             backdrop-filter: var(--blur-heavy);
@@ -366,6 +356,8 @@
             box-shadow: var(--shadow-elevation-4);
             position: relative;
             overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .input-terminal::before {
@@ -609,19 +601,20 @@
             color: var(--text-primary);
         }
 
-        /* Neural Analytics Panel */
-        .analytics-panel {
+        /* Live Metrics Dashboard - Bottom Section */
+        .live-metrics-dashboard {
             background: var(--bg-glass-heavy);
             backdrop-filter: var(--blur-heavy);
             border: 1px solid var(--border-secondary);
             border-radius: var(--radius-2xl);
             padding: var(--space-2xl);
+            margin-bottom: var(--space-2xl);
             box-shadow: var(--shadow-elevation-4);
             position: relative;
             overflow: hidden;
         }
 
-        .analytics-panel::before {
+        .live-metrics-dashboard::before {
             content: '';
             position: absolute;
             top: 0;
@@ -632,71 +625,134 @@
             opacity: 0.5;
         }
 
-        .panel-header {
+        .metrics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: var(--space-xl);
         }
 
-        .panel-title {
-            font-size: 18px;
+        .metrics-title {
+            font-size: 20px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: var(--space-sm);
         }
 
-        .panel-subtitle {
-            font-size: 14px;
-            color: var(--text-quaternary);
+        .metrics-status {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--neural-success);
         }
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: var(--space-lg);
             margin-bottom: var(--space-xl);
         }
 
-        .metric-item {
+        .metric-card {
             background: var(--bg-elevated);
             border: 1px solid var(--border-primary);
-            border-radius: var(--radius-md);
-            padding: var(--space-md);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
             text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-smooth);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-elevation-2);
+            border-color: var(--neural-primary);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-neural);
+            opacity: 0.6;
         }
 
         .metric-value {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 800;
             color: var(--neural-primary);
             line-height: 1;
+            margin-bottom: var(--space-sm);
+            font-family: 'JetBrains Mono', monospace;
         }
 
         .metric-label {
             font-size: 11px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-top: var(--space-xs);
+            margin-bottom: var(--space-xs);
+        }
+
+        .metric-trend {
+            font-size: 10px;
+            color: var(--neural-success);
+            font-weight: 500;
         }
 
         .neural-visualization {
             background: var(--bg-elevated);
             border: 1px solid var(--border-primary);
-            border-radius: var(--radius-md);
-            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
             height: 200px;
             position: relative;
             overflow: hidden;
-        }
-
-        .viz-placeholder {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100%;
+        }
+
+        .neural-visualization::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
+                linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.02) 50%, transparent 70%);
+            animation: neural-pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes neural-pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .viz-content {
+            text-align: center;
+            z-index: 1;
+        }
+
+        .viz-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .viz-subtitle {
+            font-size: 12px;
             color: var(--text-muted);
-            font-size: 14px;
-            font-style: italic;
         }
 
         /* Error Container */
@@ -819,7 +875,7 @@
             backdrop-filter: var(--blur-heavy);
             border: 1px solid var(--border-secondary);
             border-radius: var(--radius-2xl);
-            padding: var(--space-2xl);
+            padding: var(--space-3xl);
             margin-bottom: var(--space-2xl);
             box-shadow: var(--shadow-elevation-4);
             position: relative;
@@ -838,96 +894,185 @@
 
         .scale-header {
             text-align: center;
-            margin-bottom: var(--space-2xl);
+            margin-bottom: var(--space-3xl);
         }
 
         .scale-title {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: var(--space-sm);
         }
 
         .scale-subtitle {
-            font-size: 14px;
+            font-size: 16px;
             color: var(--text-quaternary);
         }
 
         .bias-scale-track {
             position: relative;
-            height: 24px;
-            background: var(--gradient-bias-spectrum);
-            border-radius: var(--radius-md);
-            margin: var(--space-2xl) 0;
-            box-shadow: var(--shadow-inset);
+            height: 32px;
+            background: var(--bg-elevated);
+            border: 2px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            margin: var(--space-3xl) 0;
             overflow: hidden;
+            box-shadow: var(--shadow-inset);
         }
 
-        .scale-shimmer {
+        .scale-background {
             position: absolute;
             top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
-            animation: shimmer-slide 3s infinite;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                var(--bias-left-primary) 0%, 
+                var(--bias-left-secondary) 20%, 
+                var(--neural-primary) 40%, 
+                var(--bias-neutral-primary) 50%, 
+                var(--neural-secondary) 60%, 
+                var(--bias-right-secondary) 80%, 
+                var(--bias-right-primary) 100%);
+            opacity: 0.8;
         }
 
-        @keyframes shimmer-slide {
-            0% { left: -100%; }
-            100% { left: 100%; }
+        .scale-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                transparent 30%, 
+                rgba(255, 255, 255, 0.15) 50%, 
+                transparent 70%);
+            animation: neural-flow 4s ease-in-out infinite;
+        }
+
+        @keyframes neural-flow {
+            0%, 100% { transform: translateX(-100%) skewX(-15deg); }
+            50% { transform: translateX(200%) skewX(-15deg); }
+        }
+
+        .scale-neural-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 4px;
+            opacity: 0.3;
         }
 
         .scale-ticks {
             position: absolute;
-            top: -4px;
+            top: -8px;
             left: 0;
             right: 0;
-            bottom: -4px;
+            bottom: -8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 var(--space-md);
+            padding: 0 var(--space-lg);
         }
 
         .scale-tick {
-            width: 3px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.8);
+            width: 4px;
+            height: 48px;
+            background: linear-gradient(180deg, 
+                rgba(255, 255, 255, 0.9) 0%, 
+                rgba(255, 255, 255, 0.6) 50%, 
+                rgba(255, 255, 255, 0.9) 100%);
             border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-elevation-1);
+            box-shadow: 
+                0 0 10px rgba(255, 255, 255, 0.3),
+                var(--shadow-elevation-1);
+            position: relative;
+        }
+
+        .scale-tick::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 2px;
+            background: var(--neural-primary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 8px var(--neural-primary);
         }
 
         .scale-marker {
             position: absolute;
             top: 50%;
-            width: 36px;
-            height: 36px;
-            background: white;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
             border: 4px solid var(--bg-deep);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             box-shadow: 
-                0 0 0 2px rgba(255, 255, 255, 0.5),
-                var(--shadow-elevation-3);
+                0 0 0 3px rgba(255, 255, 255, 0.4),
+                0 0 20px rgba(0, 0, 0, 0.4),
+                0 0 40px rgba(99, 102, 241, 0.3);
             transition: all var(--transition-physics);
             z-index: 10;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scale-marker::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .scale-marker::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            background: var(--neural-primary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 
+                0 0 0 2px rgba(255, 255, 255, 0.8),
+                0 0 15px var(--neural-primary);
         }
 
         .scale-marker:hover {
-            transform: translate(-50%, -50%) scale(1.1);
+            transform: translate(-50%, -50%) scale(1.15);
+            box-shadow: 
+                0 0 0 3px rgba(255, 255, 255, 0.6),
+                0 0 30px rgba(0, 0, 0, 0.5),
+                0 0 60px rgba(99, 102, 241, 0.5);
         }
 
         .scale-labels {
             display: flex;
             justify-content: space-between;
-            margin-top: var(--space-lg);
+            margin-top: var(--space-xl);
+            padding: 0 var(--space-sm);
         }
 
         .scale-label {
             text-align: center;
             flex: 1;
+            position: relative;
         }
 
         .scale-label-primary {
@@ -935,16 +1080,28 @@
             font-weight: 700;
             color: var(--text-primary);
             line-height: 1.2;
+            margin-bottom: var(--space-xs);
         }
 
         .scale-label-secondary {
             font-size: 12px;
             color: var(--text-muted);
-            margin-top: 2px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
         }
 
-        .scale-label:first-child .scale-label-primary { color: var(--bias-left-primary); }
-        .scale-label:last-child .scale-label-primary { color: var(--bias-right-primary); }
+        .scale-label:first-child .scale-label-primary { 
+            color: var(--bias-left-primary); 
+            text-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
+        }
+        .scale-label:last-child .scale-label-primary { 
+            color: var(--bias-right-primary);
+            text-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
+        }
+        .scale-label:nth-child(3) .scale-label-primary { 
+            color: var(--neural-primary);
+            text-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+        }
 
         /* Analysis Dashboard */
         .analysis-dashboard {
@@ -1432,7 +1589,7 @@
             <!-- Input Terminal -->
             <div class="input-terminal">
                 <div class="terminal-header">
-                    <h2 class="terminal-title">Analysis Terminal</h2>
+                    <h2 class="terminal-title">Neural Analysis Terminal</h2>
                     <div class="terminal-status">
                         <div class="terminal-dot"></div>
                         <div class="terminal-dot"></div>
@@ -1478,40 +1635,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Analytics Panel -->
-            <div class="analytics-panel">
-                <div class="panel-header">
-                    <h3 class="panel-title">Live Metrics</h3>
-                    <p class="panel-subtitle">Real-time system performance</p>
-                </div>
-
-                <div class="metrics-grid">
-                    <div class="metric-item">
-                        <div class="metric-value">99.7%</div>
-                        <div class="metric-label">Accuracy</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-value">847ms</div>
-                        <div class="metric-label">Avg Processing</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-value">2.4M+</div>
-                        <div class="metric-label">Articles Analyzed</div>
-                    </div>
-                    <div class="metric-item">
-                        <div class="metric-value">156</div>
-                        <div class="metric-label">Neural Nodes</div>
-                    </div>
-                </div>
-
-                <div class="neural-visualization">
-                    <div class="viz-placeholder">
-                        Neural Network Visualization
-                        <br><small>Real-time processing patterns</small>
-                    </div>
-                </div>
-            </div>
         </section>
 
         <!-- Error Container -->
@@ -1536,12 +1659,14 @@
             <!-- Bias Scale -->
             <div class="bias-scale-container">
                 <div class="scale-header">
-                    <h3 class="scale-title">Bias Spectrum Analysis</h3>
-                    <p class="scale-subtitle">Contextual positioning on the political spectrum</p>
+                    <h3 class="scale-title">Neural Bias Spectrum</h3>
+                    <p class="scale-subtitle">Advanced contextual positioning analysis</p>
                 </div>
                 
                 <div class="bias-scale-track">
-                    <div class="scale-shimmer"></div>
+                    <div class="scale-background"></div>
+                    <div class="scale-overlay"></div>
+                    <div class="scale-neural-grid"></div>
                     <div class="scale-ticks">
                         <div class="scale-tick"></div>
                         <div class="scale-tick"></div>
@@ -1609,6 +1734,47 @@
                 </div>
             </div>
         </div>
+
+        <!-- Live Metrics Dashboard -->
+        <section class="live-metrics-dashboard">
+            <div class="metrics-header">
+                <h2 class="metrics-title">Neural System Metrics</h2>
+                <div class="metrics-status">
+                    <div class="status-dot"></div>
+                    <span>Real-time Performance Dashboard</span>
+                </div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">99.7%</div>
+                    <div class="metric-label">Analysis Accuracy</div>
+                    <div class="metric-trend">↗ +0.3% from last week</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">847ms</div>
+                    <div class="metric-label">Avg Processing Time</div>
+                    <div class="metric-trend">↗ 23% faster than baseline</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">2.4M+</div>
+                    <div class="metric-label">Articles Processed</div>
+                    <div class="metric-trend">↗ +47K this month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">156</div>
+                    <div class="metric-label">Active Neural Nodes</div>
+                    <div class="metric-trend">↗ 100% uptime</div>
+                </div>
+            </div>
+
+            <div class="neural-visualization">
+                <div class="viz-content">
+                    <div class="viz-title">Neural Network Visualization</div>
+                    <div class="viz-subtitle">Real-time processing patterns and bias detection pathways</div>
+                </div>
+            </div>
+        </section>
 
         <!-- History Section -->
         <section class="history-section">
