@@ -5,31 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>BiasLens - AI-Powered Bias Detection</title>
+    <title>BiasLens - AI-Powered Media Analysis</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
         :root {
-            --bg-primary: #0f0f23;
-            --bg-secondary: #1a1a2e;
-            --bg-tertiary: #16213e;
-            --bg-card: #1e1e3f;
-            --text-primary: #ffffff;
-            --text-secondary: #b4b4d1;
-            --text-muted: #8b8ba7;
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #111118;
+            --bg-tertiary: #1a1a24;
+            --bg-card: #151521;
+            --bg-elevated: #1e1e2e;
+            --bg-glass: rgba(30, 30, 46, 0.7);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --text-subtle: #64748b;
             --accent-primary: #6366f1;
             --accent-secondary: #8b5cf6;
             --accent-blue: #3b82f6;
             --accent-red: #ef4444;
             --accent-green: #10b981;
             --accent-orange: #f59e0b;
-            --border-primary: #2d2d5a;
-            --border-secondary: #3a3a6b;
-            --glow-primary: rgba(99, 102, 241, 0.4);
-            --glow-secondary: rgba(59, 130, 246, 0.3);
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.4);
-            --shadow-button: 0 4px 20px rgba(99, 102, 241, 0.3);
+            --accent-pink: #ec4899;
+            --accent-cyan: #06b6d4;
+            --border-primary: #27272a;
+            --border-secondary: #3f3f46;
+            --border-accent: #52525b;
+            --glow-primary: rgba(99, 102, 241, 0.3);
+            --glow-blue: rgba(59, 130, 246, 0.2);
+            --glow-red: rgba(239, 68, 68, 0.2);
+            --glow-soft: rgba(139, 92, 246, 0.1);
+            --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            --gradient-card: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+            --gradient-border: linear-gradient(135deg, #667eea, #764ba2);
+            --gradient-bias-left: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            --gradient-bias-neutral: linear-gradient(90deg, #6b7280, #9ca3af);
+            --gradient-bias-right: linear-gradient(90deg, #dc2626, #ef4444);
+            --shadow-card: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            --shadow-button: 0 10px 15px -3px rgba(99, 102, 241, 0.2), 0 4px 6px -2px rgba(99, 102, 241, 0.1);
+            --shadow-glow: 0 0 50px rgba(99, 102, 241, 0.15);
+            --blur-glass: blur(16px);
+            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
         * {
@@ -47,173 +64,264 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg-primary);
             background-image: 
-                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+                radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 0%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
             -webkit-text-size-adjust: 100%;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-feature-settings: 'kern' 1;
         }
 
-        .container {
-            max-width: 800px;
+        .app-container {
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 24px;
             min-height: 100vh;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-top: env(safe-area-inset-top, 20px);
-        }
-
-        .logo {
             display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            padding: 60px 0 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-hero);
+            opacity: 0.03;
+            animation: heroShift 20s ease-in-out infinite;
+        }
+
+        @keyframes heroShift {
+            0%, 100% { transform: translateX(-5%) rotate(-1deg); }
+            50% { transform: translateX(5%) rotate(1deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-container {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 8px 24px 8px 8px;
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur-glass);
+            border: 1px solid var(--border-secondary);
+            border-radius: 100px;
+            box-shadow: var(--shadow-glow);
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--gradient-primary);
-            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-hero);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            font-weight: 700;
+            font-weight: 800;
             color: white;
-            box-shadow: var(--shadow-button);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+            position: relative;
         }
 
-        .title {
-            font-size: 32px;
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: var(--gradient-border);
+            border-radius: 18px;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .logo-text {
+            font-size: 24px;
             font-weight: 700;
-            background: var(--gradient-primary);
+            background: var(--gradient-hero);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 8px;
         }
 
-        .subtitle {
-            font-size: 16px;
+        .hero-title {
+            font-size: clamp(48px, 8vw, 72px);
+            font-weight: 900;
+            margin-bottom: 16px;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            letter-spacing: -0.025em;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
             color: var(--text-secondary);
-            font-weight: 400;
+            margin-bottom: 8px;
+            font-weight: 500;
         }
 
-        .main-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-primary);
-            border-radius: 20px;
-            padding: 32px;
-            margin-bottom: 32px;
-            box-shadow: var(--shadow-card);
-            backdrop-filter: blur(10px);
+        .hero-description {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
         }
 
+        /* Main Input Section */
         .input-section {
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur-glass);
+            border: 1px solid var(--border-secondary);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .input-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gradient-border);
+            opacity: 0.5;
+        }
+
+        .input-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .input-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .input-subtitle {
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+
+        .url-input-container {
+            position: relative;
             margin-bottom: 24px;
         }
 
-        .input-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .input-field {
+        .url-input {
             width: 100%;
-            padding: 16px 20px;
+            padding: 20px 24px;
             border: 2px solid var(--border-primary);
-            border-radius: 12px;
-            background: var(--bg-secondary);
+            border-radius: 16px;
+            background: var(--bg-elevated);
             color: var(--text-primary);
             font-size: 16px;
-            transition: all 0.3s ease;
+            font-weight: 500;
+            transition: all 0.3s var(--transition-smooth);
             -webkit-appearance: none;
             font-family: inherit;
         }
 
-        .input-field:focus {
+        .url-input:focus {
             outline: none;
             border-color: var(--accent-primary);
-            box-shadow: 0 0 0 4px var(--glow-primary);
+            box-shadow: 0 0 0 4px var(--glow-primary), var(--shadow-card);
+            transform: translateY(-2px);
         }
 
-        .input-field::placeholder {
-            color: var(--text-muted);
+        .url-input::placeholder {
+            color: var(--text-subtle);
         }
 
-        .btn {
+        .analyze-button {
             width: 100%;
-            padding: 16px 24px;
+            padding: 20px 32px;
             border: none;
-            border-radius: 12px;
+            border-radius: 16px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s var(--transition-smooth);
             position: relative;
             overflow: hidden;
-            min-height: 56px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            -webkit-tap-highlight-color: transparent;
-            font-family: inherit;
-        }
-
-        .btn-primary {
-            background: var(--gradient-primary);
+            gap: 12px;
+            background: var(--gradient-hero);
             color: white;
             box-shadow: var(--shadow-button);
+            -webkit-tap-highlight-color: transparent;
+            font-family: inherit;
+            min-height: 64px;
         }
 
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+        .analyze-button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.3), 0 10px 10px -5px rgba(99, 102, 241, 0.2);
         }
 
-        .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-secondary);
-            border: 1px solid var(--border-secondary);
+        .analyze-button:active:not(:disabled) {
+            transform: translateY(-1px);
         }
 
-        .btn-secondary:hover:not(:disabled) {
-            background: var(--bg-secondary);
-            border-color: var(--accent-primary);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
+        .analyze-button:disabled {
+            opacity: 0.7;
             cursor: not-allowed;
             transform: none !important;
         }
 
-        .loading {
-            display: inline-block;
+        .button-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-icon {
             width: 20px;
             height: 20px;
-            border: 2px solid transparent;
-            border-top: 2px solid currentColor;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -222,196 +330,372 @@
             to { transform: rotate(360deg); }
         }
 
-        .collapsible {
-            margin-bottom: 20px;
+        /* Alternative Input */
+        .alternative-input {
+            margin-top: 24px;
+            border-top: 1px solid var(--border-primary);
+            padding-top: 24px;
         }
 
-        .collapsible-header {
-            background: var(--bg-tertiary);
+        .collapsible-trigger {
+            width: 100%;
+            background: none;
             border: 1px solid var(--border-primary);
             border-radius: 12px;
             padding: 16px 20px;
+            color: var(--text-secondary);
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s ease;
-            font-weight: 500;
+            transition: all 0.3s var(--transition-smooth);
+            font-family: inherit;
         }
 
-        .collapsible-header:hover {
-            background: var(--bg-secondary);
+        .collapsible-trigger:hover {
+            background: var(--bg-elevated);
             border-color: var(--border-secondary);
         }
 
         .chevron {
-            transition: transform 0.3s ease;
+            transition: transform 0.3s var(--transition-smooth);
             color: var(--accent-primary);
         }
 
-        .collapsible-header[aria-expanded="true"] .chevron {
+        .collapsible-trigger[aria-expanded="true"] .chevron {
             transform: rotate(180deg);
         }
 
         .collapsible-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease;
+            transition: all 0.3s var(--transition-smooth);
         }
 
         .collapsible-content.open {
-            max-height: 600px;
+            max-height: 400px;
+            margin-top: 16px;
         }
 
-        .collapsible-inner {
-            padding: 20px;
-            border: 1px solid var(--border-primary);
-            border-top: none;
-            border-radius: 0 0 12px 12px;
-            background: var(--bg-secondary);
+        .textarea-container {
+            position: relative;
         }
 
         .textarea {
             width: 100%;
             min-height: 120px;
-            padding: 16px;
-            border: 1px solid var(--border-primary);
+            padding: 16px 20px;
+            border: 2px solid var(--border-primary);
             border-radius: 12px;
-            background: var(--bg-primary);
+            background: var(--bg-elevated);
             color: var(--text-primary);
             font-size: 14px;
             resize: vertical;
             font-family: inherit;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s var(--transition-smooth);
+            line-height: 1.6;
         }
 
         .textarea:focus {
             outline: none;
             border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--glow-primary);
         }
 
-        .result-card {
+        .analyze-text-button {
+            width: 100%;
+            margin-top: 12px;
+            padding: 14px 24px;
+            border: 1px solid var(--border-secondary);
+            border-radius: 12px;
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-smooth);
+            font-family: inherit;
+        }
+
+        .analyze-text-button:hover:not(:disabled) {
             background: var(--bg-card);
-            border: 1px solid var(--border-primary);
-            border-radius: 20px;
-            padding: 32px;
-            margin-bottom: 32px;
-            box-shadow: var(--shadow-card);
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s ease;
-            backdrop-filter: blur(10px);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
         }
 
-        .result-card.visible {
+        /* Results Section */
+        .results-container {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s var(--transition-smooth);
+            display: none;
+        }
+
+        .results-container.visible {
             opacity: 1;
             transform: translateY(0);
+            display: block;
         }
 
-        .score-section {
-            text-align: center;
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
             margin-bottom: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Score Card */
+        .score-card {
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur-glass);
+            border: 1px solid var(--border-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gradient-border);
+            opacity: 0.5;
         }
 
         .score-number {
             font-size: 64px;
-            font-weight: 800;
-            margin-bottom: 8px;
+            font-weight: 900;
             line-height: 1;
+            margin-bottom: 8px;
+            position: relative;
         }
 
         .score-label {
-            font-size: 16px;
-            color: var(--text-secondary);
+            font-size: 14px;
+            color: var(--text-muted);
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 24px;
+        }
+
+        .score-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        /* Bias Scale Card */
+        .bias-scale-card {
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur-glass);
+            border: 1px solid var(--border-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bias-scale-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gradient-border);
+            opacity: 0.5;
+        }
+
+        .scale-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-align: center;
+            color: var(--text-primary);
         }
 
         .bias-scale {
             position: relative;
-            height: 50px;
-            background: linear-gradient(90deg, #3b82f6 0%, #6b7280 50%, #ef4444 100%);
-            border-radius: 25px;
+            height: 16px;
+            background: linear-gradient(90deg, 
+                var(--accent-blue) 0%, 
+                #4f46e5 25%, 
+                #6b7280 45%, 
+                #6b7280 55%, 
+                #dc2626 75%, 
+                var(--accent-red) 100%);
+            border-radius: 8px;
             margin: 32px 0;
-            overflow: hidden;
             box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
         }
 
-        .scale-ticks {
+        .scale-overlay {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(200%); }
+        }
+
+        .scale-ticks {
+            position: absolute;
+            top: -2px;
+            left: 0;
+            right: 0;
+            bottom: -2px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 15px;
+            padding: 0 12px;
         }
 
         .scale-tick {
-            width: 3px;
-            height: 25px;
-            background: rgba(255, 255, 255, 0.4);
-            border-radius: 2px;
+            width: 2px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 1px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
         }
 
         .scale-marker {
             position: absolute;
             top: 50%;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             background: white;
+            border: 4px solid var(--bg-primary);
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            transition: left 1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 0 0 2px rgba(255, 255, 255, 0.3),
+                0 8px 25px rgba(0, 0, 0, 0.4);
+            transition: all 1.2s var(--transition-bounce);
             z-index: 10;
-            border: 3px solid var(--bg-card);
         }
 
         .scale-labels {
             display: flex;
             justify-content: space-between;
+            margin-top: 16px;
             font-size: 12px;
+            font-weight: 600;
+        }
+
+        .scale-label {
             color: var(--text-muted);
-            margin-top: 12px;
-            font-weight: 500;
+            text-align: center;
+            flex: 1;
         }
 
-        .explanation-section {
-            margin-top: 24px;
+        .scale-label:first-child { color: var(--accent-blue); }
+        .scale-label:last-child { color: var(--accent-red); }
+
+        /* Analysis Section */
+        .analysis-section {
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur-glass);
+            border: 1px solid var(--border-secondary);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
         }
 
-        .section-title {
-            font-size: 18px;
+        .analysis-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gradient-border);
+            opacity: 0.5;
+        }
+
+        .analysis-title {
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             color: var(--text-primary);
         }
 
+        .ai-badge {
+            background: var(--gradient-hero);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .explanation-text {
-            font-size: 15px;
-            line-height: 1.7;
-            margin-bottom: 20px;
+            font-size: 16px;
+            line-height: 1.8;
             color: var(--text-secondary);
+            margin-bottom: 32px;
+            padding: 24px;
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        .evidence-section {
+            margin-bottom: 32px;
+        }
+
+        .evidence-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
         }
 
         .evidence-chips {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 24px;
         }
 
         .evidence-chip {
-            background: var(--bg-secondary);
+            background: var(--bg-elevated);
             border: 1px solid var(--border-secondary);
             border-radius: 20px;
-            padding: 8px 14px;
+            padding: 8px 16px;
             font-size: 12px;
             font-weight: 500;
-            color: var(--text-secondary);
-            transition: all 0.3s ease;
+            transition: all 0.3s var(--transition-smooth);
         }
 
         .evidence-chip.positive {
@@ -426,57 +710,56 @@
             background: rgba(59, 130, 246, 0.1);
         }
 
-        .bias-sentences {
-            margin-top: 24px;
+        .evidence-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Key Sentences Section */
+        .sentences-section {
+            margin-top: 32px;
+        }
+
+        .sentences-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
         }
 
         .bias-sentence {
-            background: var(--bg-secondary);
-            border-left: 4px solid var(--border-secondary);
-            border-radius: 8px;
-            padding: 16px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 20px;
             margin-bottom: 16px;
-            transition: all 0.3s ease;
+            transition: all 0.3s var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
         }
 
         .bias-sentence:hover {
-            background: var(--bg-tertiary);
+            transform: translateX(4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         }
 
-        .bias-sentence.left-positive {
-            border-left-color: var(--accent-blue);
-            background: rgba(59, 130, 246, 0.08);
+        .bias-sentence::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: currentColor;
         }
 
-        .bias-sentence.left-negative {
-            border-left-color: var(--accent-red);
-            background: rgba(239, 68, 68, 0.08);
-        }
-
-        .bias-sentence.right-positive {
-            border-left-color: var(--accent-red);
-            background: rgba(239, 68, 68, 0.08);
-        }
-
-        .bias-sentence.right-negative {
-            border-left-color: var(--accent-blue);
-            background: rgba(59, 130, 246, 0.08);
-        }
-
-        .bias-sentence.left-framing {
-            border-left-color: var(--accent-blue);
-            background: rgba(59, 130, 246, 0.08);
-        }
-
-        .bias-sentence.right-framing {
-            border-left-color: var(--accent-red);
-            background: rgba(239, 68, 68, 0.08);
-        }
-
-        .bias-sentence.emotional-language {
-            border-left-color: var(--accent-orange);
-            background: rgba(245, 158, 11, 0.08);
-        }
+        .bias-sentence.left-positive { color: var(--accent-blue); }
+        .bias-sentence.left-negative { color: var(--accent-red); }
+        .bias-sentence.right-positive { color: var(--accent-red); }
+        .bias-sentence.right-negative { color: var(--accent-blue); }
+        .bias-sentence.left-framing { color: var(--accent-blue); }
+        .bias-sentence.right-framing { color: var(--accent-red); }
+        .bias-sentence.emotional-language { color: var(--accent-orange); }
 
         .sentence-label {
             font-size: 11px;
@@ -487,53 +770,65 @@
             opacity: 0.9;
         }
 
-        .sentence-label.left-positive { color: var(--accent-blue); }
-        .sentence-label.left-negative { color: var(--accent-red); }
-        .sentence-label.right-positive { color: var(--accent-red); }
-        .sentence-label.right-negative { color: var(--accent-blue); }
-        .sentence-label.left-framing { color: var(--accent-blue); }
-        .sentence-label.right-framing { color: var(--accent-red); }
-        .sentence-label.emotional-language { color: var(--accent-orange); }
-
         .sentence-text {
             font-size: 14px;
             line-height: 1.6;
+            color: var(--text-secondary);
             font-style: italic;
         }
 
+        /* History Section */
         .history-section {
-            margin-bottom: 32px;
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur-glass);
+            border: 1px solid var(--border-secondary);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
         }
 
-        .history-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-primary);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: var(--shadow-card);
+        .history-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gradient-border);
+            opacity: 0.5;
+        }
+
+        .history-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-primary);
         }
 
         .history-item {
-            background: var(--bg-secondary);
+            background: var(--bg-elevated);
             border: 1px solid var(--border-primary);
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s var(--transition-smooth);
         }
 
         .history-item:hover {
-            background: var(--bg-tertiary);
+            background: var(--bg-card);
             border-color: var(--border-secondary);
-            transform: translateX(4px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .history-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .history-score {
@@ -554,47 +849,85 @@
             text-overflow: ellipsis;
         }
 
+        .no-history {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 40px 20px;
+        }
+
+        /* Error Messages */
         .error-message {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid var(--accent-red);
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
             color: var(--accent-red);
             text-align: center;
             font-weight: 500;
+            animation: slideIn 0.3s var(--transition-smooth);
         }
 
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* About Section */
         .about-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border-primary);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 32px;
+            background: var(--bg-glass);
+            backdrop-filter: var(--blur-glass);
+            border: 1px solid var(--border-secondary);
+            border-radius: 20px;
+            padding: 32px;
             box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gradient-border);
+            opacity: 0.5;
         }
 
         .about-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
             cursor: pointer;
             user-select: none;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-weight: 600;
         }
 
         .about-title::after {
             content: "🤖";
-            font-size: 16px;
+            font-size: 18px;
         }
 
+        .about-description {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        /* Dev Panel */
         .dev-panel {
             background: var(--bg-primary);
             border: 2px solid var(--accent-green);
             border-radius: 12px;
             padding: 20px;
             margin-top: 20px;
-            font-family: 'Courier New', monospace;
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
             font-size: 12px;
             line-height: 1.5;
             max-height: 400px;
@@ -604,6 +937,12 @@
 
         .dev-panel.visible {
             display: block;
+            animation: fadeIn 0.3s var(--transition-smooth);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .dev-section {
@@ -619,23 +958,46 @@
 
         .dev-label {
             color: var(--accent-green);
-            font-weight: bold;
+            font-weight: 600;
             display: block;
             margin-bottom: 4px;
         }
 
-        .safe-area-bottom {
-            height: env(safe-area-inset-bottom, 20px);
+        .dev-value {
+            color: var(--text-secondary);
         }
 
-        /* iOS specific optimizations */
-        @supports (-webkit-touch-callout: none) {
-            .input-field {
-                font-size: 16px; /* Prevents zoom on iOS */
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 16px;
+                gap: 24px;
+            }
+
+            .hero-section {
+                padding: 40px 0 60px;
+            }
+
+            .hero-title {
+                font-size: 48px;
+            }
+
+            .input-section {
+                padding: 24px;
+            }
+
+            .score-card,
+            .bias-scale-card,
+            .analysis-section {
+                padding: 24px;
+            }
+
+            .score-number {
+                font-size: 48px;
             }
         }
 
-        /* Accessibility improvements */
+        /* Accessibility */
         .sr-only {
             position: absolute;
             width: 1px;
@@ -648,177 +1010,192 @@
             border: 0;
         }
 
-        /* Focus indicators */
-        .btn:focus,
-        .input-field:focus,
-        .collapsible-header:focus,
+        /* Focus styles */
+        .analyze-button:focus,
+        .url-input:focus,
+        .textarea:focus,
+        .collapsible-trigger:focus,
+        .analyze-text-button:focus,
         .history-item:focus {
             outline: 2px solid var(--accent-primary);
             outline-offset: 2px;
         }
 
-        /* Mobile responsiveness */
-        @media (max-width: 480px) {
-            .container {
-                padding: 16px;
-            }
-            
-            .main-card {
-                padding: 24px;
-            }
-            
-            .title {
-                font-size: 28px;
-            }
-            
-            .score-number {
-                font-size: 48px;
-            }
+        /* Safe area for mobile devices */
+        .safe-area {
+            padding-bottom: env(safe-area-inset-bottom, 24px);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div class="logo">
-                <div class="logo-icon">BL</div>
-                <div>
-                    <h1 class="title">BiasLens</h1>
-                    <p class="subtitle">AI-Powered Media Bias Detection</p>
+    <div class="app-container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-background"></div>
+            <div class="hero-content">
+                <div class="logo-container">
+                    <div class="logo-icon">BL</div>
+                    <div class="logo-text">BiasLens</div>
                 </div>
-            </div>
-        </header>
-
-        <main>
-            <div class="main-card">
-                <div class="input-section">
-                    <label for="url-input" class="input-label">Article URL</label>
-                    <div class="input-group">
-                        <input 
-                            type="url" 
-                            id="url-input" 
-                            class="input-field" 
-                            placeholder="https://example.com/news-article" 
-                            aria-describedby="url-help"
-                        >
-                    </div>
-                    <button id="analyze-btn" class="btn btn-primary" aria-describedby="analyze-help">
-                        <span id="analyze-text">Analyze with AI</span>
-                        <span id="analyze-loading" class="loading" style="display: none;" aria-hidden="true"></span>
-                    </button>
-                    <div id="url-help" class="sr-only">Enter the URL of a news article to analyze for political bias</div>
-                    <div id="analyze-help" class="sr-only">Click to start AI bias analysis</div>
-                </div>
-
-                <div class="collapsible">
-                    <div class="collapsible-header" tabindex="0" role="button" aria-expanded="false" aria-controls="paste-content">
-                        <span>Alternative: Paste Article Text</span>
-                        <span class="chevron">▼</span>
-                    </div>
-                    <div class="collapsible-content" id="paste-content">
-                        <div class="collapsible-inner">
-                            <label for="article-text" class="input-label">Article Content</label>
-                            <textarea 
-                                id="article-text" 
-                                class="textarea" 
-                                placeholder="Paste the full article text here for direct analysis..."
-                                aria-label="Article text for manual analysis"
-                            ></textarea>
-                            <button id="analyze-text-btn" class="btn btn-secondary" style="margin-top: 16px;">
-                                Analyze Text
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="error-container"></div>
-
-            <div id="result-section" class="result-card" style="display: none;" role="region" aria-label="Analysis results">
-                <div class="score-section">
-                    <div id="score-number" class="score-number" aria-label="Bias score">0</div>
-                    <div class="score-label">Political Bias Score</div>
-                </div>
-                
-                <div class="bias-scale" role="img" aria-label="Political bias scale">
-                    <div class="scale-ticks">
-                        <div class="scale-tick"></div>
-                        <div class="scale-tick"></div>
-                        <div class="scale-tick"></div>
-                        <div class="scale-tick"></div>
-                        <div class="scale-tick"></div>
-                    </div>
-                    <div id="scale-marker" class="scale-marker"></div>
-                </div>
-                <div class="scale-labels">
-                    <span>Liberal -100</span>
-                    <span>-50</span>
-                    <span>Neutral</span>
-                    <span>+50</span>
-                    <span>Conservative +100</span>
-                </div>
-
-                <div class="explanation-section">
-                    <h3 class="section-title">AI Analysis</h3>
-                    <div id="explanation-text" class="explanation-text"></div>
-                    <div id="evidence-chips" class="evidence-chips" aria-label="Evidence keywords"></div>
-                    
-                    <div class="bias-sentences">
-                        <h3 class="section-title">Key Evidence Sentences</h3>
-                        <div id="bias-sentences-list" aria-label="Sentences that demonstrate bias"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="history-section">
-                <div class="history-card">
-                    <h2 class="section-title">Recent Analyses</h2>
-                    <div id="history-list" aria-label="Analysis history">
-                        <p id="no-history" class="history-item" style="opacity: 0.6; cursor: default; text-align: center;">No analyses yet - try analyzing your first article!</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="about-section">
-                <h2 class="section-title about-title" id="about-title">How BiasLens Works</h2>
-                <p style="font-size: 14px; line-height: 1.7; color: var(--text-secondary);">
-                    BiasLens uses advanced natural language processing to analyze news articles for political bias. 
-                    Our AI examines contextual sentiment around political entities, linguistic patterns, argument structure, 
-                    source attribution, and topic framing to estimate bias on a liberal-conservative scale. The analysis focuses 
-                    on <em>how</em> things are said rather than just <em>what</em> is said. 
-                    <strong>Results are AI estimates</strong> - always use your critical thinking.
+                <h1 class="hero-title">Decode Media Bias</h1>
+                <p class="hero-subtitle">AI-Powered Political Analysis</p>
+                <p class="hero-description">
+                    Advanced natural language processing that reveals hidden political bias in news articles through contextual analysis, sentiment detection, and linguistic pattern recognition.
                 </p>
-                
-                <div id="dev-panel" class="dev-panel">
-                    <div class="dev-section">
-                        <span class="dev-label">Proxy Used:</span>
-                        <div id="dev-proxy">None</div>
-                    </div>
-                    <div class="dev-section">
-                        <span class="dev-label">Feature Scores:</span>
-                        <div id="dev-features">N/A</div>
-                    </div>
-                    <div class="dev-section">
-                        <span class="dev-label">Evidence Signals:</span>
-                        <div id="dev-lexicon">N/A</div>
-                    </div>
-                    <div class="dev-section">
-                        <span class="dev-label">Outlet Prior:</span>
-                        <div id="dev-outlet">N/A</div>
-                    </div>
-                    <div class="dev-section">
-                        <span class="dev-label">Score Normalization:</span>
-                        <div id="dev-norm">N/A</div>
-                    </div>
-                    <div class="dev-section">
-                        <span class="dev-label">Processing Time:</span>
-                        <div id="dev-timing">N/A</div>
+            </div>
+        </section>
+
+        <!-- Input Section -->
+        <section class="input-section">
+            <div class="input-header">
+                <h2 class="input-title">Analyze Any Article</h2>
+                <p class="input-subtitle">Paste a URL or article text to get started</p>
+            </div>
+
+            <div class="url-input-container">
+                <input 
+                    type="url" 
+                    id="url-input" 
+                    class="url-input" 
+                    placeholder="https://example.com/news-article" 
+                    aria-label="Article URL for analysis"
+                >
+            </div>
+
+            <button id="analyze-btn" class="analyze-button">
+                <div class="button-content" id="button-content">
+                    <div class="ai-icon">AI</div>
+                    <span id="analyze-text">Analyze with AI</span>
+                </div>
+                <div class="loading-spinner" id="loading-spinner" style="display: none;"></div>
+            </button>
+
+            <div class="alternative-input">
+                <button class="collapsible-trigger" aria-expanded="false" aria-controls="text-input-content">
+                    <span>Alternative: Paste Article Text</span>
+                    <span class="chevron">▼</span>
+                </button>
+                <div class="collapsible-content" id="text-input-content">
+                    <div class="textarea-container">
+                        <textarea 
+                            id="article-text" 
+                            class="textarea" 
+                            placeholder="Paste the full article text here for direct analysis..."
+                            aria-label="Article text for manual analysis"
+                        ></textarea>
+                        <button id="analyze-text-btn" class="analyze-text-button">
+                            Analyze Text
+                        </button>
                     </div>
                 </div>
             </div>
-        </main>
+        </section>
 
-        <div class="safe-area-bottom"></div>
+        <!-- Error Container -->
+        <div id="error-container"></div>
+
+        <!-- Results Section -->
+        <div id="results-container" class="results-container">
+            <div class="results-grid">
+                <!-- Score Card -->
+                <div class="score-card">
+                    <div class="score-indicator" id="score-indicator"></div>
+                    <div id="score-number" class="score-number">0</div>
+                    <div class="score-label">Bias Score</div>
+                </div>
+
+                <!-- Bias Scale Card -->
+                <div class="bias-scale-card">
+                    <h3 class="scale-title">Political Spectrum</h3>
+                    <div class="bias-scale">
+                        <div class="scale-overlay"></div>
+                        <div class="scale-ticks">
+                            <div class="scale-tick"></div>
+                            <div class="scale-tick"></div>
+                            <div class="scale-tick"></div>
+                            <div class="scale-tick"></div>
+                            <div class="scale-tick"></div>
+                        </div>
+                        <div id="scale-marker" class="scale-marker"></div>
+                    </div>
+                    <div class="scale-labels">
+                        <div class="scale-label">Liberal<br>-100</div>
+                        <div class="scale-label">-50</div>
+                        <div class="scale-label">Neutral<br>0</div>
+                        <div class="scale-label">+50</div>
+                        <div class="scale-label">Conservative<br>+100</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Section -->
+            <div class="analysis-section">
+                <h3 class="analysis-title">
+                    <span>AI Analysis</span>
+                    <span class="ai-badge">Neural</span>
+                </h3>
+                
+                <div id="explanation-text" class="explanation-text"></div>
+
+                <div class="evidence-section">
+                    <h4 class="evidence-title">Key Evidence</h4>
+                    <div id="evidence-chips" class="evidence-chips"></div>
+                </div>
+
+                <div class="sentences-section">
+                    <h4 class="sentences-title">Identified Bias Patterns</h4>
+                    <div id="bias-sentences-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <section class="history-section">
+            <h2 class="history-title">Analysis History</h2>
+            <div id="history-list">
+                <div id="no-history" class="no-history">
+                    No analyses yet — analyze your first article to get started!
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about-section">
+            <h2 class="about-title" id="about-title">How BiasLens Works</h2>
+            <p class="about-description">
+                BiasLens employs state-of-the-art natural language processing techniques to analyze news articles for political bias. Our AI examines contextual sentiment around political entities, linguistic patterns, argument structure, source attribution, and topic framing to estimate bias on a liberal-conservative spectrum. The analysis focuses on <em>how</em> information is presented rather than just <em>what</em> is reported. 
+                <strong>Results are AI-generated estimates</strong> — always apply critical thinking.
+            </p>
+            
+            <div id="dev-panel" class="dev-panel">
+                <div class="dev-section">
+                    <span class="dev-label">Proxy Used:</span>
+                    <div class="dev-value" id="dev-proxy">None</div>
+                </div>
+                <div class="dev-section">
+                    <span class="dev-label">Feature Scores:</span>
+                    <div class="dev-value" id="dev-features">N/A</div>
+                </div>
+                <div class="dev-section">
+                    <span class="dev-label">Evidence Signals:</span>
+                    <div class="dev-value" id="dev-lexicon">N/A</div>
+                </div>
+                <div class="dev-section">
+                    <span class="dev-label">Outlet Prior:</span>
+                    <div class="dev-value" id="dev-outlet">N/A</div>
+                </div>
+                <div class="dev-section">
+                    <span class="dev-label">Score Normalization:</span>
+                    <div class="dev-value" id="dev-norm">N/A</div>
+                </div>
+                <div class="dev-section">
+                    <span class="dev-label">Processing Time:</span>
+                    <div class="dev-value" id="dev-timing">N/A</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="safe-area"></div>
     </div>
 
     <script>
@@ -830,11 +1207,11 @@
             proxyTimeout: 7000,
             maxRetries: 3,
             storageVersion: 1,
-            storageKey: 'biaslens_v1',
+            storageKey: 'biaslens_pro_v1',
             maxHistoryItems: 5
         };
 
-        // CORS Proxy rotation - Add more proxies as needed
+        // CORS Proxy rotation
         const PROXIES = [
             'https://corsproxy.io/?',
             'https://cors-anywhere.herokuapp.com/',
@@ -870,13 +1247,15 @@
         const elements = {
             urlInput: document.getElementById('url-input'),
             analyzeBtn: document.getElementById('analyze-btn'),
+            buttonContent: document.getElementById('button-content'),
             analyzeText: document.getElementById('analyze-text'),
-            analyzeLoading: document.getElementById('analyze-loading'),
+            loadingSpinner: document.getElementById('loading-spinner'),
             articleText: document.getElementById('article-text'),
             analyzeTextBtn: document.getElementById('analyze-text-btn'),
             errorContainer: document.getElementById('error-container'),
-            resultSection: document.getElementById('result-section'),
+            resultsContainer: document.getElementById('results-container'),
             scoreNumber: document.getElementById('score-number'),
+            scoreIndicator: document.getElementById('score-indicator'),
             scaleMarker: document.getElementById('scale-marker'),
             explanationText: document.getElementById('explanation-text'),
             evidenceChips: document.getElementById('evidence-chips'),
@@ -894,18 +1273,6 @@
         };
 
         // Utility functions
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-
         function isValidUrl(string) {
             try {
                 const url = new URL(string);
@@ -934,8 +1301,8 @@
         function setLoading(isLoading) {
             elements.analyzeBtn.disabled = isLoading;
             elements.analyzeTextBtn.disabled = isLoading;
-            elements.analyzeText.style.display = isLoading ? 'none' : 'inline';
-            elements.analyzeLoading.style.display = isLoading ? 'inline-block' : 'none';
+            elements.buttonContent.style.display = isLoading ? 'none' : 'flex';
+            elements.loadingSpinner.style.display = isLoading ? 'block' : 'none';
         }
 
         // Storage functions
@@ -955,9 +1322,7 @@
                     score: analysis.score
                 });
 
-                // Keep only last 5 analyses
                 history.analyses = history.analyses.slice(0, CONFIG.maxHistoryItems);
-                
                 localStorage.setItem(CONFIG.storageKey, JSON.stringify(history));
                 renderHistory();
             } catch (error) {
@@ -1033,28 +1398,18 @@
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 
-                // Remove scripts, styles, and other unwanted elements
                 const unwanted = doc.querySelectorAll('script, style, nav, footer, aside, header, .ad, .advertisement, .sidebar, .related, .comments, .social, .share');
                 unwanted.forEach(el => el.remove());
 
-                // Extract title
                 let title = '';
                 const titleEl = doc.querySelector('title, h1, .title, .headline');
                 if (titleEl) {
                     title = titleEl.textContent.trim();
                 }
 
-                // Extract main content
                 const contentSelectors = [
-                    'article',
-                    '.article-content',
-                    '.content',
-                    '.post-content',
-                    '.entry-content',
-                    'main',
-                    '.main-content',
-                    '.story-body',
-                    '.article-body'
+                    'article', '.article-content', '.content', '.post-content', 
+                    '.entry-content', 'main', '.main-content', '.story-body', '.article-body'
                 ];
 
                 let content = '';
@@ -1066,7 +1421,6 @@
                     }
                 }
 
-                // Fallback to body if no specific content found
                 if (!content) {
                     const body = doc.querySelector('body');
                     if (body) {
@@ -1074,14 +1428,12 @@
                     }
                 }
 
-                // Clean and normalize text
                 content = content
                     .replace(/\s+/g, ' ')
                     .replace(/[""'']/g, '"')
                     .replace(/[–—]/g, '-')
                     .trim();
 
-                // Limit word count
                 const words = content.split(/\s+/);
                 if (words.length > CONFIG.maxWordCount) {
                     content = words.slice(0, CONFIG.maxWordCount).join(' ') + '...';
@@ -1099,7 +1451,6 @@
             let lastError = null;
             let proxyUsed = 'Direct';
 
-            // Try direct fetch first (for CORS-enabled sites)
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), CONFIG.proxyTimeout);
@@ -1122,7 +1473,6 @@
                 lastError = error;
             }
 
-            // Try proxies
             for (let i = 0; i < PROXIES.length; i++) {
                 const proxy = PROXIES[i];
                 proxyUsed = `Proxy ${i + 1}`;
@@ -1155,33 +1505,29 @@
             throw new Error(`All proxies failed. Last error: ${lastError?.message || 'Unknown error'}`);
         }
 
-        // Natural bias detection algorithm - analyzes context, tone, and argumentation patterns
+        // Natural bias detection algorithm
         function analyzeBias(text, title = '', url = '') {
             const startTime = Date.now();
             
-            // Normalize and prepare text
             const normalizedText = text.toLowerCase();
             const sentences = text.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 10);
             
-            // Political entities for contextual analysis
             const politicalEntities = {
                 left: ['democrats', 'biden', 'harris', 'pelosi', 'schumer', 'aoc', 'sanders', 'warren'],
                 right: ['republicans', 'trump', 'desantis', 'mcconnell', 'cruz', 'hawley', 'greene'],
                 neutral: ['congress', 'senate', 'house', 'government', 'administration', 'officials']
             };
 
-            // Initialize scoring components
             let features = {};
             let evidenceTerms = [];
             let contextualSignals = 0;
-            let biasSentences = []; // Store sentences that show bias
+            let biasSentences = [];
 
-            // 1. CONTEXTUAL SENTIMENT ANALYSIS
-            // Analyze sentiment around political entities and capture biased sentences
+            // Contextual sentiment analysis
             function analyzeContextualSentiment() {
                 let leftSentiment = 0;
                 let rightSentiment = 0;
-                const contextWindow = 20; // words around entity
+                const contextWindow = 20;
                 
                 sentences.forEach(sentence => {
                     const words = sentence.toLowerCase().split(/\s+/);
@@ -1189,7 +1535,6 @@
                     let sentenceDirection = null;
                     let foundEntities = [];
                     
-                    // Find political entities in sentence
                     words.forEach((word, index) => {
                         let entityBias = null;
                         if (politicalEntities.left.some(entity => word.includes(entity))) {
@@ -1202,12 +1547,10 @@
                         }
                         
                         if (entityBias) {
-                            // Analyze context around entity
                             const start = Math.max(0, index - contextWindow);
                             const end = Math.min(words.length, index + contextWindow);
                             const context = words.slice(start, end).join(' ');
                             
-                            // Positive sentiment indicators
                             const positiveContext = /\b(successful|effective|strong|praised|support|defend|champion|fight for|stand up|deliver|accomplish|achieve|brilliant|outstanding|excellent)\b/g;
                             const negativeContext = /\b(failed|ineffective|weak|criticized|attack|oppose|undermine|damage|hurt|threaten|dangerous|extreme|ridiculous|absurd|disaster)\b/g;
                             
@@ -1215,13 +1558,11 @@
                             const negativeMatches = (context.match(negativeContext) || []).length;
                             const sentimentScore = positiveMatches - negativeMatches;
                             
-                            // Track sentence-level bias
                             if (Math.abs(sentimentScore) > 0) {
                                 sentenceBias += sentimentScore;
                                 sentenceDirection = entityBias;
                             }
                             
-                            // Apply sentiment based on entity bias
                             if (entityBias === 'left') {
                                 leftSentiment += sentimentScore;
                             } else {
@@ -1239,7 +1580,6 @@
                         }
                     });
                     
-                    // Store biased sentences for display
                     if (Math.abs(sentenceBias) > 0 && foundEntities.length > 0) {
                         const finalBias = sentenceBias > 0 ? 
                             (sentenceDirection === 'left' ? 'left-positive' : 'right-positive') :
@@ -1258,26 +1598,22 @@
                 return { leftSentiment, rightSentiment };
             }
 
-            // 2. LINGUISTIC PATTERN ANALYSIS
-            // Detect rhetorical patterns that indicate bias and capture sentences
+            // Linguistic pattern analysis
             function analyzeLinguisticPatterns() {
                 let patterns = { certainty: 0, hedging: 0, emotional: 0, factual: 0 };
                 
-                // Certainty vs hedging language
                 const certaintyMarkers = /\b(clearly|obviously|undoubtedly|definitely|certainly|without question|no doubt|absolutely)\b/gi;
                 const hedgingMarkers = /\b(might|could|perhaps|possibly|allegedly|reportedly|sources say|appears to|seems to|may have)\b/gi;
                 
                 patterns.certainty = (normalizedText.match(certaintyMarkers) || []).length;
                 patterns.hedging = (normalizedText.match(hedgingMarkers) || []).length;
                 
-                // Emotional vs factual language
                 const emotionalMarkers = /\b(outrageous|shocking|devastating|alarming|dangerous|disaster|crisis|betrayal|attack|defend|fight|slams|blasts|destroys)\b/gi;
                 const factualMarkers = /\b(according to|data shows|study found|research indicates|statistics|analysis|report|survey)\b/gi;
                 
                 patterns.emotional = (normalizedText.match(emotionalMarkers) || []).length;
                 patterns.factual = (normalizedText.match(factualMarkers) || []).length;
                 
-                // Find sentences with strong emotional or certainty language
                 sentences.forEach(sentence => {
                     const sentenceLower = sentence.toLowerCase();
                     const emotionalMatches = (sentenceLower.match(emotionalMarkers) || []).length;
@@ -1298,28 +1634,25 @@
                 return patterns;
             }
 
-            // 3. SOURCE AND ATTRIBUTION ANALYSIS
+            // Source and attribution analysis
             function analyzeSourcePatterns() {
                 let sourceScore = 0;
                 
-                // Anonymous sources (can indicate speculation)
                 const anonymousSources = /\b(sources say|unnamed official|according to sources|insiders report|leaked|off the record)\b/gi;
                 const namedSources = /\b(said|stated|announced|declared|confirmed|according to [A-Z][a-z]+ [A-Z][a-z]+)\b/gi;
                 
                 const anonymousCount = (normalizedText.match(anonymousSources) || []).length;
                 const namedCount = (normalizedText.match(namedSources) || []).length;
                 
-                // More anonymous sources may indicate less reliable reporting
                 sourceScore = namedCount - (anonymousCount * 0.5);
                 
                 return { sourceScore, anonymousCount, namedCount };
             }
 
-            // 4. ARGUMENT STRUCTURE ANALYSIS
+            // Argument structure analysis
             function analyzeArgumentStructure() {
                 let structureScore = 0;
                 
-                // Look for balanced reporting indicators
                 const balanceIndicators = /\b(however|but|on the other hand|meanwhile|in contrast|alternatively|critics argue|supporters say|both sides)\b/gi;
                 const onesided = /\b(all|every|always|never|completely|totally|entirely|absolutely no|zero|none)\b/gi;
                 
@@ -1331,20 +1664,16 @@
                 return { structureScore, balanceCount, onesidedCount };
             }
 
-            // 5. TOPIC FRAMING ANALYSIS
-            // Analyze how topics are framed and capture biased framing sentences
+            // Topic framing analysis
             function analyzeTopicFraming() {
                 let framingBias = 0;
                 
-                // Economic framing
                 const economicLeft = /\b(inequality|corporate greed|tax the rich|worker rights|minimum wage|wealth gap)\b/gi;
                 const economicRight = /\b(job creators|free market|economic growth|business friendly|tax burden|regulation hurts)\b/gi;
                 
-                // Social framing  
                 const socialLeft = /\b(social justice|systemic racism|reproductive rights|lgbtq rights|inclusion|equity)\b/gi;
                 const socialRight = /\b(traditional values|family values|religious freedom|law and order|personal responsibility)\b/gi;
                 
-                // Government framing
                 const govLeft = /\b(public investment|government programs|safety net|public option|infrastructure)\b/gi;
                 const govRight = /\b(government overreach|bureaucracy|red tape|states rights|limited government)\b/gi;
                 
@@ -1358,7 +1687,6 @@
                 
                 framingBias = rightFraming - leftFraming;
                 
-                // Find sentences with strong framing language
                 sentences.forEach(sentence => {
                     const sentenceLower = sentence.toLowerCase();
                     const leftMatches = (sentenceLower.match(economicLeft) || []).length +
@@ -1391,34 +1719,28 @@
             const argumentStructure = analyzeArgumentStructure();
             const topicFraming = analyzeTopicFraming();
 
-            // COMPOSITE SCORING
-            // Weight different aspects of bias detection
+            // Composite scoring
             let biasScore = 0;
             
-            // Contextual sentiment (40% weight) - most important
             const sentimentScore = sentimentAnalysis.rightSentiment - sentimentAnalysis.leftSentiment;
             biasScore += sentimentScore * 4;
             features.sentiment = sentimentScore;
             
-            // Topic framing (25% weight)
             biasScore += topicFraming.framingBias * 2.5;
             features.framing = topicFraming.framingBias;
             
-            // Linguistic patterns (20% weight)
             const linguisticBias = (linguisticPatterns.certainty - linguisticPatterns.hedging) + 
                                  (linguisticPatterns.emotional - linguisticPatterns.factual) * 0.5;
             biasScore += linguisticBias * 0.8;
             features.linguistic = linguisticBias;
             
-            // Argument structure (10% weight) - lack of balance adds bias
             biasScore -= argumentStructure.structureScore * 0.5;
             features.structure = argumentStructure.structureScore;
             
-            // Source reliability (5% weight)
             biasScore -= sourcePatterns.sourceScore * 0.2;
             features.sources = sourcePatterns.sourceScore;
 
-            // Apply outlet prior (small influence)
+            // Apply outlet prior
             let outletPrior = 0;
             if (url) {
                 try {
@@ -1430,12 +1752,11 @@
                 }
             }
 
-            // Title analysis (1.5x multiplier)
+            // Title analysis
             if (title) {
                 const titleSentiment = title.toLowerCase();
                 let titleBias = 0;
                 
-                // Check for loaded language in title
                 if (/\b(slams|blasts|destroys|demolishes|attacks|hits|strikes)\b/.test(titleSentiment)) titleBias += 2;
                 if (/\b(defends|supports|champions|stands up|fights for)\b/.test(titleSentiment)) titleBias -= 2;
                 if (/\b(crisis|disaster|chaos|failure|threatens)\b/.test(titleSentiment)) titleBias += 1.5;
@@ -1445,18 +1766,17 @@
                 features.titleBias = titleBias;
             }
 
-            // Normalize to [-100, 100] scale with natural curve
-            // Use tanh for smooth natural scaling instead of hard caps
+            // Normalize to [-100, 100] scale
             const normalizedScore = Math.round(Math.tanh(biasScore / 15) * 100);
             
-            // Generate natural explanation
+            // Generate explanation
             const explanation = generateNaturalExplanation(normalizedScore, features, evidenceTerms);
             
             const analysis = {
                 score: normalizedScore,
                 explanation,
-                evidence: evidenceTerms.slice(0, 8), // Top evidence
-                biasSentences: biasSentences.sort((a, b) => b.strength - a.strength).slice(0, 5), // Top 5 biased sentences
+                evidence: evidenceTerms.slice(0, 8),
+                biasSentences: biasSentences.sort((a, b) => b.strength - a.strength).slice(0, 5),
                 features,
                 outletPrior,
                 timing: Date.now() - startTime,
@@ -1473,7 +1793,6 @@
         function generateNaturalExplanation(score, features, evidenceTerms) {
             let explanation = '';
             
-            // Primary bias assessment
             if (Math.abs(score) < 10) {
                 explanation = 'BiasLens detected relatively balanced reporting with neutral tone and framing throughout the article.';
             } else if (score < -30) {
@@ -1486,7 +1805,6 @@
                 explanation = 'BiasLens detected moderate conservative bias with somewhat favorable treatment of traditional policies and politicians.';
             }
 
-            // Add specific reasoning based on strongest signals
             const sentimentSignal = Math.abs(features.sentiment || 0);
             const framingSignal = Math.abs(features.framing || 0);
             const linguisticSignal = Math.abs(features.linguistic || 0);
@@ -1499,7 +1817,6 @@
                 explanation += ' The bias is evident in the certainty of language and emotional word choices used throughout.';
             }
 
-            // Source and structure commentary
             if (features.sources && features.sources < -2) {
                 explanation += ' Heavy reliance on anonymous sources may indicate speculative reporting.';
             } else if (features.structure && features.structure < -2) {
@@ -1528,13 +1845,15 @@
         function displayResults(analysis) {
             currentAnalysis = analysis;
             
-            // Update score display
+            // Update score display with color
             elements.scoreNumber.textContent = analysis.score > 0 ? `+${analysis.score}` : analysis.score;
-            elements.scoreNumber.style.color = analysis.score > 0 ? 'var(--accent-red)' : 
-                                               analysis.score < 0 ? 'var(--accent-blue)' : 'var(--text-primary)';
+            const scoreColor = analysis.score > 0 ? 'var(--accent-red)' : 
+                              analysis.score < 0 ? 'var(--accent-blue)' : 'var(--text-secondary)';
+            elements.scoreNumber.style.color = scoreColor;
+            elements.scoreIndicator.style.backgroundColor = scoreColor;
             
             // Update bias scale marker position
-            const markerPosition = ((analysis.score + 100) / 200) * 100; // Convert [-100,100] to [0,100]%
+            const markerPosition = ((analysis.score + 100) / 200) * 100;
             elements.scaleMarker.style.left = `${markerPosition}%`;
             
             // Update explanation
@@ -1578,9 +1897,9 @@
             }
             
             // Show results with animation
-            elements.resultSection.style.display = 'block';
+            elements.resultsContainer.style.display = 'block';
             setTimeout(() => {
-                elements.resultSection.classList.add('visible');
+                elements.resultsContainer.classList.add('visible');
             }, 100);
             
             // Save to history
@@ -1640,7 +1959,6 @@
         elements.analyzeBtn.addEventListener('click', analyzeUrl);
         elements.analyzeTextBtn.addEventListener('click', analyzeText);
 
-        // URL input handling
         elements.urlInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
@@ -1648,18 +1966,16 @@
             }
         });
 
-        // Collapsible text area
-        document.querySelector('.collapsible-header').addEventListener('click', function() {
+        // Collapsible functionality
+        document.querySelector('.collapsible-trigger').addEventListener('click', function() {
             const content = document.querySelector('.collapsible-content');
-            const chevron = this.querySelector('.chevron');
             const isOpen = content.classList.contains('open');
             
             content.classList.toggle('open');
             this.setAttribute('aria-expanded', !isOpen);
         });
 
-        // Keyboard navigation for collapsible
-        document.querySelector('.collapsible-header').addEventListener('keydown', function(event) {
+        document.querySelector('.collapsible-trigger').addEventListener('keydown', function(event) {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
                 this.click();
@@ -1675,7 +1991,6 @@
                 devPanelTaps = 0;
             }
             
-            // Reset counter after 2 seconds
             setTimeout(() => {
                 if (devPanelTaps < 5) devPanelTaps = 0;
             }, 2000);
@@ -1684,13 +1999,10 @@
         // Initialize app
         function initApp() {
             renderHistory();
-            
-            // Hide results initially
-            elements.resultSection.style.display = 'none';
-            elements.resultSection.classList.remove('visible');
+            elements.resultsContainer.style.display = 'none';
+            elements.resultsContainer.classList.remove('visible');
         }
 
-        // Start the app
         initApp();
     </script>
 </body>
