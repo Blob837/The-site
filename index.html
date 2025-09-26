@@ -5,24 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Bias Detector</title>
+    <title>BiasLens - AI-Powered Bias Detection</title>
     <style>
         :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #1a1a1a;
-            --bg-tertiary: #2a2a2a;
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #16213e;
+            --bg-card: #1e1e3f;
             --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --text-muted: #808080;
+            --text-secondary: #b4b4d1;
+            --text-muted: #8b8ba7;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
             --accent-blue: #3b82f6;
             --accent-red: #ef4444;
             --accent-green: #10b981;
-            --border-color: #404040;
-            --glow-blue: rgba(59, 130, 246, 0.3);
-            --glow-red: rgba(239, 68, 68, 0.3);
-            --gradient-left: linear-gradient(90deg, #3b82f6, #6366f1);
-            --gradient-right: linear-gradient(90deg, #f59e0b, #ef4444);
-            --gradient-neutral: linear-gradient(90deg, #6b7280, #9ca3af);
+            --accent-orange: #f59e0b;
+            --border-primary: #2d2d5a;
+            --border-secondary: #3a3a6b;
+            --glow-primary: rgba(99, 102, 241, 0.4);
+            --glow-secondary: rgba(59, 130, 246, 0.3);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.4);
+            --shadow-button: 0 4px 20px rgba(99, 102, 241, 0.3);
         }
 
         * {
@@ -40,17 +47,20 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
             background: var(--bg-primary);
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
             color: var(--text-primary);
-            line-height: 1.5;
+            line-height: 1.6;
             min-height: 100vh;
             -webkit-text-size-adjust: 100%;
             -webkit-font-smoothing: antialiased;
         }
 
         .container {
-            max-width: 390px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             min-height: 100vh;
@@ -58,56 +68,101 @@
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             padding-top: env(safe-area-inset-top, 20px);
         }
 
-        .title {
-            font-size: 28px;
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 8px;
-            background: var(--gradient-neutral);
+            color: white;
+            box-shadow: var(--shadow-button);
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 700;
+            background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 10px var(--glow-blue);
+            background-clip: text;
+            margin-bottom: 8px;
         }
 
         .subtitle {
-            font-size: 14px;
+            font-size: 16px;
             color: var(--text-secondary);
-            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-card);
+            backdrop-filter: blur(10px);
         }
 
         .input-section {
-            margin-bottom: 30px;
+            margin-bottom: 24px;
+        }
+
+        .input-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: block;
         }
 
         .input-group {
             position: relative;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .input-field {
             width: 100%;
-            padding: 16px;
-            border: 2px solid var(--border-color);
+            padding: 16px 20px;
+            border: 2px solid var(--border-primary);
             border-radius: 12px;
             background: var(--bg-secondary);
             color: var(--text-primary);
             font-size: 16px;
             transition: all 0.3s ease;
             -webkit-appearance: none;
+            font-family: inherit;
         }
 
         .input-field:focus {
             outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 20px var(--glow-blue);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px var(--glow-primary);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-muted);
         }
 
         .btn {
             width: 100%;
-            padding: 16px;
+            padding: 16px 24px;
             border: none;
             border-radius: 12px;
             font-size: 16px;
@@ -116,29 +171,39 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            min-height: 44px;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             -webkit-tap-highlight-color: transparent;
+            font-family: inherit;
         }
 
         .btn-primary {
-            background: var(--gradient-left);
+            background: var(--gradient-primary);
             color: white;
-            box-shadow: 0 4px 20px var(--glow-blue);
+            box-shadow: var(--shadow-button);
         }
 
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 25px var(--glow-blue);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
         }
 
         .btn-secondary {
             background: var(--bg-tertiary);
             color: var(--text-secondary);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border-secondary);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--bg-secondary);
+            border-color: var(--accent-primary);
         }
 
         .btn:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
             transform: none !important;
         }
@@ -162,19 +227,30 @@
         }
 
         .collapsible-header {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 16px 20px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             transition: all 0.3s ease;
+            font-weight: 500;
         }
 
         .collapsible-header:hover {
-            background: var(--bg-tertiary);
+            background: var(--bg-secondary);
+            border-color: var(--border-secondary);
+        }
+
+        .chevron {
+            transition: transform 0.3s ease;
+            color: var(--accent-primary);
+        }
+
+        .collapsible-header[aria-expanded="true"] .chevron {
+            transform: rotate(180deg);
         }
 
         .collapsible-content {
@@ -184,40 +260,47 @@
         }
 
         .collapsible-content.open {
-            max-height: 500px;
+            max-height: 600px;
         }
 
         .collapsible-inner {
-            padding: 16px;
-            border: 1px solid var(--border-color);
+            padding: 20px;
+            border: 1px solid var(--border-primary);
             border-top: none;
-            border-radius: 0 0 8px 8px;
+            border-radius: 0 0 12px 12px;
             background: var(--bg-secondary);
         }
 
         .textarea {
             width: 100%;
             min-height: 120px;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
             background: var(--bg-primary);
             color: var(--text-primary);
             font-size: 14px;
             resize: vertical;
             font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
         }
 
         .result-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-card);
             opacity: 0;
             transform: translateY(20px);
-            transition: all 0.5s ease;
+            transition: all 0.6s ease;
+            backdrop-filter: blur(10px);
         }
 
         .result-card.visible {
@@ -225,29 +308,32 @@
             transform: translateY(0);
         }
 
-        .score-display {
+        .score-section {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 32px;
         }
 
         .score-number {
-            font-size: 48px;
-            font-weight: 700;
+            font-size: 64px;
+            font-weight: 800;
             margin-bottom: 8px;
+            line-height: 1;
         }
 
-        .confidence {
-            font-size: 14px;
+        .score-label {
+            font-size: 16px;
             color: var(--text-secondary);
+            font-weight: 500;
         }
 
         .bias-scale {
             position: relative;
-            height: 40px;
-            background: linear-gradient(90deg, var(--accent-blue), #6b7280, var(--accent-red));
-            border-radius: 20px;
-            margin: 24px 0;
+            height: 50px;
+            background: linear-gradient(90deg, #3b82f6 0%, #6b7280 50%, #ef4444 100%);
+            border-radius: 25px;
+            margin: 32px 0;
             overflow: hidden;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .scale-ticks {
@@ -259,27 +345,28 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 10px;
+            padding: 0 15px;
         }
 
         .scale-tick {
-            width: 2px;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 1px;
+            width: 3px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 2px;
         }
 
         .scale-marker {
             position: absolute;
             top: 50%;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             background: white;
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transition: left 1s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 10;
+            border: 3px solid var(--bg-card);
         }
 
         .scale-labels {
@@ -287,95 +374,117 @@
             justify-content: space-between;
             font-size: 12px;
             color: var(--text-muted);
-            margin-top: 8px;
+            margin-top: 12px;
+            font-weight: 500;
         }
 
-        .explanation {
-            margin-top: 20px;
+        .explanation-section {
+            margin-top: 24px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
         }
 
         .explanation-text {
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 16px;
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
         }
 
         .evidence-chips {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+            margin-bottom: 24px;
         }
 
         .evidence-chip {
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 6px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-secondary);
+            border-radius: 20px;
+            padding: 8px 14px;
             font-size: 12px;
+            font-weight: 500;
             color: var(--text-secondary);
+            transition: all 0.3s ease;
         }
 
         .evidence-chip.positive {
             border-color: var(--accent-red);
             color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.1);
         }
 
         .evidence-chip.negative {
             border-color: var(--accent-blue);
             color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .bias-sentences {
+            margin-top: 24px;
         }
 
         .bias-sentence {
-            background: var(--bg-primary);
-            border-left: 4px solid var(--border-color);
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 12px;
-            font-size: 14px;
-            line-height: 1.5;
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--border-secondary);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .bias-sentence:hover {
+            background: var(--bg-tertiary);
         }
 
         .bias-sentence.left-positive {
             border-left-color: var(--accent-blue);
-            background: rgba(59, 130, 246, 0.05);
+            background: rgba(59, 130, 246, 0.08);
         }
 
         .bias-sentence.left-negative {
             border-left-color: var(--accent-red);
-            background: rgba(239, 68, 68, 0.05);
+            background: rgba(239, 68, 68, 0.08);
         }
 
         .bias-sentence.right-positive {
             border-left-color: var(--accent-red);
-            background: rgba(239, 68, 68, 0.05);
+            background: rgba(239, 68, 68, 0.08);
         }
 
         .bias-sentence.right-negative {
             border-left-color: var(--accent-blue);
-            background: rgba(59, 130, 246, 0.05);
+            background: rgba(59, 130, 246, 0.08);
         }
 
         .bias-sentence.left-framing {
             border-left-color: var(--accent-blue);
-            background: rgba(59, 130, 246, 0.05);
+            background: rgba(59, 130, 246, 0.08);
         }
 
         .bias-sentence.right-framing {
             border-left-color: var(--accent-red);
-            background: rgba(239, 68, 68, 0.05);
+            background: rgba(239, 68, 68, 0.08);
         }
 
         .bias-sentence.emotional-language {
-            border-left-color: var(--accent-green);
-            background: rgba(16, 185, 129, 0.05);
+            border-left-color: var(--accent-orange);
+            background: rgba(245, 158, 11, 0.08);
         }
 
         .sentence-label {
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
-            margin-bottom: 6px;
-            opacity: 0.8;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            opacity: 0.9;
         }
 
         .sentence-label.left-positive { color: var(--accent-blue); }
@@ -384,31 +493,39 @@
         .sentence-label.right-negative { color: var(--accent-blue); }
         .sentence-label.left-framing { color: var(--accent-blue); }
         .sentence-label.right-framing { color: var(--accent-red); }
-        .sentence-label.emotional-language { color: var(--accent-green); }
+        .sentence-label.emotional-language { color: var(--accent-orange); }
 
-        .history-section {
-            margin-bottom: 30px;
+        .sentence-text {
+            font-size: 14px;
+            line-height: 1.6;
+            font-style: italic;
         }
 
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--text-primary);
+        .history-section {
+            margin-bottom: 32px;
+        }
+
+        .history-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-card);
         }
 
         .history-item {
             background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 8px;
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .history-item:hover {
             background: var(--bg-tertiary);
+            border-color: var(--border-secondary);
             transform: translateX(4px);
         }
 
@@ -416,11 +533,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .history-score {
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 16px;
         }
 
         .history-time {
@@ -429,7 +547,7 @@
         }
 
         .history-url {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-secondary);
             overflow: hidden;
             white-space: nowrap;
@@ -437,38 +555,49 @@
         }
 
         .error-message {
-            background: var(--bg-secondary);
+            background: rgba(239, 68, 68, 0.1);
             border: 1px solid var(--accent-red);
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 16px;
             margin-bottom: 20px;
             color: var(--accent-red);
             text-align: center;
+            font-weight: 500;
         }
 
         .about-section {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-card);
         }
 
         .about-title {
             cursor: pointer;
             user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .about-title::after {
+            content: "🤖";
+            font-size: 16px;
         }
 
         .dev-panel {
             background: var(--bg-primary);
             border: 2px solid var(--accent-green);
-            border-radius: 8px;
-            padding: 16px;
+            border-radius: 12px;
+            padding: 20px;
             margin-top: 20px;
-            font-family: monospace;
+            font-family: 'Courier New', monospace;
             font-size: 12px;
-            line-height: 1.4;
-            max-height: 300px;
+            line-height: 1.5;
+            max-height: 400px;
             overflow-y: auto;
             display: none;
         }
@@ -478,9 +607,9 @@
         }
 
         .dev-section {
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-primary);
         }
 
         .dev-section:last-child {
@@ -491,6 +620,8 @@
         .dev-label {
             color: var(--accent-green);
             font-weight: bold;
+            display: block;
+            margin-bottom: 4px;
         }
 
         .safe-area-bottom {
@@ -522,64 +653,91 @@
         .input-field:focus,
         .collapsible-header:focus,
         .history-item:focus {
-            outline: 2px solid var(--accent-blue);
+            outline: 2px solid var(--accent-primary);
             outline-offset: 2px;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .main-card {
+                padding: 24px;
+            }
+            
+            .title {
+                font-size: 28px;
+            }
+            
+            .score-number {
+                font-size: 48px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1 class="title">Bias Detector</h1>
-            <p class="subtitle">Natural language analysis via contextual patterns</p>
+            <div class="logo">
+                <div class="logo-icon">BL</div>
+                <div>
+                    <h1 class="title">BiasLens</h1>
+                    <p class="subtitle">AI-Powered Media Bias Detection</p>
+                </div>
+            </div>
         </header>
 
         <main>
-            <section class="input-section">
-                <div class="input-group">
-                    <label for="url-input" class="sr-only">Article URL</label>
-                    <input 
-                        type="url" 
-                        id="url-input" 
-                        class="input-field" 
-                        placeholder="Enter article URL..." 
-                        aria-describedby="url-help"
-                    >
+            <div class="main-card">
+                <div class="input-section">
+                    <label for="url-input" class="input-label">Article URL</label>
+                    <div class="input-group">
+                        <input 
+                            type="url" 
+                            id="url-input" 
+                            class="input-field" 
+                            placeholder="https://example.com/news-article" 
+                            aria-describedby="url-help"
+                        >
+                    </div>
+                    <button id="analyze-btn" class="btn btn-primary" aria-describedby="analyze-help">
+                        <span id="analyze-text">Analyze with AI</span>
+                        <span id="analyze-loading" class="loading" style="display: none;" aria-hidden="true"></span>
+                    </button>
+                    <div id="url-help" class="sr-only">Enter the URL of a news article to analyze for political bias</div>
+                    <div id="analyze-help" class="sr-only">Click to start AI bias analysis</div>
                 </div>
-                <button id="analyze-btn" class="btn btn-primary" aria-describedby="analyze-help">
-                    <span id="analyze-text">Analyze Article</span>
-                    <span id="analyze-loading" class="loading" style="display: none;" aria-hidden="true"></span>
-                </button>
-                <div id="url-help" class="sr-only">Enter the URL of a news article to analyze for political bias</div>
-                <div id="analyze-help" class="sr-only">Click to start bias analysis</div>
-            </section>
 
-            <section class="collapsible">
-                <div class="collapsible-header" tabindex="0" role="button" aria-expanded="false" aria-controls="paste-content">
-                    <span>Paste Article Text</span>
-                    <span class="chevron">▼</span>
-                </div>
-                <div class="collapsible-content" id="paste-content">
-                    <div class="collapsible-inner">
-                        <textarea 
-                            id="article-text" 
-                            class="textarea" 
-                            placeholder="Paste article text here as fallback..."
-                            aria-label="Article text for manual analysis"
-                        ></textarea>
-                        <button id="analyze-text-btn" class="btn btn-secondary" style="margin-top: 12px;">
-                            Analyze Text
-                        </button>
+                <div class="collapsible">
+                    <div class="collapsible-header" tabindex="0" role="button" aria-expanded="false" aria-controls="paste-content">
+                        <span>Alternative: Paste Article Text</span>
+                        <span class="chevron">▼</span>
+                    </div>
+                    <div class="collapsible-content" id="paste-content">
+                        <div class="collapsible-inner">
+                            <label for="article-text" class="input-label">Article Content</label>
+                            <textarea 
+                                id="article-text" 
+                                class="textarea" 
+                                placeholder="Paste the full article text here for direct analysis..."
+                                aria-label="Article text for manual analysis"
+                            ></textarea>
+                            <button id="analyze-text-btn" class="btn btn-secondary" style="margin-top: 16px;">
+                                Analyze Text
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </section>
+            </div>
 
             <div id="error-container"></div>
 
-            <section id="result-section" class="result-card" style="display: none;" role="region" aria-label="Analysis results">
-                <div class="score-display">
+            <div id="result-section" class="result-card" style="display: none;" role="region" aria-label="Analysis results">
+                <div class="score-section">
                     <div id="score-number" class="score-number" aria-label="Bias score">0</div>
-                    <div id="confidence-display" class="confidence">Confidence: <span id="confidence-value">0</span>%</div>
+                    <div class="score-label">Political Bias Score</div>
                 </div>
                 
                 <div class="bias-scale" role="img" aria-label="Political bias scale">
@@ -593,68 +751,71 @@
                     <div id="scale-marker" class="scale-marker"></div>
                 </div>
                 <div class="scale-labels">
-                    <span>Left -100</span>
+                    <span>Liberal -100</span>
                     <span>-50</span>
-                    <span>0</span>
+                    <span>Neutral</span>
                     <span>+50</span>
-                    <span>Right +100</span>
+                    <span>Conservative +100</span>
                 </div>
 
-                <div class="explanation">
+                <div class="explanation-section">
+                    <h3 class="section-title">AI Analysis</h3>
                     <div id="explanation-text" class="explanation-text"></div>
                     <div id="evidence-chips" class="evidence-chips" aria-label="Evidence keywords"></div>
                     
-                    <div class="bias-sentences" style="margin-top: 20px;">
-                        <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">Key Sentences Showing Bias:</h3>
+                    <div class="bias-sentences">
+                        <h3 class="section-title">Key Evidence Sentences</h3>
                         <div id="bias-sentences-list" aria-label="Sentences that demonstrate bias"></div>
                     </div>
                 </div>
-            </section>
+            </div>
 
-            <section class="history-section">
-                <h2 class="section-title">Recent Analyses</h2>
-                <div id="history-list" aria-label="Analysis history">
-                    <p id="no-history" class="history-item" style="opacity: 0.6; cursor: default;">No analyses yet</p>
+            <div class="history-section">
+                <div class="history-card">
+                    <h2 class="section-title">Recent Analyses</h2>
+                    <div id="history-list" aria-label="Analysis history">
+                        <p id="no-history" class="history-item" style="opacity: 0.6; cursor: default; text-align: center;">No analyses yet - try analyzing your first article!</p>
+                    </div>
                 </div>
-            </section>
+            </div>
 
-            <section class="about-section">
-                <h2 class="section-title about-title" id="about-title">About & Method</h2>
-                <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
-                    This tool analyzes news articles for political bias using natural language processing techniques. 
-                    It examines contextual sentiment around political entities, linguistic patterns, argument structure, 
-                    source attribution, and topic framing to estimate bias on a left-right scale. The analysis focuses 
+            <div class="about-section">
+                <h2 class="section-title about-title" id="about-title">How BiasLens Works</h2>
+                <p style="font-size: 14px; line-height: 1.7; color: var(--text-secondary);">
+                    BiasLens uses advanced natural language processing to analyze news articles for political bias. 
+                    Our AI examines contextual sentiment around political entities, linguistic patterns, argument structure, 
+                    source attribution, and topic framing to estimate bias on a liberal-conservative scale. The analysis focuses 
                     on <em>how</em> things are said rather than just <em>what</em> is said. 
-                    <strong>Results are estimates</strong> - use critical thinking.
+                    <strong>Results are AI estimates</strong> - always use your critical thinking.
                 </p>
                 
                 <div id="dev-panel" class="dev-panel">
                     <div class="dev-section">
-                        <div class="dev-label">Proxy Used:</div>
+                        <span class="dev-label">Proxy Used:</span>
                         <div id="dev-proxy">None</div>
                     </div>
                     <div class="dev-section">
-                        <div class="dev-label">Feature Scores:</div>
+                        <span class="dev-label">Feature Scores:</span>
                         <div id="dev-features">N/A</div>
                     </div>
                     <div class="dev-section">
-                        <div class="dev-label">Lexicon Hits:</div>
+                        <span class="dev-label">Evidence Signals:</span>
                         <div id="dev-lexicon">N/A</div>
                     </div>
                     <div class="dev-section">
-                        <div class="dev-label">Outlet Prior:</div>
+                        <span class="dev-label">Outlet Prior:</span>
                         <div id="dev-outlet">N/A</div>
                     </div>
                     <div class="dev-section">
-                        <div class="dev-label">Normalization:</div>
+                        <span class="dev-label">Score Normalization:</span>
                         <div id="dev-norm">N/A</div>
                     </div>
                     <div class="dev-section">
-                        <div class="dev-label">Timing:</div>
+                        <span class="dev-label">Processing Time:</span>
                         <div id="dev-timing">N/A</div>
                     </div>
                 </div>
-            </section>
+            </div>
         </main>
 
         <div class="safe-area-bottom"></div>
@@ -669,7 +830,7 @@
             proxyTimeout: 7000,
             maxRetries: 3,
             storageVersion: 1,
-            storageKey: 'bias_detector_v1',
+            storageKey: 'biaslens_v1',
             maxHistoryItems: 5
         };
 
@@ -716,7 +877,6 @@
             errorContainer: document.getElementById('error-container'),
             resultSection: document.getElementById('result-section'),
             scoreNumber: document.getElementById('score-number'),
-            confidenceValue: document.getElementById('confidence-value'),
             scaleMarker: document.getElementById('scale-marker'),
             explanationText: document.getElementById('explanation-text'),
             evidenceChips: document.getElementById('evidence-chips'),
@@ -792,8 +952,7 @@
                     timestamp: Date.now(),
                     url: analysis.url || 'Manual Text',
                     title: analysis.title || 'Untitled',
-                    score: analysis.score,
-                    confidence: analysis.confidence
+                    score: analysis.score
                 });
 
                 // Keep only last 5 analyses
@@ -858,7 +1017,6 @@
                 elements.urlInput.value = item.url;
             }
             
-            // Could restore full analysis here if we saved more details
             showError(`Restored: ${item.title} (Score: ${item.score})`);
         };
 
@@ -872,7 +1030,6 @@
         // Content extraction from HTML
         function extractContent(html, url) {
             try {
-                // Create a new DOMParser instance for safe parsing
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 
@@ -1292,27 +1449,11 @@
             // Use tanh for smooth natural scaling instead of hard caps
             const normalizedScore = Math.round(Math.tanh(biasScore / 15) * 100);
             
-            // CONFIDENCE CALCULATION
-            // Based on signal strength and content analysis depth
-            const wordCount = text.split(/\s+/).length;
-            const politicalDensity = evidenceTerms.length / Math.max(sentences.length, 1);
-            const signalStrength = Math.abs(sentimentScore) + Math.abs(topicFraming.framingBias) + Math.abs(linguisticBias);
-            
-            let confidence = 0;
-            confidence += Math.min(30, wordCount / 30); // Content length
-            confidence += Math.min(25, politicalDensity * 200); // Political content density
-            confidence += Math.min(20, signalStrength); // Signal strength
-            confidence += Math.min(15, sourcePatterns.namedCount * 2); // Source quality
-            confidence += Math.min(10, argumentStructure.balanceCount); // Reporting balance
-            
-            confidence = Math.round(Math.max(5, Math.min(100, confidence)));
-
             // Generate natural explanation
-            const explanation = generateNaturalExplanation(normalizedScore, confidence, features, evidenceTerms);
+            const explanation = generateNaturalExplanation(normalizedScore, features, evidenceTerms);
             
             const analysis = {
                 score: normalizedScore,
-                confidence,
                 explanation,
                 evidence: evidenceTerms.slice(0, 8), // Top evidence
                 biasSentences: biasSentences.sort((a, b) => b.strength - a.strength).slice(0, 5), // Top 5 biased sentences
@@ -1320,7 +1461,7 @@
                 outletPrior,
                 timing: Date.now() - startTime,
                 rawScore: biasScore,
-                wordCount,
+                wordCount: text.split(/\s+/).length,
                 url,
                 title
             };
@@ -1329,20 +1470,20 @@
             return analysis;
         }
 
-        function generateNaturalExplanation(score, confidence, features, evidenceTerms) {
+        function generateNaturalExplanation(score, features, evidenceTerms) {
             let explanation = '';
             
             // Primary bias assessment
             if (Math.abs(score) < 10) {
-                explanation = 'This article maintains relatively balanced reporting with neutral tone and framing.';
+                explanation = 'BiasLens detected relatively balanced reporting with neutral tone and framing throughout the article.';
             } else if (score < -30) {
-                explanation = 'This article displays strong liberal bias through sympathetic coverage of left-leaning positions and critical framing of conservative viewpoints.';
+                explanation = 'BiasLens detected strong liberal bias through sympathetic coverage of progressive positions and critical framing of conservative viewpoints.';
             } else if (score < -10) {
-                explanation = 'This article shows moderate liberal bias with somewhat favorable treatment of progressive policies and politicians.';
+                explanation = 'BiasLens detected moderate liberal bias with somewhat favorable treatment of progressive policies and politicians.';
             } else if (score > 30) {
-                explanation = 'This article displays strong conservative bias through sympathetic coverage of right-leaning positions and critical framing of liberal viewpoints.';
+                explanation = 'BiasLens detected strong conservative bias through sympathetic coverage of right-leaning positions and critical framing of liberal viewpoints.';
             } else if (score > 10) {
-                explanation = 'This article shows moderate conservative bias with somewhat favorable treatment of traditional policies and politicians.';
+                explanation = 'BiasLens detected moderate conservative bias with somewhat favorable treatment of traditional policies and politicians.';
             }
 
             // Add specific reasoning based on strongest signals
@@ -1351,7 +1492,7 @@
             const linguisticSignal = Math.abs(features.linguistic || 0);
 
             if (sentimentSignal > framingSignal && sentimentSignal > linguisticSignal) {
-                explanation += ' This is primarily driven by the emotional tone used when discussing political figures and policies.';
+                explanation += ' This assessment is primarily driven by the emotional tone used when discussing political figures and policies.';
             } else if (framingSignal > linguisticSignal) {
                 explanation += ' This bias appears mainly in how issues are framed and contextualized rather than explicit opinion.';
             } else if (linguisticSignal > 1) {
@@ -1363,13 +1504,6 @@
                 explanation += ' Heavy reliance on anonymous sources may indicate speculative reporting.';
             } else if (features.structure && features.structure < -2) {
                 explanation += ' The article lacks balanced perspectives from multiple viewpoints.';
-            }
-
-            // Confidence reasoning
-            if (confidence < 40) {
-                explanation += ' Confidence is low due to limited political content or weak bias indicators.';
-            } else if (confidence > 80) {
-                explanation += ' High confidence due to consistent bias patterns throughout the article.';
             }
 
             return explanation;
@@ -1399,8 +1533,6 @@
             elements.scoreNumber.style.color = analysis.score > 0 ? 'var(--accent-red)' : 
                                                analysis.score < 0 ? 'var(--accent-blue)' : 'var(--text-primary)';
             
-            elements.confidenceValue.textContent = analysis.confidence;
-            
             // Update bias scale marker position
             const markerPosition = ((analysis.score + 100) / 200) * 100; // Convert [-100,100] to [0,100]%
             elements.scaleMarker.style.left = `${markerPosition}%`;
@@ -1424,10 +1556,10 @@
                 elements.biasSentencesList.innerHTML = analysis.biasSentences.map(sentence => {
                     let labelText = '';
                     switch (sentence.bias) {
-                        case 'left-positive': labelText = 'Positive toward left'; break;
-                        case 'left-negative': labelText = 'Negative toward left'; break;
-                        case 'right-positive': labelText = 'Positive toward right'; break;
-                        case 'right-negative': labelText = 'Negative toward right'; break;
+                        case 'left-positive': labelText = 'Positive toward liberals'; break;
+                        case 'left-negative': labelText = 'Negative toward liberals'; break;
+                        case 'right-positive': labelText = 'Positive toward conservatives'; break;
+                        case 'right-negative': labelText = 'Negative toward conservatives'; break;
                         case 'left-framing': labelText = 'Liberal framing'; break;
                         case 'right-framing': labelText = 'Conservative framing'; break;
                         case 'emotional-language': labelText = 'Emotional language'; break;
@@ -1442,7 +1574,7 @@
                     `;
                 }).join('');
             } else {
-                elements.biasSentencesList.innerHTML = '<div style="color: var(--text-muted); font-style: italic;">No clearly biased sentences detected</div>';
+                elements.biasSentencesList.innerHTML = '<div style="color: var(--text-muted); font-style: italic; text-align: center; padding: 20px;">No clearly biased sentences detected by our AI</div>';
             }
             
             // Show results with animation
@@ -1523,7 +1655,6 @@
             const isOpen = content.classList.contains('open');
             
             content.classList.toggle('open');
-            chevron.textContent = isOpen ? '▼' : '▲';
             this.setAttribute('aria-expanded', !isOpen);
         });
 
