@@ -1,938 +1,647 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Real-time crude oil price tracker for WTI and Brent">
-    <title>Crude Oil Price Tracker</title>
-    
-    <style>
-        /* Reset and base styles - no surprises, no blow-outs */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        :root {
-            --primary: #1a1a2e;
-            --secondary: #16213e;
-            --accent: #0f3460;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --text: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --border: #334155;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: var(--text);
-            min-height: 100vh;
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        /* Container - keeps everything in line like good casing */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-        
-        /* Header - simple and functional */
-        header {
-            text-align: center;
-            padding: 2rem 0;
-            border-bottom: 2px solid var(--border);
-            margin-bottom: 2rem;
-        }
-        
-        h1 {
-            font-size: clamp(1.5rem, 4vw, 2.5rem);
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .status-bar {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 2rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-        
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--success);
-            animation: pulse 2s infinite;
-        }
-        
-        .status-dot.closed {
-            background: var(--warning);
-            animation: none;
-        }
-        
-        .status-dot.error {
-            background: var(--danger);
-            animation: none;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        /* Price cards - the meat and potatoes */
-        .price-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .price-card {
-            background: var(--secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .price-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        
-        .price-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--accent);
-        }
-        
-        .price-card.up::before {
-            background: var(--success);
-        }
-        
-        .price-card.down::before {
-            background: var(--danger);
-        }
-        
-        .oil-type {
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .price-main {
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .price-change {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            font-size: 1.1rem;
-        }
-        
-        .change-value {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .arrow {
-            font-size: 1.2rem;
-        }
-        
-        .positive { color: var(--success); }
-        .negative { color: var(--danger); }
-        .neutral { color: var(--text-secondary); }
-        
-        /* Chart container - where the magic happens */
-        .chart-section {
-            background: var(--secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        
-        .chart-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-        
-        .time-selector {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .time-btn {
-            padding: 0.5rem 1rem;
-            background: var(--accent);
-            border: none;
-            border-radius: 6px;
-            color: var(--text);
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        
-        .time-btn:hover {
-            background: var(--primary);
-        }
-        
-        .time-btn.active {
-            background: var(--success);
-        }
-        
-        #priceChart {
-            width: 100%;
-            height: 300px;
-            margin-top: 1rem;
-        }
-        
-        /* Controls - keeping it simple */
-        .controls {
-            background: var(--secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .refresh-btn {
-            width: 100%;
-            padding: 1rem;
-            background: var(--accent);
-            border: none;
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        
-        .refresh-btn:hover {
-            background: var(--primary);
-        }
-        
-        .refresh-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        /* Error and loading states */
-        .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid var(--danger);
-            color: var(--danger);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-secondary);
-        }
-        
-        .spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 2rem 0;
-            border-top: 1px solid var(--border);
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-        
-        /* Mobile responsiveness - gotta work in the field */
-        @media (max-width: 768px) {
-            .container {
-                padding: 0.75rem;
-            }
-            
-            header {
-                padding: 1.5rem 0;
-            }
-            
-            .price-card {
-                padding: 1.25rem;
-            }
-            
-            .chart-section {
-                padding: 1rem;
-            }
-            
-            #priceChart {
-                height: 250px;
-            }
-        }
-        
-        /* Offline indicator */
-        .offline-badge {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--warning);
-            color: var(--primary);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 600;
-            display: none;
-            z-index: 1000;
-        }
-        
-        .offline-badge.show {
-            display: block;
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<title>Crude Oil Price Tracker</title>
+<meta name="description" content="Mobile-first crude oil pricing tracker for WTI and Brent. No keys. Single-file. GitHub Pages ready." />
+<meta name="theme-color" content="#0b0f12" />
+<style>
+  :root{
+    --bg:#0b0f12;--bg2:#11161b;--card:#121920;--ink:#e6eef5;--muted:#9fb0bf;
+    --up:#19c37d;--down:#ff5a6e;--amber:#ffb020;--accent:#39a0ff;--grid:#1b232b;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+    --radius:14px;--radius-sm:10px;--pad:14px;--gap:12px;
+    --tap:48px;--mono:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:var(--sans); color:var(--ink); background:linear-gradient(180deg,#0b0f12 0%, #0e1318 60%, #0b0f12 100%);
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-left)) max(20px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-right))}
+  header{
+    display:flex;align-items:center;gap:10px;justify-content:space-between;margin-bottom:12px
+  }
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{width:28px;height:28px;border-radius:7px;background:radial-gradient(120% 120% at 20% 20%, #19324a 0%, #0d1b27 50%, #05080b 100%); box-shadow:inset 0 0 0 1px #233040, 0 10px 24px rgba(0,0,0,.45); position:relative}
+  .logo::after{content:"";position:absolute;inset:5px;border-radius:5px;background:conic-gradient(from 210deg, #39a0ff, #19c37d, #ffb020, #39a0ff)}
+  h1{font-size:16px;letter-spacing:.4px;margin:0;color:#eaf2f9}
+  .meta{font-size:12px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1fr;gap:var(--gap)}
+  @media (min-width:780px){.grid{grid-template-columns:1fr 1fr}}
+  .card{
+    background:linear-gradient(180deg,#0d141a 0%, #0b1116 100%);
+    border-radius:var(--radius);
+    border:1px solid #1b2733; box-shadow:var(--shadow);
+    padding:var(--pad);
+  }
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .ticker{display:flex;align-items:center;gap:10px}
+  .chip{font-family:var(--mono); font-size:12px; padding:4px 8px; border-radius:8px; background:#0a1218; border:1px solid #1b2733; color:#a9c2d8}
+  .price{font-size:28px;font-weight:700; letter-spacing:.2px}
+  .chg{font-family:var(--mono);font-size:13px;padding:6px 8px;border-radius:9px;border:1px solid #1b2733;background:#0b1218}
+  .chg.up{color:var(--up);border-color:#174233;background:#0c1a14}
+  .chg.down{color:var(--down);border-color:#3b1a22;background:#190e11}
+  .stamp{font-size:12px;color:var(--muted); margin-top:6px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+  button, .btn{
+    appearance:none; border:none; cursor:pointer; color:#dbe8f3; background:#0e151b; border:1px solid #243444;
+    padding:10px 12px; border-radius:10px; min-height:var(--tap); font-size:14px; touch-action:manipulation
+  }
+  button[aria-pressed="true"]{outline:2px solid var(--accent); background:#0b1320}
+  .split{display:grid; grid-template-columns:1fr; gap:var(--gap)}
+  @media (min-width:560px){.split{grid-template-columns:1fr 1fr}}
+  canvas{width:100%; height:220px; display:block; border-radius:12px; background:linear-gradient(180deg,#0a1217,#0a1114); border:1px solid #1b2733}
+  .alertBox{display:grid;gap:10px}
+  .input{
+    display:flex;gap:8px; align-items:center; background:#0e151b; border:1px solid #243444; border-radius:10px; padding:8px 10px
+  }
+  .input input{
+    flex:1; min-height:var(--tap); border:none; outline:none; background:transparent; color:#e6eef5; font-size:16px; font-family:var(--mono)
+  }
+  .status{display:flex;gap:10px; align-items:center; flex-wrap:wrap}
+  .badge{padding:6px 8px; border-radius:9px; font-size:12px; border:1px solid #1b2733; background:#0b1218; color:#a9c2d8}
+  .badge.live{border-color:#21462c; color:#b9f3d6; background:#0f1b14}
+  .badge.closed{border-color:#3b2a1a; color:#ffd9a3; background:#1a140d}
+  .err{color:#ffd3da}
+  .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0}
+  /* micro-reduced motion support */
+  @media (prefers-reduced-motion:no-preference){
+    .card{transition:transform .2s ease, border-color .2s ease}
+    .card:focus-within, .card:hover{transform:translateY(-1px); border-color:#2a3c4e}
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🛢️ Crude Oil Price Tracker</h1>
-            <div class="status-bar">
-                <div class="status-indicator">
-                    <span class="status-dot" id="marketStatus"></span>
-                    <span id="marketText">Market Open</span>
-                </div>
-                <div class="status-indicator">
-                    <span>Last Update:</span>
-                    <span id="lastUpdate">--:--:--</span>
-                </div>
-            </div>
-        </header>
-        
-        <main>
-            <div id="errorContainer"></div>
-            
-            <div class="price-grid" id="priceGrid">
-                <div class="price-card" id="wtiCard">
-                    <div class="oil-type">WTI Crude</div>
-                    <div class="price-main" id="wtiPrice">--</div>
-                    <div class="price-change">
-                        <span class="change-value" id="wtiChange">
-                            <span class="arrow">—</span>
-                            <span>--</span>
-                        </span>
-                        <span class="change-value" id="wtiPercent">(--)</span>
-                    </div>
-                </div>
-                
-                <div class="price-card" id="brentCard">
-                    <div class="oil-type">Brent Crude</div>
-                    <div class="price-main" id="brentPrice">--</div>
-                    <div class="price-change">
-                        <span class="change-value" id="brentChange">
-                            <span class="arrow">—</span>
-                            <span>--</span>
-                        </span>
-                        <span class="change-value" id="brentPercent">(--)</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="chart-section">
-                <div class="chart-header">
-                    <h2 class="chart-title">Price History</h2>
-                    <div class="time-selector">
-                        <button class="time-btn active" data-range="1d">1D</button>
-                        <button class="time-btn" data-range="7d">7D</button>
-                        <button class="time-btn" data-range="30d">30D</button>
-                    </div>
-                </div>
-                <canvas id="priceChart"></canvas>
-            </div>
-            
-            <div class="controls">
-                <button class="refresh-btn" id="refreshBtn">
-                    <span>🔄</span>
-                    <span>Refresh Prices</span>
-                </button>
-            </div>
-        </main>
-        
-        <footer>
-            <p>Data provided by public financial APIs • Updates every 15 minutes</p>
-            <p>Built tough for production • No API keys required</p>
-        </footer>
+<div class="wrap" role="application" aria-label="Crude Oil Price Tracker">
+  <header aria-label="Header">
+    <div class="brand">
+      <div aria-hidden="true" class="logo"></div>
+      <div>
+        <h1>Crude Oil Price Tracker</h1>
+        <div class="meta" id="meta">No keys • Single-file • Offline-capable</div>
+      </div>
     </div>
-    
-    <div class="offline-badge" id="offlineBadge">📡 Offline Mode</div>
-    
-    <!-- Chart.js from CDN - the only external dependency -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
-    <script>
-        // Rick's production-grade crude oil tracker
-        // Built like a Christmas tree - simple, visible, and won't kill anybody
-        
-        class CrudeOilTracker {
-            constructor() {
-                // Configuration - hardened like a wellhead
-                this.config = {
-                    updateInterval: 15 * 60 * 1000, // 15 minutes
-                    cacheKey: 'crude_oil_data',
-                    cacheExpiry: 15 * 60 * 1000,
-                    retryAttempts: 3,
-                    retryDelay: 2000
-                };
-                
-                // State management
-                this.chart = null;
-                this.currentRange = '1d';
-                this.isUpdating = false;
-                
-                // API endpoints - using proxy to handle CORS like a proper bypass
-                this.apis = [
-                    {
-                        name: 'Yahoo Finance Proxy',
-                        wti: 'https://query1.finance.yahoo.com/v8/finance/chart/CL=F',
-                        brent: 'https://query1.finance.yahoo.com/v8/finance/chart/BZ=F',
-                        parser: this.parseYahooData
-                    },
-                    {
-                        name: 'Backup API',
-                        wti: 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://finance.yahoo.com/quote/CL=F'),
-                        brent: 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://finance.yahoo.com/quote/BZ=F'),
-                        parser: this.parseBackupData
-                    }
-                ];
-                
-                this.init();
-            }
-            
-            init() {
-                // Wire up the controls
-                this.bindEvents();
-                
-                // Check if we're online
-                this.updateOnlineStatus();
-                window.addEventListener('online', () => this.updateOnlineStatus());
-                window.addEventListener('offline', () => this.updateOnlineStatus());
-                
-                // Load cached data first
-                this.loadCachedData();
-                
-                // Fetch fresh data
-                this.updatePrices();
-                
-                // Set up auto-refresh during market hours
-                this.setupAutoRefresh();
-                
-                // Initialize chart
-                this.initChart();
-            }
-            
-            bindEvents() {
-                // Refresh button
-                document.getElementById('refreshBtn').addEventListener('click', () => {
-                    this.updatePrices(true);
-                });
-                
-                // Time range selectors
-                document.querySelectorAll('.time-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
-                        e.target.classList.add('active');
-                        this.currentRange = e.target.dataset.range;
-                        this.updateChart();
-                    });
-                });
-            }
-            
-            updateOnlineStatus() {
-                const badge = document.getElementById('offlineBadge');
-                if (navigator.onLine) {
-                    badge.classList.remove('show');
-                } else {
-                    badge.classList.add('show');
-                }
-            }
-            
-            async updatePrices(manual = false) {
-                if (this.isUpdating && !manual) return;
-                
-                this.isUpdating = true;
-                const refreshBtn = document.getElementById('refreshBtn');
-                refreshBtn.disabled = true;
-                
-                try {
-                    // Clear any previous errors
-                    this.clearError();
-                    
-                    // Try to fetch data from APIs
-                    let data = await this.fetchPrices();
-                    
-                    if (data) {
-                        this.displayPrices(data);
-                        this.cacheData(data);
-                        this.updateChart(data);
-                        this.updateLastUpdateTime();
-                    } else {
-                        throw new Error('Unable to fetch price data');
-                    }
-                } catch (error) {
-                    console.error('Price update failed:', error);
-                    this.showError('Failed to update prices. Using cached data if available.');
-                } finally {
-                    this.isUpdating = false;
-                    refreshBtn.disabled = false;
-                }
-            }
-            
-            async fetchPrices() {
-                // Try each API endpoint with retries
-                for (const api of this.apis) {
-                    for (let attempt = 1; attempt <= this.config.retryAttempts; attempt++) {
-                        try {
-                            // For now, using mock data since real APIs require more complex setup
-                            // In production, you'd uncomment the actual fetch calls
-                            
-                            // const wtiResponse = await fetch(api.wti);
-                            // const brentResponse = await fetch(api.brent);
-                            // const wtiData = await api.parser(await wtiResponse.text(), 'wti');
-                            // const brentData = await api.parser(await brentResponse.text(), 'brent');
-                            
-                            // Mock data for demonstration - replace with actual API calls
-                            const mockData = this.generateMockData();
-                            return mockData;
-                            
-                        } catch (error) {
-                            console.warn(`API attempt ${attempt} failed:`, error);
-                            if (attempt < this.config.retryAttempts) {
-                                await this.sleep(this.config.retryDelay);
-                            }
-                        }
-                    }
-                }
-                
-                return null;
-            }
-            
-            generateMockData() {
-                // Realistic mock data generator for demonstration
-                const baseWti = 75 + Math.random() * 10;
-                const baseBrent = 80 + Math.random() * 10;
-                const wtiChange = (Math.random() - 0.5) * 4;
-                const brentChange = (Math.random() - 0.5) * 4;
-                
-                // Generate historical data
-                const history = [];
-                const now = new Date();
-                for (let i = 30; i >= 0; i--) {
-                    const date = new Date(now);
-                    date.setDate(date.getDate() - i);
-                    history.push({
-                        date: date.toISOString(),
-                        wti: baseWti + (Math.random() - 0.5) * 8,
-                        brent: baseBrent + (Math.random() - 0.5) * 8
-                    });
-                }
-                
-                return {
-                    wti: {
-                        price: baseWti,
-                        change: wtiChange,
-                        changePercent: (wtiChange / baseWti) * 100,
-                        previousClose: baseWti - wtiChange
-                    },
-                    brent: {
-                        price: baseBrent,
-                        change: brentChange,
-                        changePercent: (brentChange / baseBrent) * 100,
-                        previousClose: baseBrent - brentChange
-                    },
-                    history: history,
-                    timestamp: new Date().toISOString()
-                };
-            }
-            
-            parseYahooData(html, type) {
-                // Parse Yahoo Finance data - in production, use proper JSON API
-                // This is a simplified parser
-                const priceMatch = html.match(/regularMarketPrice.*?"fmt":"([0-9.]+)"/);
-                const changeMatch = html.match(/regularMarketChange.*?"fmt":"([0-9.-]+)"/);
-                const percentMatch = html.match(/regularMarketChangePercent.*?"fmt":"([0-9.-]+)%"/);
-                
-                if (priceMatch && changeMatch && percentMatch) {
-                    return {
-                        price: parseFloat(priceMatch[1]),
-                        change: parseFloat(changeMatch[1]),
-                        changePercent: parseFloat(percentMatch[1])
-                    };
-                }
-                return null;
-            }
-            
-            parseBackupData(data, type) {
-                // Backup parser for alternative data source
-                return this.parseYahooData(data, type);
-            }
-            
-            displayPrices(data) {
-                // Update WTI
-                document.getElementById('wtiPrice').textContent = `$${data.wti.price.toFixed(2)}`;
-                const wtiChange = document.getElementById('wtiChange');
-                const wtiPercent = document.getElementById('wtiPercent');
-                const wtiCard = document.getElementById('wtiCard');
-                
-                if (data.wti.change > 0) {
-                    wtiChange.innerHTML = `<span class="arrow">↑</span><span>${Math.abs(data.wti.change).toFixed(2)}</span>`;
-                    wtiChange.className = 'change-value positive';
-                    wtiPercent.textContent = `(+${Math.abs(data.wti.changePercent).toFixed(2)}%)`;
-                    wtiPercent.className = 'change-value positive';
-                    wtiCard.className = 'price-card up';
-                } else if (data.wti.change < 0) {
-                    wtiChange.innerHTML = `<span class="arrow">↓</span><span>${Math.abs(data.wti.change).toFixed(2)}</span>`;
-                    wtiChange.className = 'change-value negative';
-                    wtiPercent.textContent = `(-${Math.abs(data.wti.changePercent).toFixed(2)}%)`;
-                    wtiPercent.className = 'change-value negative';
-                    wtiCard.className = 'price-card down';
-                } else {
-                    wtiChange.innerHTML = `<span class="arrow">—</span><span>0.00</span>`;
-                    wtiChange.className = 'change-value neutral';
-                    wtiPercent.textContent = `(0.00%)`;
-                    wtiPercent.className = 'change-value neutral';
-                    wtiCard.className = 'price-card';
-                }
-                
-                // Update Brent
-                document.getElementById('brentPrice').textContent = `$${data.brent.price.toFixed(2)}`;
-                const brentChange = document.getElementById('brentChange');
-                const brentPercent = document.getElementById('brentPercent');
-                const brentCard = document.getElementById('brentCard');
-                
-                if (data.brent.change > 0) {
-                    brentChange.innerHTML = `<span class="arrow">↑</span><span>${Math.abs(data.brent.change).toFixed(2)}</span>`;
-                    brentChange.className = 'change-value positive';
-                    brentPercent.textContent = `(+${Math.abs(data.brent.changePercent).toFixed(2)}%)`;
-                    brentPercent.className = 'change-value positive';
-                    brentCard.className = 'price-card up';
-                } else if (data.brent.change < 0) {
-                    brentChange.innerHTML = `<span class="arrow">↓</span><span>${Math.abs(data.brent.change).toFixed(2)}</span>`;
-                    brentChange.className = 'change-value negative';
-                    brentPercent.textContent = `(-${Math.abs(data.brent.changePercent).toFixed(2)}%)`;
-                    brentPercent.className = 'change-value negative';
-                    brentCard.className = 'price-card down';
-                } else {
-                    brentChange.innerHTML = `<span class="arrow">—</span><span>0.00</span>`;
-                    brentChange.className = 'change-value neutral';
-                    brentPercent.textContent = `(0.00%)`;
-                    brentPercent.className = 'change-value neutral';
-                    brentCard.className = 'price-card';
-                }
-                
-                // Update market status
-                this.updateMarketStatus();
-            }
-            
-            initChart() {
-                const ctx = document.getElementById('priceChart').getContext('2d');
-                
-                this.chart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: [],
-                        datasets: [
-                            {
-                                label: 'WTI Crude',
-                                data: [],
-                                borderColor: '#22c55e',
-                                backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 2
-                            },
-                            {
-                                label: 'Brent Crude',
-                                data: [],
-                                borderColor: '#3b82f6',
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                tension: 0.4,
-                                borderWidth: 2
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            intersect: false,
-                            mode: 'index'
-                        },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                                labels: {
-                                    color: '#f1f5f9',
-                                    padding: 15,
-                                    font: {
-                                        size: 12
-                                    }
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(26, 26, 46, 0.9)',
-                                titleColor: '#f1f5f9',
-                                bodyColor: '#94a3b8',
-                                borderColor: '#334155',
-                                borderWidth: 1,
-                                padding: 12,
-                                displayColors: true,
-                                callbacks: {
-                                    label: function(context) {
-                                        return context.dataset.label + ': $' + context.parsed.y.toFixed(2);
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: {
-                                    display: false,
-                                    borderColor: '#334155'
-                                },
-                                ticks: {
-                                    color: '#94a3b8',
-                                    maxRotation: 0
-                                }
-                            },
-                            y: {
-                                grid: {
-                                    color: 'rgba(51, 65, 85, 0.3)',
-                                    borderColor: '#334155'
-                                },
-                                ticks: {
-                                    color: '#94a3b8',
-                                    callback: function(value) {
-                                        return '$' + value.toFixed(0);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-            
-            updateChart(data) {
-                if (!this.chart) return;
-                
-                const cachedData = data || this.getCachedData();
-                if (!cachedData || !cachedData.history) return;
-                
-                // Filter data based on selected range
-                let filteredData = cachedData.history;
-                const now = new Date();
-                
-                switch(this.currentRange) {
-                    case '1d':
-                        filteredData = cachedData.history.slice(-24);
-                        break;
-                    case '7d':
-                        filteredData = cachedData.history.slice(-7);
-                        break;
-                    case '30d':
-                        // Use all data
-                        break;
-                }
-                
-                // Update chart data
-                this.chart.data.labels = filteredData.map(point => {
-                    const date = new Date(point.date);
-                    if (this.currentRange === '1d') {
-                        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-                    } else {
-                        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    }
-                });
-                
-                this.chart.data.datasets[0].data = filteredData.map(point => point.wti);
-                this.chart.data.datasets[1].data = filteredData.map(point => point.brent);
-                
-                this.chart.update('none'); // No animation for better performance
-            }
-            
-            updateMarketStatus() {
-                const now = new Date();
-                const hour = now.getUTCHours();
-                const day = now.getUTCDay();
-                
-                // Crude oil trades Sunday 6PM - Friday 5PM ET (roughly)
-                // This is simplified - real implementation would check holidays too
-                const isMarketOpen = !(day === 6 || (day === 5 && hour >= 21) || (day === 0 && hour < 22));
-                
-                const statusDot = document.getElementById('marketStatus');
-                const statusText = document.getElementById('marketText');
-                
-                if (isMarketOpen) {
-                    statusDot.className = 'status-dot';
-                    statusText.textContent = 'Market Open';
-                } else {
-                    statusDot.className = 'status-dot closed';
-                    statusText.textContent = 'Market Closed';
-                }
-            }
-            
-            updateLastUpdateTime() {
-                const now = new Date();
-                document.getElementById('lastUpdate').textContent = 
-                    now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            }
-            
-            setupAutoRefresh() {
-                // Refresh every 15 minutes during market hours
-                setInterval(() => {
-                    const now = new Date();
-                    const hour = now.getUTCHours();
-                    const day = now.getUTCDay();
-                    
-                    const isMarketOpen = !(day === 6 || (day === 5 && hour >= 21) || (day === 0 && hour < 22));
-                    if (isMarketOpen) {
-                        this.updatePrices();
-                    }
-                }, this.config.updateInterval);
-            }
-            
-            // Cache management - reliable as a mud pump
-            cacheData(data) {
-                if (!data) return;
-                
-                const cacheEntry = {
-                    data: data,
-                    timestamp: Date.now()
-                };
-                
-                try {
-                    localStorage.setItem(this.config.cacheKey, JSON.stringify(cacheEntry));
-   } catch (error) {
-                    console.warn('Cache storage failed:', error);
-                }
-            }
-            
-            loadCachedData() {
-                try {
-                    const cached = localStorage.getItem(this.config.cacheKey);
-                    if (!cached) return null;
-                    
-                    const cacheEntry = JSON.parse(cached);
-                    const age = Date.now() - cacheEntry.timestamp;
-                    
-                    // Use cached data if it's fresh enough
-                    if (age < this.config.cacheExpiry) {
-                        this.displayPrices(cacheEntry.data);
-                        this.updateChart(cacheEntry.data);
-                        console.log('Loaded cached data, age:', Math.round(age / 1000), 'seconds');
-                    }
-                    
-                    return cacheEntry.data;
-                } catch (error) {
-                    console.warn('Cache load failed:', error);
-                    return null;
-                }
-            }
-            
-            getCachedData() {
-                try {
-                    const cached = localStorage.getItem(this.config.cacheKey);
-                    if (!cached) return null;
-                    return JSON.parse(cached).data;
-                } catch (error) {
-                    return null;
-                }
-            }
-            
-            // Error handling - because things go sideways
-            showError(message) {
-                const container = document.getElementById('errorContainer');
-                container.innerHTML = `
-                    <div class="error-message">
-                        ⚠️ ${message}
-                    </div>
-                `;
-            }
-            
-            clearError() {
-                document.getElementById('errorContainer').innerHTML = '';
-            }
-            
-            // Utility functions
-            sleep(ms) {
-                return new Promise(resolve => setTimeout(resolve, ms));
-            }
+    <div class="status" aria-live="polite">
+      <span class="badge" id="marketBadge">Market: —</span>
+      <span class="badge" id="pollBadge" title="Auto-refresh cadence">Refresh: 15m</span>
+    </div>
+  </header>
+
+  <main class="grid">
+    <!-- DASHBOARD -->
+    <section class="card" aria-labelledby="dashTitle">
+      <h2 id="dashTitle" class="sr-only">Price Dashboard</h2>
+      <div class="split" role="region" aria-label="Spot prices">
+        <div class="panel" id="panel-wti" aria-label="WTI panel">
+          <div class="row">
+            <div class="ticker">
+              <span class="chip" aria-label="Symbol">WTI</span>
+              <span class="chip" title="Yahoo symbol">CL=F</span>
+            </div>
+            <div class="row" style="gap:8px">
+              <span class="price" id="wtiPrice">—</span>
+              <span class="chg" id="wtiChg">—</span>
+            </div>
+          </div>
+          <div class="stamp" id="wtiStamp">Awaiting data…</div>
+          <div class="controls" role="group" aria-label="WTI ranges">
+            <button class="rangeBtn" data-series="wti" data-range="1d" aria-pressed="false">1D</button>
+            <button class="rangeBtn" data-series="wti" data-range="7d" aria-pressed="false">7D</button>
+            <button class="rangeBtn" data-series="wti" data-range="30d" aria-pressed="true">30D</button>
+            <button class="rangeBtn" data-series="wti" data-range="all" aria-pressed="false">All</button>
+          </div>
+          <canvas id="wtiChart" aria-label="WTI chart" role="img"></canvas>
+        </div>
+
+        <div class="panel" id="panel-brent" aria-label="Brent panel">
+          <div class="row">
+            <div class="ticker">
+              <span class="chip">BRENT</span>
+              <span class="chip" title="Yahoo symbol">BZ=F</span>
+            </div>
+            <div class="row" style="gap:8px">
+              <span class="price" id="brentPrice">—</span>
+              <span class="chg" id="brentChg">—</span>
+            </div>
+          </div>
+          <div class="stamp" id="brentStamp">Awaiting data…</div>
+          <div class="controls" role="group" aria-label="Brent ranges">
+            <button class="rangeBtn" data-series="brent" data-range="1d" aria-pressed="false">1D</button>
+            <button class="rangeBtn" data-series="brent" data-range="7d" aria-pressed="false">7D</button>
+            <button class="rangeBtn" data-series="brent" data-range="30d" aria-pressed="true">30D</button>
+            <button class="rangeBtn" data-series="brent" data-range="all" aria-pressed="false">All</button>
+          </div>
+          <canvas id="brentChart" aria-label="Brent chart" role="img"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALERTS -->
+    <section class="card" aria-labelledby="alertTitle">
+      <h2 id="alertTitle" class="sr-only">Alerts & Notifications</h2>
+      <div class="alertBox">
+        <div class="row">
+          <div class="badge" id="notifyStatus" aria-live="polite">Notifications: Off</div>
+          <button id="enableNotify">Enable Notifications</button>
+        </div>
+        <div class="input" aria-label="WTI alert">
+          <label for="wtiAlert" class="sr-only">WTI alert threshold</label>
+          <input id="wtiAlert" type="number" step="0.01" placeholder="WTI alert @ price (e.g., 70)" inputmode="decimal" />
+          <button id="saveWtiAlert">Save WTI Alert</button>
+        </div>
+        <div class="input" aria-label="Brent alert">
+          <label for="brentAlert" class="sr-only">Brent alert threshold</label>
+          <input id="brentAlert" type="number" step="0.01" placeholder="Brent alert @ price (e.g., 75)" inputmode="decimal" />
+          <button id="saveBrentAlert">Save Brent Alert</button>
+        </div>
+        <div class="stamp" id="alertInfo">Set one-time price alerts. Alerts fire when the last price equals or crosses your threshold.</div>
+      </div>
+    </section>
+
+    <!-- SYSTEM -->
+    <section class="card" aria-labelledby="sysTitle">
+      <h2 id="sysTitle" class="sr-only">System</h2>
+      <div class="row" style="align-items:flex-start">
+        <div>
+          <div class="badge" id="sourceBadge" title="Active data source">Source: Auto</div>
+          <div class="badge" id="cacheBadge" title="Cache state">Cache: —</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button id="refreshBtn" title="Force refresh">Refresh Now</button>
+          <button id="purgeCacheBtn" title="Clear local cache">Clear Cache</button>
+        </div>
+      </div>
+      <div class="stamp" id="sysMsg" aria-live="polite"></div>
+      <div class="stamp err" id="errMsg" role="status" aria-live="assertive"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ============
+   CONFIG
+=========== */
+const SYMS = { wti: 'CL=F', brent: 'BZ=F' };
+const LSKEY = 'crude_oil_tracker_v1';
+const POLL_MINUTES = 15;
+const TZ = 'America/Chicago';
+
+/* ============
+   UTIL
+=========== */
+const $ = sel => document.querySelector(sel);
+const fmt = new Intl.NumberFormat(undefined,{minimumFractionDigits:2, maximumFractionDigits:2});
+const fmtPct = new Intl.NumberFormat(undefined,{style:'percent', minimumFractionDigits:2, maximumFractionDigits:2});
+const toCT = d => new Date(d.toLocaleString('en-US',{timeZone:TZ}));
+const nowCT = () => toCT(new Date());
+const isoLocal = (d) => new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().replace('T',' ').slice(0,19);
+
+function isMarketOpenCT(dateCT=nowCT()){
+  const d = new Date(dateCT);
+  const day = d.getDay(); // 0 Sun ... 6 Sat
+  // CME Globex for NYMEX energy futures: Sun-Fri 5:00 PM–4:00 PM CT, daily maintenance 4:00–5:00 PM CT
+  if (day===6) return false; // Saturday closed
+  // Sunday special-case: before 5pm open, after 5pm open running into Monday
+  const h = d.getHours(), m = d.getMinutes();
+  const t = h*60+m;
+  const openStart = 17*60; // 5:00 PM
+  const maintStart = 16*60; // 4:00 PM
+  if (day===0){ // Sunday
+    return t>=openStart; // 5pm–midnight open
+  }
+  // Mon–Fri: open all day except maintenance 4–5pm
+  if (t>=maintStart && t<openStart) return false; // 4–5pm maintenance
+  return true;
+}
+
+function setBadge(id, text, cls){
+  const el = $(id);
+  el.textContent = text;
+  el.classList.remove('live','closed');
+  if (cls) el.classList.add(cls);
+}
+
+function saveCache(state){
+  try{
+    localStorage.setItem(LSKEY, JSON.stringify(state));
+    $('#cacheBadge').textContent = 'Cache: Saved';
+  }catch(e){ $('#cacheBadge').textContent = 'Cache: Failed'; }
+}
+function loadCache(){
+  try{
+    const raw = localStorage.getItem(LSKEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+
+/* ============
+   DATA SOURCES (multi-fallback, no keys)
+   Order:
+   1) Direct Yahoo Finance chart API (CORS usually ok)
+   2) Yahoo via r.jina.ai CORS cache proxy (static GET)
+   3) Stooq CSV via r.jina.ai (daily)
+=========== */
+async function fetchYahooChart(symbol, range='1mo', interval='1h', viaProxy=false){
+  const base = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${interval}`;
+  const url = viaProxy ? `https://r.jina.ai/http://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${interval}` : base;
+  const res = await fetch(url, { cache:'no-store' });
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const json = await res.json();
+  const r = json?.chart?.result?.[0];
+  if(!r || !r.timestamp || !r.indicators?.quote?.[0]?.close) throw new Error('Malformed Yahoo response');
+  const tzOff = (r.meta.gmtoffset ?? 0) * 1000;
+  const points = r.timestamp.map((ts,i)=>({ t: new Date((ts*1000) + tzOff), v: r.indicators.quote[0].close[i] })).filter(p=>Number.isFinite(p.v));
+  const last = points[points.length-1]?.v ?? NaN;
+  const prev = points[points.length-2]?.v ?? NaN;
+  return { points, last, prev, source: viaProxy?'Yahoo (proxy)':'Yahoo' };
+}
+
+async function fetchStooqCSV(symbol){ // symbol like CL=F -> cl.f ; BZ=F -> brn.f
+  const map = { 'CL=F':'cl.f', 'BZ=F':'brn.f' };
+  const code = map[symbol] || symbol.toLowerCase();
+  const url = `https://r.jina.ai/http://stooq.com/q/d/l/?s=${encodeURIComponent(code)}&i=d`;
+  const res = await fetch(url, { cache:'no-store' });
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const text = await res.text();
+  const lines = text.trim().split('\n').slice(1);
+  const points = lines.map(line=>{
+    const [date, open, high, low, close] = line.split(',');
+    return { t: new Date(date+'T20:00:00Z'), v: parseFloat(close) };
+  }).filter(p=>Number.isFinite(p.v));
+  const last = points[points.length-1]?.v ?? NaN;
+  const prev = points[points.length-2]?.v ?? NaN;
+  return { points, last, prev, source:'Stooq (proxy)' };
+}
+
+async function getSeries(symbol){
+  // Prefer intraday for 30d/1h from Yahoo; fall back in order
+  try{ return await fetchYahooChart(symbol,'1mo','1h',false); }
+  catch(e1){
+    try{ return await fetchYahooChart(symbol,'1mo','1h',true); }
+    catch(e2){
+      return await fetchStooqCSV(symbol);
+    }
+  }
+}
+
+/* ============
+   RENDER: Minimal canvas chart with pan/zoom + range filters
+=========== */
+class MiniChart{
+  constructor(canvas){
+    this.c = canvas; this.ctx = canvas.getContext('2d', { alpha:false, desynchronized:true });
+    this.data = []; this.viewStart = 0; this.viewEnd = 1; // [0..1] relative
+    this.padding = { l:40, r:10, t:8, b:22 };
+    this._bind();
+    this._resize();
+  }
+  setData(points){
+    this.data = points;
+    this.viewStart = Math.max(0, 1 - 30/Math.max(30, points.length)); // default to ~last 30 points
+    this.viewEnd = 1;
+    this.draw();
+  }
+  setRange(days){
+    if(!this.data.length){ this.draw(); return; }
+    if(days==='all'){ this.viewStart = 0; this.viewEnd = 1; }
+    else{
+      const ms = { '1d': 24*3600e3, '7d': 7*24*3600e3, '30d': 30*24*3600e3 }[days] || 30*24*3600e3;
+      const lastT = this.data[this.data.length-1].t.getTime();
+      const startT = lastT - ms;
+      const idx = this.data.findIndex(p=>p.t.getTime()>=startT);
+      this.viewStart = Math.max(0, (idx<=0?0:idx)/this.data.length);
+      this.viewEnd = 1;
+    }
+    this.draw();
+  }
+  _bind(){
+    window.addEventListener('resize', ()=>this._resize(), { passive:true });
+    let dragging=false, lastX=0, pinchDist0=0, viewSpan0=0;
+    const onPointerDown = (e)=>{ dragging=true; lastX=e.clientX; this.c.setPointerCapture(e.pointerId); };
+    const onPointerMove = (e)=>{
+      if(e.pointerType==='touch' && e.isPrimary===false){
+        // naive pinch support using two touches from TouchEvent API (fallback)
+        // browsers fire PointerEvents per finger; we implement wheel zoom instead for simplicity
+        return;
+      }
+      if(dragging){
+        const dx = (e.clientX - lastX) / this.c.clientWidth;
+        const span = this.viewEnd - this.viewStart;
+        this.viewStart = Math.max(0, Math.min(1-span, this.viewStart - dx));
+        this.viewEnd = this.viewStart + span;
+        lastX = e.clientX;
+        this.draw();
+      }
+    };
+    const onPointerUp = (e)=>{ dragging=false; try{ this.c.releasePointerCapture(e.pointerId);}catch{} };
+    const onWheel = (e)=>{
+      e.preventDefault();
+      const rect = this.c.getBoundingClientRect();
+      const x = (e.clientX-rect.left)/rect.width;
+      const zoom = Math.exp(-e.deltaY*0.0015);
+      const span = this.viewEnd - this.viewStart;
+      let newSpan = span/zoom;
+      newSpan = Math.max(0.02, Math.min(1, newSpan));
+      const center = this.viewStart + span*x;
+      this.viewStart = Math.max(0, Math.min(1-newSpan, center - newSpan*x));
+      this.viewEnd = this.viewStart + newSpan;
+      this.draw();
+    };
+    this.c.addEventListener('pointerdown', onPointerDown);
+    this.c.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    this.c.addEventListener('wheel', onWheel, { passive:false });
+  }
+  _resize(){
+    const dpr = Math.max(1, window.devicePixelRatio||1);
+    const w = this.c.clientWidth, h = this.c.clientHeight;
+    this.c.width = Math.floor(w*dpr); this.c.height = Math.floor(h*dpr);
+    this.ctx.setTransform(dpr,0,0,dpr,0,0);
+    this.draw();
+  }
+  draw(){
+    const ctx = this.ctx, {width:w, height:h} = this.c;
+    const W = this.c.clientWidth, H = this.c.clientHeight;
+    ctx.clearRect(0,0,W,H);
+    // background grid
+    ctx.fillStyle = '#0a1116'; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle = '#1b2733'; ctx.lineWidth = 1;
+    for(let i=0;i<6;i++){ const y = this.padding.t + (H-this.padding.t-this.padding.b)*i/5; ctx.beginPath(); ctx.moveTo(this.padding.l,y+.5); ctx.lineTo(W-this.padding.r,y+.5); ctx.stroke(); }
+    const data = this.data;
+    if(!data || data.length<2){
+      ctx.fillStyle = '#9fb0bf'; ctx.fillText('No data', this.padding.l+10, H/2); return;
+    }
+    const a = Math.floor(this.viewStart * data.length);
+    const b = Math.max(a+1, Math.floor(this.viewEnd * data.length));
+    const segment = data.slice(a,b);
+    const min = segment.reduce((m,p)=>Math.min(m,p.v), +Infinity);
+    const max = segment.reduce((m,p)=>Math.max(m,p.v), -Infinity);
+    const xScale = (t,i)=> this.padding.l + (W-this.padding.l-this.padding.r) * (i/(segment.length-1));
+    const yScale = v => this.padding.t + (H-this.padding.t-this.padding.b) * (1 - ((v-min)/(max-min||1)));
+    // axis labels
+    ctx.fillStyle = '#9fb0bf'; ctx.font = '12px ' + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign='right'; ctx.textBaseline='middle';
+    for(let i=0;i<=5;i++){ const val = min + (max-min)*i/5; const y=yScale(val); ctx.fillText(val.toFixed(2), this.padding.l-6, y); }
+    // line
+    ctx.lineWidth = 2.0; ctx.strokeStyle = '#39a0ff';
+    ctx.beginPath();
+    segment.forEach((p,i)=>{ const x=xScale(p.t,i), y=yScale(p.v); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+    ctx.stroke();
+    // last point dot
+    const last = segment[segment.length-1]; const lx=xScale(last.t,segment.length-1), ly=yScale(last.v);
+    ctx.fillStyle = '#e6eef5'; ctx.beginPath(); ctx.arc(lx,ly,3,0,Math.PI*2); ctx.fill();
+  }
+}
+
+/* ============
+   STATE
+=========== */
+const state = {
+  wti: { series: [], last:null, prev:null, range:'30d', chart:null, src:'—', stamp:null },
+  brent: { series: [], last:null, prev:null, range:'30d', chart:null, src:'—', stamp:null },
+  lastFetch: null, marketOpen: null
+};
+
+/* ============
+   UI HOOKUP
+=========== */
+function setChange(el, last, prev){
+  if(!Number.isFinite(last) || !Number.isFinite(prev)){ el.textContent = '—'; el.className='chg'; return; }
+  const chg = last - prev; const pct = prev ? chg/prev : 0;
+  el.textContent = `${chg>=0?'+':''}${fmt.format(chg)} (${fmtPct.format(pct)})`;
+  el.className = 'chg ' + (chg>=0?'up':'down');
+}
+function updateDashboard(){
+  $('#wtiPrice').textContent   = Number.isFinite(state.wti.last) ? fmt.format(state.wti.last) : '—';
+  $('#brentPrice').textContent = Number.isFinite(state.brent.last) ? fmt.format(state.brent.last) : '—';
+  setChange($('#wtiChg'), state.wti.last, state.wti.prev);
+  setChange($('#brentChg'), state.brent.last, state.brent.prev);
+  $('#wtiStamp').textContent = state.wti.stamp ? `Last update: ${state.wti.stamp}` : '—';
+  $('#brentStamp').textContent = state.brent.stamp ? `Last update: ${state.brent.stamp}` : '—';
+  $('#sourceBadge').textContent = `Source: ${state.wti.src === state.brent.src ? state.wti.src : 'Mixed'}`;
+}
+function setRangeButtons(series, range){
+  document.querySelectorAll(`.rangeBtn[data-series="${series}"]`).forEach(btn=>{
+    btn.setAttribute('aria-pressed', btn.dataset.range===range ? 'true':'false');
+  });
+}
+
+async function refreshAll({force=false}={}){
+  $('#errMsg').textContent = '';
+  const open = isMarketOpenCT();
+  state.marketOpen = open;
+  setBadge('#marketBadge', open?'Market: Open':'Market: Closed', open?'live':'closed');
+
+  const t0 = performance.now();
+  try{
+    const [wti, brent] = await Promise.all([ getSeries(SYMS.wti), getSeries(SYMS.brent) ]);
+    const ts = isoLocal(nowCT());
+    Object.assign(state.wti, { series:wti.points, last:wti.last, prev:wti.prev, src:wti.source, stamp:ts });
+    Object.assign(state.brent, { series:brent.points, last:brent.last, prev:brent.prev, src:brent.source, stamp:ts });
+    // charts
+    if(!state.wti.chart){ state.wti.chart = new MiniChart($('#wtiChart')); }
+    if(!state.brent.chart){ state.brent.chart = new MiniChart($('#brentChart')); }
+    state.wti.chart.setData(state.wti.series);
+    state.brent.chart.setData(state.brent.series);
+    state.wti.chart.setRange(state.wti.range);
+    state.brent.chart.setRange(state.brent.range);
+    updateDashboard();
+    state.lastFetch = Date.now();
+    saveCache({ meta:{ ts:state.lastFetch }, wti:state.wti, brent:state.brent });
+    checkAlerts();
+    $('#sysMsg').textContent = `Fetched in ${Math.round(performance.now()-t0)} ms`;
+  }catch(err){
+    $('#errMsg').textContent = 'Data fetch failed. Using cache if available.';
+    const cached = loadCache();
+    if(cached){
+      Object.assign(state.wti, cached.wti);
+      Object.assign(state.brent, cached.brent);
+      if(!state.wti.chart) state.wti.chart = new MiniChart($('#wtiChart'));
+      if(!state.brent.chart) state.brent.chart = new MiniChart($('#brentChart'));
+      state.wti.chart.setData(state.wti.series||[]);
+      state.brent.chart.setData(state.brent.series||[]);
+      state.wti.chart.setRange(state.wti.range);
+      state.brent.chart.setRange(state.brent.range);
+      updateDashboard();
+      $('#sysMsg').textContent = 'Loaded from cache';
+    }else{
+      $('#sysMsg').textContent = 'No cache available';
+    }
+  }
+}
+
+/* ============
+   RANGES + CONTROLS
+=========== */
+document.querySelectorAll('.rangeBtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const k = btn.dataset.series;
+    const rng = btn.dataset.range;
+    state[k].range = rng;
+    setRangeButtons(k, rng);
+    if(state[k].chart) state[k].chart.setRange(rng);
+  });
+});
+
+$('#refreshBtn').addEventListener('click', ()=>refreshAll({force:true}));
+$('#purgeCacheBtn').addEventListener('click', ()=>{
+  localStorage.removeItem(LSKEY);
+  $('#cacheBadge').textContent='Cache: Cleared';
+});
+
+/* ============
+   POLLER (15m during market, 60m otherwise)
+=========== */
+function schedulePoller(){
+  const open = isMarketOpenCT();
+  const mins = open ? POLL_MINUTES : 60;
+  setTimeout(async ()=>{
+    await refreshAll();
+    schedulePoller();
+  }, mins*60*1000);
+}
+
+/* ============
+   NOTIFICATIONS & ALERTS
+=========== */
+let swReg = null;
+async function ensureSW(){
+  if(!('serviceWorker' in navigator)) return null;
+  if(swReg) return swReg;
+  // Inline service worker via Blob (keeps repo single-file)
+  const swCode = `
+    self.addEventListener('install', e=>{
+      e.waitUntil((async()=>{ const cache = await caches.open('cot-v1'); await cache.addAll(['./']); })());
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e=>{ self.clients.claim(); });
+    self.addEventListener('fetch', e=>{
+      const url = new URL(e.request.url);
+      if(e.request.method!=='GET') return;
+      e.respondWith((async()=>{
+        const cache = await caches.open('cot-v1');
+        const cached = await cache.match(e.request);
+        try{
+          const net = await fetch(e.request);
+          cache.put(e.request, net.clone()).catch(()=>{});
+          return net;
+        }catch(err){
+          if(cached) return cached;
+          throw err;
         }
-        
-        // Fire it up when the DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                new CrudeOilTracker();
-            });
-        } else {
-            new CrudeOilTracker();
-        }
-        
-        // Service worker registration for offline capability (optional enhancement)
-        if ('serviceWorker' in navigator) {
-            // Could add a service worker for full offline support
-            // But keeping it simple for single-file deployment
-        }
-    </script>
+      })());
+    });
+    self.addEventListener('notificationclick', e=>{
+      e.notification.close();
+      e.waitUntil(self.clients.matchAll({type:'window'}).then(clients=>{
+        if(clients.length) clients[0].focus();
+        else self.clients.openWindow('./');
+      }));
+    });
+  `;
+  const blob = new Blob([swCode], {type:'text/javascript'});
+  const url = URL.createObjectURL(blob);
+  try{ swReg = await navigator.serviceWorker.register(url, { scope:'./' }); }catch{}
+  return swReg;
+}
+
+function getAlerts(){
+  try{
+    const raw = localStorage.getItem(LSKEY+'_alerts'); return raw?JSON.parse(raw):{ wti:null, brent:null };
+  }catch{ return { wti:null, brent:null }; }
+}
+function setAlerts(a){
+  localStorage.setItem(LSKEY+'_alerts', JSON.stringify(a));
+  $('#alertInfo').textContent = `WTI alert: ${a.wti??'—'} • Brent alert: ${a.brent??'—'}`;
+}
+function checkAlerts(){
+  const a = getAlerts();
+  const hits = [];
+  if(a.wti!=null && Number.isFinite(state.wti.last) && ((state.wti.prev<=a.wti && state.wti.last>=a.wti) || (state.wti.prev>=a.wti && state.wti.last<=a.wti))) hits.push({k:'WTI', at:a.wti, px:state.wti.last});
+  if(a.brent!=null && Number.isFinite(state.brent.last) && ((state.brent.prev<=a.brent && state.brent.last>=a.brent) || (state.brent.prev>=a.brent && state.brent.last<=a.brent))) hits.push({k:'Brent', at:a.brent, px:state.brent.last});
+  if(!hits.length) return;
+  notify(`${hits.map(h=>`${h.k} hit ${fmt.format(h.at)} (last ${fmt.format(h.px)})`).join(' • ')}`);
+  // one-shot alerts: clear after firing
+  const next = getAlerts();
+  hits.forEach(h=>{ if(h.k==='WTI') next.wti=null; if(h.k==='Brent') next.brent=null; });
+  setAlerts(next);
+}
+
+async function notify(msg){
+  try{
+    const reg = await ensureSW();
+    if(!('Notification' in window)) return;
+    if(Notification.permission!=='granted'){
+      const perm = await Notification.requestPermission();
+      if(perm!=='granted'){ $('#notifyStatus').textContent='Notifications: Denied'; return; }
+    }
+    $('#notifyStatus').textContent='Notifications: On';
+    if(reg?.showNotification){
+      reg.showNotification('Crude Oil Alert', { body: msg, icon: undefined, badge: undefined });
+    }else{
+      new Notification('Crude Oil Alert', { body: msg });
+    }
+  }catch{}
+}
+
+$('#enableNotify').addEventListener('click', ()=>notify('Notifications enabled. You will receive price alerts when thresholds are met.'));
+
+$('#saveWtiAlert').addEventListener('click', ()=>{
+  const v = parseFloat($('#wtiAlert').value);
+  const a = getAlerts(); a.wti = Number.isFinite(v) ? v : null; setAlerts(a);
+});
+$('#saveBrentAlert').addEventListener('click', ()=>{
+  const v = parseFloat($('#brentAlert').value);
+  const a = getAlerts(); a.brent = Number.isFinite(v) ? v : null; setAlerts(a);
+});
+
+/* ============
+   DAILY SUMMARY (on first load each day)
+=========== */
+function dailySummary(){
+  const key = LSKEY+'_summary_date';
+  const today = nowCT().toISOString().slice(0,10);
+  const last = localStorage.getItem(key);
+  if(last===today) return;
+  localStorage.setItem(key, today);
+  if(Number.isFinite(state.wti.last) && Number.isFinite(state.brent.last)){
+    notify(`Daily Summary — WTI ${fmt.format(state.wti.last)} (${($('#wtiChg').textContent)}) • Brent ${fmt.format(state.brent.last)} (${($('#brentChg').textContent)})`);
+  }
+}
+
+/* ============
+   STARTUP
+=========== */
+(async function init(){
+  // Restore cached immediately for instant paint
+  const cached = loadCache();
+  if(cached){
+    Object.assign(state.wti, cached.wti);
+    Object.assign(state.brent, cached.brent);
+    if(state.wti.series?.length){
+      state.wti.chart = new MiniChart($('#wtiChart')); state.wti.chart.setData(state.wti.series); state.wti.chart.setRange(state.wti.range||'30d');
+    }
+    if(state.brent.series?.length){
+      state.brent.chart = new MiniChart($('#brentChart')); state.brent.chart.setData(state.brent.series); state.brent.chart.setRange(state.brent.range||'30d');
+    }
+    updateDashboard();
+    $('#cacheBadge').textContent='Cache: Warm';
+    $('#sysMsg').textContent='Boot from cache; syncing…';
+  }else{
+    $('#cacheBadge').textContent='Cache: Empty';
+  }
+  setBadge('#marketBadge', isMarketOpenCT()?'Market: Open':'Market: Closed', isMarketOpenCT()?'live':'closed');
+  setAlerts(getAlerts());
+  await ensureSW();
+  await refreshAll();
+  schedulePoller();
+  dailySummary();
+})();
+</script>
 </body>
 </html>
