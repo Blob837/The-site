@@ -325,6 +325,67 @@
             color: var(--accent-blue);
         }
 
+        .bias-sentence {
+            background: var(--bg-primary);
+            border-left: 4px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .bias-sentence.left-positive {
+            border-left-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .bias-sentence.left-negative {
+            border-left-color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .bias-sentence.right-positive {
+            border-left-color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .bias-sentence.right-negative {
+            border-left-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .bias-sentence.left-framing {
+            border-left-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .bias-sentence.right-framing {
+            border-left-color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .bias-sentence.emotional-language {
+            border-left-color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .sentence-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            opacity: 0.8;
+        }
+
+        .sentence-label.left-positive { color: var(--accent-blue); }
+        .sentence-label.left-negative { color: var(--accent-red); }
+        .sentence-label.right-positive { color: var(--accent-red); }
+        .sentence-label.right-negative { color: var(--accent-blue); }
+        .sentence-label.left-framing { color: var(--accent-blue); }
+        .sentence-label.right-framing { color: var(--accent-red); }
+        .sentence-label.emotional-language { color: var(--accent-green); }
+
         .history-section {
             margin-bottom: 30px;
         }
@@ -542,6 +603,11 @@
                 <div class="explanation">
                     <div id="explanation-text" class="explanation-text"></div>
                     <div id="evidence-chips" class="evidence-chips" aria-label="Evidence keywords"></div>
+                    
+                    <div class="bias-sentences" style="margin-top: 20px;">
+                        <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">Key Sentences Showing Bias:</h3>
+                        <div id="bias-sentences-list" aria-label="Sentences that demonstrate bias"></div>
+                    </div>
                 </div>
             </section>
 
@@ -654,6 +720,7 @@
             scaleMarker: document.getElementById('scale-marker'),
             explanationText: document.getElementById('explanation-text'),
             evidenceChips: document.getElementById('evidence-chips'),
+            biasSentencesList: document.getElementById('bias-sentences-list'),
             historyList: document.getElementById('history-list'),
             noHistory: document.getElementById('no-history'),
             aboutTitle: document.getElementById('about-title'),
@@ -950,9 +1017,10 @@
             let features = {};
             let evidenceTerms = [];
             let contextualSignals = 0;
+            let biasSentences = []; // Store sentences that show bias
 
             // 1. CONTEXTUAL SENTIMENT ANALYSIS
-            // Analyze sentiment around political entities rather than just counting words
+            // Analyze sentiment around political entities and capture biased sentences
             function analyzeContextualSentiment() {
                 let leftSentiment = 0;
                 let rightSentiment = 0;
@@ -960,12 +1028,21 @@
                 
                 sentences.forEach(sentence => {
                     const words = sentence.toLowerCase().split(/\s+/);
+                    let sentenceBias = 0;
+                    let sentenceDirection = null;
+                    let foundEntities = [];
                     
                     // Find political entities in sentence
                     words.forEach((word, index) => {
                         let entityBias = null;
-                        if (politicalEntities.left.some(entity => word.includes(entity))) entityBias = 'left';
-                        if (politicalEntities.right.some(entity => word.includes(entity))) entityBias = 'right';
+                        if (politicalEntities.left.some(entity => word.includes(entity))) {
+                            entityBias = 'left';
+                            foundEntities.push(word);
+                        }
+                        if (politicalEntities.right.some(entity => word.includes(entity))) {
+                            entityBias = 'right';
+                            foundEntities.push(word);
+                        }
                         
                         if (entityBias) {
                             // Analyze context around entity
@@ -974,12 +1051,18 @@
                             const context = words.slice(start, end).join(' ');
                             
                             // Positive sentiment indicators
-                            const positiveContext = /\b(successful|effective|strong|praised|support|defend|champion|fight for|stand up|deliver|accomplish|achieve)\b/g;
-                            const negativeContext = /\b(failed|ineffective|weak|criticized|attack|oppose|undermine|damage|hurt|threaten|dangerous|extreme)\b/g;
+                            const positiveContext = /\b(successful|effective|strong|praised|support|defend|champion|fight for|stand up|deliver|accomplish|achieve|brilliant|outstanding|excellent)\b/g;
+                            const negativeContext = /\b(failed|ineffective|weak|criticized|attack|oppose|undermine|damage|hurt|threaten|dangerous|extreme|ridiculous|absurd|disaster)\b/g;
                             
                             const positiveMatches = (context.match(positiveContext) || []).length;
                             const negativeMatches = (context.match(negativeContext) || []).length;
                             const sentimentScore = positiveMatches - negativeMatches;
+                            
+                            // Track sentence-level bias
+                            if (Math.abs(sentimentScore) > 0) {
+                                sentenceBias += sentimentScore;
+                                sentenceDirection = entityBias;
+                            }
                             
                             // Apply sentiment based on entity bias
                             if (entityBias === 'left') {
@@ -998,13 +1081,28 @@
                             }
                         }
                     });
+                    
+                    // Store biased sentences for display
+                    if (Math.abs(sentenceBias) > 0 && foundEntities.length > 0) {
+                        const finalBias = sentenceBias > 0 ? 
+                            (sentenceDirection === 'left' ? 'left-positive' : 'right-positive') :
+                            (sentenceDirection === 'left' ? 'left-negative' : 'right-negative');
+                            
+                        biasSentences.push({
+                            text: sentence.trim(),
+                            bias: finalBias,
+                            strength: Math.abs(sentenceBias),
+                            entities: foundEntities,
+                            type: 'contextual'
+                        });
+                    }
                 });
                 
                 return { leftSentiment, rightSentiment };
             }
 
             // 2. LINGUISTIC PATTERN ANALYSIS
-            // Detect rhetorical patterns that indicate bias
+            // Detect rhetorical patterns that indicate bias and capture sentences
             function analyzeLinguisticPatterns() {
                 let patterns = { certainty: 0, hedging: 0, emotional: 0, factual: 0 };
                 
@@ -1016,11 +1114,29 @@
                 patterns.hedging = (normalizedText.match(hedgingMarkers) || []).length;
                 
                 // Emotional vs factual language
-                const emotionalMarkers = /\b(outrageous|shocking|devastating|alarming|dangerous|disaster|crisis|betrayal|attack|defend|fight)\b/gi;
+                const emotionalMarkers = /\b(outrageous|shocking|devastating|alarming|dangerous|disaster|crisis|betrayal|attack|defend|fight|slams|blasts|destroys)\b/gi;
                 const factualMarkers = /\b(according to|data shows|study found|research indicates|statistics|analysis|report|survey)\b/gi;
                 
                 patterns.emotional = (normalizedText.match(emotionalMarkers) || []).length;
                 patterns.factual = (normalizedText.match(factualMarkers) || []).length;
+                
+                // Find sentences with strong emotional or certainty language
+                sentences.forEach(sentence => {
+                    const sentenceLower = sentence.toLowerCase();
+                    const emotionalMatches = (sentenceLower.match(emotionalMarkers) || []).length;
+                    const certaintyMatches = (sentenceLower.match(certaintyMarkers) || []).length;
+                    
+                    if (emotionalMatches > 1 || certaintyMatches > 1) {
+                        const biasStrength = emotionalMatches + certaintyMatches;
+                        biasSentences.push({
+                            text: sentence.trim(),
+                            bias: 'emotional-language',
+                            strength: biasStrength,
+                            type: 'linguistic',
+                            indicators: emotionalMatches > 0 ? 'emotional' : 'certainty'
+                        });
+                    }
+                });
                 
                 return patterns;
             }
@@ -1059,6 +1175,7 @@
             }
 
             // 5. TOPIC FRAMING ANALYSIS
+            // Analyze how topics are framed and capture biased framing sentences
             function analyzeTopicFraming() {
                 let framingBias = 0;
                 
@@ -1083,6 +1200,29 @@
                                    (normalizedText.match(govRight) || []).length;
                 
                 framingBias = rightFraming - leftFraming;
+                
+                // Find sentences with strong framing language
+                sentences.forEach(sentence => {
+                    const sentenceLower = sentence.toLowerCase();
+                    const leftMatches = (sentenceLower.match(economicLeft) || []).length +
+                                       (sentenceLower.match(socialLeft) || []).length +
+                                       (sentenceLower.match(govLeft) || []).length;
+                    const rightMatches = (sentenceLower.match(economicRight) || []).length +
+                                        (sentenceLower.match(socialRight) || []).length +
+                                        (sentenceLower.match(govRight) || []).length;
+                    
+                    if (leftMatches > 0 || rightMatches > 0) {
+                        const netBias = rightMatches - leftMatches;
+                        if (Math.abs(netBias) > 0) {
+                            biasSentences.push({
+                                text: sentence.trim(),
+                                bias: netBias > 0 ? 'right-framing' : 'left-framing',
+                                strength: Math.abs(netBias),
+                                type: 'framing'
+                            });
+                        }
+                    }
+                });
                 
                 return { framingBias, leftFraming, rightFraming };
             }
@@ -1175,6 +1315,7 @@
                 confidence,
                 explanation,
                 evidence: evidenceTerms.slice(0, 8), // Top evidence
+                biasSentences: biasSentences.sort((a, b) => b.strength - a.strength).slice(0, 5), // Top 5 biased sentences
                 features,
                 outletPrior,
                 timing: Date.now() - startTime,
@@ -1276,6 +1417,32 @@
                 }).join('');
             } else {
                 elements.evidenceChips.innerHTML = '<span class="evidence-chip">No significant evidence found</span>';
+            }
+            
+            // Update bias sentences
+            if (analysis.biasSentences && analysis.biasSentences.length > 0) {
+                elements.biasSentencesList.innerHTML = analysis.biasSentences.map(sentence => {
+                    let labelText = '';
+                    switch (sentence.bias) {
+                        case 'left-positive': labelText = 'Positive toward left'; break;
+                        case 'left-negative': labelText = 'Negative toward left'; break;
+                        case 'right-positive': labelText = 'Positive toward right'; break;
+                        case 'right-negative': labelText = 'Negative toward right'; break;
+                        case 'left-framing': labelText = 'Liberal framing'; break;
+                        case 'right-framing': labelText = 'Conservative framing'; break;
+                        case 'emotional-language': labelText = 'Emotional language'; break;
+                        default: labelText = 'Biased language';
+                    }
+                    
+                    return `
+                        <div class="bias-sentence ${sentence.bias}">
+                            <div class="sentence-label ${sentence.bias}">${labelText}</div>
+                            <div class="sentence-text">"${sentence.text}"</div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                elements.biasSentencesList.innerHTML = '<div style="color: var(--text-muted); font-style: italic;">No clearly biased sentences detected</div>';
             }
             
             // Show results with animation
