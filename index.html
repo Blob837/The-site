@@ -808,69 +808,8 @@
             color: var(--text-tertiary);
         }
 
-        /* Premium Score Display */
-        .score-showcase {
-            background: var(--bg-glass-heavy);
-            backdrop-filter: var(--blur-heavy);
-            border: 1px solid var(--border-secondary);
-            border-radius: var(--radius-2xl);
-            padding: var(--space-3xl);
-            margin-bottom: var(--space-2xl);
-            box-shadow: var(--shadow-elevation-4);
-            position: relative;
-            overflow: hidden;
-            text-align: center;
-        }
-
-        .score-showcase::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: var(--gradient-neural);
-        }
-
-        .score-display {
-            position: relative;
-            z-index: 2;
-        }
-
-        .score-number {
-            font-size: 96px;
-            font-weight: 900;
-            line-height: 0.8;
-            margin-bottom: var(--space-md);
-            position: relative;
-            font-feature-settings: 'tnum';
-        }
-
-        .score-indicator-ring {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: conic-gradient(from 0deg, transparent 0deg, currentColor 5deg, transparent 10deg);
-            margin: 0 auto var(--space-lg);
-            position: relative;
-            animation: rotate 4s linear infinite;
-        }
-
-        @keyframes rotate {
-            to { transform: rotate(360deg); }
-        }
-
-        .score-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-quaternary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: var(--space-xl);
-        }
-
-        /* Premium Bias Scale */
-        .bias-scale-container {
+        /* Neural Bias Analysis - Premium Combined Section */
+        .neural-bias-analysis {
             background: var(--bg-glass-heavy);
             backdrop-filter: var(--blur-heavy);
             border: 1px solid var(--border-secondary);
@@ -882,7 +821,7 @@
             overflow: hidden;
         }
 
-        .bias-scale-container::before {
+        .neural-bias-analysis::before {
             content: '';
             position: absolute;
             top: 0;
@@ -892,215 +831,293 @@
             background: var(--gradient-neural);
         }
 
-        .scale-header {
+        .bias-header {
             text-align: center;
             margin-bottom: var(--space-3xl);
         }
 
-        .scale-title {
+        .bias-title {
             font-size: 24px;
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: var(--space-sm);
         }
 
-        .scale-subtitle {
+        .bias-subtitle {
             font-size: 16px;
             color: var(--text-quaternary);
         }
 
-        .bias-scale-track {
+        /* Score Display */
+        .score-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-3xl);
+            padding: var(--space-xl);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
             position: relative;
-            height: 32px;
+            overflow: hidden;
+        }
+
+        .score-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+            animation: score-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes score-pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .score-container {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-value {
+            font-size: 72px;
+            font-weight: 900;
+            line-height: 1;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            text-shadow: 0 0 30px currentColor;
+            transition: all var(--transition-elegant);
+        }
+
+        .score-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--neural-primary);
+            box-shadow: 
+                0 0 20px currentColor,
+                0 0 40px rgba(99, 102, 241, 0.3);
+            animation: indicator-pulse 2s ease-in-out infinite;
+            transition: all var(--transition-smooth);
+        }
+
+        @keyframes indicator-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .score-meta {
+            text-align: left;
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: var(--space-xs);
+        }
+
+        .score-status {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Neural Spectrum */
+        .neural-spectrum {
+            position: relative;
+        }
+
+        .spectrum-track {
+            position: relative;
+            height: 80px;
             background: var(--bg-elevated);
             border: 2px solid var(--border-primary);
-            border-radius: var(--radius-lg);
-            margin: var(--space-3xl) 0;
+            border-radius: var(--radius-xl);
             overflow: hidden;
+            margin: var(--space-2xl) 0;
             box-shadow: var(--shadow-inset);
         }
 
-        .scale-background {
+        .spectrum-background {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(90deg, 
-                var(--bias-left-primary) 0%, 
-                var(--bias-left-secondary) 20%, 
-                var(--neural-primary) 40%, 
-                var(--bias-neutral-primary) 50%, 
-                var(--neural-secondary) 60%, 
-                var(--bias-right-secondary) 80%, 
-                var(--bias-right-primary) 100%);
-            opacity: 0.8;
+            background: linear-gradient(90deg,
+                var(--bias-left-primary) 0%,
+                rgba(37, 99, 235, 0.8) 15%,
+                rgba(99, 102, 241, 0.6) 30%,
+                rgba(107, 114, 128, 0.4) 45%,
+                rgba(107, 114, 128, 0.2) 50%,
+                rgba(107, 114, 128, 0.4) 55%,
+                rgba(99, 102, 241, 0.6) 70%,
+                rgba(239, 68, 68, 0.8) 85%,
+                var(--bias-right-primary) 100%
+            );
         }
 
-        .scale-overlay {
+        .spectrum-nodes {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, 
-                transparent 30%, 
-                rgba(255, 255, 255, 0.15) 50%, 
-                transparent 70%);
-            animation: neural-flow 4s ease-in-out infinite;
-        }
-
-        @keyframes neural-flow {
-            0%, 100% { transform: translateX(-100%) skewX(-15deg); }
-            50% { transform: translateX(200%) skewX(-15deg); }
-        }
-
-        .scale-neural-grid {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-                linear-gradient(0deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 20px 4px;
-            opacity: 0.3;
-        }
-
-        .scale-ticks {
-            position: absolute;
-            top: -8px;
-            left: 0;
-            right: 0;
-            bottom: -8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0 var(--space-lg);
         }
 
-        .scale-tick {
-            width: 4px;
-            height: 48px;
-            background: linear-gradient(180deg, 
-                rgba(255, 255, 255, 0.9) 0%, 
-                rgba(255, 255, 255, 0.6) 50%, 
-                rgba(255, 255, 255, 0.9) 100%);
-            border-radius: var(--radius-sm);
-            box-shadow: 
-                0 0 10px rgba(255, 255, 255, 0.3),
-                var(--shadow-elevation-1);
-            position: relative;
-        }
-
-        .scale-tick::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 2px;
-            height: 2px;
-            background: var(--neural-primary);
+        .spectrum-node {
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 8px var(--neural-primary);
+            border: 3px solid var(--bg-deep);
+            box-shadow: 
+                0 0 0 2px rgba(255, 255, 255, 0.3),
+                0 0 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 5;
         }
 
-        .scale-marker {
+        .spectrum-node.left-extreme { background: var(--bias-left-primary); box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3), 0 0 20px var(--bias-left-primary); }
+        .spectrum-node.left-moderate { background: rgba(59, 130, 246, 0.8); box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3), 0 0 15px rgba(59, 130, 246, 0.5); }
+        .spectrum-node.neutral { background: var(--neural-primary); box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3), 0 0 20px var(--neural-primary); }
+        .spectrum-node.right-moderate { background: rgba(239, 68, 68, 0.8); box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3), 0 0 15px rgba(239, 68, 68, 0.5); }
+        .spectrum-node.right-extreme { background: var(--bias-right-primary); box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3), 0 0 20px var(--bias-right-primary); }
+
+        .spectrum-flow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.1) 25%, 
+                rgba(255, 255, 255, 0.2) 50%, 
+                rgba(255, 255, 255, 0.1) 75%, 
+                transparent 100%);
+            animation: neural-flow 6s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        @keyframes neural-flow {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .spectrum-marker {
             position: absolute;
             top: 50%;
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
             border: 4px solid var(--bg-deep);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             box-shadow: 
-                0 0 0 3px rgba(255, 255, 255, 0.4),
-                0 0 20px rgba(0, 0, 0, 0.4),
-                0 0 40px rgba(99, 102, 241, 0.3);
+                0 0 0 3px rgba(255, 255, 255, 0.5),
+                0 0 20px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(99, 102, 241, 0.4);
             transition: all var(--transition-physics);
             z-index: 10;
             cursor: pointer;
             position: relative;
-            overflow: hidden;
         }
 
-        .scale-marker::before {
+        .spectrum-marker::before {
             content: '';
             position: absolute;
             top: 2px;
             left: 2px;
             right: 2px;
             bottom: 2px;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), transparent 70%);
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), transparent 60%);
             border-radius: 50%;
-            pointer-events: none;
         }
 
-        .scale-marker::after {
+        .spectrum-marker::after {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 12px;
-            height: 12px;
+            width: 8px;
+            height: 8px;
             background: var(--neural-primary);
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 
-                0 0 0 2px rgba(255, 255, 255, 0.8),
-                0 0 15px var(--neural-primary);
+            box-shadow: 0 0 10px var(--neural-primary);
         }
 
-        .scale-marker:hover {
-            transform: translate(-50%, -50%) scale(1.15);
+        .spectrum-marker:hover {
+            transform: translate(-50%, -50%) scale(1.2);
             box-shadow: 
-                0 0 0 3px rgba(255, 255, 255, 0.6),
-                0 0 30px rgba(0, 0, 0, 0.5),
-                0 0 60px rgba(99, 102, 241, 0.5);
+                0 0 0 3px rgba(255, 255, 255, 0.7),
+                0 0 30px rgba(0, 0, 0, 0.7),
+                0 0 50px rgba(99, 102, 241, 0.6);
         }
 
-        .scale-labels {
+        .spectrum-labels {
             display: flex;
             justify-content: space-between;
-            margin-top: var(--space-xl);
+            margin-top: var(--space-lg);
             padding: 0 var(--space-sm);
         }
 
-        .scale-label {
+        .spectrum-label {
             text-align: center;
             flex: 1;
             position: relative;
         }
 
-        .scale-label-primary {
+        .label-primary {
             font-size: 14px;
             font-weight: 700;
-            color: var(--text-primary);
-            line-height: 1.2;
+            color: var(--text-secondary);
             margin-bottom: var(--space-xs);
+            transition: all var(--transition-smooth);
         }
 
-        .scale-label-secondary {
-            font-size: 12px;
-            color: var(--text-muted);
+        .label-value {
+            font-size: 11px;
             font-family: 'JetBrains Mono', monospace;
             font-weight: 600;
+            color: var(--text-muted);
         }
 
-        .scale-label:first-child .scale-label-primary { 
-            color: var(--bias-left-primary); 
+        .spectrum-label.left .label-primary {
+            color: var(--bias-left-primary);
             text-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
         }
-        .scale-label:last-child .scale-label-primary { 
+
+        .spectrum-label.right .label-primary {
             color: var(--bias-right-primary);
             text-shadow: 0 0 10px rgba(220, 38, 38, 0.3);
         }
-        .scale-label:nth-child(3) .scale-label-primary { 
+
+        .spectrum-label.center .label-primary {
             color: var(--neural-primary);
             text-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+        }
+
+        .spectrum-label.left-mod .label-primary,
+        .spectrum-label.right-mod .label-primary {
+            color: var(--text-primary);
         }
 
         /* Analysis Dashboard */
@@ -1497,17 +1514,64 @@
                 font-size: 48px;
             }
 
-            .neural-interface {
-                grid-template-columns: 1fr;
-            }
-
             .input-terminal,
-            .analytics-panel {
+            .neural-bias-analysis {
                 padding: var(--space-lg);
             }
 
-            .score-number {
-                font-size: 64px;
+            .score-display {
+                flex-direction: column;
+                gap: var(--space-lg);
+                text-align: center;
+            }
+
+            .score-value {
+                font-size: 56px;
+            }
+
+            .spectrum-track {
+                height: 60px;
+            }
+
+            .spectrum-marker {
+                width: 28px;
+                height: 28px;
+            }
+
+            .spectrum-nodes {
+                padding: 0 var(--space-md);
+            }
+
+            .spectrum-node {
+                width: 12px;
+                height: 12px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .neural-visualization {
+                height: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .score-display {
+                padding: var(--space-lg);
+            }
+
+            .score-value {
+                font-size: 48px;
+            }
+
+            .spectrum-track {
+                height: 50px;
+            }
+
+            .spectrum-marker {
+                width: 24px;
+                height: 24px;
             }
 
             .metrics-grid {
@@ -1647,56 +1711,59 @@
                 <p class="results-subtitle">Advanced AI processing reveals the following insights</p>
             </div>
 
-            <!-- Score Showcase -->
-            <div class="score-showcase">
+            <!-- Neural Bias Analysis -->
+            <div class="neural-bias-analysis">
+                <div class="bias-header">
+                    <h2 class="bias-title">Neural Bias Analysis</h2>
+                    <p class="bias-subtitle">Advanced contextual spectrum positioning</p>
+                </div>
+
                 <div class="score-display">
-                    <div class="score-indicator-ring" id="score-indicator-ring"></div>
-                    <div id="score-number" class="score-number">0</div>
-                    <div class="score-label">Political Bias Index</div>
-                </div>
-            </div>
-
-            <!-- Bias Scale -->
-            <div class="bias-scale-container">
-                <div class="scale-header">
-                    <h3 class="scale-title">Neural Bias Spectrum</h3>
-                    <p class="scale-subtitle">Advanced contextual positioning analysis</p>
-                </div>
-                
-                <div class="bias-scale-track">
-                    <div class="scale-background"></div>
-                    <div class="scale-overlay"></div>
-                    <div class="scale-neural-grid"></div>
-                    <div class="scale-ticks">
-                        <div class="scale-tick"></div>
-                        <div class="scale-tick"></div>
-                        <div class="scale-tick"></div>
-                        <div class="scale-tick"></div>
-                        <div class="scale-tick"></div>
+                    <div class="score-container">
+                        <div class="score-value" id="score-number">0</div>
+                        <div class="score-indicator" id="score-indicator"></div>
                     </div>
-                    <div id="scale-marker" class="scale-marker"></div>
+                    <div class="score-meta">
+                        <div class="score-label">Political Bias Index</div>
+                        <div class="score-status" id="score-status">Awaiting Analysis</div>
+                    </div>
                 </div>
 
-                <div class="scale-labels">
-                    <div class="scale-label">
-                        <div class="scale-label-primary">Liberal</div>
-                        <div class="scale-label-secondary">-100</div>
+                <div class="neural-spectrum">
+                    <div class="spectrum-track">
+                        <div class="spectrum-background"></div>
+                        <div class="spectrum-nodes">
+                            <div class="spectrum-node left-extreme"></div>
+                            <div class="spectrum-node left-moderate"></div>
+                            <div class="spectrum-node neutral"></div>
+                            <div class="spectrum-node right-moderate"></div>
+                            <div class="spectrum-node right-extreme"></div>
+                        </div>
+                        <div class="spectrum-flow"></div>
+                        <div class="spectrum-marker" id="spectrum-marker"></div>
                     </div>
-                    <div class="scale-label">
-                        <div class="scale-label-primary">Moderate Left</div>
-                        <div class="scale-label-secondary">-50</div>
-                    </div>
-                    <div class="scale-label">
-                        <div class="scale-label-primary">Neutral</div>
-                        <div class="scale-label-secondary">0</div>
-                    </div>
-                    <div class="scale-label">
-                        <div class="scale-label-primary">Moderate Right</div>
-                        <div class="scale-label-secondary">+50</div>
-                    </div>
-                    <div class="scale-label">
-                        <div class="scale-label-primary">Conservative</div>
-                        <div class="scale-label-secondary">+100</div>
+                    
+                    <div class="spectrum-labels">
+                        <div class="spectrum-label left">
+                            <div class="label-primary">Liberal</div>
+                            <div class="label-value">-100</div>
+                        </div>
+                        <div class="spectrum-label left-mod">
+                            <div class="label-primary">Left</div>
+                            <div class="label-value">-50</div>
+                        </div>
+                        <div class="spectrum-label center">
+                            <div class="label-primary">Neutral</div>
+                            <div class="label-value">0</div>
+                        </div>
+                        <div class="spectrum-label right-mod">
+                            <div class="label-primary">Right</div>
+                            <div class="label-value">+50</div>
+                        </div>
+                        <div class="spectrum-label right">
+                            <div class="label-primary">Conservative</div>
+                            <div class="label-value">+100</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1871,8 +1938,9 @@
             errorContainer: document.getElementById('error-container'),
             resultsSection: document.getElementById('results-section'),
             scoreNumber: document.getElementById('score-number'),
-            scoreIndicatorRing: document.getElementById('score-indicator-ring'),
-            scaleMarker: document.getElementById('scale-marker'),
+            scoreIndicator: document.getElementById('score-indicator'),
+            scoreStatus: document.getElementById('score-status'),
+            spectrumMarker: document.getElementById('spectrum-marker'),
             explanationText: document.getElementById('explanation-text'),
             evidenceChips: document.getElementById('evidence-chips'),
             biasSentencesList: document.getElementById('bias-sentences-list'),
@@ -2462,16 +2530,28 @@
         function displayResults(analysis) {
             currentAnalysis = analysis;
             
-            // Update score with color coding
+            // Update score with premium styling
             elements.scoreNumber.textContent = analysis.score > 0 ? `+${analysis.score}` : analysis.score;
             const scoreColor = analysis.score > 0 ? 'var(--bias-right-primary)' : 
-                              analysis.score < 0 ? 'var(--bias-left-primary)' : 'var(--text-secondary)';
+                              analysis.score < 0 ? 'var(--bias-left-primary)' : 'var(--neural-primary)';
             elements.scoreNumber.style.color = scoreColor;
-            elements.scoreIndicatorRing.style.color = scoreColor;
+            elements.scoreIndicator.style.background = scoreColor;
             
-            // Update bias scale marker with physics animation
+            // Update status
+            const statusText = Math.abs(analysis.score) < 10 ? 'Neutral Content' :
+                              analysis.score > 30 ? 'Strong Conservative Bias' :
+                              analysis.score > 10 ? 'Moderate Conservative Bias' :
+                              analysis.score < -30 ? 'Strong Liberal Bias' :
+                              analysis.score < -10 ? 'Moderate Liberal Bias' : 'Minimal Bias Detected';
+            elements.scoreStatus.textContent = statusText;
+            
+            // Update spectrum marker with premium physics animation
             const markerPosition = ((analysis.score + 100) / 200) * 100;
-            elements.scaleMarker.style.left = `${markerPosition}%`;
+            elements.spectrumMarker.style.left = `${markerPosition}%`;
+            elements.spectrumMarker.style.boxShadow = `
+                0 0 0 3px rgba(255, 255, 255, 0.5),
+                0 0 20px rgba(0, 0, 0, 0.6),
+                0 0 30px ${scoreColor}`;
             
             // Update explanation
             elements.explanationText.textContent = analysis.explanation;
