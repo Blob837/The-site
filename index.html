@@ -1,646 +1,853 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<title>Crude Oil Price Tracker</title>
-<meta name="description" content="Mobile-first crude oil pricing tracker for WTI and Brent. No keys. Single-file. GitHub Pages ready." />
-<meta name="theme-color" content="#0b0f12" />
+<meta charset="utf-8">
+<title>Oil Monitor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0f0a">
 <style>
   :root{
-    --bg:#0b0f12;--bg2:#11161b;--card:#121920;--ink:#e6eef5;--muted:#9fb0bf;
-    --up:#19c37d;--down:#ff5a6e;--amber:#ffb020;--accent:#39a0ff;--grid:#1b232b;
-    --shadow:0 8px 24px rgba(0,0,0,.35);
-    --radius:14px;--radius-sm:10px;--pad:14px;--gap:12px;
-    --tap:48px;--mono:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-    --sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    --bg:#0a0f0a;
+    --bg-2:#0c130c;
+    --panel:#0e1710;
+    --panel-2:#0f1b12;
+    --scan:#0a0f0a;
+    --text:#d6f5d6;
+    --muted:#9ccf9c;
+    --accent:#37ff8b;
+    --accent-2:#39d77a;
+    --warn:#ffcc66;
+    --err:#ff6b6b;
+    --up:#20e37a;
+    --down:#ff4d4d;
+    --flat:#9aa59a;
+    --shadow:0 6px 24px rgba(0,0,0,.45), inset 0 1px rgba(255,255,255,.03);
+    --radius:18px;
+    --tap:56px;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0; font-family:var(--sans); color:var(--ink); background:linear-gradient(180deg,#0b0f12 0%, #0e1318 60%, #0b0f12 100%);
-    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    margin:0;
+    font:16px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,Apple Color Emoji,Segoe UI Emoji;
+    color:var(--text);
+    background: radial-gradient(1200px 800px at 10% -10%, #112315 10%, transparent 50%),
+                radial-gradient(1000px 700px at 110% 10%, #0c1b11 5%, transparent 45%),
+                linear-gradient(135deg,#071007 0%,#0b160c 60%,#0a0f0a 100%);
+    background-attachment: fixed;
+    min-height:100%;
+    overscroll-behavior-y:none;
   }
-  .wrap{max-width:980px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-left)) max(20px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-right))}
-  header{
-    display:flex;align-items:center;gap:10px;justify-content:space-between;margin-bottom:12px
-  }
-  .brand{display:flex;align-items:center;gap:10px}
-  .logo{width:28px;height:28px;border-radius:7px;background:radial-gradient(120% 120% at 20% 20%, #19324a 0%, #0d1b27 50%, #05080b 100%); box-shadow:inset 0 0 0 1px #233040, 0 10px 24px rgba(0,0,0,.45); position:relative}
-  .logo::after{content:"";position:absolute;inset:5px;border-radius:5px;background:conic-gradient(from 210deg, #39a0ff, #19c37d, #ffb020, #39a0ff)}
-  h1{font-size:16px;letter-spacing:.4px;margin:0;color:#eaf2f9}
-  .meta{font-size:12px;color:var(--muted)}
-  .grid{display:grid;grid-template-columns:1fr;gap:var(--gap)}
-  @media (min-width:780px){.grid{grid-template-columns:1fr 1fr}}
-  .card{
-    background:linear-gradient(180deg,#0d141a 0%, #0b1116 100%);
-    border-radius:var(--radius);
-    border:1px solid #1b2733; box-shadow:var(--shadow);
-    padding:var(--pad);
-  }
-  .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .ticker{display:flex;align-items:center;gap:10px}
-  .chip{font-family:var(--mono); font-size:12px; padding:4px 8px; border-radius:8px; background:#0a1218; border:1px solid #1b2733; color:#a9c2d8}
-  .price{font-size:28px;font-weight:700; letter-spacing:.2px}
-  .chg{font-family:var(--mono);font-size:13px;padding:6px 8px;border-radius:9px;border:1px solid #1b2733;background:#0b1218}
-  .chg.up{color:var(--up);border-color:#174233;background:#0c1a14}
-  .chg.down{color:var(--down);border-color:#3b1a22;background:#190e11}
-  .stamp{font-size:12px;color:var(--muted); margin-top:6px}
-  .controls{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
-  button, .btn{
-    appearance:none; border:none; cursor:pointer; color:#dbe8f3; background:#0e151b; border:1px solid #243444;
-    padding:10px 12px; border-radius:10px; min-height:var(--tap); font-size:14px; touch-action:manipulation
-  }
-  button[aria-pressed="true"]{outline:2px solid var(--accent); background:#0b1320}
-  .split{display:grid; grid-template-columns:1fr; gap:var(--gap)}
-  @media (min-width:560px){.split{grid-template-columns:1fr 1fr}}
-  canvas{width:100%; height:220px; display:block; border-radius:12px; background:linear-gradient(180deg,#0a1217,#0a1114); border:1px solid #1b2733}
-  .alertBox{display:grid;gap:10px}
-  .input{
-    display:flex;gap:8px; align-items:center; background:#0e151b; border:1px solid #243444; border-radius:10px; padding:8px 10px
-  }
-  .input input{
-    flex:1; min-height:var(--tap); border:none; outline:none; background:transparent; color:#e6eef5; font-size:16px; font-family:var(--mono)
-  }
-  .status{display:flex;gap:10px; align-items:center; flex-wrap:wrap}
-  .badge{padding:6px 8px; border-radius:9px; font-size:12px; border:1px solid #1b2733; background:#0b1218; color:#a9c2d8}
-  .badge.live{border-color:#21462c; color:#b9f3d6; background:#0f1b14}
-  .badge.closed{border-color:#3b2a1a; color:#ffd9a3; background:#1a140d}
-  .err{color:#ffd3da}
-  .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0}
-  /* micro-reduced motion support */
   @media (prefers-reduced-motion:no-preference){
-    .card{transition:transform .2s ease, border-color .2s ease}
-    .card:focus-within, .card:hover{transform:translateY(-1px); border-color:#2a3c4e}
+    body::after{
+      content:"";
+      position:fixed;inset:0;pointer-events:none;
+      background:
+        linear-gradient(180deg,rgba(255,255,255,.05),rgba(0,0,0,0) 40%),
+        repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 2px, rgba(0,0,0,.15) 2px 3px);
+      mix-blend-mode:overlay;
+      opacity:.3;
+      animation:scan 8s linear infinite;
+    }
+    @keyframes scan{0%{background-position:0 0,0 0}100%{background-position:0 1000px,0 0}}
+  }
+  .crt-glow{
+    text-shadow:0 0 6px rgba(55,255,139,.55), 0 0 18px rgba(55,255,139,.25);
+    filter:drop-shadow(0 0 10px rgba(55,255,139,.15));
+  }
+  header{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:saturate(120%) blur(10px);
+    background:
+      linear-gradient(120deg, rgba(25,50,35,.85), rgba(10,20,14,.85)),
+      radial-gradient(1200px 300px at 50% -40%, rgba(55,255,139,.12), transparent 70%);
+    box-shadow:var(--shadow);
+    padding: env(safe-area-inset-top) 12px 8px 12px;
+    border-bottom:1px solid rgba(132,255,186,.12);
+  }
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .between{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .brand{font-weight:800;font-size:20px;letter-spacing:.6px}
+  .brand .mono{font-family:SFMono-Regular,Menlo,Consolas,monospace;font-weight:700}
+  .badge{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:6px 10px;border-radius:999px;font-size:12px;line-height:1;
+    background:linear-gradient(180deg,#122016,#0c140f);border:1px solid rgba(132,255,186,.18)
+  }
+  .badge.dot::before{content:"";width:8px;height:8px;border-radius:50%}
+  .dot.online::before{background:var(--up);box-shadow:0 0 10px var(--up)}
+  .dot.offline::before{background:var(--warn);box-shadow:0 0 10px var(--warn)}
+  .dot.error::before{background:var(--err);box-shadow:0 0 10px var(--err)}
+  main{padding:10px 12px calc(12px + env(safe-area-inset-bottom))}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .card{
+    background:linear-gradient(180deg,var(--panel) 0%,var(--panel-2) 100%);
+    border:1px solid rgba(132,255,186,.12);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:12px;
+    position:relative;overflow:hidden
+  }
+  .card:hover{transform:translateY(-1px)}
+  @media (prefers-reduced-motion:no-preference){
+    .card{transition:transform .12s ease, box-shadow .12s ease}
+    .card:hover{box-shadow:0 10px 36px rgba(0,0,0,.55), inset 0 1px rgba(255,255,255,.05)}
+  }
+  .tile-head{display:flex;justify-content:space-between;align-items:first baseline;margin-bottom:6px}
+  .sym{font-weight:700;letter-spacing:.4px}
+  .price{font-size:28px;font-weight:800}
+  .delta{font-size:14px;padding:4px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#0e1710}
+  .delta.up{color:var(--up);border-color:rgba(32,227,122,.25)}
+  .delta.down{color:var(--down);border-color:rgba(255,77,77,.25)}
+  .delta.flat{color:var(--flat)}
+  .sub{font-size:12px;color:var(--muted)}
+  .section{margin-top:14px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .tab{
+    min-height:var(--tap);
+    display:inline-flex;align-items:center;justify-content:center;
+    padding:10px 14px;border-radius:12px;
+    border:1px solid rgba(132,255,186,.18);
+    background:linear-gradient(180deg,#0f1b12,#0c140f);
+    font-weight:600;font-size:14px
+  }
+  .tab[aria-selected="true"]{
+    outline:2px solid rgba(55,255,139,.35);
+    box-shadow:0 0 0 6px rgba(55,255,139,.08) inset;
+  }
+  .chart-wrap{position:relative}
+  canvas{display:block;width:100%;height:220px;border-radius:12px;background:#0a120c}
+  .tooltip{
+    position:absolute;pointer-events:none;padding:8px 10px;border-radius:10px;
+    background:#0f1b12;border:1px solid rgba(132,255,186,.25);font-size:12px;white-space:nowrap
+  }
+  details.news{border:1px solid rgba(132,255,186,.12);border-radius:var(--radius);overflow:hidden}
+  details.news>summary{
+    list-style:none;padding:14px 14px;cursor:pointer;font-weight:700;background:linear-gradient(180deg,#0e1710,#0b130d);
+    display:flex;align-items:center;justify-content:space-between
+  }
+  details.news[open]>summary{border-bottom:1px solid rgba(132,255,186,.12)}
+  .news-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px}
+  .news-tabs button{min-height:var(--tap)}
+  .list{padding:6px 8px 12px;display:grid;gap:8px;max-height:360px;overflow:auto}
+  .item{
+    display:grid;gap:4px;padding:10px;border-radius:12px;border:1px solid rgba(132,255,186,.10);
+    background:linear-gradient(180deg,#0f1a12,#0b140e)
+  }
+  .item a{color:var(--text);text-decoration:none}
+  .item a:hover{text-decoration:underline}
+  .item small{color:var(--muted)}
+  footer{
+    position:sticky;bottom:0;z-index:40;
+    padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg, rgba(15,25,18,.85), rgba(10,15,11,.9));
+    border-top:1px solid rgba(132,255,186,.12);
+    backdrop-filter:saturate(120%) blur(8px)
+  }
+  .actions{display:flex;gap:10px}
+  .btn{
+    flex:1;
+    min-height:var(--tap);
+    display:flex;align-items:center;justify-content:center;
+    border-radius:14px;border:1px solid rgba(132,255,186,.22);
+    background:linear-gradient(180deg,#112016,#0b140e);
+    font-weight:700
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.warn{border-color:rgba(255,204,102,.35)}
+  .btn.ghost{background:transparent}
+  .statusbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .clock{font-variant-numeric:tabular-nums}
+  .offline-badge{
+    position:fixed;right:10px;top:calc(env(safe-area-inset-top) + 8px);
+    z-index:60;padding:8px 10px;border-radius:12px;font-size:12px;
+    background:#2c2210;border:1px solid rgba(255,204,102,.35);color:#ffdca0;display:none
+  }
+  .diag{
+    position:fixed;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom));
+    max-height:52vh;transform:translateY(110%);transition:transform .18s ease;
+    background:linear-gradient(180deg,#0d1912,#0a130d);border-top:1px solid rgba(132,255,186,.14);
+    box-shadow:0 -16px 40px rgba(0,0,0,.45);
+    padding:12px;z-index:55
+  }
+  .diag.open{transform:translateY(0)}
+  .diag h3{margin:0 0 8px 0}
+  .kv{display:grid;grid-template-columns:140px 1fr;gap:6px;font-size:13px}
+  .mono{font-family:SFMono-Regular,Menlo,Consolas,monospace}
+  .warn-text{color:var(--warn)}
+  .err-text{color:var(--err)}
+  .divider{
+    height:1px;background:
+      linear-gradient(90deg,transparent,rgba(55,255,139,.35),transparent);
+    margin:10px 0
+  }
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .hstack{display:flex;align-items:center;gap:8px}
+  .seg{display:inline-flex;background:#0c140f;border:1px solid rgba(132,255,186,.18);border-radius:12px;overflow:hidden}
+  .seg button{border:0;background:transparent;color:var(--muted);padding:10px 12px;min-width:74px}
+  .seg button[aria-pressed="true"]{color:var(--text);background:#112016}
+  @media (min-width:720px){
+    main{max-width:940px;margin:0 auto}
+    .tiles{grid-template-columns:repeat(2,1fr)}
   }
 </style>
 </head>
 <body>
-<div class="wrap" role="application" aria-label="Crude Oil Price Tracker">
-  <header aria-label="Header">
-    <div class="brand">
-      <div aria-hidden="true" class="logo"></div>
-      <div>
-        <h1>Crude Oil Price Tracker</h1>
-        <div class="meta" id="meta">No keys • Single-file • Offline-capable</div>
+<div id="offlineBadge" class="offline-badge mono" role="status" aria-live="polite"></div>
+<header>
+  <div class="between">
+    <div class="brand crt-glow" aria-label="App name"><span class="mono">Oil</span> Monitor</div>
+    <div class="statusbar">
+      <span id="networkBadge" class="badge dot online" aria-live="polite">Online</span>
+      <span id="cacheBadge" class="badge" title="Cache status">Cache: cold</span>
+      <span class="badge"><span class="clock" id="clock">--:--</span></span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section aria-labelledby="prices-h">
+    <h2 id="prices-h" class="sr-only">Prices</h2>
+    <div class="tiles" role="region" aria-label="Current Prices">
+      <article class="card" id="tile-CL">
+        <div class="tile-head">
+          <div>
+            <div class="sym">WTI <span class="sub mono">(CL=F)</span></div>
+            <div class="sub">Last update: <span class="mono" id="tCL">—</span></div>
+          </div>
+          <div class="delta flat mono" id="dCL">+0.00 (+0.00%)</div>
+        </div>
+        <div class="price crt-glow mono" id="pCL">--.--</div>
+      </article>
+      <article class="card" id="tile-BZ">
+        <div class="tile-head">
+          <div>
+            <div class="sym">Brent <span class="sub mono">(BZ=F)</span></div>
+            <div class="sub">Last update: <span class="mono" id="tBZ">—</span></div>
+          </div>
+          <div class="delta flat mono" id="dBZ">+0.00 (+0.00%)</div>
+        </div>
+        <div class="price crt-glow mono" id="pBZ">--.--</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="charts-h">
+    <div class="between">
+      <h2 id="charts-h">Charts</h2>
+      <div class="seg" role="tablist" aria-label="Symbol">
+        <button class="tab" role="tab" aria-selected="true" id="symTab-CL" data-sym="CL">WTI</button>
+        <button class="tab" role="tab" aria-selected="false" id="symTab-BZ" data-sym="BZ">Brent</button>
       </div>
     </div>
-    <div class="status" aria-live="polite">
-      <span class="badge" id="marketBadge">Market: —</span>
-      <span class="badge" id="pollBadge" title="Auto-refresh cadence">Refresh: 15m</span>
+    <div class="hstack" style="margin:10px 0">
+      <div class="seg" role="tablist" aria-label="Range">
+        <button class="tab" role="tab" aria-selected="true" data-range="1D">1D</button>
+        <button class="tab" role="tab" aria-selected="false" data-range="5D">5D</button>
+        <button class="tab" role="tab" aria-selected="false" data-range="30D">30D</button>
+      </div>
+      <span class="sub" id="chartStatus" style="margin-left:auto">—</span>
     </div>
-  </header>
+    <div class="card chart-wrap">
+      <canvas id="chart" aria-label="Price chart" role="img"></canvas>
+      <div id="tt" class="tooltip" style="display:none"></div>
+    </div>
+  </section>
 
-  <main class="grid">
-    <!-- DASHBOARD -->
-    <section class="card" aria-labelledby="dashTitle">
-      <h2 id="dashTitle" class="sr-only">Price Dashboard</h2>
-      <div class="split" role="region" aria-label="Spot prices">
-        <div class="panel" id="panel-wti" aria-label="WTI panel">
-          <div class="row">
-            <div class="ticker">
-              <span class="chip" aria-label="Symbol">WTI</span>
-              <span class="chip" title="Yahoo symbol">CL=F</span>
-            </div>
-            <div class="row" style="gap:8px">
-              <span class="price" id="wtiPrice">—</span>
-              <span class="chg" id="wtiChg">—</span>
-            </div>
-          </div>
-          <div class="stamp" id="wtiStamp">Awaiting data…</div>
-          <div class="controls" role="group" aria-label="WTI ranges">
-            <button class="rangeBtn" data-series="wti" data-range="1d" aria-pressed="false">1D</button>
-            <button class="rangeBtn" data-series="wti" data-range="7d" aria-pressed="false">7D</button>
-            <button class="rangeBtn" data-series="wti" data-range="30d" aria-pressed="true">30D</button>
-            <button class="rangeBtn" data-series="wti" data-range="all" aria-pressed="false">All</button>
-          </div>
-          <canvas id="wtiChart" aria-label="WTI chart" role="img"></canvas>
-        </div>
-
-        <div class="panel" id="panel-brent" aria-label="Brent panel">
-          <div class="row">
-            <div class="ticker">
-              <span class="chip">BRENT</span>
-              <span class="chip" title="Yahoo symbol">BZ=F</span>
-            </div>
-            <div class="row" style="gap:8px">
-              <span class="price" id="brentPrice">—</span>
-              <span class="chg" id="brentChg">—</span>
-            </div>
-          </div>
-          <div class="stamp" id="brentStamp">Awaiting data…</div>
-          <div class="controls" role="group" aria-label="Brent ranges">
-            <button class="rangeBtn" data-series="brent" data-range="1d" aria-pressed="false">1D</button>
-            <button class="rangeBtn" data-series="brent" data-range="7d" aria-pressed="false">7D</button>
-            <button class="rangeBtn" data-series="brent" data-range="30d" aria-pressed="true">30D</button>
-            <button class="rangeBtn" data-series="brent" data-range="all" aria-pressed="false">All</button>
-          </div>
-          <canvas id="brentChart" aria-label="Brent chart" role="img"></canvas>
-        </div>
+  <section class="section" aria-labelledby="news-h">
+    <details class="news" open>
+      <summary><span id="news-h">News (Today)</span> <span class="sub" id="newsCount">0</span></summary>
+      <div class="news-tabs">
+        <button class="btn" data-feedtab="TX" aria-pressed="true">Texas</button>
+        <button class="btn" data-feedtab="US" aria-pressed="false">U.S.</button>
+        <button class="btn" data-feedtab="GL" aria-pressed="false">Global</button>
+        <button class="btn" data-feedtab="OPEC" aria-pressed="false">OPEC</button>
       </div>
-    </section>
-
-    <!-- ALERTS -->
-    <section class="card" aria-labelledby="alertTitle">
-      <h2 id="alertTitle" class="sr-only">Alerts & Notifications</h2>
-      <div class="alertBox">
-        <div class="row">
-          <div class="badge" id="notifyStatus" aria-live="polite">Notifications: Off</div>
-          <button id="enableNotify">Enable Notifications</button>
-        </div>
-        <div class="input" aria-label="WTI alert">
-          <label for="wtiAlert" class="sr-only">WTI alert threshold</label>
-          <input id="wtiAlert" type="number" step="0.01" placeholder="WTI alert @ price (e.g., 70)" inputmode="decimal" />
-          <button id="saveWtiAlert">Save WTI Alert</button>
-        </div>
-        <div class="input" aria-label="Brent alert">
-          <label for="brentAlert" class="sr-only">Brent alert threshold</label>
-          <input id="brentAlert" type="number" step="0.01" placeholder="Brent alert @ price (e.g., 75)" inputmode="decimal" />
-          <button id="saveBrentAlert">Save Brent Alert</button>
-        </div>
-        <div class="stamp" id="alertInfo">Set one-time price alerts. Alerts fire when the last price equals or crosses your threshold.</div>
+      <div id="newsLists">
+        <div class="list" id="list-TX" role="region" aria-label="Texas news"></div>
+        <div class="list" id="list-US" hidden role="region" aria-label="U.S. news"></div>
+        <div class="list" id="list-GL" hidden role="region" aria-label="Global news"></div>
+        <div class="list" id="list-OP" hidden role="region" aria-label="OPEC news"></div>
       </div>
-    </section>
+    </details>
+  </section>
+</main>
 
-    <!-- SYSTEM -->
-    <section class="card" aria-labelledby="sysTitle">
-      <h2 id="sysTitle" class="sr-only">System</h2>
-      <div class="row" style="align-items:flex-start">
-        <div>
-          <div class="badge" id="sourceBadge" title="Active data source">Source: Auto</div>
-          <div class="badge" id="cacheBadge" title="Cache state">Cache: —</div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button id="refreshBtn" title="Force refresh">Refresh Now</button>
-          <button id="purgeCacheBtn" title="Clear local cache">Clear Cache</button>
-        </div>
-      </div>
-      <div class="stamp" id="sysMsg" aria-live="polite"></div>
-      <div class="stamp err" id="errMsg" role="status" aria-live="assertive"></div>
-    </section>
-  </main>
-</div>
+<footer>
+  <div class="actions">
+    <button id="btnRefresh" class="btn">Refresh</button>
+    <button id="btnDemo" class="btn warn" aria-pressed="false">Demo Data</button>
+    <button id="btnDiag" class="btn ghost">Diagnostics</button>
+  </div>
+</footer>
+
+<section id="diag" class="diag" aria-live="polite">
+  <h3>Diagnostics</h3>
+  <div class="kv">
+    <div>Online</div><div id="dOnline">—</div>
+    <div>Last Refresh</div><div id="dLast">—</div>
+    <div>Yahoo CL</div><div id="dYCL">—</div>
+    <div>Yahoo BZ</div><div id="dYBZ">—</div>
+    <div>Fallback CL</div><div id="dFCL">—</div>
+    <div>Fallback BZ</div><div id="dFBZ">—</div>
+    <div>News TX</div><div id="dNTX">—</div>
+    <div>News US</div><div id="dNUS">—</div>
+    <div>News GL</div><div id="dNGL">—</div>
+    <div>News OPEC</div><div id="dNOP">—</div>
+    <div>Cache Age</div><div id="dCache">—</div>
+    <div>Retries</div><div id="dRetries">—</div>
+  </div>
+  <div class="divider"></div>
+  <div id="diagWarn" class="mono warn-text"></div>
+  <div id="diagErr" class="mono err-text"></div>
+</section>
 
 <script>
-/* ============
-   CONFIG
-=========== */
-const SYMS = { wti: 'CL=F', brent: 'BZ=F' };
-const LSKEY = 'crude_oil_tracker_v1';
-const POLL_MINUTES = 15;
-const TZ = 'America/Chicago';
-
-/* ============
-   UTIL
-=========== */
-const $ = sel => document.querySelector(sel);
-const fmt = new Intl.NumberFormat(undefined,{minimumFractionDigits:2, maximumFractionDigits:2});
-const fmtPct = new Intl.NumberFormat(undefined,{style:'percent', minimumFractionDigits:2, maximumFractionDigits:2});
-const toCT = d => new Date(d.toLocaleString('en-US',{timeZone:TZ}));
-const nowCT = () => toCT(new Date());
-const isoLocal = (d) => new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().replace('T',' ').slice(0,19);
-
-function isMarketOpenCT(dateCT=nowCT()){
-  const d = new Date(dateCT);
-  const day = d.getDay(); // 0 Sun ... 6 Sat
-  // CME Globex for NYMEX energy futures: Sun-Fri 5:00 PM–4:00 PM CT, daily maintenance 4:00–5:00 PM CT
-  if (day===6) return false; // Saturday closed
-  // Sunday special-case: before 5pm open, after 5pm open running into Monday
-  const h = d.getHours(), m = d.getMinutes();
-  const t = h*60+m;
-  const openStart = 17*60; // 5:00 PM
-  const maintStart = 16*60; // 4:00 PM
-  if (day===0){ // Sunday
-    return t>=openStart; // 5pm–midnight open
-  }
-  // Mon–Fri: open all day except maintenance 4–5pm
-  if (t>=maintStart && t<openStart) return false; // 4–5pm maintenance
-  return true;
+/* ---------- Utilities ---------- */
+const $=sel=>document.querySelector(sel);
+const $$=sel=>Array.from(document.querySelectorAll(sel));
+const fmtNum=(n,dec=2)=>Number.isFinite(n)?n.toFixed(dec):'--';
+const ts=(d)=>new Date(d);
+const now=()=>new Date();
+const fmtTime=(t)=>t?ts(t).toLocaleString(undefined,{month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const withTimeout=(ms, p)=>Promise.race([p, new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms))]);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const isToday=(d)=>{
+  const x=ts(d), n=now();
+  return x.getFullYear()===n.getFullYear()&&x.getMonth()===n.getMonth()&&x.getDate()===n.getDate();
+};
+const marketHours=()=>{
+  // Approximate CME/ICE liquid hours window for updates: 05:00–17:00 local, Mon–Fri
+  const t=now(); const day=t.getDay(); const h=t.getHours();
+  return day>=1 && day<=5 && h>=5 && h<17;
+};
+const backoffSeq=[5000,15000,60000,60000];
+const state={
+  selectedSym:'CL',
+  selectedRange:'1D',
+  fetching:false,
+  retries:0,
+  lastRefresh:null,
+  sources:{YCL:null,YBZ:null,FCL:null,FBZ:null,NTX:null,NUS:null,NGL:null,NOP:null},
+  cacheTime:null,
+  demo:false
+};
+const STORAGE_KEYS={
+  prices:'oil.prices.v1',
+  series:'oil.series.v1',
+  news:'oil.news.v1',
+  meta:'oil.meta.v1'
+};
+function saveLS(key,val){try{localStorage.setItem(key,JSON.stringify(val));}catch{}}
+function loadLS(key){try{const v=localStorage.getItem(key);return v?JSON.parse(v):null;}catch{return null}}
+function setBadgeOnline(on){
+  const b=$("#networkBadge");
+  b.classList.remove('offline','error','online');
+  b.classList.add(on?'online':'offline','dot');
+  b.textContent=on?'Online':'Offline';
 }
-
-function setBadge(id, text, cls){
-  const el = $(id);
-  el.textContent = text;
-  el.classList.remove('live','closed');
-  if (cls) el.classList.add(cls);
+function setOfflineBanner(text){
+  const el=$("#offlineBadge");
+  if(text){el.style.display='block'; el.textContent=text;}
+  else el.style.display='none';
 }
-
-function saveCache(state){
-  try{
-    localStorage.setItem(LSKEY, JSON.stringify(state));
-    $('#cacheBadge').textContent = 'Cache: Saved';
-  }catch(e){ $('#cacheBadge').textContent = 'Cache: Failed'; }
+function setCacheBadge(text){$("#cacheBadge").textContent=text;}
+/* ---------- Clock & Network ---------- */
+function startClock(){
+  const clk=$("#clock");
+  const tick=()=>{clk.textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})};
+  tick(); setInterval(tick,1000);
 }
-function loadCache(){
-  try{
-    const raw = localStorage.getItem(LSKEY);
-    return raw ? JSON.parse(raw) : null;
-  }catch(e){ return null; }
-}
+window.addEventListener('online',()=>{setBadgeOnline(true); setOfflineBanner(null)});
+window.addEventListener('offline',()=>{setBadgeOnline(false); setOfflineBanner(`Offline (cached at ${$("#cacheBadge").textContent.replace('Cache: ','')})`)});
 
-/* ============
-   DATA SOURCES (multi-fallback, no keys)
-   Order:
-   1) Direct Yahoo Finance chart API (CORS usually ok)
-   2) Yahoo via r.jina.ai CORS cache proxy (static GET)
-   3) Stooq CSV via r.jina.ai (daily)
-=========== */
-async function fetchYahooChart(symbol, range='1mo', interval='1h', viaProxy=false){
-  const base = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${interval}`;
-  const url = viaProxy ? `https://r.jina.ai/http://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${interval}` : base;
-  const res = await fetch(url, { cache:'no-store' });
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  const json = await res.json();
-  const r = json?.chart?.result?.[0];
-  if(!r || !r.timestamp || !r.indicators?.quote?.[0]?.close) throw new Error('Malformed Yahoo response');
-  const tzOff = (r.meta.gmtoffset ?? 0) * 1000;
-  const points = r.timestamp.map((ts,i)=>({ t: new Date((ts*1000) + tzOff), v: r.indicators.quote[0].close[i] })).filter(p=>Number.isFinite(p.v));
-  const last = points[points.length-1]?.v ?? NaN;
-  const prev = points[points.length-2]?.v ?? NaN;
-  return { points, last, prev, source: viaProxy?'Yahoo (proxy)':'Yahoo' };
-}
-
-async function fetchStooqCSV(symbol){ // symbol like CL=F -> cl.f ; BZ=F -> brn.f
-  const map = { 'CL=F':'cl.f', 'BZ=F':'brn.f' };
-  const code = map[symbol] || symbol.toLowerCase();
-  const url = `https://r.jina.ai/http://stooq.com/q/d/l/?s=${encodeURIComponent(code)}&i=d`;
-  const res = await fetch(url, { cache:'no-store' });
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  const text = await res.text();
-  const lines = text.trim().split('\n').slice(1);
-  const points = lines.map(line=>{
-    const [date, open, high, low, close] = line.split(',');
-    return { t: new Date(date+'T20:00:00Z'), v: parseFloat(close) };
-  }).filter(p=>Number.isFinite(p.v));
-  const last = points[points.length-1]?.v ?? NaN;
-  const prev = points[points.length-2]?.v ?? NaN;
-  return { points, last, prev, source:'Stooq (proxy)' };
-}
-
-async function getSeries(symbol){
-  // Prefer intraday for 30d/1h from Yahoo; fall back in order
-  try{ return await fetchYahooChart(symbol,'1mo','1h',false); }
-  catch(e1){
-    try{ return await fetchYahooChart(symbol,'1mo','1h',true); }
-    catch(e2){
-      return await fetchStooqCSV(symbol);
-    }
-  }
-}
-
-/* ============
-   RENDER: Minimal canvas chart with pan/zoom + range filters
-=========== */
+/* ---------- Minimal Canvas Line Chart (micro-lib) ---------- */
 class MiniChart{
   constructor(canvas){
-    this.c = canvas; this.ctx = canvas.getContext('2d', { alpha:false, desynchronized:true });
-    this.data = []; this.viewStart = 0; this.viewEnd = 1; // [0..1] relative
-    this.padding = { l:40, r:10, t:8, b:22 };
+    this.c=canvas; this.ctx=canvas.getContext('2d');
+    this.data=[]; this.view=[0,1]; this.pad=18;
+    this.tooltip=$("#tt");
     this._bind();
-    this._resize();
+    this.resizeObserver=new ResizeObserver(()=>this.draw());
+    this.resizeObserver.observe(canvas);
   }
-  setData(points){
-    this.data = points;
-    this.viewStart = Math.max(0, 1 - 30/Math.max(30, points.length)); // default to ~last 30 points
-    this.viewEnd = 1;
+  setData(points){ // points: [{t:ms,v:number}]
+    this.data=points||[];
+    if(this.data.length) this.view=[0,this.data.length-1];
     this.draw();
   }
-  setRange(days){
-    if(!this.data.length){ this.draw(); return; }
-    if(days==='all'){ this.viewStart = 0; this.viewEnd = 1; }
-    else{
-      const ms = { '1d': 24*3600e3, '7d': 7*24*3600e3, '30d': 30*24*3600e3 }[days] || 30*24*3600e3;
-      const lastT = this.data[this.data.length-1].t.getTime();
-      const startT = lastT - ms;
-      const idx = this.data.findIndex(p=>p.t.getTime()>=startT);
-      this.viewStart = Math.max(0, (idx<=0?0:idx)/this.data.length);
-      this.viewEnd = 1;
-    }
-    this.draw();
+  setTheme(upColor='#37ff8b'){this.upColor=upColor}
+  setStatus(el){this.statusEl=el}
+  draw(){
+    const {width, height}=this.c.getBoundingClientRect();
+    const scale=window.devicePixelRatio||1;
+    this.c.width=Math.floor(width*scale);
+    this.c.height=Math.floor(height*scale);
+    const w=this.c.width, h=this.c.height, ctx=this.ctx;
+    ctx.setTransform(scale,0,0,scale,0,0);
+    ctx.clearRect(0,0,width,height);
+    // bg grid
+    ctx.fillStyle='#0b140e'; ctx.fillRect(0,0,width,height);
+    ctx.strokeStyle='rgba(132,255,186,.14)'; ctx.lineWidth=1;
+    for(let gx=0;gx<width;gx+=60){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,height);ctx.stroke()}
+    for(let gy=0;gy<height;gy+=40){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(width,gy);ctx.stroke()}
+    if(!this.data.length) return;
+    const [i0,i1]=this.view;
+    const slice=this.data.slice(Math.max(0,Math.floor(i0)), Math.min(this.data.length, Math.floor(i1)+1));
+    const xs=slice.map((_,i)=>i);
+    const ys=slice.map(p=>p.v).filter(Number.isFinite);
+    const min=Math.min(...ys), max=Math.max(...ys);
+    const px=(i)=>this.pad + (i/(slice.length-1||1))*(width-2*this.pad);
+    const py=(v)=>height-this.pad - ((v-min)/(max-min||1))*(height-2*this.pad);
+    // area & line
+    ctx.beginPath();
+    slice.forEach((p,i)=>{const x=px(i), y=py(p.v); if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y)});
+    ctx.strokeStyle=this.upColor||'#37ff8b'; ctx.lineWidth=2; ctx.stroke();
+    // axes labels
+    ctx.fillStyle='rgba(214,245,214,.9)'; ctx.font='12px SFMono-Regular, Menlo, monospace';
+    ctx.fillText(fmtNum(min,2), 6, height-6);
+    ctx.fillText(fmtNum(max,2), 6, 14);
+    // save slice for hit-testing
+    this._slice=slice; this._px=px; this._py=py; this._w=width; this._h=height;
   }
   _bind(){
-    window.addEventListener('resize', ()=>this._resize(), { passive:true });
-    let dragging=false, lastX=0, pinchDist0=0, viewSpan0=0;
-    const onPointerDown = (e)=>{ dragging=true; lastX=e.clientX; this.c.setPointerCapture(e.pointerId); };
-    const onPointerMove = (e)=>{
-      if(e.pointerType==='touch' && e.isPrimary===false){
-        // naive pinch support using two touches from TouchEvent API (fallback)
-        // browsers fire PointerEvents per finger; we implement wheel zoom instead for simplicity
-        return;
-      }
-      if(dragging){
-        const dx = (e.clientX - lastX) / this.c.clientWidth;
-        const span = this.viewEnd - this.viewStart;
-        this.viewStart = Math.max(0, Math.min(1-span, this.viewStart - dx));
-        this.viewEnd = this.viewStart + span;
-        lastX = e.clientX;
-        this.draw();
-      }
+    const el=this.c;
+    let dragging=false, lastX=0;
+    const onMove=(clientX, clientY)=>{
+      if(!this._slice || !this._slice.length) return;
+      const rect=el.getBoundingClientRect();
+      const x=clientX - rect.left;
+      const frac=clamp((x-this.pad)/Math.max(1,(rect.width-2*this.pad)),0,1);
+      const idx=Math.round(frac*(this._slice.length-1));
+      const p=this._slice[idx]; if(!p) return;
+      const tx=this._px(idx), ty=this._py(p.v);
+      const tt=this.tooltip; tt.style.display='block';
+      tt.style.left=(rect.left+tx- tt.offsetWidth/2) + 'px';
+      tt.style.top=(rect.top+ty-36) + 'px';
+      tt.textContent = `${fmtNum(p.v)} @ ${new Date(p.t).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
+      if(this.statusEl) this.statusEl.textContent=`${new Date(p.t).toLocaleString([], {month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit'})}`;
     };
-    const onPointerUp = (e)=>{ dragging=false; try{ this.c.releasePointerCapture(e.pointerId);}catch{} };
-    const onWheel = (e)=>{
-      e.preventDefault();
-      const rect = this.c.getBoundingClientRect();
-      const x = (e.clientX-rect.left)/rect.width;
-      const zoom = Math.exp(-e.deltaY*0.0015);
-      const span = this.viewEnd - this.viewStart;
-      let newSpan = span/zoom;
-      newSpan = Math.max(0.02, Math.min(1, newSpan));
-      const center = this.viewStart + span*x;
-      this.viewStart = Math.max(0, Math.min(1-newSpan, center - newSpan*x));
-      this.viewEnd = this.viewStart + newSpan;
-      this.draw();
-    };
-    this.c.addEventListener('pointerdown', onPointerDown);
-    this.c.addEventListener('pointermove', onPointerMove);
-    window.addEventListener('pointerup', onPointerUp);
-    this.c.addEventListener('wheel', onWheel, { passive:false });
+    const onDown=(e)=>{dragging=true; lastX=(e.touches?e.touches[0].clientX:e.clientX)};
+    const onDrag=(e)=>{ if(!dragging) return; const x=(e.touches?e.touches[0].clientX:e.clientX); const dx=x-lastX; lastX=x; this._pan(dx); };
+    const onUp=()=>{dragging=false};
+    el.addEventListener('mousemove',e=>onMove(e.clientX,e.clientY));
+    el.addEventListener('touchmove',e=>{onMove(e.touches[0].clientX,e.touches[0].clientY); onDrag(e)}, {passive:true});
+    el.addEventListener('mousedown',onDown);
+    window.addEventListener('mouseup',onUp);
+    el.addEventListener('touchstart',onDown,{passive:true});
+    el.addEventListener('touchend',onUp);
+    el.addEventListener('mouseleave',()=>this.tooltip.style.display='none');
   }
-  _resize(){
-    const dpr = Math.max(1, window.devicePixelRatio||1);
-    const w = this.c.clientWidth, h = this.c.clientHeight;
-    this.c.width = Math.floor(w*dpr); this.c.height = Math.floor(h*dpr);
-    this.ctx.setTransform(dpr,0,0,dpr,0,0);
+  _pan(dx){
+    if(!this._slice) return;
+    const width=this.c.getBoundingClientRect().width;
+    const span=Math.max(5, this.view[1]-this.view[0]);
+    const delta = Math.round(-dx/width * span);
+    const i0=clamp(this.view[0]+delta, 0, this.data.length-span);
+    const i1=i0+span;
+    this.view=[i0,i1];
     this.draw();
   }
-  draw(){
-    const ctx = this.ctx, {width:w, height:h} = this.c;
-    const W = this.c.clientWidth, H = this.c.clientHeight;
-    ctx.clearRect(0,0,W,H);
-    // background grid
-    ctx.fillStyle = '#0a1116'; ctx.fillRect(0,0,W,H);
-    ctx.strokeStyle = '#1b2733'; ctx.lineWidth = 1;
-    for(let i=0;i<6;i++){ const y = this.padding.t + (H-this.padding.t-this.padding.b)*i/5; ctx.beginPath(); ctx.moveTo(this.padding.l,y+.5); ctx.lineTo(W-this.padding.r,y+.5); ctx.stroke(); }
-    const data = this.data;
-    if(!data || data.length<2){
-      ctx.fillStyle = '#9fb0bf'; ctx.fillText('No data', this.padding.l+10, H/2); return;
-    }
-    const a = Math.floor(this.viewStart * data.length);
-    const b = Math.max(a+1, Math.floor(this.viewEnd * data.length));
-    const segment = data.slice(a,b);
-    const min = segment.reduce((m,p)=>Math.min(m,p.v), +Infinity);
-    const max = segment.reduce((m,p)=>Math.max(m,p.v), -Infinity);
-    const xScale = (t,i)=> this.padding.l + (W-this.padding.l-this.padding.r) * (i/(segment.length-1));
-    const yScale = v => this.padding.t + (H-this.padding.t-this.padding.b) * (1 - ((v-min)/(max-min||1)));
-    // axis labels
-    ctx.fillStyle = '#9fb0bf'; ctx.font = '12px ' + getComputedStyle(document.body).fontFamily;
-    ctx.textAlign='right'; ctx.textBaseline='middle';
-    for(let i=0;i<=5;i++){ const val = min + (max-min)*i/5; const y=yScale(val); ctx.fillText(val.toFixed(2), this.padding.l-6, y); }
-    // line
-    ctx.lineWidth = 2.0; ctx.strokeStyle = '#39a0ff';
-    ctx.beginPath();
-    segment.forEach((p,i)=>{ const x=xScale(p.t,i), y=yScale(p.v); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
-    ctx.stroke();
-    // last point dot
-    const last = segment[segment.length-1]; const lx=xScale(last.t,segment.length-1), ly=yScale(last.v);
-    ctx.fillStyle = '#e6eef5'; ctx.beginPath(); ctx.arc(lx,ly,3,0,Math.PI*2); ctx.fill();
-  }
 }
 
-/* ============
-   STATE
-=========== */
-const state = {
-  wti: { series: [], last:null, prev:null, range:'30d', chart:null, src:'—', stamp:null },
-  brent: { series: [], last:null, prev:null, range:'30d', chart:null, src:'—', stamp:null },
-  lastFetch: null, marketOpen: null
+/* ---------- Data Fetchers ---------- */
+const Yahoo={
+  CL:'https://query1.finance.yahoo.com/v8/finance/chart/CL=F',
+  BZ:'https://query1.finance.yahoo.com/v8/finance/chart/BZ=F'
 };
+const Stooq={
+  CL:'https://stooq.com/q/d/l/?s=cl.f&i=d',
+  BZ:'https://stooq.com/q/d/l/?s=brn.f&i=d'
+};
+async function fetchJSON(url, timeoutMs=7000){
+  const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs);
+  try{
+    const res=await fetch(url,{signal:ctrl.signal,cache:'no-store',mode:'cors'});
+    if(!res.ok) throw new Error('http '+res.status);
+    const j=await res.json(); return {ok:true,data:j,status:res.status};
+  }catch(e){return {ok:false,error:String(e)}}
+  finally{clearTimeout(t)}
+}
+async function fetchText(url, timeoutMs=7000){
+  const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),timeoutMs);
+  try{
+    const res=await fetch(url,{signal:ctrl.signal,cache:'no-store',mode:'cors'});
+    if(!res.ok) throw new Error('http '+res.status);
+    const txt=await res.text(); return {ok:true,data:txt,status:res.status};
+  }catch(e){return {ok:false,error:String(e)}}
+  finally{clearTimeout(t)}
+}
+function parseYahooChart(j){
+  if(!j?.chart?.result?.[0]) throw new Error('no result');
+  const r=j.chart.result[0];
+  const price=r.meta.regularMarketPrice;
+  const prev=r.meta.chartPreviousClose ?? r.meta.previousClose ?? null;
+  const tss=r.timestamp || r.indicators?.quote?.[0]?.timestamp || [];
+  const closes=r.indicators?.quote?.[0]?.close || [];
+  const series=[];
+  for(let i=0;i<Math.min(tss.length,closes.length);i++){
+    const v=closes[i]; const t=tss[i]*1000;
+    if(Number.isFinite(v) && t) series.push({t,v});
+  }
+  return {price, prev, series, at: Date.now()};
+}
+function parseStooqCSV(txt){
+  // Date,Open,High,Low,Close,Volume\n2025-09-25,74.00,76.00,...
+  const lines=txt.trim().split(/\r?\n/); lines.shift();
+  const series=[];
+  for(const ln of lines){
+    const [d, , , , c]=ln.split(',');
+    const v=parseFloat(c); if(!Number.isFinite(v)) continue;
+    const t=Date.parse(d); series.push({t,v});
+  }
+  return series;
+}
+function splitRanges(series){
+  const dayMs=864e5;
+  const latest=series.at(-1)?.t||Date.now();
+  const start5=latest-5*dayMs, start30=latest-30*dayMs;
+  const intraday=series.filter(p=>p.t>latest - dayMs);
+  const r5=series.filter(p=>p.t>start5);
+  const r30=series.filter(p=>p.t>start30);
+  return {intraday,r5,r30};
+}
+async function getPricesAndSeries(sym){ // 'CL' | 'BZ'
+  if(state.demo) return demoPrices(sym);
+  const url=Yahoo[sym];
+  let res=await fetchJSON(url);
+  if(res.ok){
+    try{
+      const parsed=parseYahooChart(res.data);
+      return {source:'yahoo', ...parsed};
+    }catch(e){res={ok:false,error:String(e)}}
+  }
+  // fallback Stooq (daily only)
+  const sres=await fetchText(Stooq[sym]);
+  if(sres.ok){
+    const daily=parseStooqCSV(sres.data);
+    const last=daily.at(-1)?.v ?? null;
+    const prev=daily.at(-2)?.v ?? null;
+    return {source:'stooq', price:last, prev, series:daily, at:Date.now()};
+  }
+  throw new Error(`All sources failed: ${res.error||''} ${sres.error||''}`.trim());
+}
 
-/* ============
-   UI HOOKUP
-=========== */
-function setChange(el, last, prev){
-  if(!Number.isFinite(last) || !Number.isFinite(prev)){ el.textContent = '—'; el.className='chg'; return; }
-  const chg = last - prev; const pct = prev ? chg/prev : 0;
-  el.textContent = `${chg>=0?'+':''}${fmt.format(chg)} (${fmtPct.format(pct)})`;
-  el.className = 'chg ' + (chg>=0?'up':'down');
+/* ---------- News Aggregation ---------- */
+const FEEDS={
+  TX:[
+    'https://www.ogj.com/rss.html',
+    'https://www.texastribune.org/feeds/'
+  ],
+  US:[
+    'https://feeds.reuters.com/reuters/businessNews',
+    'https://www.eia.gov/rss/todayinenergy.xml'
+  ],
+  GL:[
+    'https://feeds.reuters.com/reuters/worldNews',
+    'https://www.bloomberg.com/feeds/podcast/commodities.xml'
+  ],
+  OP:[
+    'https://www.opec.org/opec_web/en/press_rss.htm'
+  ]
+};
+const TEXAS_KEYS=/\b(Texas|Permian|Eagle Ford|Houston|Corpus Christi|Midland|Odessa)\b/i;
+const ENERGY_KEYS=/\b(oil|energy|crude|refinery|OPEC|gas|petroleum|diesel|WTI|Brent)\b/i;
+function parseRSS(xmlText){
+  const doc=new DOMParser().parseFromString(xmlText,'application/xml');
+  const items=[...doc.querySelectorAll('item')].map(it=>{
+    return {
+      title: it.querySelector('title')?.textContent?.trim()||'',
+      link: it.querySelector('link')?.textContent?.trim()||it.querySelector('guid')?.textContent?.trim()||'#',
+      pubDate: it.querySelector('pubDate')?.textContent || it.querySelector('published')?.textContent || '',
+      source: it.querySelector('source')?.textContent || doc.querySelector('channel>title')?.textContent || 'Feed'
+    };
+  });
+  if(!items.length){
+    // Atom?
+    const entries=[...doc.querySelectorAll('entry')].map(e=>({
+      title:e.querySelector('title')?.textContent?.trim()||'',
+      link:e.querySelector('link')?.getAttribute('href')||'#',
+      pubDate:e.querySelector('updated')?.textContent||e.querySelector('published')?.textContent||'',
+      source:doc.querySelector('title')?.textContent||'Feed'
+    }));
+    return entries;
+  }
+  return items;
 }
-function updateDashboard(){
-  $('#wtiPrice').textContent   = Number.isFinite(state.wti.last) ? fmt.format(state.wti.last) : '—';
-  $('#brentPrice').textContent = Number.isFinite(state.brent.last) ? fmt.format(state.brent.last) : '—';
-  setChange($('#wtiChg'), state.wti.last, state.wti.prev);
-  setChange($('#brentChg'), state.brent.last, state.brent.prev);
-  $('#wtiStamp').textContent = state.wti.stamp ? `Last update: ${state.wti.stamp}` : '—';
-  $('#brentStamp').textContent = state.brent.stamp ? `Last update: ${state.brent.stamp}` : '—';
-  $('#sourceBadge').textContent = `Source: ${state.wti.src === state.brent.src ? state.wti.src : 'Mixed'}`;
+function filterNews(group, items){
+  const today=items.filter(x=>isToday(x.pubDate||Date.now()));
+  let f=[];
+  if(group==='TX') f=today.filter(x=>TEXAS_KEYS.test(x.title));
+  else if(group==='US') f=today.filter(x=>ENERGY_KEYS.test(x.title));
+  else if(group==='GL') f=today.filter(x=>ENERGY_KEYS.test(x.title));
+  else if(group==='OP') f=today.filter(x=>/\b(OPEC|oil|crude)\b/i.test(x.title));
+  // de-duplicate
+  const seen=new Set();
+  const norm=s=>s.toLowerCase().replace(/\s+/g,' ').replace(/[^\w ]+/g,'').slice(0,120);
+  const out=[];
+  for(const it of f){
+    const k=norm(it.title)+'|'+norm(it.link||'');
+    if(seen.has(k)) continue;
+    seen.add(k); out.push(it);
+    if(out.length>=15) break;
+  }
+  return out;
 }
-function setRangeButtons(series, range){
-  document.querySelectorAll(`.rangeBtn[data-series="${series}"]`).forEach(btn=>{
-    btn.setAttribute('aria-pressed', btn.dataset.range===range ? 'true':'false');
+async function fetchRSS(url){
+  if(state.demo) return demoRSS(url);
+  const r=await fetchText(url);
+  if(!r.ok) throw new Error(r.error||'rss');
+  return parseRSS(r.data);
+}
+
+/* ---------- Rendering ---------- */
+function updateTile(sym, data){
+  const priceEl=$("#p"+sym), deltaEl=$("#d"+sym), timeEl=$("#t"+sym);
+  const price=data.price; const prev=data.prev;
+  const ch=Number.isFinite(price)&&Number.isFinite(prev)?(price-prev):0;
+  const pct=Number.isFinite(ch)&&Number.isFinite(prev)&&prev!==0? (ch/prev*100):0;
+  priceEl.textContent=fmtNum(price);
+  timeEl.textContent=fmtTime(data.at);
+  deltaEl.textContent=`${ch>=0?'+':''}${fmtNum(ch)} (${ch>=0?'+':''}${fmtNum(pct)}%)`;
+  deltaEl.classList.remove('up','down','flat');
+  deltaEl.classList.add(ch>0?'up':ch<0?'down':'flat');
+}
+let chart;
+function renderChart(){
+  if(!chart) chart=new MiniChart($("#chart"));
+  const sym=state.selectedSym;
+  const all=loadLS(STORAGE_KEYS.series)||{};
+  const s=all[sym]; if(!s?.series?.length){ $("#chartStatus").textContent='No series data'; chart.setData([]); return; }
+  const {series}=s;
+  const ranges=splitRanges(series);
+  let arr=[];
+  if(state.selectedRange==='1D' && ranges.intraday.length>=3){ arr=ranges.intraday; $("#chartStatus").textContent='Intraday'; }
+  else if(state.selectedRange==='5D' && ranges.r5.length>=6){ arr=ranges.r5; $("#chartStatus").textContent='5 Day'; }
+  else { arr=ranges.r30.length?ranges.r30:series; $("#chartStatus").textContent=ranges.r30.length?'30 Day':'30 Day (fallback)'; }
+  chart.setStatus($("#chartStatus"));
+  chart.setTheme('#37ff8b');
+  chart.setData(arr);
+}
+
+/* ---------- News UI ---------- */
+function renderNewsGroup(code, items){
+  const map={TX:'#list-TX',US:'#list-US',GL:'#list-GL',OP:'#list-OP'};
+  const el=$(map[code]);
+  el.innerHTML='';
+  items.forEach(it=>{
+    const t=ts(it.pubDate||Date.now());
+    const card=document.createElement('div'); card.className='item';
+    const a=document.createElement('a'); a.href=it.link||'#'; a.target='_blank'; a.rel='noopener';
+    a.textContent=it.title||'(no title)';
+    const sm=document.createElement('small'); sm.textContent=`${(new URL(it.link||'https://')).hostname.replace('www.','')} • ${t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
+    card.append(a,sm); el.append(card);
   });
 }
+function updateNewsCount(){
+  const total = ['#list-TX','#list-US','#list-GL','#list-OP']
+    .map(sel=>$(sel).children.length).reduce((a,b)=>a+b,0);
+  $("#newsCount").textContent=String(total);
+}
 
-async function refreshAll({force=false}={}){
-  $('#errMsg').textContent = '';
-  const open = isMarketOpenCT();
-  state.marketOpen = open;
-  setBadge('#marketBadge', open?'Market: Open':'Market: Closed', open?'live':'closed');
-
-  const t0 = performance.now();
+/* ---------- Scheduler & Fetch Cycle ---------- */
+async function runCycle(manual=false){
+  if(state.fetching) return;
+  state.fetching=true;
+  let retries=0; let anyErr=false; const diagWarn=[], diagErr=[];
+  $("#dRetries").textContent='0';
+  const record=(k,v)=>{state.sources[k]=v; $("#d"+k).textContent=v;};
   try{
-    const [wti, brent] = await Promise.all([ getSeries(SYMS.wti), getSeries(SYMS.brent) ]);
-    const ts = isoLocal(nowCT());
-    Object.assign(state.wti, { series:wti.points, last:wti.last, prev:wti.prev, src:wti.source, stamp:ts });
-    Object.assign(state.brent, { series:brent.points, last:brent.last, prev:brent.prev, src:brent.source, stamp:ts });
-    // charts
-    if(!state.wti.chart){ state.wti.chart = new MiniChart($('#wtiChart')); }
-    if(!state.brent.chart){ state.brent.chart = new MiniChart($('#brentChart')); }
-    state.wti.chart.setData(state.wti.series);
-    state.brent.chart.setData(state.brent.series);
-    state.wti.chart.setRange(state.wti.range);
-    state.brent.chart.setRange(state.brent.range);
-    updateDashboard();
-    state.lastFetch = Date.now();
-    saveCache({ meta:{ ts:state.lastFetch }, wti:state.wti, brent:state.brent });
-    checkAlerts();
-    $('#sysMsg').textContent = `Fetched in ${Math.round(performance.now()-t0)} ms`;
-  }catch(err){
-    $('#errMsg').textContent = 'Data fetch failed. Using cache if available.';
-    const cached = loadCache();
-    if(cached){
-      Object.assign(state.wti, cached.wti);
-      Object.assign(state.brent, cached.brent);
-      if(!state.wti.chart) state.wti.chart = new MiniChart($('#wtiChart'));
-      if(!state.brent.chart) state.brent.chart = new MiniChart($('#brentChart'));
-      state.wti.chart.setData(state.wti.series||[]);
-      state.brent.chart.setData(state.brent.series||[]);
-      state.wti.chart.setRange(state.wti.range);
-      state.brent.chart.setRange(state.brent.range);
-      updateDashboard();
-      $('#sysMsg').textContent = 'Loaded from cache';
-    }else{
-      $('#sysMsg').textContent = 'No cache available';
+    // Prices & series
+    for(const sym of ['CL','BZ']){
+      let attempt=0, success=false, lastErr=null;
+      while(attempt<=backoffSeq.length && !success){
+        try{
+          const dat=await withTimeout(7000, getPricesAndSeries(sym));
+          const prices=loadLS(STORAGE_KEYS.prices)||{};
+          prices[sym]={price:dat.price, prev:dat.prev, at:dat.at, src:dat.source};
+          saveLS(STORAGE_KEYS.prices, prices);
+          const series=loadLS(STORAGE_KEYS.series)||{};
+          series[sym]={series:dat.series, at:dat.at, src:dat.source};
+          saveLS(STORAGE_KEYS.series, series);
+          updateTile(sym, prices[sym]);
+          success=true;
+          record((sym==='CL'?'YCL':'YBZ'), dat.source==='yahoo'?'OK':'—');
+          record((sym==='CL'?'FCL':'FBZ'), dat.source==='stooq'?'Used':'—');
+        }catch(e){
+          lastErr=e; anyErr=true;
+          record((sym==='CL'?'YCL':'YBZ'), 'fail');
+          await sleep(backoffSeq[Math.min(attempt, backoffSeq.length-1)]);
+          retries++; $("#dRetries").textContent=String(retries);
+        }
+        attempt++;
+      }
+      if(!success){
+        diagErr.push(`${sym}: ${String(lastErr)}`);
+        // Try render from cache
+        const prices=loadLS(STORAGE_KEYS.prices)||{};
+        if(prices[sym]) updateTile(sym, prices[sym]);
+      }
     }
+    renderChart();
+
+    // News
+    const newsAll={TX:[],US:[],GL:[],OP:[]};
+    for(const [code,urls] of Object.entries(FEEDS)){
+      let collected=[]; let warn=[];
+      for(const url of urls){
+        try{
+          const items=await withTimeout(7000, fetchRSS(url));
+          collected=collected.concat(items);
+        }catch(e){warn.push(`${new URL(url).hostname}: ${String(e).slice(0,48)}`)}
+      }
+      if(warn.length){
+        $("#dN"+(code==='OP'?'OP':' ')).textContent='';
+        diagWarn.push(`${code}: ${warn.join(' | ')}`);
+      }
+      const filtered=filterNews(code==='OP'?'OP':code, collected);
+      newsAll[code]=filtered;
+      renderNewsGroup(code, filtered);
+      $("#dN"+(code==='OP'?'OP':code)).textContent=filtered.length+' items';
+    }
+    saveLS(STORAGE_KEYS.news, {at:Date.now(), data:newsAll});
+    updateNewsCount();
+
+    state.lastRefresh=Date.now();
+    state.cacheTime=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    setCacheBadge('Cache: '+state.cacheTime);
+    $("#dLast").textContent=fmtTime(state.lastRefresh);
+    $("#dOnline").textContent=navigator.onLine?'true':'false';
+    $("#dCache").textContent=state.cacheTime;
+    $("#diagWarn").textContent=diagWarn.join('\n');
+    $("#diagErr").textContent=diagErr.join('\n');
+    if(!navigator.onLine) setOfflineBanner(`Offline (cached at ${state.cacheTime})`);
+  } finally {
+    state.fetching=false;
   }
 }
-
-/* ============
-   RANGES + CONTROLS
-=========== */
-document.querySelectorAll('.rangeBtn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const k = btn.dataset.series;
-    const rng = btn.dataset.range;
-    state[k].range = rng;
-    setRangeButtons(k, rng);
-    if(state[k].chart) state[k].chart.setRange(rng);
-  });
-});
-
-$('#refreshBtn').addEventListener('click', ()=>refreshAll({force:true}));
-$('#purgeCacheBtn').addEventListener('click', ()=>{
-  localStorage.removeItem(LSKEY);
-  $('#cacheBadge').textContent='Cache: Cleared';
-});
-
-/* ============
-   POLLER (15m during market, 60m otherwise)
-=========== */
-function schedulePoller(){
-  const open = isMarketOpenCT();
-  const mins = open ? POLL_MINUTES : 60;
-  setTimeout(async ()=>{
-    await refreshAll();
-    schedulePoller();
-  }, mins*60*1000);
+function schedule(){
+  const interval = marketHours()? 15*60*1000 : 60*60*1000;
+  setInterval(()=>runCycle(false), interval);
 }
 
-/* ============
-   NOTIFICATIONS & ALERTS
-=========== */
-let swReg = null;
-async function ensureSW(){
-  if(!('serviceWorker' in navigator)) return null;
-  if(swReg) return swReg;
-  // Inline service worker via Blob (keeps repo single-file)
-  const swCode = `
-    self.addEventListener('install', e=>{
-      e.waitUntil((async()=>{ const cache = await caches.open('cot-v1'); await cache.addAll(['./']); })());
-      self.skipWaiting();
+/* ---------- Interactions ---------- */
+function bindUI(){
+  // Symbol tabs
+  $$('#charts-h ~ .between .seg [data-sym]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      $$('#charts-h ~ .between .seg [data-sym]').forEach(b=>b.setAttribute('aria-selected','false'));
+      btn.setAttribute('aria-selected','true');
+      state.selectedSym=btn.dataset.sym;
+      renderChart();
     });
-    self.addEventListener('activate', e=>{ self.clients.claim(); });
-    self.addEventListener('fetch', e=>{
-      const url = new URL(e.request.url);
-      if(e.request.method!=='GET') return;
-      e.respondWith((async()=>{
-        const cache = await caches.open('cot-v1');
-        const cached = await cache.match(e.request);
-        try{
-          const net = await fetch(e.request);
-          cache.put(e.request, net.clone()).catch(()=>{});
-          return net;
-        }catch(err){
-          if(cached) return cached;
-          throw err;
-        }
-      })());
+  });
+  // Range tabs
+  document.querySelectorAll('[data-range]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('[data-range]').forEach(b=>b.setAttribute('aria-selected','false'));
+      btn.setAttribute('aria-selected','true');
+      state.selectedRange=btn.dataset.range;
+      renderChart();
     });
-    self.addEventListener('notificationclick', e=>{
-      e.notification.close();
-      e.waitUntil(self.clients.matchAll({type:'window'}).then(clients=>{
-        if(clients.length) clients[0].focus();
-        else self.clients.openWindow('./');
-      }));
+  });
+  // News tabs
+  document.querySelectorAll('[data-feedtab]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('[data-feedtab]').forEach(b=>b.setAttribute('aria-pressed','false'));
+      btn.setAttribute('aria-pressed','true');
+      const code=btn.dataset.feedtab;
+      $('#list-TX').hidden = code!=='TX';
+      $('#list-US').hidden = code!=='US';
+      $('#list-GL').hidden = code!=='GL';
+      $('#list-OP').hidden = code!=='OPEC' && code!=='OP';
+    });
+  });
+  // Actions
+  $('#btnRefresh').addEventListener('click',()=>runCycle(true));
+  $('#btnDiag').addEventListener('click',()=>$('#diag').classList.toggle('open'));
+  $('#btnDemo').addEventListener('click',()=>{
+    state.demo=!state.demo;
+    $('#btnDemo').setAttribute('aria-pressed', String(state.demo));
+    runCycle(true);
+  });
+}
+
+/* ---------- Offline Cache: Service Worker (inlined via Blob) ---------- */
+async function registerSW(){
+  if(!('serviceWorker' in navigator)) return;
+  const swCode=`
+    const CACHE='oil-monitor-v1';
+    self.addEventListener('install',e=>{
+      e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./'])).then(()=>self.skipWaiting()));
+    });
+    self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim())});
+    self.addEventListener('fetch',e=>{
+      const req=e.request;
+      const url=new URL(req.url);
+      // Cache-first for same-origin shell; network-first for external JSON/XML with fallback to cache
+      if(url.origin===location.origin){
+        e.respondWith(caches.match(req).then(r=>r||fetch(req).then(res=>{const cc=res.clone(); caches.open(CACHE).then(c=>c.put(req,cc)); return res})));
+      }else{
+        e.respondWith(fetch(req).then(res=>{
+          const ok = res.ok && (res.headers.get('content-type')||'').match(/json|xml|rss|atom|text/);
+          if(ok){const clone=res.clone(); caches.open(CACHE).then(c=>c.put(req,clone));}
+          return res;
+        }).catch(()=>caches.match(req)));
+      }
     });
   `;
-  const blob = new Blob([swCode], {type:'text/javascript'});
-  const url = URL.createObjectURL(blob);
-  try{ swReg = await navigator.serviceWorker.register(url, { scope:'./' }); }catch{}
-  return swReg;
+  const blob=new Blob([swCode],{type:'text/javascript'});
+  const url=URL.createObjectURL(blob);
+  try{ await navigator.serviceWorker.register(url); }catch{}
 }
 
-function getAlerts(){
-  try{
-    const raw = localStorage.getItem(LSKEY+'_alerts'); return raw?JSON.parse(raw):{ wti:null, brent:null };
-  }catch{ return { wti:null, brent:null }; }
+/* ---------- Demo Data (if all networks fail) ---------- */
+function demoPrices(sym){
+  const t=Date.now();
+  const base=sym==='CL'?75.12:79.45;
+  const prev=base - (Math.random()*2-1);
+  const series=Array.from({length:300},(_,i)=>({t:t-(300-i)*300000, v: base + Math.sin(i/12)*0.6 + (Math.random()-.5)*0.2}));
+  return {source:'demo', price:base, prev, series, at:t};
 }
-function setAlerts(a){
-  localStorage.setItem(LSKEY+'_alerts', JSON.stringify(a));
-  $('#alertInfo').textContent = `WTI alert: ${a.wti??'—'} • Brent alert: ${a.brent??'—'}`;
-}
-function checkAlerts(){
-  const a = getAlerts();
-  const hits = [];
-  if(a.wti!=null && Number.isFinite(state.wti.last) && ((state.wti.prev<=a.wti && state.wti.last>=a.wti) || (state.wti.prev>=a.wti && state.wti.last<=a.wti))) hits.push({k:'WTI', at:a.wti, px:state.wti.last});
-  if(a.brent!=null && Number.isFinite(state.brent.last) && ((state.brent.prev<=a.brent && state.brent.last>=a.brent) || (state.brent.prev>=a.brent && state.brent.last<=a.brent))) hits.push({k:'Brent', at:a.brent, px:state.brent.last});
-  if(!hits.length) return;
-  notify(`${hits.map(h=>`${h.k} hit ${fmt.format(h.at)} (last ${fmt.format(h.px)})`).join(' • ')}`);
-  // one-shot alerts: clear after firing
-  const next = getAlerts();
-  hits.forEach(h=>{ if(h.k==='WTI') next.wti=null; if(h.k==='Brent') next.brent=null; });
-  setAlerts(next);
+function demoRSS(url){
+  const host=new URL(url).hostname;
+  const t=Date.now();
+  const mk=(k)=>Array.from({length:6},(_,i)=>({title:`${k} ${i+1}: WTI holds gains as supply shifts`, link:`https://${host}/demo/${k}/${i}`, pubDate:new Date(t - i*3600000).toUTCString(), source:host}));
+  if(/texas|ogj/.test(url)) return mk('Texas');
+  if(/reuters|eia/.test(url)) return mk('US');
+  if(/bloomberg|worldnews/.test(url)) return mk('Global');
+  return mk('OPEC');
 }
 
-async function notify(msg){
-  try{
-    const reg = await ensureSW();
-    if(!('Notification' in window)) return;
-    if(Notification.permission!=='granted'){
-      const perm = await Notification.requestPermission();
-      if(perm!=='granted'){ $('#notifyStatus').textContent='Notifications: Denied'; return; }
-    }
-    $('#notifyStatus').textContent='Notifications: On';
-    if(reg?.showNotification){
-      reg.showNotification('Crude Oil Alert', { body: msg, icon: undefined, badge: undefined });
-    }else{
-      new Notification('Crude Oil Alert', { body: msg });
-    }
-  }catch{}
-}
-
-$('#enableNotify').addEventListener('click', ()=>notify('Notifications enabled. You will receive price alerts when thresholds are met.'));
-
-$('#saveWtiAlert').addEventListener('click', ()=>{
-  const v = parseFloat($('#wtiAlert').value);
-  const a = getAlerts(); a.wti = Number.isFinite(v) ? v : null; setAlerts(a);
-});
-$('#saveBrentAlert').addEventListener('click', ()=>{
-  const v = parseFloat($('#brentAlert').value);
-  const a = getAlerts(); a.brent = Number.isFinite(v) ? v : null; setAlerts(a);
-});
-
-/* ============
-   DAILY SUMMARY (on first load each day)
-=========== */
-function dailySummary(){
-  const key = LSKEY+'_summary_date';
-  const today = nowCT().toISOString().slice(0,10);
-  const last = localStorage.getItem(key);
-  if(last===today) return;
-  localStorage.setItem(key, today);
-  if(Number.isFinite(state.wti.last) && Number.isFinite(state.brent.last)){
-    notify(`Daily Summary — WTI ${fmt.format(state.wti.last)} (${($('#wtiChg').textContent)}) • Brent ${fmt.format(state.brent.last)} (${($('#brentChg').textContent)})`);
-  }
-}
-
-/* ============
-   STARTUP
-=========== */
+/* ---------- Bootstrap ---------- */
 (async function init(){
-  // Restore cached immediately for instant paint
-  const cached = loadCache();
-  if(cached){
-    Object.assign(state.wti, cached.wti);
-    Object.assign(state.brent, cached.brent);
-    if(state.wti.series?.length){
-      state.wti.chart = new MiniChart($('#wtiChart')); state.wti.chart.setData(state.wti.series); state.wti.chart.setRange(state.wti.range||'30d');
-    }
-    if(state.brent.series?.length){
-      state.brent.chart = new MiniChart($('#brentChart')); state.brent.chart.setData(state.brent.series); state.brent.chart.setRange(state.brent.range||'30d');
-    }
-    updateDashboard();
-    $('#cacheBadge').textContent='Cache: Warm';
-    $('#sysMsg').textContent='Boot from cache; syncing…';
-  }else{
-    $('#cacheBadge').textContent='Cache: Empty';
+  setBadgeOnline(navigator.onLine);
+  startClock();
+  bindUI();
+  await registerSW();
+
+  // Warm from cache/localStorage on cold start
+  const prices=loadLS(STORAGE_KEYS.prices);
+  if(prices){
+    if(prices.CL) updateTile('CL', prices.CL);
+    if(prices.BZ) updateTile('BZ', prices.BZ);
   }
-  setBadge('#marketBadge', isMarketOpenCT()?'Market: Open':'Market: Closed', isMarketOpenCT()?'live':'closed');
-  setAlerts(getAlerts());
-  await ensureSW();
-  await refreshAll();
-  schedulePoller();
-  dailySummary();
+  const news=loadLS(STORAGE_KEYS.news);
+  if(news?.data){
+    renderNewsGroup('TX', news.data.TX||[]);
+    renderNewsGroup('US', news.data.US||[]);
+    renderNewsGroup('GL', news.data.GL||[]);
+    renderNewsGroup('OP', news.data.OP||[]);
+    updateNewsCount();
+    $("#cacheBadge").textContent='Cache: '+new Date(news.at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  }else setCacheBadge('Cache: cold');
+
+  // First run
+  runCycle(true);
+  schedule();
 })();
 </script>
 </body>
