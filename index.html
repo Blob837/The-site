@@ -328,38 +328,34 @@
             const proxyResponse = await fetch(PROXY_URL + encodeURIComponent(url));
             if (!proxyResponse.ok) throw new Error('Proxy fetch failed');
             const proxyData = await proxyResponse.json();
-            return proxyData.contents;
+            return JSON.parse(proxyData.contents);
         }
 
-        // Get quote data via scraping Yahoo page
+        // Get quote data using chart API meta
         async function getQuote(symbol) {
             const cacheKey = `quote_${symbol}`;
             let data = getCache(cacheKey, QUOTE_CACHE_TTL);
             if (data) return data;
             try {
-                const url = `https://finance.yahoo.com/quote/${encodeURIComponent(symbol)}`;
-                const html = await fetchWithProxy(url);
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const priceEl = doc.querySelector('[data-field="regularMarketPrice"]');
-                const changeEl = doc.querySelector('[data-field="regularMarketChange"]');
-                const changePercentEl = doc.querySelector('[data-field="regularMarketChangePercent"]');
-                if (!priceEl || !changeEl || !changePercentEl) throw new Error('Data not found in page');
-                const price = parseFloat(priceEl.textContent.trim());
-                let changeStr = changeEl.textContent.trim().replace(/[\+\-]/, '');
-                const change = parseFloat(changeStr);
-                let percentStr = changePercentEl.textContent.trim().replace('%', '').replace(/[\+\-]/, '');
-                const changePercent = parseFloat(percentStr);
+                const response = await fetchWithProxy(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}`);
+                const result = response.chart.result[0];
+                if (!result) throw new Error('No chart data');
+                const meta = result.meta;
+                if (!meta.regularMarketPrice) throw new Error('No market data in meta');
+                const price = meta.regularMarketPrice;
+                const previousClose = meta.previousClose || meta.chartPreviousClose;
+                const change = price - previousClose;
+                const changePercent = (change / previousClose) * 100;
                 data = {
-                    price,
-                    change,
-                    changePercent,
-                    previousClose: price - change,
-                    timestamp: new Date().toLocaleString()
+                    price: price,
+                    change: change,
+                    changePercent: changePercent,
+                    previousClose: previousClose,
+                    timestamp: new Date(meta.regularMarketTime * 1000).toLocaleString()
                 };
                 setCache(cacheKey, data);
             } catch (error) {
-                console.warn('Quote scrape failed:', error);
+                console.warn('Quote fetch failed:', error);
                 if (!data) {
                     throw new Error('Unable to fetch data and no cache available');
                 }
@@ -367,7 +363,7 @@
             return data;
         }
 
-        // Get history data (keeping Yahoo chart API, as it may work independently)
+        // Get history data
         async function getHistory(symbol, days) {
             const cacheKey = `history_${symbol}_${days}`;
             let history = getCache(cacheKey, HISTORY_CACHE_TTL);
@@ -376,9 +372,7 @@
             const start = end - days * 24 * 3600;
             const interval = days <= 1 ? '1h' : '1d';
             try {
-                const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?period1=${start}&period2=${end}&interval=${interval}`;
-                const responseText = await fetchWithProxy(url);
-                const response = JSON.parse(responseText);
+                const response = await fetchWithProxy(`https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?period1=${start}&period2=${end}&interval=${interval}`);
                 const result = response.chart.result[0];
                 if (!result) throw new Error('No history data');
                 const timestamps = result.timestamp;
@@ -386,7 +380,7 @@
                 history = timestamps.slice(0, closes.length).map((t, i) => ({
                     date: new Date(t * 1000),
                     price: closes[i]
-                })).reverse(); // Reverse to chronological order
+                })).reverse(); // Chronological order
                 setCache(cacheKey, history);
             } catch (error) {
                 console.warn('History fetch failed:', error);
@@ -464,6 +458,7 @@
         // Init chart with dark theme
         function initChart() {
             const ctx = document.getElementById('price-chart').getContext('2d');
+            Chart.register(ChartZoom); // Register zoom plugin
             chart = new Chart(ctx, {
                 type: 'line',
                 data: {
