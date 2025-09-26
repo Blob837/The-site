@@ -3,246 +3,461 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberOil Tracker</title>
+    <meta name="description" content="Crude Oil Price Tracker for WTI and Brent">
+    <title>Crude Oil Price Tracker</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-
-        body {
-            background-color: #000;
-            color: #fff;
-            font-family: 'Orbitron', sans-serif;
+        /* Reset and base styles */
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
-            min-height: 100vh;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            background-color: #f4f4f4;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 1rem;
         }
-
-        header {
+        h1, h2 {
+            text-align: center;
+        }
+        #container {
+            max-width: 1200px;
             width: 100%;
-            text-align: center;
-            padding: 20px 0;
-            background: linear-gradient(to bottom, #000, #111);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+        section {
+            margin-bottom: 2rem;
         }
 
-        h1 {
-            font-size: 2.5em;
-            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff, 0 0 40px #ff00ff, 0 0 50px #ff00ff;
-            animation: glitch 1s linear infinite;
-        }
-
-        @keyframes glitch {
-            2%, 64% {
-                transform: translate(2px, 0) skew(3deg);
-            }
-            4%, 60% {
-                transform: translate(-2px, 0) skew(-3deg);
-            }
-            62% {
-                transform: translate(0, 0) skew(5deg); 
-            }
-        }
-
-        .prices-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
-            width: 90%;
-        }
-
-        .price-card {
-            background: #111;
-            border: 2px solid #00ffff;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            width: 150px;
-            box-shadow: 0 0 15px #00ffff;
-            transition: transform 0.3s;
-        }
-
-        .price-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px #00ffff, 0 0 50px #ff00ff;
-        }
-
-        .price-card h2 {
-            font-size: 1.5em;
-            margin: 0;
-            color: #00ffff;
-        }
-
-        .price-card p {
-            font-size: 2em;
-            margin: 10px 0 0;
-            color: #ff00ff;
-            text-shadow: 0 0 10px #ff00ff;
-        }
-
-        .news-section {
-            width: 90%;
-            margin: 20px 0;
-        }
-
-        .news-section h2 {
-            font-size: 1.8em;
-            text-shadow: 0 0 10px #ff00ff;
-            margin-bottom: 10px;
-        }
-
-        .news-list {
+        /* Settings section */
+        #settings {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            align-items: center;
+            gap: 0.5rem;
         }
-
-        .news-item {
-            background: #222;
-            border: 1px solid #ff00ff;
-            border-radius: 8px;
-            padding: 15px;
-            text-decoration: none;
-            color: #fff;
-            box-shadow: 0 0 10px #ff00ff;
-            transition: box-shadow 0.3s;
-        }
-
-        .news-item:hover {
-            box-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff;
-        }
-
-        .news-item h3 {
-            font-size: 1.2em;
-            margin: 0 0 10px;
-            color: #00ffff;
-        }
-
-        .news-item p {
-            font-size: 0.9em;
-            margin: 0;
-        }
-
-        .loading {
-            color: #888;
-        }
-
-        footer {
+        #settings input {
+            padding: 0.5rem;
             width: 100%;
-            text-align: center;
-            padding: 10px 0;
-            background: #111;
-            margin-top: auto;
+            max-width: 300px;
+        }
+        #settings button {
+            padding: 0.5rem 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
 
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 2em;
-            }
+        /* Dashboard */
+        #dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .price-card {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .price-card h2 {
+            font-size: 1.5rem;
+        }
+        .price-card p {
+            font-size: 1.2rem;
+        }
+        #market-status {
+            text-align: center;
+            font-style: italic;
+        }
 
+        /* Charts */
+        #charts {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .selectors {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        select, button {
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+
+        /* Alerts */
+        #alerts {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        #alerts input, #alerts select {
+            padding: 0.5rem;
+            width: 100%;
+            max-width: 200px;
+        }
+        #alerts button {
+            padding: 0.5rem 1rem;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Error message */
+        #error-message {
+            color: red;
+            text-align: center;
+        }
+
+        /* Media queries for larger screens */
+        @media (min-width: 600px) {
+            #dashboard {
+                flex-direction: row;
+                justify-content: space-around;
+            }
             .price-card {
-                width: 100%;
+                width: 45%;
             }
+            #settings, #alerts {
+                flex-direction: row;
+            }
+        }
 
-            .prices-container {
-                flex-direction: column;
+        @media (min-width: 900px) {
+            body {
+                padding: 2rem;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>CyberOil Tracker</h1>
-    </header>
+    <div id="container">
+        <header>
+            <h1>Crude Oil Price Tracker</h1>
+        </header>
 
-    <div class="prices-container">
-        <div class="price-card">
-            <h2>WTI Oil</h2>
-            <p id="wti-price" class="loading">Loading...</p>
-        </div>
-        <div class="price-card">
-            <h2>Brent Oil</h2>
-            <p id="brent-price" class="loading">Loading...</p>
-        </div>
+        <section id="settings" aria-label="API Key Settings">
+            <input type="text" id="api-key" placeholder="Enter Alpha Vantage API Key (get free at alphavantage.co)">
+            <button onclick="saveApiKey()">Save Key</button>
+        </section>
+
+        <section id="dashboard" aria-label="Price Dashboard">
+            <div class="price-card" id="wti">
+                <h2>WTI Crude</h2>
+                <p id="wti-price" aria-live="polite">--</p>
+                <p id="wti-change" aria-live="polite">--</p>
+                <p id="wti-timestamp">--</p>
+            </div>
+            <div class="price-card" id="brent">
+                <h2>Brent Crude</h2>
+                <p id="brent-price" aria-live="polite">--</p>
+                <p id="brent-change" aria-live="polite">--</p>
+                <p id="brent-timestamp">--</p>
+            </div>
+            <p id="market-status" aria-live="polite">--</p>
+        </section>
+
+        <section id="charts" aria-label="Price Charts">
+            <div class="selectors">
+                <select id="oil-type">
+                    <option value="wti">WTI</option>
+                    <option value="brent">Brent</option>
+                </select>
+                <select id="view-select">
+                    <option value="1day">1 Day</option>
+                    <option value="7day">7 Days</option>
+                    <option value="30day" selected>30 Days</option>
+                </select>
+            </div>
+            <canvas id="price-chart" role="img" aria-label="Price history chart"></canvas>
+        </section>
+
+        <section id="alerts" aria-label="Alerts and Notifications">
+            <input type="number" id="threshold" placeholder="Price threshold (e.g., 70)">
+            <select id="direction">
+                <option value="above">Above</option>
+                <option value="below">Below</option>
+            </select>
+            <select id="alert-oil-type">
+                <option value="wti">WTI</option>
+                <option value="brent">Brent</option>
+            </select>
+            <button onclick="setAlert()">Set Alert</button>
+        </section>
+
+        <div id="error-message" aria-live="assertive"></div>
     </div>
 
-    <section class="news-section">
-        <h2>Texas Oil News</h2>
-        <div id="texas-news" class="news-list loading">Loading news...</div>
-    </section>
-
-    <section class="news-section">
-        <h2>U.S. Oil News</h2>
-        <div id="us-news" class="news-list loading">Loading news...</div>
-    </section>
-
-    <section class="news-section">
-        <h2>OPEC Oil News</h2>
-        <div id="opec-news" class="news-list loading">Loading news...</div>
-    </section>
-
-    <section class="news-section">
-        <h2>National Oil News</h2>
-        <div id="national-news" class="news-list loading">Loading news...</div>
-    </section>
-
-    <footer>
-        <p>Powered by xAI & Cyberpunk Vibes | Hosted on GitHub Pages</p>
-    </footer>
+    <!-- Chart.js and plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
 
     <script>
-        const proxy = 'https://api.allorigins.win/raw?url=';
+        // Constants
+        const API_BASE = 'https://www.alphavantage.co/query?';
+        const symbols = { wti: 'CL=F', brent: 'BZ=F' };
+        let chart = null;
+        let notificationPermission = false;
 
-        async function fetchPrices() {
-            const url = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=CL%3DF,BZ%3DF';
+        // Helper functions
+        function getApiKey() {
+            return localStorage.getItem('api_key') || 'demo';
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('api-key').value.trim();
+            if (key) {
+                localStorage.setItem('api_key', key);
+                alert('API Key saved!');
+                location.reload(); // Reload to apply
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('error-message').textContent = message;
+        }
+
+        function clearError() {
+            document.getElementById('error-message').textContent = '';
+        }
+
+        function isMarketOpen() {
+            const now = new Date();
+            const day = now.getDay();
+            if (day === 6 || (day === 0 && now.getHours() < 18)) return false; // Saturday or Sunday before 6pm ET
+            return true;
+        }
+
+        function updateMarketStatus() {
+            document.getElementById('market-status').textContent = isMarketOpen() ? 'Market Open' : 'Market Closed';
+        }
+
+        // Fetch current quote
+        async function fetchCurrent(type) {
+            clearError();
+            const symbol = symbols[type];
+            const url = `${API_BASE}function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${getApiKey()}`;
             try {
-                const res = await fetch(proxy + encodeURIComponent(url));
+                const res = await fetch(url);
                 const data = await res.json();
-                const quotes = data.quoteResponse.result;
-                const wti = quotes.find(q => q.symbol === 'CL=F')?.regularMarketPrice.toFixed(2) || 'N/A';
-                const brent = quotes.find(q => q.symbol === 'BZ=F')?.regularMarketPrice.toFixed(2) || 'N/A';
-                document.getElementById('wti-price').textContent = `$${wti}`;
-                document.getElementById('brent-price').textContent = `$${brent}`;
-            } catch (e) {
-                document.getElementById('wti-price').textContent = 'Error';
-                document.getElementById('brent-price').textContent = 'Error';
+                const quote = data['Global Quote'];
+                if (!quote || Object.keys(quote).length === 0) {
+                    throw new Error('Invalid data');
+                }
+                updatePriceDisplay(type, quote);
+                localStorage.setItem(`${type}_quote`, JSON.stringify(quote));
+                checkDailySummary(type, quote);
+                checkAlert(type, parseFloat(quote['05. price']));
+            } catch (err) {
+                showError(`Failed to fetch ${type.toUpperCase()} price: ${err.message}. Using cached data if available.`);
+                useCachedCurrent(type);
             }
         }
 
-        async function fetchNews(sectionId, query) {
-            const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query + ' oil news when:1d')}&hl=en-US&gl=US&ceid=US:en`;
+        function updatePriceDisplay(type, quote) {
+            const price = parseFloat(quote['05. price']).toFixed(2);
+            const change = parseFloat(quote['09. change']).toFixed(2);
+            const percent = quote['10. change percent'];
+            const color = change > 0 ? 'green' : 'red';
+            const timestamp = quote['07. latest trading day'];
+            document.getElementById(`${type}-price`).innerHTML = `$${price}`;
+            document.getElementById(`${type}-change`).innerHTML = `<span style="color: ${color};">${change} (${percent})</span>`;
+            document.getElementById(`${type}-timestamp`).textContent = `Last update: ${timestamp}`;
+        }
+
+        function useCachedCurrent(type) {
+            const cached = localStorage.getItem(`${type}_quote`);
+            if (cached) {
+                const quote = JSON.parse(cached);
+                updatePriceDisplay(type, quote);
+            }
+        }
+
+        // Check for daily summary notification
+        function checkDailySummary(type, quote) {
+            const lastDay = localStorage.getItem(`${type}_last_day`);
+            const currentDay = quote['07. latest trading day'];
+            if (lastDay !== currentDay) {
+                const previousClose = quote['08. previous close'];
+                sendNotification(`${type.toUpperCase()} Daily Summary`, `Close: $${previousClose}`);
+                localStorage.setItem(`${type}_last_day`, currentDay);
+            }
+        }
+
+        // Fetch history for chart
+        async function fetchHistory(type, view) {
+            clearError();
+            const symbol = symbols[type];
+            let func = 'TIME_SERIES_DAILY';
+            let interval = '';
+            let timeKey = 'Time Series (Daily)';
+            let numPoints;
+            if (view === '1day') {
+                func = 'TIME_SERIES_INTRADAY';
+                interval = '&interval=15min&extended_hours=false';
+                timeKey = 'Time Series (15min)';
+                numPoints = 96; // Approx for 1 day, 15min intervals in trading hours
+            } else if (view === '7day') {
+                numPoints = 7;
+            } else {
+                numPoints = 30;
+            }
+            const url = `${API_BASE}function=${func}&symbol=${symbol}${interval}&apikey=${getApiKey()}`;
             try {
-                const res = await fetch(proxy + encodeURIComponent(rssUrl));
-                const str = await res.text();
-                const doc = new DOMParser().parseFromString(str, 'text/xml');
-                const items = doc.querySelectorAll('item');
-                let html = '';
-                let count = 0;
-                items.forEach(item => {
-                    if (count >= 5) return; // Limit to 5 news items
-                    const title = item.querySelector('title')?.textContent || '';
-                    const link = item.querySelector('link')?.textContent || '';
-                    const desc = item.querySelector('description')?.textContent || '';
-                    html += `<a href="${link}" target="_blank" rel="noopener" class="news-item"><h3>${title}</h3><p>${desc}</p></a>`;
-                    count++;
-                });
-                document.getElementById(sectionId).innerHTML = html || 'No news found.';
-            } catch (e) {
-                document.getElementById(sectionId).innerHTML = 'Error loading news.';
+                const res = await fetch(url);
+                const data = await res.json();
+                const series = data[timeKey];
+                if (!series) {
+                    throw new Error('Invalid data');
+                }
+                let entries = Object.entries(series).slice(0, numPoints);
+                const labels = entries.map(([date]) => date).reverse();
+                const prices = entries.map(([, val]) => val['4. close']).reverse();
+                createChart(labels, prices, view === '1day' ? 'hour' : 'day');
+                localStorage.setItem(`${type}_${view}`, JSON.stringify({ labels, prices }));
+            } catch (err) {
+                showError(`Failed to fetch ${view} history for ${type.toUpperCase()}: ${err.message}. Using cached data if available.`);
+                useCachedHistory(type, view);
             }
         }
 
-        window.onload = () => {
-            fetchPrices();
-            fetchNews('texas-news', 'Texas');
-            fetchNews('us-news', 'United States');
-            fetchNews('opec-news', 'OPEC');
-            fetchNews('national-news', 'national');
-        };
+        function useCachedHistory(type, view) {
+            const cached = localStorage.getItem(`${type}_${view}`);
+            if (cached) {
+                const { labels, prices } = JSON.parse(cached);
+                createChart(labels, prices, view === '1day' ? 'hour' : 'day');
+            }
+        }
+
+        // Create chart
+        function createChart(labels, data, unit) {
+            const ctx = document.getElementById('price-chart');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Price (USD)',
+                        data: data,
+                        borderColor: '#007bff',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: { unit: unit },
+                            adapters: { date: { locale: 'en' } }
+                        },
+                        y: { beginAtZero: false }
+                    },
+                    plugins: {
+                        zoom: {
+                            zoom: {
+                                wheel: { enabled: true },
+                                pinch: { enabled: true },
+                                mode: 'xy'
+                            },
+                            pan: {
+                                enabled: true,
+                                mode: 'xy'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Alerts
+        async function setAlert() {
+            const threshold = parseFloat(document.getElementById('threshold').value);
+            const direction = document.getElementById('direction').value;
+            const oilType = document.getElementById('alert-oil-type').value;
+            if (isNaN(threshold)) {
+                alert('Please enter a valid number for threshold.');
+                return;
+            }
+            localStorage.setItem(`${oilType}_alert_threshold`, threshold);
+            localStorage.setItem(`${oilType}_alert_direction`, direction);
+            alert('Alert set!');
+            if (!notificationPermission) {
+                const perm = await Notification.requestPermission();
+                notificationPermission = perm === 'granted';
+            }
+        }
+
+        function checkAlert(type, price) {
+            const threshold = localStorage.getItem(`${type}_alert_threshold`);
+            const direction = localStorage.getItem(`${type}_alert_direction`);
+            if (threshold && direction && notificationPermission) {
+                const thresh = parseFloat(threshold);
+                if ((direction === 'above' && price > thresh) || (direction === 'below' && price < thresh)) {
+                    sendNotification(`${type.toUpperCase()} Price Alert`, `Price is ${direction} $${thresh}: $${price}`);
+                    // Optional: clear alert after trigger
+                    // localStorage.removeItem(`${type}_alert_threshold`);
+                    // localStorage.removeItem(`${type}_alert_direction`);
+                }
+            }
+        }
+
+        function sendNotification(title, body) {
+            if (notificationPermission) {
+                new Notification(title, { body });
+            }
+        }
+
+        // Event listeners
+        document.getElementById('oil-type').addEventListener('change', () => {
+            const type = document.getElementById('oil-type').value;
+            const view = document.getElementById('view-select').value;
+            fetchHistory(type, view);
+        });
+
+        document.getElementById('view-select').addEventListener('change', () => {
+            const type = document.getElementById('oil-type').value;
+            const view = document.getElementById('view-select').value;
+            fetchHistory(type, view);
+        });
+
+        // Initialization
+        function init() {
+            updateMarketStatus();
+            fetchCurrent('wti');
+            fetchCurrent('brent');
+            const initialType = 'wti';
+            const initialView = '30day';
+            fetchHistory(initialType, initialView);
+            if (isMarketOpen()) {
+                setInterval(() => {
+                    fetchCurrent('wti');
+                    fetchCurrent('brent');
+                }, 15 * 60 * 1000); // 15 minutes
+            }
+            // Check notification permission
+            if (Notification.permission === 'granted') {
+                notificationPermission = true;
+            }
+        }
+
+        init();
     </script>
 </body>
 </html>
