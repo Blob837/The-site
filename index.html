@@ -470,7 +470,7 @@
     <div class="container">
         <header class="header">
             <h1 class="title">Bias Detector</h1>
-            <p class="subtitle">Client-side analysis via proxy rotation</p>
+            <p class="subtitle">Natural language analysis via contextual patterns</p>
         </header>
 
         <main>
@@ -555,9 +555,10 @@
             <section class="about-section">
                 <h2 class="section-title about-title" id="about-title">About & Method</h2>
                 <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
-                    This tool analyzes news articles for political bias using client-side lexicon-based scoring. 
-                    It examines language patterns, political entity mentions, and contextual framing to estimate 
-                    bias on a left-right scale. Scores are deterministic and explainable. 
+                    This tool analyzes news articles for political bias using natural language processing techniques. 
+                    It examines contextual sentiment around political entities, linguistic patterns, argument structure, 
+                    source attribution, and topic framing to estimate bias on a left-right scale. The analysis focuses 
+                    on <em>how</em> things are said rather than just <em>what</em> is said. 
                     <strong>Results are estimates</strong> - use critical thinking.
                 </p>
                 
@@ -613,52 +614,6 @@
             'https://api.allorigins.win/raw?url=',
             'https://thingproxy.freeboard.io/fetch/'
         ];
-
-        // Bias Detection Lexicons (embedded for deterministic scoring)
-        const LEXICONS = {
-            left: {
-                policy: [
-                    'progressive', 'liberal', 'social justice', 'inequality', 'climate change',
-                    'healthcare reform', 'medicare for all', 'green new deal', 'minimum wage',
-                    'wealth tax', 'immigration reform', 'lgbtq rights', 'reproductive rights',
-                    'gun control', 'criminal justice reform', 'systemic racism'
-                ],
-                frames: [
-                    'grassroots', 'working families', 'corporate greed', 'income inequality',
-                    'social safety net', 'public option', 'investment in communities',
-                    'environmental justice', 'affordable housing', 'student debt relief'
-                ],
-                orgs: [
-                    'aclu', 'planned parenthood', 'sierra club', 'move on', 'democratic party',
-                    'progressive caucus', 'ocasio-cortez', 'sanders', 'warren', 'aoc'
-                ]
-            },
-            right: {
-                policy: [
-                    'conservative', 'traditional values', 'free market', 'deregulation', 'tax cuts',
-                    'border security', 'second amendment', 'pro life', 'law and order',
-                    'fiscal responsibility', 'small government', 'personal responsibility',
-                    'national security', 'energy independence', 'school choice'
-                ],
-                frames: [
-                    'taxpayers', 'job creators', 'american workers', 'constitutional rights',
-                    'individual liberty', 'free enterprise', 'strong defense', 'family values',
-                    'government overreach', 'bureaucratic red tape'
-                ],
-                orgs: [
-                    'nra', 'heritage foundation', 'republican party', 'gop', 'conservative caucus',
-                    'trump', 'desantis', 'cruz', 'fox news', 'breitbart'
-                ]
-            },
-            loaded: {
-                left_positive: ['progressive', 'inclusive', 'compassionate', 'forward-thinking', 'innovative'],
-                left_negative: ['extremist', 'radical', 'socialist', 'unrealistic', 'divisive'],
-                right_positive: ['traditional', 'principled', 'patriotic', 'pragmatic', 'responsible'],
-                right_negative: ['extremist', 'radical', 'regressive', 'discriminatory', 'authoritarian']
-            },
-            hedging: ['might', 'could', 'perhaps', 'possibly', 'allegedly', 'reportedly', 'sources say'],
-            certainty: ['definitely', 'clearly', 'obviously', 'undoubtedly', 'certainly', 'without question']
-        };
 
         // Outlet bias priors (small influence, max ±8)
         const OUTLET_PRIORS = {
@@ -976,146 +931,254 @@
             throw new Error(`All proxies failed. Last error: ${lastError?.message || 'Unknown error'}`);
         }
 
-        // Bias detection algorithm
+        // Natural bias detection algorithm - analyzes context, tone, and argumentation patterns
         function analyzeBias(text, title = '', url = '') {
             const startTime = Date.now();
             
-            // Normalize text
+            // Normalize and prepare text
             const normalizedText = text.toLowerCase();
-            const normalizedTitle = title.toLowerCase();
-            
-            // Tokenize into sentences
             const sentences = text.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 10);
             
-            // Initialize scores
-            let leftScore = 0;
-            let rightScore = 0;
+            // Political entities for contextual analysis
+            const politicalEntities = {
+                left: ['democrats', 'biden', 'harris', 'pelosi', 'schumer', 'aoc', 'sanders', 'warren'],
+                right: ['republicans', 'trump', 'desantis', 'mcconnell', 'cruz', 'hawley', 'greene'],
+                neutral: ['congress', 'senate', 'house', 'government', 'administration', 'officials']
+            };
+
+            // Initialize scoring components
             let features = {};
-            let lexiconHits = {};
-            let politicalSentences = 0;
+            let evidenceTerms = [];
+            let contextualSignals = 0;
 
-            // Feature extraction
-            function countMatches(text, terms, weight = 1) {
-                let count = 0;
-                const hits = [];
-                for (const term of terms) {
-                    const regex = new RegExp('\\b' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
-                    const matches = (text.match(regex) || []).length;
-                    if (matches > 0) {
-                        count += matches * weight * Math.log(matches + 1); // Log dampening
-                        hits.push({ term, count: matches });
-                    }
-                }
-                return { score: count, hits };
-            }
-
-            // Policy terms scoring
-            const leftPolicy = countMatches(normalizedText, LEXICONS.left.policy, 1);
-            const rightPolicy = countMatches(normalizedText, LEXICONS.right.policy, 1);
-            leftScore += leftPolicy.score;
-            rightScore += rightPolicy.score;
-            features.leftPolicy = leftPolicy.score;
-            features.rightPolicy = rightPolicy.score;
-            lexiconHits.leftPolicy = leftPolicy.hits;
-            lexiconHits.rightPolicy = rightPolicy.hits;
-
-            // Framing terms
-            const leftFrames = countMatches(normalizedText, LEXICONS.left.frames, 0.8);
-            const rightFrames = countMatches(normalizedText, LEXICONS.right.frames, 0.8);
-            leftScore += leftFrames.score;
-            rightScore += rightFrames.score;
-            features.leftFrames = leftFrames.score;
-            features.rightFrames = rightFrames.score;
-            lexiconHits.leftFrames = leftFrames.hits;
-            lexiconHits.rightFrames = rightFrames.hits;
-
-            // Organization mentions
-            const leftOrgs = countMatches(normalizedText, LEXICONS.left.orgs, 1.2);
-            const rightOrgs = countMatches(normalizedText, LEXICONS.right.orgs, 1.2);
-            leftScore += leftOrgs.score;
-            rightScore += rightOrgs.score;
-            features.leftOrgs = leftOrgs.score;
-            features.rightOrgs = rightOrgs.score;
-            lexiconHits.leftOrgs = leftOrgs.hits;
-            lexiconHits.rightOrgs = rightOrgs.hits;
-
-            // Loaded language analysis
-            const loadedLeft = countMatches(normalizedText, LEXICONS.loaded.left_positive, 0.5);
-            const loadedRight = countMatches(normalizedText, LEXICONS.loaded.right_positive, 0.5);
-            leftScore += loadedLeft.score;
-            rightScore += loadedRight.score;
-
-            // Headline multiplier (1.5x weight for title content)
-            if (title) {
-                const titleLeftPolicy = countMatches(normalizedTitle, LEXICONS.left.policy, 1.5);
-                const titleRightPolicy = countMatches(normalizedTitle, LEXICONS.right.policy, 1.5);
-                leftScore += titleLeftPolicy.score;
-                rightScore += titleRightPolicy.score;
-                features.titleBoost = titleLeftPolicy.score + titleRightPolicy.score;
-            }
-
-            // Count political sentences for confidence
-            for (const sentence of sentences) {
-                const sentenceLower = sentence.toLowerCase();
-                const hasLeftTerms = LEXICONS.left.policy.some(term => sentenceLower.includes(term)) ||
-                                  LEXICONS.left.orgs.some(term => sentenceLower.includes(term));
-                const hasRightTerms = LEXICONS.right.policy.some(term => sentenceLower.includes(term)) ||
-                                    LEXICONS.right.orgs.some(term => sentenceLower.includes(term));
+            // 1. CONTEXTUAL SENTIMENT ANALYSIS
+            // Analyze sentiment around political entities rather than just counting words
+            function analyzeContextualSentiment() {
+                let leftSentiment = 0;
+                let rightSentiment = 0;
+                const contextWindow = 20; // words around entity
                 
-                if (hasLeftTerms || hasRightTerms) {
-                    politicalSentences++;
-                }
+                sentences.forEach(sentence => {
+                    const words = sentence.toLowerCase().split(/\s+/);
+                    
+                    // Find political entities in sentence
+                    words.forEach((word, index) => {
+                        let entityBias = null;
+                        if (politicalEntities.left.some(entity => word.includes(entity))) entityBias = 'left';
+                        if (politicalEntities.right.some(entity => word.includes(entity))) entityBias = 'right';
+                        
+                        if (entityBias) {
+                            // Analyze context around entity
+                            const start = Math.max(0, index - contextWindow);
+                            const end = Math.min(words.length, index + contextWindow);
+                            const context = words.slice(start, end).join(' ');
+                            
+                            // Positive sentiment indicators
+                            const positiveContext = /\b(successful|effective|strong|praised|support|defend|champion|fight for|stand up|deliver|accomplish|achieve)\b/g;
+                            const negativeContext = /\b(failed|ineffective|weak|criticized|attack|oppose|undermine|damage|hurt|threaten|dangerous|extreme)\b/g;
+                            
+                            const positiveMatches = (context.match(positiveContext) || []).length;
+                            const negativeMatches = (context.match(negativeContext) || []).length;
+                            const sentimentScore = positiveMatches - negativeMatches;
+                            
+                            // Apply sentiment based on entity bias
+                            if (entityBias === 'left') {
+                                leftSentiment += sentimentScore;
+                            } else {
+                                rightSentiment += sentimentScore;
+                            }
+                            
+                            if (Math.abs(sentimentScore) > 0) {
+                                evidenceTerms.push({
+                                    term: word,
+                                    context: sentimentScore > 0 ? 'positive' : 'negative',
+                                    strength: Math.abs(sentimentScore),
+                                    bias: entityBias
+                                });
+                            }
+                        }
+                    });
+                });
+                
+                return { leftSentiment, rightSentiment };
             }
 
-            // Outlet prior (small influence)
+            // 2. LINGUISTIC PATTERN ANALYSIS
+            // Detect rhetorical patterns that indicate bias
+            function analyzeLinguisticPatterns() {
+                let patterns = { certainty: 0, hedging: 0, emotional: 0, factual: 0 };
+                
+                // Certainty vs hedging language
+                const certaintyMarkers = /\b(clearly|obviously|undoubtedly|definitely|certainly|without question|no doubt|absolutely)\b/gi;
+                const hedgingMarkers = /\b(might|could|perhaps|possibly|allegedly|reportedly|sources say|appears to|seems to|may have)\b/gi;
+                
+                patterns.certainty = (normalizedText.match(certaintyMarkers) || []).length;
+                patterns.hedging = (normalizedText.match(hedgingMarkers) || []).length;
+                
+                // Emotional vs factual language
+                const emotionalMarkers = /\b(outrageous|shocking|devastating|alarming|dangerous|disaster|crisis|betrayal|attack|defend|fight)\b/gi;
+                const factualMarkers = /\b(according to|data shows|study found|research indicates|statistics|analysis|report|survey)\b/gi;
+                
+                patterns.emotional = (normalizedText.match(emotionalMarkers) || []).length;
+                patterns.factual = (normalizedText.match(factualMarkers) || []).length;
+                
+                return patterns;
+            }
+
+            // 3. SOURCE AND ATTRIBUTION ANALYSIS
+            function analyzeSourcePatterns() {
+                let sourceScore = 0;
+                
+                // Anonymous sources (can indicate speculation)
+                const anonymousSources = /\b(sources say|unnamed official|according to sources|insiders report|leaked|off the record)\b/gi;
+                const namedSources = /\b(said|stated|announced|declared|confirmed|according to [A-Z][a-z]+ [A-Z][a-z]+)\b/gi;
+                
+                const anonymousCount = (normalizedText.match(anonymousSources) || []).length;
+                const namedCount = (normalizedText.match(namedSources) || []).length;
+                
+                // More anonymous sources may indicate less reliable reporting
+                sourceScore = namedCount - (anonymousCount * 0.5);
+                
+                return { sourceScore, anonymousCount, namedCount };
+            }
+
+            // 4. ARGUMENT STRUCTURE ANALYSIS
+            function analyzeArgumentStructure() {
+                let structureScore = 0;
+                
+                // Look for balanced reporting indicators
+                const balanceIndicators = /\b(however|but|on the other hand|meanwhile|in contrast|alternatively|critics argue|supporters say|both sides)\b/gi;
+                const onesided = /\b(all|every|always|never|completely|totally|entirely|absolutely no|zero|none)\b/gi;
+                
+                const balanceCount = (normalizedText.match(balanceIndicators) || []).length;
+                const onesidedCount = (normalizedText.match(onesided) || []).length;
+                
+                structureScore = balanceCount - (onesidedCount * 0.3);
+                
+                return { structureScore, balanceCount, onesidedCount };
+            }
+
+            // 5. TOPIC FRAMING ANALYSIS
+            function analyzeTopicFraming() {
+                let framingBias = 0;
+                
+                // Economic framing
+                const economicLeft = /\b(inequality|corporate greed|tax the rich|worker rights|minimum wage|wealth gap)\b/gi;
+                const economicRight = /\b(job creators|free market|economic growth|business friendly|tax burden|regulation hurts)\b/gi;
+                
+                // Social framing  
+                const socialLeft = /\b(social justice|systemic racism|reproductive rights|lgbtq rights|inclusion|equity)\b/gi;
+                const socialRight = /\b(traditional values|family values|religious freedom|law and order|personal responsibility)\b/gi;
+                
+                // Government framing
+                const govLeft = /\b(public investment|government programs|safety net|public option|infrastructure)\b/gi;
+                const govRight = /\b(government overreach|bureaucracy|red tape|states rights|limited government)\b/gi;
+                
+                const leftFraming = (normalizedText.match(economicLeft) || []).length + 
+                                  (normalizedText.match(socialLeft) || []).length +
+                                  (normalizedText.match(govLeft) || []).length;
+                
+                const rightFraming = (normalizedText.match(economicRight) || []).length + 
+                                   (normalizedText.match(socialRight) || []).length +
+                                   (normalizedText.match(govRight) || []).length;
+                
+                framingBias = rightFraming - leftFraming;
+                
+                return { framingBias, leftFraming, rightFraming };
+            }
+
+            // Execute all analyses
+            const sentimentAnalysis = analyzeContextualSentiment();
+            const linguisticPatterns = analyzeLinguisticPatterns();
+            const sourcePatterns = analyzeSourcePatterns();
+            const argumentStructure = analyzeArgumentStructure();
+            const topicFraming = analyzeTopicFraming();
+
+            // COMPOSITE SCORING
+            // Weight different aspects of bias detection
+            let biasScore = 0;
+            
+            // Contextual sentiment (40% weight) - most important
+            const sentimentScore = sentimentAnalysis.rightSentiment - sentimentAnalysis.leftSentiment;
+            biasScore += sentimentScore * 4;
+            features.sentiment = sentimentScore;
+            
+            // Topic framing (25% weight)
+            biasScore += topicFraming.framingBias * 2.5;
+            features.framing = topicFraming.framingBias;
+            
+            // Linguistic patterns (20% weight)
+            const linguisticBias = (linguisticPatterns.certainty - linguisticPatterns.hedging) + 
+                                 (linguisticPatterns.emotional - linguisticPatterns.factual) * 0.5;
+            biasScore += linguisticBias * 0.8;
+            features.linguistic = linguisticBias;
+            
+            // Argument structure (10% weight) - lack of balance adds bias
+            biasScore -= argumentStructure.structureScore * 0.5;
+            features.structure = argumentStructure.structureScore;
+            
+            // Source reliability (5% weight)
+            biasScore -= sourcePatterns.sourceScore * 0.2;
+            features.sources = sourcePatterns.sourceScore;
+
+            // Apply outlet prior (small influence)
             let outletPrior = 0;
             if (url) {
                 try {
                     const hostname = new URL(url).hostname.toLowerCase().replace('www.', '');
                     outletPrior = OUTLET_PRIORS[hostname] || 0;
+                    biasScore += outletPrior;
                 } catch (error) {
                     // Invalid URL, no prior
                 }
             }
 
-            // Calculate raw bias score
-            const rawScore = rightScore - leftScore + outletPrior;
-            
-            // Normalize to [-100, 100] scale
-            const maxScore = 50; // Heuristic cap for normalization
-            let normalizedScore = Math.max(-100, Math.min(100, (rawScore / maxScore) * 100));
-            normalizedScore = Math.round(normalizedScore);
+            // Title analysis (1.5x multiplier)
+            if (title) {
+                const titleSentiment = title.toLowerCase();
+                let titleBias = 0;
+                
+                // Check for loaded language in title
+                if (/\b(slams|blasts|destroys|demolishes|attacks|hits|strikes)\b/.test(titleSentiment)) titleBias += 2;
+                if (/\b(defends|supports|champions|stands up|fights for)\b/.test(titleSentiment)) titleBias -= 2;
+                if (/\b(crisis|disaster|chaos|failure|threatens)\b/.test(titleSentiment)) titleBias += 1.5;
+                if (/\b(progress|success|achievement|breakthrough|delivers)\b/.test(titleSentiment)) titleBias -= 1.5;
+                
+                biasScore += titleBias * 1.5;
+                features.titleBias = titleBias;
+            }
 
-            // Confidence calculation
+            // Normalize to [-100, 100] scale with natural curve
+            // Use tanh for smooth natural scaling instead of hard caps
+            const normalizedScore = Math.round(Math.tanh(biasScore / 15) * 100);
+            
+            // CONFIDENCE CALCULATION
+            // Based on signal strength and content analysis depth
             const wordCount = text.split(/\s+/).length;
-            const politicalDensity = politicalSentences / Math.max(sentences.length, 1);
-            const totalSignals = leftScore + rightScore;
-            const scoreAgreement = Math.abs(rawScore) / (totalSignals + 1); // Agreement across features
+            const politicalDensity = evidenceTerms.length / Math.max(sentences.length, 1);
+            const signalStrength = Math.abs(sentimentScore) + Math.abs(topicFraming.framingBias) + Math.abs(linguisticBias);
             
             let confidence = 0;
-            confidence += Math.min(40, wordCount / 25); // Up to 40 points for word count
-            confidence += Math.min(30, politicalDensity * 100); // Up to 30 points for political density  
-            confidence += Math.min(20, totalSignals * 2); // Up to 20 points for signal strength
-            confidence += Math.min(10, scoreAgreement * 10); // Up to 10 points for agreement
+            confidence += Math.min(30, wordCount / 30); // Content length
+            confidence += Math.min(25, politicalDensity * 200); // Political content density
+            confidence += Math.min(20, signalStrength); // Signal strength
+            confidence += Math.min(15, sourcePatterns.namedCount * 2); // Source quality
+            confidence += Math.min(10, argumentStructure.balanceCount); // Reporting balance
             
-            confidence = Math.round(Math.max(0, Math.min(100, confidence)));
+            confidence = Math.round(Math.max(5, Math.min(100, confidence)));
 
-            // Generate explanation and evidence
-            const explanation = generateExplanation(normalizedScore, confidence, features, outletPrior);
-            const evidence = generateEvidence(lexiconHits, normalizedScore);
-
+            // Generate natural explanation
+            const explanation = generateNaturalExplanation(normalizedScore, confidence, features, evidenceTerms);
+            
             const analysis = {
                 score: normalizedScore,
                 confidence,
                 explanation,
-                evidence,
+                evidence: evidenceTerms.slice(0, 8), // Top evidence
                 features,
-                lexiconHits,
                 outletPrior,
                 timing: Date.now() - startTime,
-                rawScore,
-                totalSignals,
-                politicalSentences,
+                rawScore: biasScore,
                 wordCount,
                 url,
                 title
@@ -1125,61 +1188,50 @@
             return analysis;
         }
 
-        function generateExplanation(score, confidence, features, outletPrior) {
+        function generateNaturalExplanation(score, confidence, features, evidenceTerms) {
             let explanation = '';
             
+            // Primary bias assessment
             if (Math.abs(score) < 10) {
-                explanation = 'This article appears relatively neutral with minimal partisan language or framing.';
-            } else if (score < -25) {
-                explanation = 'This article shows strong left-leaning bias through progressive policy emphasis and liberal framing.';
-            } else if (score < 0) {
-                explanation = 'This article leans left with some progressive policy mentions and liberal perspectives.';
-            } else if (score > 25) {
-                explanation = 'This article shows strong right-leaning bias through conservative policy emphasis and traditional framing.';
-            } else {
-                explanation = 'This article leans right with some conservative policy mentions and traditional perspectives.';
+                explanation = 'This article maintains relatively balanced reporting with neutral tone and framing.';
+            } else if (score < -30) {
+                explanation = 'This article displays strong liberal bias through sympathetic coverage of left-leaning positions and critical framing of conservative viewpoints.';
+            } else if (score < -10) {
+                explanation = 'This article shows moderate liberal bias with somewhat favorable treatment of progressive policies and politicians.';
+            } else if (score > 30) {
+                explanation = 'This article displays strong conservative bias through sympathetic coverage of right-leaning positions and critical framing of liberal viewpoints.';
+            } else if (score > 10) {
+                explanation = 'This article shows moderate conservative bias with somewhat favorable treatment of traditional policies and politicians.';
             }
 
-            if (outletPrior !== 0) {
-                const direction = outletPrior > 0 ? 'conservative' : 'liberal';
-                explanation += ` The outlet's known ${direction} lean influenced the score by ${Math.abs(outletPrior)} points.`;
+            // Add specific reasoning based on strongest signals
+            const sentimentSignal = Math.abs(features.sentiment || 0);
+            const framingSignal = Math.abs(features.framing || 0);
+            const linguisticSignal = Math.abs(features.linguistic || 0);
+
+            if (sentimentSignal > framingSignal && sentimentSignal > linguisticSignal) {
+                explanation += ' This is primarily driven by the emotional tone used when discussing political figures and policies.';
+            } else if (framingSignal > linguisticSignal) {
+                explanation += ' This bias appears mainly in how issues are framed and contextualized rather than explicit opinion.';
+            } else if (linguisticSignal > 1) {
+                explanation += ' The bias is evident in the certainty of language and emotional word choices used throughout.';
             }
 
-            if (confidence < 50) {
-                explanation += ' Confidence is low due to limited political content or weak signals.';
+            // Source and structure commentary
+            if (features.sources && features.sources < -2) {
+                explanation += ' Heavy reliance on anonymous sources may indicate speculative reporting.';
+            } else if (features.structure && features.structure < -2) {
+                explanation += ' The article lacks balanced perspectives from multiple viewpoints.';
+            }
+
+            // Confidence reasoning
+            if (confidence < 40) {
+                explanation += ' Confidence is low due to limited political content or weak bias indicators.';
+            } else if (confidence > 80) {
+                explanation += ' High confidence due to consistent bias patterns throughout the article.';
             }
 
             return explanation;
-        }
-
-        function generateEvidence(lexiconHits, score) {
-            const evidence = [];
-            const isLeftLeaning = score < 0;
-            
-            // Collect all hits with their bias direction
-            const allHits = [];
-            
-            Object.entries(lexiconHits).forEach(([category, hits]) => {
-                const isLeftCategory = category.includes('left');
-                hits.forEach(hit => {
-                    allHits.push({
-                        term: hit.term,
-                        count: hit.count,
-                        bias: isLeftCategory ? 'left' : 'right',
-                        weight: hit.count
-                    });
-                });
-            });
-
-            // Sort by weight and take top 8
-            allHits.sort((a, b) => b.weight - a.weight);
-            const topHits = allHits.slice(0, 8);
-
-            return topHits.map(hit => ({
-                term: hit.term,
-                bias: hit.bias,
-                count: hit.count
-            }));
         }
 
         function updateDevPanel(analysis) {
@@ -1188,8 +1240,8 @@
             elements.devProxy.textContent = analysis.proxy || 'N/A';
             elements.devFeatures.textContent = analysis.features ? 
                 Object.entries(analysis.features).map(([k, v]) => `${k}: ${v.toFixed(1)}`).join(', ') : 'N/A';
-            elements.devLexicon.textContent = analysis.lexiconHits ? 
-                Object.keys(analysis.lexiconHits).reduce((acc, key) => acc + analysis.lexiconHits[key].length, 0) + ' total hits' : 'N/A';
+            elements.devLexicon.textContent = analysis.evidence ? 
+                `${analysis.evidence.length} contextual signals found` : 'N/A';
             elements.devOutlet.textContent = analysis.outletPrior ? 
                 `${analysis.outletPrior > 0 ? '+' : ''}${analysis.outletPrior}` : '0';
             elements.devNorm.textContent = analysis.rawScore !== undefined ? 
@@ -1219,7 +1271,8 @@
             if (analysis.evidence && analysis.evidence.length > 0) {
                 elements.evidenceChips.innerHTML = analysis.evidence.map(item => {
                     const className = item.bias === 'left' ? 'negative' : 'positive';
-                    return `<span class="evidence-chip ${className}">${item.term} (${item.count})</span>`;
+                    const contextLabel = item.context === 'positive' ? '+' : item.context === 'negative' ? '-' : '';
+                    return `<span class="evidence-chip ${className}">${item.term} ${contextLabel}</span>`;
                 }).join('');
             } else {
                 elements.evidenceChips.innerHTML = '<span class="evidence-chip">No significant evidence found</span>';
