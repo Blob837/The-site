@@ -6,15 +6,17 @@
     <meta name="description" content="Mobile-first crude oil price tracker with offline support and alerts." />
     <meta http-equiv="Cache-Control" content="max-age=300, must-revalidate" />
     <meta name="theme-color" content="#0b1b2b" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Crude Oil Price Tracker</title>
     <style>
-      :root{color-scheme:dark light;--bg:#0b1b2b;--bg-alt:#11253a;--card:#142a40;--accent:#1f8a70;--accent-soft:#28b487;--danger:#c0392b;--text:#f5f7fa;--muted:#8da3bc;--shadow:0 18px 32px rgba(9,22,37,.35);font-size:16px}
+      :root{color-scheme:dark light;--bg:#0b1b2b;--bg-alt:#11253a;--card:#142a40;--accent:#1f8a70;--accent-soft:#28b487;--danger:#c0392b;--text:#f5f7fa;--muted:#8da3bc;--shadow:0 18px 32px rgba(9,22,37,.35);--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);font-size:16px}
       *{box-sizing:border-box;margin:0;padding:0}
-      body{font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(160deg,var(--bg),#07121f);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:stretch;-webkit-font-smoothing:antialiased}
-      header{padding:1.25rem 1.5rem 1rem;display:flex;flex-direction:column;gap:.5rem;background:rgba(8,18,33,.8);backdrop-filter:blur(14px);position:sticky;top:0;z-index:10;box-shadow:0 12px 30px rgba(6,12,20,.25)}
+      html{min-height:100%;background:linear-gradient(160deg,var(--bg),#07121f) fixed}
+      body{font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);min-height:100vh;min-height:100svh;display:flex;flex-direction:column;align-items:stretch;-webkit-font-smoothing:antialiased;background:transparent}
+      header{padding:calc(1.25rem + var(--safe-top)) 1.5rem 1rem;display:flex;flex-direction:column;gap:.5rem;background:rgba(8,18,33,.8);backdrop-filter:blur(14px);position:sticky;top:0;z-index:10;box-shadow:0 12px 30px rgba(6,12,20,.25);margin-top:calc(var(--safe-top)*-1)}
       header h1{font-size:1.65rem;font-weight:700;letter-spacing:.02em}
       header p{color:var(--muted);font-size:.95rem;line-height:1.4}
-      main{flex:1;display:flex;flex-direction:column;gap:1.25rem;padding:1rem 1.25rem 4rem}
+      main{flex:1;display:flex;flex-direction:column;gap:1.25rem;padding:1rem 1.25rem calc(4rem + var(--safe-bottom))}
       .grid{display:grid;gap:1rem}
       .price-board{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
       .card{background:linear-gradient(145deg,var(--card),rgba(20,42,64,.85));border-radius:20px;padding:1.1rem 1.25rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.75rem;position:relative;overflow:hidden}
@@ -54,9 +56,9 @@
       @keyframes pulse{0%{transform:scale(.3);opacity:.8}70%{transform:scale(1);opacity:.15}100%{transform:scale(.3);opacity:.8}}
       .error-banner{background:rgba(192,57,43,.18);border:1px solid rgba(192,57,43,.45);color:#f8d7da;padding:.75rem 1rem;border-radius:12px;font-size:.9rem;display:none}
       .error-banner.active{display:block}
-      footer{padding:1.5rem;text-align:center;color:var(--muted);font-size:.78rem}
+      footer{padding:1.5rem 1.5rem calc(1.5rem + var(--safe-bottom));text-align:center;color:var(--muted);font-size:.78rem}
       .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-      @media (min-width:900px){header{flex-direction:row;align-items:flex-end;justify-content:space-between}header h1{font-size:2rem}main{padding:1.5rem 2rem 4rem}.grid.price-board{grid-template-columns:repeat(2, minmax(280px,1fr))}.chart-card{padding:1.35rem}}
+      @media (min-width:900px){header{flex-direction:row;align-items:flex-end;justify-content:space-between;padding:calc(1.5rem + var(--safe-top)) 2rem 1.25rem}header h1{font-size:2rem}main{padding:1.5rem 2rem calc(4.5rem + var(--safe-bottom))}.grid.price-board{grid-template-columns:repeat(2, minmax(280px,1fr))}.chart-card{padding:1.35rem}}
     </style>
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js" integrity="sha384-gTq4CPGK/c/pdwV61TezKDgxKDsNmptBPR6jI+IvAxdajmFK2umrQ06+ObBuAz7j" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" integrity="sha384-fcPTLnRuW01WmvuyDNYOR1c9ZftYuAP92mTTrKPpQhc5EjcN0NPpTivYS/sx5Rn1" crossorigin="anonymous"></script>
@@ -155,6 +157,7 @@
     <footer>&copy; <span id="year"></span> Crude Oil Tracker. Data via Yahoo Finance. Refreshes automatically every 15 minutes during market hours.</footer>
     <script>
       const STORAGE_KEYS={quotes:"cot_quotes_v1",history:"cot_history_v1",prefs:"cot_prefs_v1"};
+      const YAHOO_HOSTS=["https://query2.finance.yahoo.com","https://query1.finance.yahoo.com"];
       const SYMBOLS={wti:"CL=F",brent:"BZ=F"};
       const RANGE_CONFIG={"1d":{label:"1D",range:"1d",interval:"30m"},"7d":{label:"7D",range:"7d",interval:"2h"},"30d":{label:"30D",range:"1mo",interval:"1d"}};
       const FIFTEEN_MIN=9e5;const MARKET_OPEN_UTC=13;const MARKET_CLOSE_UTC=23;
@@ -182,11 +185,37 @@
         label.textContent=open?"Market open":"Market closed";
       }
 
+      async function fetchYahooJSON(buildPath){
+        let lastError;
+        for(const host of YAHOO_HOSTS){
+          const path=buildPath(host);
+          const url=`${host}${path}`;
+          try{
+            const res=await fetch(url,{mode:"cors",cache:"no-store"});
+            if(!res.ok)throw new Error(`Request failed (${res.status})`);
+            const payload=await res.json();
+            if(payload?.finance?.error)throw new Error(payload.finance.error);
+            return payload;
+          }catch(err){
+            lastError=err;
+            console.warn("Yahoo request failed",url,err);
+          }
+        }
+        throw lastError||new Error("All Yahoo endpoints failed");
+      }
+
       async function fetchQuotes(){
-        const url="https://query1.finance.yahoo.com/v7/finance/quote?symbols="+encodeURIComponent(SYMBOLS.wti+","+SYMBOLS.brent);
-        const res=await fetch(url,{mode:"cors",cache:"no-store"});
-        if(!res.ok)throw new Error("Quote request failed");
-        const data=await res.json();
+        const params=new URLSearchParams({
+          lang:"en-US",
+          region:"US",
+          symbols:`${SYMBOLS.wti},${SYMBOLS.brent}`,
+          fields:"regularMarketPrice,regularMarketChange,regularMarketChangePercent,regularMarketTime,regularMarketPreviousClose"
+        });
+        const data=await fetchYahooJSON(host=>{
+          const qs=new URLSearchParams(params);
+          if(host.includes("query2"))qs.set("corsDomain","finance.yahoo.com");
+          return `/v6/finance/quote?${qs.toString()}`;
+        });
         const result=data?.quoteResponse?.result||[];
         if(result.length<2)throw new Error("Incomplete quote data");
         const [wtiData,brentData]=SYMBOLS.wti===result[0].symbol?[result[0],result[1]]:[result[1],result[0]];
@@ -201,21 +230,22 @@
 
       function mapQuote(q){
         return {
-          price:q.regularMarketPrice??null,
-          change:q.regularMarketChange??0,
-          changePercent:q.regularMarketChangePercent??0,
+          price:q.regularMarketPrice??q.postMarketPrice??q.preMarketPrice??null,
+          change:q.regularMarketChange??q.postMarketChange??q.preMarketChange??0,
+          changePercent:q.regularMarketChangePercent??q.postMarketChangePercent??q.preMarketChangePercent??0,
           previousClose:q.regularMarketPreviousClose??null,
-          exchangeTime:q.regularMarketTime?new Date(q.regularMarketTime*1e3).toISOString():null
+          exchangeTime:q.regularMarketTime?new Date(q.regularMarketTime*1e3).toISOString():q.postMarketTime?new Date(q.postMarketTime*1e3).toISOString():q.preMarketTime?new Date(q.preMarketTime*1e3).toISOString():null
         };
       }
 
       async function fetchHistory(symbol,rangeKey){
         const cfg=RANGE_CONFIG[rangeKey];
-        const qs=new URLSearchParams({range:cfg.range,interval:cfg.interval,includePrePost:"false",corsDomain:"finance.yahoo.com"});
-        const url=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?${qs.toString()}`;
-        const res=await fetch(url,{mode:"cors",cache:"no-store"});
-        if(!res.ok)throw new Error("History request failed");
-        const payload=await res.json();
+        const baseParams={range:cfg.range,interval:cfg.interval,includePrePost:"false",lang:"en-US",region:"US"};
+        const payload=await fetchYahooJSON(host=>{
+          const qs=new URLSearchParams(baseParams);
+          if(host.includes("query2"))qs.set("corsDomain","finance.yahoo.com");
+          return `/v8/finance/chart/${encodeURIComponent(symbol)}?${qs.toString()}`;
+        });
         const chart=payload?.chart?.result?.[0];
         if(!chart||!Array.isArray(chart.timestamp))throw new Error("Invalid history data");
         const prices=chart.indicators?.quote?.[0]?.close||[];
@@ -299,13 +329,28 @@
       async function renderHistory(rangeKey){
         state.currentRange=rangeKey;
         toggleRangeButtons(rangeKey);
-        $("#chartLoading").style.display="flex";
+        const loader=$("#chartLoading");
+        loader.dataset.defaultText=loader.dataset.defaultText||loader.textContent;
+        loader.textContent=loader.dataset.defaultText;
+        loader.style.display="flex";
         await ensureChartsReady();
-        const datasets=await Promise.all([loadHistory(SYMBOLS.wti,rangeKey),loadHistory(SYMBOLS.brent,rangeKey)]);
+        let datasets;
+        try{
+          datasets=await Promise.all([loadHistory(SYMBOLS.wti,rangeKey),loadHistory(SYMBOLS.brent,rangeKey)]);
+        }catch(err){
+          console.error("Chart refresh failed",err);
+          loader.textContent="Unable to load chart data.";
+          return;
+        }
         const [wtiHistory,brentHistory]=datasets;
         upsertChart("wti",wtiHistory);
         upsertChart("brent",brentHistory);
-        $("#chartLoading").style.display="none";
+        if(wtiHistory.points.length||brentHistory.points.length){
+          loader.style.display="none";
+          loader.textContent=loader.dataset.defaultText;
+        }else{
+          loader.textContent="No historical data available for this range.";
+        }
       }
 
       async function loadHistory(symbol,rangeKey){
@@ -331,6 +376,7 @@
         const chart=state.charts[id];
         chart.data.labels=history.points.map(p=>p.t);
         chart.data.datasets[0].data=history.points.map(p=>({x:p.t,y:p.v}));
+        chart.setDatasetVisibility(0,history.points.length>0);
         chart.update("none");
       }
 
