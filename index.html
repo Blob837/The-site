@@ -30,18 +30,15 @@
             --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
             --shadow-hover: 0 12px 40px rgba(0, 255, 65, 0.15);
         }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         html, body {
             height: 100vh;
             overflow: hidden;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Monaco', 'Menlo', 'Consolas', monospace;
             background: var(--bg-primary);
@@ -52,7 +49,6 @@
             display: flex;
             flex-direction: column;
         }
-
         body::before {
             content: '';
             position: fixed;
@@ -60,7 +56,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
+            background:
                 radial-gradient(circle at 20% 20%, rgba(0, 255, 65, 0.05) 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, rgba(0, 255, 65, 0.03) 0%, transparent 50%),
                 linear-gradient(transparent 50%, rgba(0, 255, 65, 0.01) 50%);
@@ -69,25 +65,21 @@
             z-index: 1000;
             animation: backgroundPulse 10s ease-in-out infinite alternate;
         }
-
         @keyframes backgroundPulse {
             0% { opacity: 0.3; }
             100% { opacity: 0.7; }
         }
-
         @media (prefers-reduced-motion: reduce) {
             body::before { animation: none; opacity: 0.5; }
             .animate { animation: none !important; }
         }
-
         .app-container {
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            height: calc(100vh - var(--safe-area-top) - var(--safe-area-bottom));
             position: relative;
             z-index: 10;
         }
-
         .header {
             background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
             padding: 12px 0;
@@ -95,7 +87,6 @@
             backdrop-filter: blur(10px);
             flex-shrink: 0;
         }
-
         .header-content {
             max-width: 1600px;
             margin: 0 auto;
@@ -104,7 +95,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .brand {
             font-size: 1.8rem;
             font-weight: 900;
@@ -115,7 +105,6 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
         .status {
             display: flex;
             align-items: center;
@@ -123,7 +112,6 @@
             font-size: 0.95rem;
             font-weight: 600;
         }
-
         .status-indicator {
             display: flex;
             align-items: center;
@@ -134,7 +122,6 @@
             border-radius: 20px;
             box-shadow: var(--shadow-card);
         }
-
         .status-dot {
             width: 10px;
             height: 10px;
@@ -143,35 +130,28 @@
             box-shadow: var(--glow-subtle);
             animation: pulse 2s infinite;
         }
-
         .status-dot.offline { background: var(--accent-down); }
         .status-dot.loading { background: var(--accent-warning); }
-
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.7; transform: scale(1.1); }
         }
-
         .main-content {
             flex: 1;
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: var(--border) transparent;
         }
-
         .main-content::-webkit-scrollbar {
             width: 6px;
         }
-
         .main-content::-webkit-scrollbar-track {
             background: transparent;
         }
-
         .main-content::-webkit-scrollbar-thumb {
             background: var(--border);
             border-radius: 3px;
         }
-
         .content-wrapper {
             max-width: 1600px;
             margin: 0 auto;
@@ -180,16 +160,14 @@
             grid-template-columns: 1fr 1fr;
             grid-template-rows: auto 1fr;
             gap: 24px;
-            height: calc(100vh - 140px);
+            height: 100%;
         }
-
         .prices-section {
             grid-column: 1 / -1;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
         }
-
         .price-card {
             background: linear-gradient(145deg, var(--bg-card), var(--bg-secondary));
             border: 1px solid var(--border);
@@ -201,7 +179,6 @@
             position: relative;
             overflow: hidden;
         }
-
         .price-card::before {
             content: '';
             position: absolute;
@@ -212,17 +189,14 @@
             background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
             transition: left 0.6s;
         }
-
         .price-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-hover);
             border-color: var(--text-secondary);
         }
-
         .price-card:hover::before {
             left: 100%;
         }
-
         .price-card.loading::after {
             content: '';
             position: absolute;
@@ -235,12 +209,10 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
         .price-card h3 {
             font-size: 1.2rem;
             font-weight: 700;
@@ -249,55 +221,46 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-
         .price-main {
             display: flex;
             align-items: baseline;
             gap: 12px;
             margin-bottom: 16px;
         }
-
         .price-value {
             font-size: 2.8rem;
             font-weight: 900;
             text-shadow: var(--glow-subtle);
             line-height: 1;
         }
-
         .price-currency {
             font-size: 1.2rem;
             color: var(--text-muted);
             font-weight: 500;
         }
-
         .price-changes {
             display: flex;
             gap: 16px;
             margin-bottom: 12px;
         }
-
         .price-change {
             display: flex;
             flex-direction: column;
             gap: 2px;
         }
-
         .change-label {
             font-size: 0.75rem;
             color: var(--text-light);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         .change-value {
             font-size: 1.1rem;
             font-weight: 700;
         }
-
         .change-up { color: var(--accent-up); }
         .change-down { color: var(--accent-down); }
         .change-flat { color: var(--accent-flat); }
-
         .price-meta {
             font-size: 0.85rem;
             color: var(--text-light);
@@ -307,7 +270,6 @@
             padding-top: 12px;
             border-top: 1px solid var(--border);
         }
-
         .data-quality {
             padding: 2px 8px;
             border-radius: 10px;
@@ -315,17 +277,14 @@
             font-weight: 600;
             text-transform: uppercase;
         }
-
         .quality-live {
             background: rgba(0, 255, 65, 0.2);
             color: var(--accent-up);
         }
-
         .quality-calculated {
             background: rgba(255, 163, 0, 0.2);
             color: var(--accent-warning);
         }
-
         .section {
             background: linear-gradient(145deg, var(--bg-card), var(--bg-secondary));
             border: 1px solid var(--border);
@@ -335,7 +294,6 @@
             flex-direction: column;
             overflow: hidden;
         }
-
         .section-header {
             padding: 20px 24px 16px;
             border-bottom: 1px solid var(--border);
@@ -344,14 +302,12 @@
             align-items: center;
             background: var(--bg-tertiary);
         }
-
         .section-title {
             font-size: 1.4rem;
             font-weight: 800;
             text-shadow: var(--glow-subtle);
             letter-spacing: 1px;
         }
-
         .auto-refresh-indicator {
             display: flex;
             align-items: center;
@@ -359,18 +315,15 @@
             color: var(--text-light);
             font-size: 0.8rem;
         }
-
         .refresh-timer {
             color: var(--text-secondary);
             font-weight: 600;
         }
-
         .tabs {
             display: flex;
             background: var(--bg-tertiary);
             margin: 0;
         }
-
         .tab {
             flex: 1;
             padding: 14px 16px;
@@ -386,7 +339,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         .tab::after {
             content: '';
             position: absolute;
@@ -398,43 +350,35 @@
             transform: scaleX(0);
             transition: transform 0.3s ease;
         }
-
         .tab.active {
             color: var(--text-primary);
             background: var(--bg-card);
         }
-
         .tab.active::after {
             transform: scaleX(1);
         }
-
         .tab:hover:not(.active) {
             color: var(--text-secondary);
             background: var(--bg-secondary);
         }
-
         .tab-content {
             display: none;
             flex: 1;
             overflow: hidden;
         }
-
         .tab-content.active {
             display: flex;
             flex-direction: column;
         }
-
         .charts-container {
             padding: 20px 24px;
             flex: 1;
             overflow-y: auto;
         }
-
         .chart-grid {
             display: grid;
             gap: 20px;
         }
-
         .chart-container {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
@@ -442,7 +386,6 @@
             padding: 20px;
             box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
         }
-
         .chart-title {
             font-size: 1.1rem;
             font-weight: 700;
@@ -450,25 +393,21 @@
             color: var(--text-secondary);
             text-align: center;
         }
-
         .chart-canvas {
             width: 100%;
             height: 200px;
             border-radius: 8px;
         }
-
         .news-container {
             flex: 1;
             overflow-y: auto;
             padding: 0;
         }
-
         .news-grid {
             display: grid;
             gap: 1px;
             background: var(--border);
         }
-
         .news-item {
             background: var(--bg-card);
             padding: 20px 24px;
@@ -476,17 +415,14 @@
             cursor: pointer;
             border-left: 4px solid transparent;
         }
-
         .news-item:hover {
             background: var(--bg-secondary);
             border-left-color: var(--text-secondary);
             transform: translateX(4px);
         }
-
         .news-item:first-child {
             border-left-color: var(--accent-up);
         }
-
         .news-title {
             font-size: 1rem;
             font-weight: 600;
@@ -494,18 +430,15 @@
             line-height: 1.4;
             color: var(--text-primary);
         }
-
         .news-title a {
             color: inherit;
             text-decoration: none;
             transition: color 0.3s ease;
         }
-
         .news-title a:hover {
             color: var(--text-secondary);
             text-shadow: var(--glow-subtle);
         }
-
         .news-meta {
             display: flex;
             justify-content: space-between;
@@ -514,23 +447,19 @@
             color: var(--text-light);
             gap: 12px;
         }
-
         .news-source {
             font-weight: 600;
             color: var(--text-muted);
         }
-
         .news-time {
             white-space: nowrap;
         }
-
         .status-bar {
             background: var(--bg-tertiary);
             border-top: 1px solid var(--border);
             padding: 12px 20px;
             flex-shrink: 0;
         }
-
         .status-content {
             max-width: 1600px;
             margin: 0 auto;
@@ -540,7 +469,6 @@
             flex-wrap: wrap;
             gap: 16px;
         }
-
         .btn {
             background: linear-gradient(145deg, var(--bg-card), var(--bg-secondary));
             border: 1px solid var(--border);
@@ -555,20 +483,17 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         .btn:hover {
             background: var(--text-primary);
             color: var(--bg-primary);
             box-shadow: var(--glow-subtle);
             transform: translateY(-1px);
         }
-
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
         }
-
         .status-info {
             display: flex;
             align-items: center;
@@ -576,7 +501,6 @@
             font-size: 0.85rem;
             color: var(--text-light);
         }
-
         .diagnostic-panel {
             position: fixed;
             bottom: 0;
@@ -593,44 +517,37 @@
             backdrop-filter: blur(10px);
             box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6);
         }
-
         .diagnostic-panel.open {
             transform: translateY(0);
         }
-
         .diagnostic-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-
         .diagnostic-title {
             font-size: 1.3rem;
             font-weight: 800;
             color: var(--text-secondary);
         }
-
         .diagnostic-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
         }
-
         .diagnostic-section {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 16px;
         }
-
         .diagnostic-section h4 {
             color: var(--text-secondary);
             margin-bottom: 12px;
             font-size: 1rem;
             font-weight: 700;
         }
-
         .strategy-status {
             padding: 8px 12px;
             border-radius: 6px;
@@ -640,25 +557,21 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         .strategy-success {
             background: rgba(0, 255, 65, 0.2);
             color: var(--accent-up);
             border: 1px solid rgba(0, 255, 65, 0.3);
         }
-
         .strategy-failed {
             background: rgba(255, 51, 102, 0.2);
             color: var(--accent-down);
             border: 1px solid rgba(255, 51, 102, 0.3);
         }
-
         .strategy-testing {
             background: rgba(255, 165, 0, 0.2);
             color: var(--accent-warning);
             border: 1px solid rgba(255, 165, 0, 0.3);
         }
-
         .error-banner {
             background: linear-gradient(145deg, var(--accent-down), #ff1744);
             color: white;
@@ -670,7 +583,6 @@
             position: relative;
             box-shadow: var(--shadow-card);
         }
-
         .error-banner .close-btn {
             position: absolute;
             right: 12px;
@@ -683,49 +595,45 @@
             font-size: 1.4rem;
             font-weight: bold;
         }
-
         @media (max-width: 1200px) {
             .content-wrapper {
                 grid-template-columns: 1fr;
-                grid-template-rows: auto auto auto;
-                height: auto;
-                min-height: calc(100vh - 140px);
+                grid-template-rows: auto 1fr 1fr;
+                height: 100%;
             }
-            
+           
             .main-content {
-                overflow-y: visible;
+                overflow-y: auto;
             }
-            
+           
             .section {
                 min-height: 400px;
             }
         }
-
         @media (max-width: 768px) {
             .brand {
                 font-size: 1.4rem;
                 letter-spacing: 2px;
             }
-            
+           
             .price-value {
                 font-size: 2.2rem;
             }
-            
+           
             .prices-section {
                 grid-template-columns: 1fr;
             }
-            
+           
             .content-wrapper {
                 padding: 16px;
                 gap: 16px;
             }
-            
+           
             .status-content {
                 flex-direction: column;
                 gap: 12px;
             }
         }
-
         [aria-live] {
             position: absolute;
             left: -10000px;
@@ -733,13 +641,11 @@
             height: 1px;
             overflow: hidden;
         }
-
         .loading-shimmer {
             background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
             background-size: 200% 100%;
             animation: shimmer 2s infinite;
         }
-
         @keyframes shimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
@@ -749,7 +655,6 @@
 <body>
     <div class="app-container">
         <div id="error-container"></div>
-
         <header class="header">
             <div class="header-content">
                 <div class="brand">OIL MONITOR</div>
@@ -762,7 +667,6 @@
                 </div>
             </div>
         </header>
-
         <main class="main-content">
             <div class="content-wrapper">
                 <section class="prices-section">
@@ -787,7 +691,6 @@
                             <div id="wti-quality" class="data-quality quality-live">LIVE</div>
                         </div>
                     </div>
-
                     <div class="price-card loading" tabindex="0" role="button" aria-label="Brent Crude Oil Price">
                         <h3>Brent Crude</h3>
                         <div class="price-main">
@@ -810,7 +713,6 @@
                         </div>
                     </div>
                 </section>
-
                 <section class="section">
                     <div class="section-header">
                         <h2 class="section-title">CHARTS</h2>
@@ -819,13 +721,12 @@
                             <span id="chart-timer" class="refresh-timer">--</span>
                         </div>
                     </div>
-                    
+                   
                     <div class="tabs">
                         <button class="tab active" data-chart="intraday">Intraday</button>
                         <button class="tab" data-chart="5day">5-Day</button>
                         <button class="tab" data-chart="30day">30-Day</button>
                     </div>
-
                     <div id="chart-intraday" class="tab-content active">
                         <div class="charts-container">
                             <div class="chart-grid">
@@ -840,7 +741,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div id="chart-5day" class="tab-content">
                         <div class="charts-container">
                             <div class="chart-grid">
@@ -855,7 +755,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div id="chart-30day" class="tab-content">
                         <div class="charts-container">
                             <div class="chart-grid">
@@ -871,7 +770,6 @@
                         </div>
                     </div>
                 </section>
-
                 <section class="section">
                     <div class="section-header">
                         <h2 class="section-title">ENERGY NEWS</h2>
@@ -880,14 +778,12 @@
                             <span id="news-timer" class="refresh-timer">--</span>
                         </div>
                     </div>
-
                     <div class="tabs">
                         <button class="tab active" data-news="texas">Texas</button>
                         <button class="tab" data-news="us">U.S.</button>
                         <button class="tab" data-news="global">Global</button>
                         <button class="tab" data-news="opec">OPEC</button>
                     </div>
-
                     <div id="news-texas" class="tab-content active">
                         <div class="news-container">
                             <div class="news-grid" id="texas-news">
@@ -901,7 +797,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div id="news-us" class="tab-content">
                         <div class="news-container">
                             <div class="news-grid" id="us-news">
@@ -915,7 +810,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div id="news-global" class="tab-content">
                         <div class="news-container">
                             <div class="news-grid" id="global-news">
@@ -929,7 +823,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div id="news-opec" class="tab-content">
                         <div class="news-container">
                             <div class="news-grid" id="opec-news">
@@ -946,7 +839,6 @@
                 </section>
             </div>
         </main>
-
         <footer class="status-bar">
             <div class="status-content">
                 <div class="status-info">
@@ -958,9 +850,7 @@
             </div>
         </footer>
     </div>
-
     <div aria-live="polite" id="price-announcer"></div>
-
     <div id="diagnostic-panel" class="diagnostic-panel">
         <div class="diagnostic-header">
             <h3 class="diagnostic-title">System Diagnostics & Performance</h3>
@@ -981,7 +871,6 @@
             </div>
         </div>
     </div>
-
     <script>
         // Enhanced multi-strategy data fetching system
         class OilDataFetcher {
@@ -1006,7 +895,7 @@
                         ],
                         parser: this.parseYahooData
                     },
-                    
+                   
                     // Strategy 2: Alternative financial APIs
                     {
                         name: 'Alternative Finance APIs',
@@ -1018,7 +907,7 @@
                         parser: this.parseGenericData
                     }
                 ];
-                
+               
                 this.activeStrategy = null;
                 this.strategyStatus = {};
                 this.lastSuccessfulData = null;
@@ -1029,29 +918,29 @@
                     lastFetchTime: null
                 };
             }
-            
+           
             async fetchData() {
                 const startTime = Date.now();
                 this.performanceMetrics.totalRequests++;
-                
+               
                 for (let i = 0; i < this.strategies.length; i++) {
                     const strategy = this.strategies[i];
                     this.updateStrategyStatus(strategy.name, 'testing');
-                    
+                   
                     try {
                         const result = await this.tryStrategy(strategy);
-                        
+                       
                         if (result && result.success) {
                             this.activeStrategy = strategy;
                             this.updateStrategyStatus(strategy.name, 'success');
                             this.lastSuccessfulData = result.data;
                             this.performanceMetrics.successfulRequests++;
-                            
+                           
                             const responseTime = Date.now() - startTime;
-                            this.performanceMetrics.averageResponseTime = 
+                            this.performanceMetrics.averageResponseTime =
                                 (this.performanceMetrics.averageResponseTime + responseTime) / 2;
                             this.performanceMetrics.lastFetchTime = Date.now();
-                            
+                           
                             return result.data;
                         } else {
                             this.updateStrategyStatus(strategy.name, 'failed');
@@ -1060,14 +949,14 @@
                         this.updateStrategyStatus(strategy.name, 'failed', error.message);
                     }
                 }
-                
+               
                 if (this.lastSuccessfulData) {
                     return this.lastSuccessfulData;
                 }
-                
+               
                 throw new Error('All data fetch strategies failed');
             }
-            
+           
             async tryStrategy(strategy) {
                 if (strategy.proxies && strategy.endpoints) {
                     for (const proxy of strategy.proxies) {
@@ -1075,15 +964,15 @@
                             try {
                                 const url = proxy + encodeURIComponent(endpoint);
                                 const response = await this.fetchWithTimeout(url);
-                                
+                               
                                 if (response.ok) {
                                     const data = await response.json();
                                     const parsed = strategy.parser.call(this, data, endpoint);
                                     if (parsed) {
-                                        return { 
-                                            success: true, 
-                                            data: parsed, 
-                                            source: `${proxy.split('/')[2]} + ${endpoint.split('/')[2]}` 
+                                        return {
+                                            success: true,
+                                            data: parsed,
+                                            source: `${proxy.split('/')[2]} + ${endpoint.split('/')[2]}`
                                         };
                                     }
                                 }
@@ -1096,15 +985,15 @@
                     for (const endpoint of strategy.endpoints) {
                         try {
                             const response = await this.fetchWithTimeout(endpoint);
-                            
+                           
                             if (response.ok) {
                                 const data = await response.json();
                                 const parsed = strategy.parser.call(this, data, endpoint);
                                 if (parsed) {
-                                    return { 
-                                        success: true, 
-                                        data: parsed, 
-                                        source: endpoint.split('/')[2] 
+                                    return {
+                                        success: true,
+                                        data: parsed,
+                                        source: endpoint.split('/')[2]
                                     };
                                 }
                             }
@@ -1113,10 +1002,10 @@
                         }
                     }
                 }
-                
+               
                 return null;
             }
-            
+           
             async fetchWithTimeout(url, timeout = 8000) {
                 return Promise.race([
                     fetch(url, {
@@ -1126,23 +1015,23 @@
                             'User-Agent': 'Mozilla/5.0 (compatible; OilMonitor/1.0)'
                         }
                     }),
-                    new Promise((_, reject) => 
+                    new Promise((_, reject) =>
                         setTimeout(() => reject(new Error('Timeout')), timeout)
                     )
                 ]);
             }
-            
+           
             parseYahooData(data, endpoint) {
                 if (!data.chart?.result?.[0]?.meta) return null;
-                
+               
                 const meta = data.chart.result[0].meta;
                 const symbol = endpoint.includes('CL=F') ? 'wti' : 'brent';
-                
+               
                 const price = meta.regularMarketPrice || meta.previousClose || 0;
                 const previousClose = meta.previousClose || price;
                 const change = price - previousClose;
                 const changePercent = previousClose > 0 ? (change / previousClose) * 100 : 0;
-                
+               
                 const result = {
                     [symbol]: {
                         symbol: symbol.toUpperCase(),
@@ -1156,11 +1045,11 @@
                         isLive: true
                     }
                 };
-                
+               
                 // Generate the other symbol with realistic pricing relationship
                 const otherSymbol = symbol === 'wti' ? 'brent' : 'wti';
                 const spread = symbol === 'wti' ? 3.2 : -3.2; // Brent typically trades $3-4 higher than WTI
-                
+               
                 result[otherSymbol] = {
                     symbol: otherSymbol.toUpperCase(),
                     price: price + spread,
@@ -1172,13 +1061,13 @@
                     marketState: meta.marketState || 'UNKNOWN',
                     isLive: false
                 };
-                
+               
                 return result;
             }
-            
+           
             parseGenericData(data, endpoint) {
                 const priceFields = ['price', 'last', 'close', 'c', 'value'];
-                
+               
                 let price = null;
                 for (const field of priceFields) {
                     if (data[field] && typeof data[field] === 'number') {
@@ -1186,9 +1075,9 @@
                         break;
                     }
                 }
-                
+               
                 if (!price) return null;
-                
+               
                 return {
                     wti: {
                         symbol: 'WTI',
@@ -1214,33 +1103,32 @@
                     }
                 };
             }
-            
+           
             updateStrategyStatus(name, status, error = null) {
                 this.strategyStatus[name] = { status, error, timestamp: Date.now() };
                 this.renderStrategyStatus();
             }
-            
+           
             renderStrategyStatus() {
                 const container = document.getElementById('strategy-list');
                 if (!container) return;
-                
+               
                 container.innerHTML = '';
-                
+               
                 Object.entries(this.strategyStatus).forEach(([name, info]) => {
                     const div = document.createElement('div');
                     div.className = `strategy-status strategy-${info.status}`;
-                    
+                   
                     let statusText = info.status.toUpperCase();
                     if (info.error) {
                         statusText += ` (${info.error.substring(0, 30)}...)`;
                     }
-                    
+                   
                     div.innerHTML = `<strong>${name}:</strong> ${statusText}`;
                     container.appendChild(div);
                 });
             }
         }
-
         // Enhanced news generator
         class NewsGenerator {
             constructor() {
@@ -1294,7 +1182,7 @@
                         'Venezuela Oil Sector Shows Signs of Recovery'
                     ]
                 };
-                
+               
                 this.sources = {
                     texas: ['Texas Tribune', 'Houston Chronicle', 'Midland Reporter', 'Oil & Gas Journal', 'Energy Journal'],
                     us: ['Reuters Energy', 'Bloomberg Energy', 'EIA', 'S&P Global', 'Platts'],
@@ -1302,17 +1190,17 @@
                     opec: ['OPEC Bulletin', 'Arab News Energy', 'Energy Intelligence', 'Reuters', 'MEES']
                 };
             }
-            
+           
             generateNews(category, count = 8) {
                 const templates = this.newsTemplates[category] || [];
                 const sources = this.sources[category] || ['Energy News'];
                 const news = [];
-                
+               
                 for (let i = 0; i < count; i++) {
                     const template = templates[i % templates.length];
                     const source = sources[Math.floor(Math.random() * sources.length)];
                     const time = Date.now() - (i * 1800000) - (Math.random() * 3600000); // Stagger times
-                    
+                   
                     news.push({
                         title: template,
                         source: source,
@@ -1321,36 +1209,35 @@
                         id: `${category}_${i}_${Date.now()}`
                     });
                 }
-                
+               
                 return news.sort((a, b) => b.time - a.time);
             }
         }
-
         // Enhanced chart renderer with better visuals
         class ChartRenderer {
             renderChart(canvasId, data, title) {
                 const canvas = document.getElementById(canvasId);
                 if (!canvas) return;
-                
+               
                 const ctx = canvas.getContext('2d');
                 const rect = canvas.getBoundingClientRect();
-                
+               
                 const dpr = window.devicePixelRatio || 1;
                 canvas.width = rect.width * dpr;
                 canvas.height = rect.height * dpr;
                 ctx.scale(dpr, dpr);
-                
+               
                 const width = rect.width;
                 const height = rect.height;
                 const padding = 50;
-                
+               
                 // Clear canvas with gradient background
                 const gradient = ctx.createLinearGradient(0, 0, 0, height);
                 gradient.addColorStop(0, '#111111');
                 gradient.addColorStop(1, '#0a0a0a');
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, width, height);
-                
+               
                 if (!data || !data.length) {
                     ctx.fillStyle = '#666';
                     ctx.font = '14px -apple-system, BlinkMacSystemFont, sans-serif';
@@ -1358,16 +1245,16 @@
                     ctx.fillText('Generating chart data...', width / 2, height / 2);
                     return;
                 }
-                
+               
                 const minPrice = Math.min(...data);
                 const maxPrice = Math.max(...data);
                 const priceRange = maxPrice - minPrice || 1;
-                
+               
                 // Draw subtle grid
                 ctx.strokeStyle = '#222';
                 ctx.lineWidth = 1;
                 ctx.setLineDash([2, 4]);
-                
+               
                 for (let i = 1; i <= 4; i++) {
                     const y = padding + (i * (height - 2 * padding)) / 5;
                     ctx.beginPath();
@@ -1375,27 +1262,27 @@
                     ctx.lineTo(width - padding, y);
                     ctx.stroke();
                 }
-                
+               
                 ctx.setLineDash([]);
-                
+               
                 // Draw price line with gradient
                 const lineGradient = ctx.createLinearGradient(0, 0, 0, height);
                 lineGradient.addColorStop(0, '#00ff41');
                 lineGradient.addColorStop(1, '#33ff77');
-                
+               
                 ctx.strokeStyle = lineGradient;
                 ctx.lineWidth = 3;
                 ctx.lineCap = 'round';
                 ctx.lineJoin = 'round';
                 ctx.shadowColor = '#00ff41';
                 ctx.shadowBlur = 10;
-                
+               
                 ctx.beginPath();
-                
+               
                 for (let i = 0; i < data.length; i++) {
                     const x = padding + (i * (width - 2 * padding)) / (data.length - 1);
                     const y = height - padding - ((data[i] - minPrice) / priceRange) * (height - 2 * padding);
-                    
+                   
                     if (i === 0) {
                         ctx.moveTo(x, y);
                     } else {
@@ -1403,23 +1290,23 @@
                     }
                 }
                 ctx.stroke();
-                
+               
                 // Reset shadow
                 ctx.shadowColor = 'transparent';
                 ctx.shadowBlur = 0;
-                
+               
                 // Draw price labels
                 ctx.fillStyle = '#999';
                 ctx.font = '11px -apple-system, BlinkMacSystemFont, sans-serif';
                 ctx.textAlign = 'right';
                 ctx.textBaseline = 'middle';
-                
+               
                 for (let i = 0; i <= 4; i++) {
                     const price = minPrice + (i * priceRange) / 4;
                     const y = height - padding - (i * (height - 2 * padding)) / 4;
                     ctx.fillText(`$${price.toFixed(2)}`, padding - 12, y);
                 }
-                
+               
                 // Draw time labels
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'top';
@@ -1427,7 +1314,6 @@
                 ctx.fillText('Start', padding, height - padding + 8);
             }
         }
-
         // Auto-refresh timer system
         class RefreshTimer {
             constructor(interval, callback) {
@@ -1437,44 +1323,43 @@
                 this.isRunning = false;
                 this.timerId = null;
             }
-            
+           
             start() {
                 this.isRunning = true;
                 this.tick();
             }
-            
+           
             stop() {
                 this.isRunning = false;
                 if (this.timerId) {
                     clearTimeout(this.timerId);
                 }
             }
-            
+           
             reset() {
                 this.remaining = this.interval;
             }
-            
+           
             tick() {
                 if (!this.isRunning) return;
-                
+               
                 if (this.remaining <= 0) {
                     this.callback();
                     this.remaining = this.interval;
                 } else {
                     this.remaining -= 1000;
                 }
-                
+               
                 this.updateDisplay();
                 this.timerId = setTimeout(() => this.tick(), 1000);
             }
-            
+           
             updateDisplay() {
                 const minutes = Math.floor(this.remaining / 60000);
                 const seconds = Math.floor((this.remaining % 60000) / 1000);
                 return `${minutes}:${seconds.toString().padStart(2, '0')}`;
             }
         }
-
         // Main application controller
         class OilMonitorApp {
             constructor() {
@@ -1483,51 +1368,51 @@
                 this.newsGenerator = new NewsGenerator();
                 this.lastUpdate = null;
                 this.activeDataSource = 'Establishing connection...';
-                
+               
                 // Auto-refresh timers
                 this.priceTimer = new RefreshTimer(5 * 60 * 1000, () => this.refreshData()); // 5 minutes
                 this.newsTimer = new RefreshTimer(10 * 60 * 1000, () => this.refreshNews()); // 10 minutes
                 this.chartTimer = new RefreshTimer(15 * 60 * 1000, () => this.renderCharts()); // 15 minutes
-                
+               
                 this.initializeUI();
                 this.setupEventListeners();
                 this.startDataFetching();
             }
-            
+           
             initializeUI() {
                 this.updateClock();
                 this.updateStatus('INITIALIZING');
                 setInterval(() => this.updateClock(), 1000);
-                
+               
                 // Start timers
                 this.priceTimer.start();
                 this.newsTimer.start();
                 this.chartTimer.start();
-                
+               
                 // Update timer displays
                 setInterval(() => {
                     document.getElementById('chart-timer').textContent = this.chartTimer.updateDisplay();
                     document.getElementById('news-timer').textContent = this.newsTimer.updateDisplay();
                 }, 1000);
             }
-            
+           
             setupEventListeners() {
                 // Tab switching
                 document.querySelectorAll('.tab').forEach(tab => {
                     tab.addEventListener('click', (e) => this.switchTab(e.target));
                 });
-                
+               
                 // Diagnostics
                 document.getElementById('toggle-diagnostics').addEventListener('click', () => this.toggleDiagnostics());
                 document.getElementById('close-diagnostics').addEventListener('click', () => this.closeDiagnostics());
-                
+               
                 // Error banner close buttons
                 document.addEventListener('click', (e) => {
                     if (e.target.classList.contains('close-btn')) {
                         e.target.closest('.error-banner').remove();
                     }
                 });
-                
+               
                 // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Escape') this.closeDiagnostics();
@@ -1536,7 +1421,7 @@
                         this.refreshAll();
                     }
                 });
-                
+               
                 // Price card interactions
                 document.querySelectorAll('.price-card').forEach(card => {
                     card.addEventListener('click', () => {
@@ -1547,7 +1432,7 @@
                     });
                 });
             }
-            
+           
             async startDataFetching() {
                 try {
                     this.updateStatus('CONNECTING');
@@ -1558,41 +1443,41 @@
                     this.showError('Unable to establish data connection: ' + error.message);
                 }
             }
-            
+           
             async refreshAll() {
                 try {
                     await this.refreshData();
                     this.refreshNews();
                     this.renderCharts();
-                    
+                   
                     this.lastUpdate = Date.now();
-                    document.getElementById('last-update').textContent = 
+                    document.getElementById('last-update').textContent =
                         `Last updated: ${this.formatTime(this.lastUpdate)}`;
-                        
+                       
                     // Reset timers
                     this.priceTimer.reset();
                     this.newsTimer.reset();
                     this.chartTimer.reset();
-                        
+                       
                 } catch (error) {
                     this.showError(`Refresh failed: ${error.message}`);
                 }
             }
-            
+           
             async refreshData() {
                 try {
                     const result = await this.dataFetcher.fetchData();
                     this.updatePriceDisplay(result);
                     this.activeDataSource = this.dataFetcher.activeStrategy?.name || 'Unknown';
-                    
+                   
                     // Cache the data
                     localStorage.setItem('oil_monitor_cache', JSON.stringify({
                         data: result,
                         timestamp: Date.now()
                     }));
-                    
+                   
                     document.getElementById('data-source').textContent = `Data: ${this.activeDataSource}`;
-                    
+                   
                 } catch (error) {
                     // Try to load from cache
                     const cached = localStorage.getItem('oil_monitor_cache');
@@ -1607,42 +1492,42 @@
                     throw error;
                 }
             }
-            
+           
             refreshNews() {
                 // Generate enhanced news for all categories
                 const allNews = {};
-                
+               
                 Object.keys(this.newsGenerator.newsTemplates).forEach(category => {
                     allNews[category] = this.newsGenerator.generateNews(category, 10);
                 });
-                
+               
                 this.updateNewsDisplay(allNews);
             }
-            
+           
             updatePriceDisplay(prices) {
                 Object.entries(prices).forEach(([symbol, data]) => {
                     if (!data) return;
-                    
+                   
                     const card = document.querySelector(`[aria-label="${symbol === 'wti' ? 'WTI' : 'Brent'} Crude Oil Price"]`);
                     card.classList.remove('loading');
-                    
+                   
                     // Update price
                     document.getElementById(`${symbol}-price`).textContent = this.formatPrice(data.price);
-                    
+                   
                     // Update changes with proper styling
                     const changeEl = document.getElementById(`${symbol}-change`);
                     const percentEl = document.getElementById(`${symbol}-percent`);
-                    
+                   
                     changeEl.textContent = this.formatChange(data.change);
                     changeEl.className = `change-value ${this.getChangeClass(data.change)}`;
-                    
+                   
                     percentEl.textContent = this.formatPercent(data.changePercent);
                     percentEl.className = `change-value ${this.getChangeClass(data.change)}`;
-                    
+                   
                     // Update metadata
                     const metaEl = document.getElementById(`${symbol}-meta`);
                     metaEl.textContent = `${data.marketState} • Updated ${this.formatTime(data.timestamp)}`;
-                    
+                   
                     // Update data quality indicator
                     const qualityEl = document.getElementById(`${symbol}-quality`);
                     if (data.isLive) {
@@ -1653,21 +1538,21 @@
                         qualityEl.className = 'data-quality quality-calculated';
                     }
                 });
-                
+               
                 // Announce updates for accessibility
                 if (prices.wti) {
-                    document.getElementById('price-announcer').textContent = 
+                    document.getElementById('price-announcer').textContent =
                         `Oil prices updated: WTI ${this.formatPrice(prices.wti.price)}`;
                 }
             }
-            
+           
             updateNewsDisplay(news) {
                 Object.entries(news).forEach(([category, items]) => {
                     const container = document.getElementById(`${category}-news`);
                     if (!container) return;
-                    
+                   
                     container.innerHTML = '';
-                    
+                   
                     if (!items || items.length === 0) {
                         container.innerHTML = `
                             <div class="news-item">
@@ -1680,12 +1565,12 @@
                         `;
                         return;
                     }
-                    
+                   
                     items.forEach((item, index) => {
                         const newsElement = document.createElement('div');
                         newsElement.className = 'news-item';
                         if (index === 0) newsElement.style.borderLeftColor = 'var(--accent-up)';
-                        
+                       
                         newsElement.innerHTML = `
                             <div class="news-title">
                                 <a href="${item.link}" target="_blank" rel="noopener noreferrer">
@@ -1701,29 +1586,29 @@
                     });
                 });
             }
-            
+           
             renderCharts() {
                 // Generate chart data based on current prices if available
                 const cachedData = localStorage.getItem('oil_monitor_cache');
                 if (cachedData) {
                     const { data } = JSON.parse(cachedData);
-                    
+                   
                     ['wti', 'brent'].forEach(symbol => {
                         if (data[symbol]) {
                             const basePrice = data[symbol].price;
-                            
+                           
                             // Generate different chart data for different periods
                             const periods = {
                                 'intraday': { points: 60, variance: 0.02 },
                                 '5day': { points: 120, variance: 0.05 },
                                 '30day': { points: 720, variance: 0.1 }
                             };
-                            
+                           
                             Object.entries(periods).forEach(([period, config]) => {
                                 const chartData = this.generateChartData(basePrice, config.points, config.variance);
                                 this.chartRenderer.renderChart(
-                                    `${symbol}-${period}-chart`, 
-                                    chartData, 
+                                    `${symbol}-${period}-chart`,
+                                    chartData,
                                     `${symbol.toUpperCase()} ${period}`
                                 );
                             });
@@ -1731,60 +1616,60 @@
                     });
                 }
             }
-            
+           
             generateChartData(basePrice, points, variance) {
                 const data = [];
                 let currentPrice = basePrice;
-                
+               
                 for (let i = 0; i < points; i++) {
                     // Add some realistic price movement
                     const randomWalk = (Math.random() - 0.5) * basePrice * variance;
                     const trendComponent = Math.sin(i / points * Math.PI * 2) * basePrice * 0.01;
-                    
+                   
                     currentPrice += randomWalk + trendComponent;
-                    
+                   
                     // Keep price within reasonable bounds
                     currentPrice = Math.max(basePrice * 0.9, Math.min(basePrice * 1.1, currentPrice));
-                    
+                   
                     data.push(currentPrice);
                 }
-                
+               
                 return data;
             }
-            
+           
             switchTab(tab) {
                 const type = tab.dataset.chart || tab.dataset.news;
                 const prefix = tab.dataset.chart ? 'chart' : 'news';
-                
+               
                 // Update tab states
                 tab.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-                
+               
                 // Update content visibility
                 document.querySelectorAll(`[id^="${prefix}-"]`).forEach(content => {
                     content.classList.toggle('active', content.id === `${prefix}-${type}`);
                 });
-                
+               
                 // If switching to a chart tab, re-render charts
                 if (prefix === 'chart') {
                     setTimeout(() => this.renderCharts(), 100);
                 }
             }
-            
+           
             toggleDiagnostics() {
                 const panel = document.getElementById('diagnostic-panel');
                 panel.classList.toggle('open');
                 this.updateDiagnostics();
             }
-            
+           
             closeDiagnostics() {
                 document.getElementById('diagnostic-panel').classList.remove('open');
             }
-            
+           
             updateDiagnostics() {
                 // Update strategy status
                 this.dataFetcher.renderStrategyStatus();
-                
+               
                 // Update system status
                 const systemStatus = document.getElementById('system-status');
                 if (systemStatus) {
@@ -1800,14 +1685,14 @@
                         </div>
                     `;
                 }
-                
+               
                 // Update performance metrics
                 const performanceMetrics = document.getElementById('performance-metrics');
                 if (performanceMetrics) {
                     const metrics = this.dataFetcher.performanceMetrics;
-                    const successRate = metrics.totalRequests > 0 ? 
+                    const successRate = metrics.totalRequests > 0 ?
                         ((metrics.successfulRequests / metrics.totalRequests) * 100).toFixed(1) : 0;
-                    
+                   
                     performanceMetrics.innerHTML = `
                         <div class="strategy-status strategy-success">
                             <strong>Success Rate:</strong> ${successRate}%
@@ -1821,7 +1706,7 @@
                     `;
                 }
             }
-            
+           
             updateClock() {
                 const now = new Date();
                 document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', {
@@ -1830,14 +1715,14 @@
                     second: '2-digit'
                 });
             }
-            
+           
             updateStatus(status) {
                 const statusText = document.getElementById('status-text');
                 const statusDot = document.getElementById('status-dot');
-                
+               
                 statusDot.className = 'status-dot';
                 statusText.textContent = status;
-                
+               
                 switch(status) {
                     case 'ONLINE':
                         statusDot.classList.add('online');
@@ -1851,7 +1736,7 @@
                         break;
                 }
             }
-            
+           
             showError(message) {
                 const container = document.getElementById('error-container');
                 const banner = document.createElement('div');
@@ -1861,34 +1746,34 @@
                     <button class="close-btn" type="button">&times;</button>
                 `;
                 container.appendChild(banner);
-                
+               
                 // Auto-remove after 8 seconds
                 setTimeout(() => banner.remove(), 8000);
             }
-            
+           
             // Utility methods
             formatPrice(price) {
                 return price ? `$${parseFloat(price).toFixed(2)}` : 'N/A';
             }
-            
+           
             formatChange(change) {
                 if (change === null || change === undefined || isNaN(change)) return 'N/A';
                 const num = parseFloat(change);
                 return `${num >= 0 ? '+' : ''}${num.toFixed(2)}`;
             }
-            
+           
             formatPercent(percent) {
                 if (percent === null || percent === undefined || isNaN(percent)) return 'N/A';
                 const num = parseFloat(percent);
                 return `${num >= 0 ? '+' : ''}${num.toFixed(2)}%`;
             }
-            
+           
             getChangeClass(change) {
                 if (change === null || change === undefined || isNaN(change)) return 'change-flat';
                 const num = parseFloat(change);
                 return num > 0 ? 'change-up' : num < 0 ? 'change-down' : 'change-flat';
             }
-            
+           
             formatTime(timestamp) {
                 return new Date(timestamp).toLocaleString('en-US', {
                     month: 'short',
@@ -1898,14 +1783,13 @@
                 });
             }
         }
-
         // Initialize the application
         document.addEventListener('DOMContentLoaded', () => {
             try {
                 window.oilMonitor = new OilMonitorApp();
             } catch (error) {
                 console.error('Failed to initialize Oil Monitor:', error);
-                
+               
                 document.body.innerHTML = `
                     <div style="color: #ff4444; padding: 40px; text-align: center; font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0a0a0a; min-height: 100vh; display: flex; flex-direction: column; justify-content: center;">
                         <h2 style="color: #00ff41; margin-bottom: 20px; font-size: 2rem;">OIL MONITOR</h2>
@@ -1916,12 +1800,10 @@
                 `;
             }
         });
-
         // Global error handling
         window.addEventListener('error', (e) => {
             console.error('Application error:', e.error);
         });
-
         window.addEventListener('unhandledrejection', (e) => {
             console.error('Unhandled promise rejection:', e.reason);
         });
