@@ -13,16 +13,18 @@
     <title>Bias Detector</title>
     <style>
         :root {
-            --bg-color: #121212;
-            --text-color: #e0e0e0;
-            --accent-blue: #2196f3;
-            --accent-red: #f44336;
-            --neutral-gray: #808080;
-            --card-bg: #1e1e1e;
-            --input-bg: #2a2a2a;
-            --border-color: #333;
-            --glow: 0 0 5px rgba(255,255,255,0.1);
+            --bg-color: #0a0a0a;
+            --text-color: #f0f0f0;
+            --accent-blue: #00b4ff;
+            --accent-red: #ff4d4d;
+            --neutral-gray: #8a8a8a;
+            --card-bg: linear-gradient(135deg, #1a1a1a, #242424);
+            --input-bg: #2c2c2c;
+            --border-color: rgba(255,255,255,0.1);
+            --glow: 0 0 10px rgba(0, 180, 255, 0.3);
+            --shadow: 0 4px 20px rgba(0,0,0,0.5);
             --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         body {
             font-family: var(--font-family);
@@ -35,49 +37,69 @@
             align-items: center;
             min-height: 100vh;
             font-size: 16px;
-            line-height: 1.5;
+            line-height: 1.6;
             overflow-x: hidden;
+            background-image: radial-gradient(circle at top, rgba(255,255,255,0.05), transparent);
         }
         header {
             width: 100%;
             max-width: 390px;
-            padding: 16px;
+            padding: 24px 16px;
             text-align: center;
-            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent);
         }
         h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 28px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         section {
             width: 100%;
             max-width: 390px;
             padding: 16px;
         }
-        input, textarea, button {
+        input, textarea {
             width: 100%;
             box-sizing: border-box;
             background: var(--input-bg);
             color: var(--text-color);
             border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 14px;
             font-size: 16px;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            transition: var(--transition);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+        input:focus, textarea:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(0, 180, 255, 0.2), var(--glow);
         }
         button {
-            background: var(--accent-blue);
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-blue), #007acc);
             color: white;
             border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
         }
         button:hover {
-            background: #1e88e5;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 180, 255, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
         }
         .accordion {
             display: none;
-            margin-top: 8px;
+            margin-top: 12px;
+            animation: slideDown 0.3s ease;
         }
         .accordion.show {
             display: block;
@@ -85,52 +107,64 @@
         .result {
             display: none;
             background: var(--card-bg);
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: var(--glow);
-            margin-bottom: 16px;
-            animation: fadeIn 0.5s ease;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow), var(--glow);
+            animation: fadeInUp 0.5s ease;
         }
         .result.show {
             display: block;
         }
-        .gauge {
+        .gauge-container {
             position: relative;
-            height: 20px;
+            margin: 20px 0;
+        }
+        .gauge {
+            height: 24px;
             background: linear-gradient(to right, var(--accent-blue), var(--neutral-gray), var(--accent-red));
-            border-radius: 10px;
-            margin: 16px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
         .marker {
             position: absolute;
-            top: -5px;
-            width: 4px;
-            height: 30px;
+            top: -8px;
+            width: 6px;
+            height: 40px;
             background: white;
-            border-radius: 2px;
-            box-shadow: var(--glow);
-            transition: left 0.5s ease;
+            border-radius: 3px;
+            box-shadow: 0 0 10px white, var(--glow);
+            transition: left 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
         .ticks {
             display: flex;
             justify-content: space-between;
             font-size: 12px;
-            margin-top: 4px;
+            margin-top: 8px;
+            color: #bbb;
         }
         .explanation {
-            margin-top: 16px;
+            margin-top: 20px;
+            font-size: 14px;
+            line-height: 1.7;
         }
         .chips {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 10px;
+            margin-top: 12px;
         }
         .chip {
-            background: var(--input-bg);
-            padding: 4px 8px;
-            border-radius: 16px;
-            font-size: 14px;
+            background: linear-gradient(135deg, #333, #444);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        .chip:hover {
+            transform: scale(1.05);
         }
         .history {
             list-style: none;
@@ -138,31 +172,45 @@
         }
         .history li {
             background: var(--card-bg);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 8px;
-            box-shadow: var(--glow);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .history li:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
         }
         .about {
             background: var(--card-bg);
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: var(--glow);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
         }
         .dev-panel {
             display: none;
             background: var(--card-bg);
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 16px;
-            box-shadow: var(--glow);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: var(--shadow);
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; height: 0; }
+            to { opacity: 1; height: auto; }
         }
         @media (prefers-reduced-motion: reduce) {
             * { transition: none !important; animation: none !important; }
+        }
+        @media (min-width: 768px) {
+            header, section { max-width: 720px; }
+            h1 { font-size: 32px; }
         }
     </style>
 </head>
@@ -174,18 +222,19 @@
         <input type="url" id="url-input" placeholder="Paste news article URL" aria-label="Article URL">
         <button id="analyze-btn">Analyze</button>
         <div class="accordion" id="paste-accordion">
-            <p>CORS blocked fetch. Please paste the article text below:</p>
+            <p>Fetch issue detected. Please paste the article text below:</p>
             <textarea id="paste-text" rows="10" placeholder="Paste article text here" aria-label="Paste article text"></textarea>
             <button id="analyze-paste-btn">Analyze Pasted Text</button>
         </div>
     </section>
     <section id="result-section" class="result">
         <h2>Bias Score: <span id="score"></span> (Confidence: <span id="confidence"></span>%)</h2>
-        <div class="gauge">
+        <div class="gauge-container">
+            <div class="gauge"></div>
             <div class="marker" id="marker"></div>
         </div>
         <div class="ticks">
-            <span>-100</span><span>-50</span><span>0</span><span>+50</span><span>+100</span>
+            <span>-100 (Left)</span><span>-50</span><span>0 (Neutral)</span><span>+50</span><span>+100 (Right)</span>
         </div>
         <div class="explanation" id="explanation"></div>
         <div class="chips" id="chips"></div>
@@ -196,38 +245,32 @@
     </section>
     <section id="about-section" class="about">
         <h2 id="about-title">About</h2>
-        <p>This app analyzes news articles for political bias using client-side lexicons and scoring. Scores range from -100 (left) to +100 (right). Method: lexicon-based counting with sentiment and outlet priors.</p>
+        <p>This app analyzes news articles for political bias using client-side lexicons and scoring. Scores range from -100 (left-leaning) to +100 (right-leaning). The method employs lexicon-based feature counting, sentiment analysis around political entities, and optional weak outlet priors for enhanced accuracy.</p>
     </section>
     <section id="dev-panel" class="dev-panel"></section>
 
     <script>
-        // Embedded data: lexicons and priors
-        // Left-leaning cues: words/phrases with weight (higher = stronger)
+        // Embedded data: lexicons and priors (unchanged for brevity)
         const leftCues = {
             'progressive': 2, 'equity': 3, 'social justice': 4, 'climate change': 3, 'gun control': 2,
             'universal healthcare': 4, 'abortion rights': 3, 'lgbtq': 2, 'diversity': 2, 'inclusion': 2,
             'democrat': 1, 'biden': 1, 'aoc': 1, 'bernie': 1, 'msnbc': 2, 'cnn': 1
         };
-        // Right-leaning cues
         const rightCues = {
             'conservative': 2, 'liberty': 3, 'free market': 4, 'climate hoax': 3, 'second amendment': 2,
             'pro-life': 3, 'traditional values': 2, 'border security': 3, 'tax cuts': 2,
             'republican': 1, 'trump': 1, 'mcconnell': 1, 'fox news': 2, 'breitbart': 2
         };
-        // Loaded adjectives/adverbs with polarity (- for left bias, + for right)
         const loadedWords = {
             'extreme': {polarity: 1, weight: 1}, 'radical': {polarity: 1, weight: 2},
             'oppressive': {polarity: -1, weight: 2}, 'empowering': {polarity: -1, weight: 1},
             'dangerous': {polarity: 1, weight: 1}, 'inclusive': {polarity: -1, weight: 1}
         };
-        // Hedging markers (reduce confidence if many)
         const hedging = ['may', 'might', 'could', 'possibly', 'allegedly'];
-        // Political entities with orientation (- left, + right)
         const entities = {
             'democrats': -2, 'republicans': 2, 'biden': -1, 'trump': 1,
             'aoc': -2, 'pelosi': -1, 'mcconnell': 1, 'cruz': 2
         };
-        // Outlet priors: hostname to prior bias (-left, +right), weight low
         const outletPriors = {
             'cnn.com': {bias: -15, weight: 0.1},
             'msnbc.com': {bias: -20, weight: 0.1},
@@ -236,13 +279,12 @@
             'nytimes.com': {bias: -10, weight: 0.1},
             'wsj.com': {bias: 10, weight: 0.1}
         };
-        // Simple sentiment polarity lexicon
         const sentimentLex = {
             'good': 1, 'bad': -1, 'support': 1, 'oppose': -1, 'praise': 1, 'criticize': -1,
             'success': 1, 'failure': -1, 'benefit': 1, 'harm': -1
         };
 
-        // History storage
+        // History storage (unchanged)
         const HISTORY_KEY = 'bias_history_v1';
         function loadHistory() {
             try {
@@ -263,12 +305,12 @@
             list.innerHTML = '';
             loadHistory().forEach(item => {
                 const li = document.createElement('li');
-                li.innerHTML = `<strong>${item.title || item.url}</strong><br>Score: ${item.score} (Conf: ${item.confidence}%)<br>${new Date(item.timestamp).toLocaleString()}`;
+                li.innerHTML = `<strong>${item.title || item.url}</strong><br>Score: ${item.score} (Conf: ${item.confidence}%)<br><small>${new Date(item.timestamp).toLocaleString()}</small>`;
                 list.appendChild(li);
             });
         }
 
-        // Dev panel toggle
+        // Dev panel toggle (unchanged)
         let tapCount = 0;
         document.getElementById('about-title').addEventListener('click', () => {
             tapCount++;
@@ -278,14 +320,15 @@
             }
         });
 
-        // Main analysis
+        // Main analysis with proxy
         async function analyze(urlOrText, isUrl = true) {
             let text, title = '', hostname = '';
-            let fetchQuality = 1; // 1 full, 0.5 partial
+            let fetchQuality = 1;
             try {
                 if (isUrl) {
-                    const response = await fetch(urlOrText, { timeout: 5000 });
-                    if (!response.ok) throw new Error('Fetch failed');
+                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(urlOrText)}`;
+                    const response = await fetch(proxyUrl, { timeout: 10000 });
+                    if (!response.ok) throw new Error('Proxy fetch failed');
                     text = await response.text();
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(text, 'text/html');
@@ -294,24 +337,16 @@
                     hostname = new URL(urlOrText).hostname;
                 } else {
                     text = urlOrText;
-                    fetchQuality = 0.8; // Pasted, slightly lower
+                    fetchQuality = 0.8;
                 }
-                // Normalize text
                 text = text.replace(/\s+/g, ' ').trim().toLowerCase();
-                // Simple de-dupe: remove repeated phrases (nav/footer)
                 const sentences = text.split(/[.!?]+/).map(s => s.trim()).filter(s => s);
                 const uniqueSentences = [...new Set(sentences)];
-                text = uniqueSentences.slice(0, 2500 / 10).join('. '); // Approx words
-                // Headline: assume first sentence or title
+                text = uniqueSentences.slice(0, 2500 / 10).join('. ');
                 const headline = title.toLowerCase() || sentences[0] || '';
             } catch (e) {
-                if (isUrl) {
-                    document.getElementById('paste-accordion').classList.add('show');
-                    return;
-                } else {
-                    text = '';
-                    fetchQuality = 0;
-                }
+                document.getElementById('paste-accordion').classList.add('show');
+                return;
             }
 
             if (text.length < 100) {
@@ -319,20 +354,18 @@
                 return;
             }
 
-            // Pipeline
             const words = text.split(/\s+/);
             const tokenCount = words.length;
             let leftScore = 0, rightScore = 0;
-            let contributions = {}; // ngram: signed contrib
+            let contributions = {};
             let politicalSentences = 0;
 
-            // Lexicon features
             Object.entries(leftCues).forEach(([cue, weight]) => {
                 const count = (text.match(new RegExp(cue, 'g')) || []).length;
                 if (count > 0) {
                     const contrib = Math.log(1 + count) * weight;
                     leftScore += contrib;
-                    contributions[cue] = -contrib; // Left is negative
+                    contributions[cue] = -contrib;
                 }
             });
             Object.entries(rightCues).forEach(([cue, weight]) => {
@@ -344,7 +377,6 @@
                 }
             });
 
-            // Loaded words
             Object.entries(loadedWords).forEach(([word, {polarity, weight}]) => {
                 const count = (text.match(new RegExp(word, 'g')) || []).length;
                 if (count > 0) {
@@ -355,7 +387,6 @@
                 }
             });
 
-            // Entity sentiment
             sentences.forEach(sentence => {
                 let hasEntity = false;
                 let sentScore = 0;
@@ -370,51 +401,44 @@
                 if (hasEntity) {
                     politicalSentences++;
                     const entityBias = Object.entries(entities).reduce((sum, [ent, bias]) => sentence.includes(ent) ? sum + bias : sum, 0);
-                    const adjust = sentScore * 0.5 * (entityBias > 0 ? 1 : -1); // Small weight
+                    const adjust = sentScore * 0.5 * (entityBias > 0 ? 1 : -1);
                     if (adjust > 0) rightScore += adjust;
-                    else leftScore -= adjust; // Left increases with negative adjust
-                    contributions[`sent_${sentence.slice(0,20)}`] = adjust;
+                    else leftScore -= adjust;
+                    contributions[`sent_${sentence.slice(0,20)}...`] = adjust;
                 }
             });
 
-            // Headline weighting
             let headlineLeft = 0, headlineRight = 0;
             Object.entries(leftCues).forEach(([cue, w]) => headlineLeft += headline.includes(cue) ? w * 1.5 : 0);
             Object.entries(rightCues).forEach(([cue, w]) => headlineRight += headline.includes(cue) ? w * 1.5 : 0);
             leftScore += headlineLeft;
             rightScore += headlineRight;
 
-            // Outlet prior
             let priorBias = 0;
             if (hostname && outletPriors[hostname]) {
                 priorBias = outletPriors[hostname].bias * outletPriors[hostname].weight;
                 contributions[`outlet_${hostname}`] = priorBias;
             }
 
-            // Aggregate
             let raw = rightScore - leftScore + priorBias;
-            // Normalize to [-100,100]: heuristic cap at 50 raw max
-            const maxRaw = 50; // Based on lexicon sizes
+            const maxRaw = 50;
             let score = (raw / maxRaw) * 100;
             score = Math.max(-100, Math.min(100, score));
 
-            // Confidence
             const effTokens = Math.min(tokenCount, 2500) / 2500;
             const polShare = politicalSentences / sentences.length;
             const featureAgree = Math.abs(leftScore - rightScore) / (leftScore + rightScore + 1);
             let confidence = (effTokens * 0.4 + polShare * 0.3 + featureAgree * 0.2 + fetchQuality * 0.1) * 100;
             confidence = Math.round(Math.max(0, Math.min(100, confidence)));
 
-            // Explanation
             const topContribs = Object.entries(contributions)
                 .sort((a,b) => Math.abs(b[1]) - Math.abs(a[1]))
                 .slice(0,5)
                 .map(([key, val]) => `${key}: ${val.toFixed(2)}`);
 
-            // Render
             document.getElementById('score').textContent = Math.round(score);
             document.getElementById('confidence').textContent = confidence;
-            document.getElementById('explanation').innerHTML = `Explanation: ${topContribs.join('<br>')}${priorBias ? `<br>Outlet prior: ${priorBias.toFixed(2)}` : ''}`;
+            document.getElementById('explanation').innerHTML = `Key Evidence:<br>${topContribs.join('<br>')}${priorBias ? `<br>Outlet prior: ${priorBias.toFixed(2)}` : ''}`;
             const chipsEl = document.getElementById('chips');
             chipsEl.innerHTML = '';
             topContribs.forEach(c => {
@@ -428,7 +452,6 @@
             marker.style.left = `${pos}%`;
             document.getElementById('result-section').classList.add('show');
 
-            // Save history
             saveHistory({
                 timestamp: Date.now(),
                 url: isUrl ? urlOrText : '',
@@ -438,29 +461,27 @@
             });
             renderHistory();
 
-            // Dev panel
             const dev = document.getElementById('dev-panel');
             dev.innerHTML = `
-                <h3>Dev Info</h3>
+                <h3>Debug Info</h3>
                 Left Score: ${leftScore.toFixed(2)}<br>
                 Right Score: ${rightScore.toFixed(2)}<br>
-                Raw: ${raw.toFixed(2)}<br>
-                Prior: ${priorBias.toFixed(2)}<br>
-                Pol Sentences: ${politicalSentences}/${sentences.length}<br>
-                Tokens: ${tokenCount}
+                Raw Score: ${raw.toFixed(2)}<br>
+                Prior Bias: ${priorBias.toFixed(2)}<br>
+                Political Sentences: ${politicalSentences}/${sentences.length}<br>
+                Token Count: ${tokenCount}
             `;
         }
 
         // Event listeners
         document.getElementById('analyze-btn').addEventListener('click', () => {
             const url = document.getElementById('url-input').value.trim();
-            if (!url) return alert('Enter a URL');
-            if (!url.startsWith('http')) return alert('Invalid URL');
+            if (!url || !url.startsWith('http')) return alert('Please enter a valid URL');
             analyze(url);
         });
         document.getElementById('analyze-paste-btn').addEventListener('click', () => {
             const text = document.getElementById('paste-text').value.trim();
-            if (!text) return alert('Paste text');
+            if (!text) return alert('Please paste some text');
             analyze(text, false);
         });
 
