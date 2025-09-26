@@ -1,557 +1,1346 @@
-<!-- How to publish on GitHub Pages:
-1. Create a new repository on GitHub.
-2. Add this file as index.html to the repository.
-3. Go to Settings > Pages.
-4. Select 'main' branch and save.
-5. Wait a few minutes, then open the provided URL (e.g., https://username.github.io/repo).
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Bias Detector</title>
     <style>
         :root {
-            --bg-color: #0a0a0a;
-            --text-color: #f0f0f0;
-            --accent-blue: #00b4ff;
-            --accent-red: #ff4d4d;
-            --neutral-gray: #8a8a8a;
-            --card-bg: linear-gradient(135deg, #1a1a1a, #242424);
-            --input-bg: #2c2c2c;
-            --border-color: rgba(255,255,255,0.1);
-            --glow: 0 0 10px rgba(0, 180, 255, 0.3);
-            --shadow: 0 4px 20px rgba(0,0,0,0.5);
-            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #808080;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+            --border-color: #404040;
+            --glow-blue: rgba(59, 130, 246, 0.3);
+            --glow-red: rgba(239, 68, 68, 0.3);
+            --gradient-left: linear-gradient(90deg, #3b82f6, #6366f1);
+            --gradient-right: linear-gradient(90deg, #f59e0b, #ef4444);
+            --gradient-neutral: linear-gradient(90deg, #6b7280, #9ca3af);
         }
-        body {
-            font-family: var(--font-family);
-            background: var(--bg-color);
-            color: var(--text-color);
+
+        * {
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            font-size: 16px;
-            line-height: 1.6;
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at top, rgba(255,255,255,0.05), transparent);
-        }
-        header {
-            width: 100%;
-            max-width: 390px;
-            padding: 24px 16px;
-            text-align: center;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent);
-        }
-        h1 {
-            margin: 0;
-            font-size: 28px;
-            letter-spacing: 0.5px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        section {
-            width: 100%;
-            max-width: 390px;
-            padding: 16px;
-        }
-        input, textarea {
-            width: 100%;
             box-sizing: border-box;
-            background: var(--input-bg);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 14px;
-            font-size: 16px;
-            margin-bottom: 12px;
-            transition: var(--transition);
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
         }
-        input:focus, textarea:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 2px rgba(0, 180, 255, 0.2), var(--glow);
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
-        button {
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 390px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: env(safe-area-inset-top, 20px);
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: var(--gradient-neutral);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px var(--glow-blue);
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            opacity: 0.8;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .input-field {
             width: 100%;
-            background: linear-gradient(135deg, var(--accent-blue), #007acc);
-            color: white;
+            padding: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 20px var(--glow-blue);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
             border: none;
-            border-radius: 8px;
-            padding: 14px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
-            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
             position: relative;
+            overflow: hidden;
+            min-height: 44px;
+            -webkit-tap-highlight-color: transparent;
         }
-        button:hover {
+
+        .btn-primary {
+            background: var(--gradient-left);
+            color: white;
+            box-shadow: 0 4px 20px var(--glow-blue);
+        }
+
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(0, 180, 255, 0.4);
+            box-shadow: 0 6px 25px var(--glow-blue);
         }
-        button:active {
-            transform: translateY(0);
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
         }
-        button.loading {
-            pointer-events: none;
-            opacity: 0.8;
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
         }
-        .loader {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid white;
-            border-radius: 50%;
+
+        .loading {
+            display: inline-block;
             width: 20px;
             height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        button.loading .loader {
-            display: block;
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
-        button.loading span {
-            visibility: hidden;
-        }
-        .accordion {
-            display: none;
-            margin-top: 12px;
-            animation: slideDown 0.3s ease;
-        }
-        .accordion.show {
-            display: block;
-        }
-        .error-msg {
-            color: var(--accent-red);
-            margin-top: 8px;
-            font-size: 14px;
-        }
-        .result {
-            display: none;
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
+
+        .collapsible {
             margin-bottom: 20px;
-            box-shadow: var(--shadow), var(--glow);
-            animation: fadeInUp 0.5s ease;
         }
-        .result.show {
-            display: block;
+
+        .collapsible-header {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
         }
-        .gauge-container {
-            position: relative;
-            margin: 20px 0;
+
+        .collapsible-header:hover {
+            background: var(--bg-tertiary);
         }
-        .gauge {
-            height: 24px;
-            background: linear-gradient(to right, var(--accent-blue), var(--neutral-gray), var(--accent-red));
-            border-radius: 12px;
+
+        .collapsible-content {
+            max-height: 0;
             overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            transition: max-height 0.3s ease;
         }
-        .marker {
-            position: absolute;
-            top: -8px;
-            width: 6px;
+
+        .collapsible-content.open {
+            max-height: 500px;
+        }
+
+        .collapsible-inner {
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            background: var(--bg-secondary);
+        }
+
+        .textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .result-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .result-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .score-display {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .score-number {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .confidence {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .bias-scale {
+            position: relative;
             height: 40px;
-            background: white;
-            border-radius: 3px;
-            box-shadow: 0 0 10px white, var(--glow);
-            transition: left 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            background: linear-gradient(90deg, var(--accent-blue), #6b7280, var(--accent-red));
+            border-radius: 20px;
+            margin: 24px 0;
+            overflow: hidden;
         }
-        .ticks {
+
+        .scale-ticks {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        .scale-tick {
+            width: 2px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 1px;
+        }
+
+        .scale-marker {
+            position: absolute;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+
+        .scale-labels {
             display: flex;
             justify-content: space-between;
             font-size: 12px;
+            color: var(--text-muted);
             margin-top: 8px;
-            color: #bbb;
         }
+
         .explanation {
             margin-top: 20px;
-            font-size: 14px;
-            line-height: 1.7;
         }
-        .chips {
+
+        .explanation-text {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .evidence-chips {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 12px;
+            gap: 8px;
         }
-        .chip {
-            background: linear-gradient(135deg, #333, #444);
+
+        .evidence-chip {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
             padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
+            font-size: 12px;
+            color: var(--text-secondary);
         }
-        .chip:hover {
-            transform: scale(1.05);
+
+        .evidence-chip.positive {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
         }
-        .history {
-            list-style: none;
-            padding: 0;
+
+        .evidence-chip.negative {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
         }
-        .history li {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
+
+        .history-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .history-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .history li:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+
+        .history-item:hover {
+            background: var(--bg-tertiary);
+            transform: translateX(4px);
         }
-        .about {
-            background: var(--card-bg);
+
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .history-score {
+            font-weight: 600;
+        }
+
+        .history-time {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .history-url {
+            font-size: 12px;
+            color: var(--text-secondary);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .error-message {
+            background: var(--bg-secondary);
+            border: 1px solid var(--accent-red);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            color: var(--accent-red);
+            text-align: center;
+        }
+
+        .about-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: var(--shadow);
+            margin-bottom: 30px;
         }
+
+        .about-title {
+            cursor: pointer;
+            user-select: none;
+        }
+
         .dev-panel {
-            display: none;
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
+            background: var(--bg-primary);
+            border: 2px solid var(--accent-green);
+            border-radius: 8px;
+            padding: 16px;
             margin-top: 20px;
-            box-shadow: var(--shadow);
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
         }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .dev-panel.visible {
+            display: block;
         }
-        @keyframes slideDown {
-            from { opacity: 0; height: 0; }
-            to { opacity: 1; height: auto; }
+
+        .dev-section {
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        .dev-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
         }
-        @media (prefers-reduced-motion: reduce) {
-            * { transition: none !important; animation: none !important; }
+
+        .dev-label {
+            color: var(--accent-green);
+            font-weight: bold;
         }
-        @media (min-width: 768px) {
-            header, section { max-width: 720px; }
-            h1 { font-size: 32px; }
+
+        .safe-area-bottom {
+            height: env(safe-area-inset-bottom, 20px);
+        }
+
+        /* iOS specific optimizations */
+        @supports (-webkit-touch-callout: none) {
+            .input-field {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+
+        /* Accessibility improvements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus indicators */
+        .btn:focus,
+        .input-field:focus,
+        .collapsible-header:focus,
+        .history-item:focus {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Bias Detector v3</h1>
-    </header>
-    <section id="input-section">
-        <input type="url" id="url-input" placeholder="Paste news article URL" aria-label="Article URL">
-        <button id="analyze-btn"><span>Analyze</span><div class="loader"></div></button>
-        <div id="error-msg" class="error-msg"></div>
-        <div class="accordion" id="paste-accordion">
-            <p>Fetch issue detected. Please paste the article text below:</p>
-            <textarea id="paste-text" rows="10" placeholder="Paste article text here" aria-label="Paste article text"></textarea>
-            <button id="analyze-paste-btn"><span>Analyze Pasted Text</span><div class="loader"></div></button>
-        </div>
-    </section>
-    <section id="result-section" class="result">
-        <h2>Bias Score: <span id="score"></span> (Confidence: <span id="confidence"></span>%)</h2>
-        <div class="gauge-container">
-            <div class="gauge"></div>
-            <div class="marker" id="marker"></div>
-        </div>
-        <div class="ticks">
-            <span>-100 (Left)</span><span>-50</span><span>0 (Neutral)</span><span>+50</span><span>+100 (Right)</span>
-        </div>
-        <div class="explanation" id="explanation"></div>
-        <div class="chips" id="chips"></div>
-    </section>
-    <section id="history-section">
-        <h2>Recent Analyses</h2>
-        <ul class="history" id="history-list"></ul>
-    </section>
-    <section id="about-section" class="about">
-        <h2 id="about-title">About</h2>
-        <p>This app analyzes news articles for political bias using client-side lexicons and scoring. Scores range from -100 (left-leaning) to +100 (right-leaning). The method employs lexicon-based feature counting, sentiment analysis around political entities, and optional weak outlet priors for enhanced accuracy.</p>
-    </section>
-    <section id="dev-panel" class="dev-panel"></section>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Bias Detector</h1>
+            <p class="subtitle">Client-side analysis via proxy rotation</p>
+        </header>
+
+        <main>
+            <section class="input-section">
+                <div class="input-group">
+                    <label for="url-input" class="sr-only">Article URL</label>
+                    <input 
+                        type="url" 
+                        id="url-input" 
+                        class="input-field" 
+                        placeholder="Enter article URL..." 
+                        aria-describedby="url-help"
+                    >
+                </div>
+                <button id="analyze-btn" class="btn btn-primary" aria-describedby="analyze-help">
+                    <span id="analyze-text">Analyze Article</span>
+                    <span id="analyze-loading" class="loading" style="display: none;" aria-hidden="true"></span>
+                </button>
+                <div id="url-help" class="sr-only">Enter the URL of a news article to analyze for political bias</div>
+                <div id="analyze-help" class="sr-only">Click to start bias analysis</div>
+            </section>
+
+            <section class="collapsible">
+                <div class="collapsible-header" tabindex="0" role="button" aria-expanded="false" aria-controls="paste-content">
+                    <span>Paste Article Text</span>
+                    <span class="chevron">▼</span>
+                </div>
+                <div class="collapsible-content" id="paste-content">
+                    <div class="collapsible-inner">
+                        <textarea 
+                            id="article-text" 
+                            class="textarea" 
+                            placeholder="Paste article text here as fallback..."
+                            aria-label="Article text for manual analysis"
+                        ></textarea>
+                        <button id="analyze-text-btn" class="btn btn-secondary" style="margin-top: 12px;">
+                            Analyze Text
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div id="error-container"></div>
+
+            <section id="result-section" class="result-card" style="display: none;" role="region" aria-label="Analysis results">
+                <div class="score-display">
+                    <div id="score-number" class="score-number" aria-label="Bias score">0</div>
+                    <div id="confidence-display" class="confidence">Confidence: <span id="confidence-value">0</span>%</div>
+                </div>
+                
+                <div class="bias-scale" role="img" aria-label="Political bias scale">
+                    <div class="scale-ticks">
+                        <div class="scale-tick"></div>
+                        <div class="scale-tick"></div>
+                        <div class="scale-tick"></div>
+                        <div class="scale-tick"></div>
+                        <div class="scale-tick"></div>
+                    </div>
+                    <div id="scale-marker" class="scale-marker"></div>
+                </div>
+                <div class="scale-labels">
+                    <span>Left -100</span>
+                    <span>-50</span>
+                    <span>0</span>
+                    <span>+50</span>
+                    <span>Right +100</span>
+                </div>
+
+                <div class="explanation">
+                    <div id="explanation-text" class="explanation-text"></div>
+                    <div id="evidence-chips" class="evidence-chips" aria-label="Evidence keywords"></div>
+                </div>
+            </section>
+
+            <section class="history-section">
+                <h2 class="section-title">Recent Analyses</h2>
+                <div id="history-list" aria-label="Analysis history">
+                    <p id="no-history" class="history-item" style="opacity: 0.6; cursor: default;">No analyses yet</p>
+                </div>
+            </section>
+
+            <section class="about-section">
+                <h2 class="section-title about-title" id="about-title">About & Method</h2>
+                <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary);">
+                    This tool analyzes news articles for political bias using client-side lexicon-based scoring. 
+                    It examines language patterns, political entity mentions, and contextual framing to estimate 
+                    bias on a left-right scale. Scores are deterministic and explainable. 
+                    <strong>Results are estimates</strong> - use critical thinking.
+                </p>
+                
+                <div id="dev-panel" class="dev-panel">
+                    <div class="dev-section">
+                        <div class="dev-label">Proxy Used:</div>
+                        <div id="dev-proxy">None</div>
+                    </div>
+                    <div class="dev-section">
+                        <div class="dev-label">Feature Scores:</div>
+                        <div id="dev-features">N/A</div>
+                    </div>
+                    <div class="dev-section">
+                        <div class="dev-label">Lexicon Hits:</div>
+                        <div id="dev-lexicon">N/A</div>
+                    </div>
+                    <div class="dev-section">
+                        <div class="dev-label">Outlet Prior:</div>
+                        <div id="dev-outlet">N/A</div>
+                    </div>
+                    <div class="dev-section">
+                        <div class="dev-label">Normalization:</div>
+                        <div id="dev-norm">N/A</div>
+                    </div>
+                    <div class="dev-section">
+                        <div class="dev-label">Timing:</div>
+                        <div id="dev-timing">N/A</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div class="safe-area-bottom"></div>
+    </div>
 
     <script>
-        // Embedded data: lexicons and priors
-        const leftCues = {
-            'progressive': 2, 'equity': 3, 'social justice': 4, 'climate change': 3, 'gun control': 2,
-            'universal healthcare': 4, 'abortion rights': 3, 'lgbtq': 2, 'diversity': 2, 'inclusion': 2,
-            'democrat': 1, 'biden': 1, 'aoc': 1, 'bernie': 1, 'msnbc': 2, 'cnn': 1
-        };
-        const rightCues = {
-            'conservative': 2, 'liberty': 3, 'free market': 4, 'climate hoax': 3, 'second amendment': 2,
-            'pro-life': 3, 'traditional values': 2, 'border security': 3, 'tax cuts': 2,
-            'republican': 1, 'trump': 1, 'mcconnell': 1, 'fox news': 2, 'breitbart': 2
-        };
-        const loadedWords = {
-            'extreme': {polarity: 1, weight: 1}, 'radical': {polarity: 1, weight: 2},
-            'oppressive': {polarity: -1, weight: 2}, 'empowering': {polarity: -1, weight: 1},
-            'dangerous': {polarity: 1, weight: 1}, 'inclusive': {polarity: -1, weight: 1}
-        };
-        const hedging = ['may', 'might', 'could', 'possibly', 'allegedly'];
-        const entities = {
-            'democrats': -2, 'republicans': 2, 'biden': -1, 'trump': 1,
-            'aoc': -2, 'pelosi': -1, 'mcconnell': 1, 'cruz': 2
-        };
-        const outletPriors = {
-            'cnn.com': {bias: -15, weight: 0.1},
-            'msnbc.com': {bias: -20, weight: 0.1},
-            'foxnews.com': {bias: 20, weight: 0.1},
-            'breitbart.com': {bias: 25, weight: 0.1},
-            'nytimes.com': {bias: -10, weight: 0.1},
-            'wsj.com': {bias: 10, weight: 0.1}
-        };
-        const sentimentLex = {
-            'good': 1, 'bad': -1, 'support': 1, 'oppose': -1, 'praise': 1, 'criticize': -1,
-            'success': 1, 'failure': -1, 'benefit': 1, 'harm': -1
+        'use strict';
+
+        // Configuration
+        const CONFIG = {
+            maxWordCount: 2500,
+            proxyTimeout: 7000,
+            maxRetries: 3,
+            storageVersion: 1,
+            storageKey: 'bias_detector_v1',
+            maxHistoryItems: 5
         };
 
-        // History storage
-        const HISTORY_KEY = 'bias_history_v1';
-        function loadHistory() {
+        // CORS Proxy rotation - Add more proxies as needed
+        const PROXIES = [
+            'https://corsproxy.io/?',
+            'https://cors-anywhere.herokuapp.com/',
+            'https://api.allorigins.win/raw?url=',
+            'https://thingproxy.freeboard.io/fetch/'
+        ];
+
+        // Bias Detection Lexicons (embedded for deterministic scoring)
+        const LEXICONS = {
+            left: {
+                policy: [
+                    'progressive', 'liberal', 'social justice', 'inequality', 'climate change',
+                    'healthcare reform', 'medicare for all', 'green new deal', 'minimum wage',
+                    'wealth tax', 'immigration reform', 'lgbtq rights', 'reproductive rights',
+                    'gun control', 'criminal justice reform', 'systemic racism'
+                ],
+                frames: [
+                    'grassroots', 'working families', 'corporate greed', 'income inequality',
+                    'social safety net', 'public option', 'investment in communities',
+                    'environmental justice', 'affordable housing', 'student debt relief'
+                ],
+                orgs: [
+                    'aclu', 'planned parenthood', 'sierra club', 'move on', 'democratic party',
+                    'progressive caucus', 'ocasio-cortez', 'sanders', 'warren', 'aoc'
+                ]
+            },
+            right: {
+                policy: [
+                    'conservative', 'traditional values', 'free market', 'deregulation', 'tax cuts',
+                    'border security', 'second amendment', 'pro life', 'law and order',
+                    'fiscal responsibility', 'small government', 'personal responsibility',
+                    'national security', 'energy independence', 'school choice'
+                ],
+                frames: [
+                    'taxpayers', 'job creators', 'american workers', 'constitutional rights',
+                    'individual liberty', 'free enterprise', 'strong defense', 'family values',
+                    'government overreach', 'bureaucratic red tape'
+                ],
+                orgs: [
+                    'nra', 'heritage foundation', 'republican party', 'gop', 'conservative caucus',
+                    'trump', 'desantis', 'cruz', 'fox news', 'breitbart'
+                ]
+            },
+            loaded: {
+                left_positive: ['progressive', 'inclusive', 'compassionate', 'forward-thinking', 'innovative'],
+                left_negative: ['extremist', 'radical', 'socialist', 'unrealistic', 'divisive'],
+                right_positive: ['traditional', 'principled', 'patriotic', 'pragmatic', 'responsible'],
+                right_negative: ['extremist', 'radical', 'regressive', 'discriminatory', 'authoritarian']
+            },
+            hedging: ['might', 'could', 'perhaps', 'possibly', 'allegedly', 'reportedly', 'sources say'],
+            certainty: ['definitely', 'clearly', 'obviously', 'undoubtedly', 'certainly', 'without question']
+        };
+
+        // Outlet bias priors (small influence, max ±8)
+        const OUTLET_PRIORS = {
+            'cnn.com': -5,
+            'msnbc.com': -6,
+            'nytimes.com': -3,
+            'washingtonpost.com': -3,
+            'huffpost.com': -7,
+            'foxnews.com': 6,
+            'breitbart.com': 8,
+            'dailywire.com': 7,
+            'nypost.com': 4,
+            'wsj.com': 2,
+            'reuters.com': 0,
+            'ap.org': 0,
+            'apnews.com': 0,
+            'bbc.com': -1,
+            'npr.org': -2
+        };
+
+        // Application state
+        let currentAnalysis = null;
+        let devPanelTaps = 0;
+        let devPanelVisible = false;
+
+        // DOM elements
+        const elements = {
+            urlInput: document.getElementById('url-input'),
+            analyzeBtn: document.getElementById('analyze-btn'),
+            analyzeText: document.getElementById('analyze-text'),
+            analyzeLoading: document.getElementById('analyze-loading'),
+            articleText: document.getElementById('article-text'),
+            analyzeTextBtn: document.getElementById('analyze-text-btn'),
+            errorContainer: document.getElementById('error-container'),
+            resultSection: document.getElementById('result-section'),
+            scoreNumber: document.getElementById('score-number'),
+            confidenceValue: document.getElementById('confidence-value'),
+            scaleMarker: document.getElementById('scale-marker'),
+            explanationText: document.getElementById('explanation-text'),
+            evidenceChips: document.getElementById('evidence-chips'),
+            historyList: document.getElementById('history-list'),
+            noHistory: document.getElementById('no-history'),
+            aboutTitle: document.getElementById('about-title'),
+            devPanel: document.getElementById('dev-panel'),
+            devProxy: document.getElementById('dev-proxy'),
+            devFeatures: document.getElementById('dev-features'),
+            devLexicon: document.getElementById('dev-lexicon'),
+            devOutlet: document.getElementById('dev-outlet'),
+            devNorm: document.getElementById('dev-norm'),
+            devTiming: document.getElementById('dev-timing')
+        };
+
+        // Utility functions
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function isValidUrl(string) {
             try {
-                const data = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-                return Array.isArray(data) ? data.slice(0, 5) : [];
-            } catch (e) {
+                const url = new URL(string);
+                return ['http:', 'https:'].includes(url.protocol);
+            } catch {
+                return false;
+            }
+        }
+
+        function sanitizeUrl(url) {
+            if (!url) return null;
+            url = url.trim();
+            if (!url.startsWith('http')) {
+                url = 'https://' + url;
+            }
+            return isValidUrl(url) ? url : null;
+        }
+
+        function showError(message) {
+            elements.errorContainer.innerHTML = `<div class="error-message">${message}</div>`;
+            setTimeout(() => {
+                elements.errorContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        function setLoading(isLoading) {
+            elements.analyzeBtn.disabled = isLoading;
+            elements.analyzeTextBtn.disabled = isLoading;
+            elements.analyzeText.style.display = isLoading ? 'none' : 'inline';
+            elements.analyzeLoading.style.display = isLoading ? 'inline-block' : 'none';
+        }
+
+        // Storage functions
+        function saveToStorage(analysis) {
+            try {
+                const stored = localStorage.getItem(CONFIG.storageKey);
+                let history = stored ? JSON.parse(stored) : { version: CONFIG.storageVersion, analyses: [] };
+                
+                if (history.version !== CONFIG.storageVersion) {
+                    history = { version: CONFIG.storageVersion, analyses: [] };
+                }
+
+                history.analyses.unshift({
+                    timestamp: Date.now(),
+                    url: analysis.url || 'Manual Text',
+                    title: analysis.title || 'Untitled',
+                    score: analysis.score,
+                    confidence: analysis.confidence
+                });
+
+                // Keep only last 5 analyses
+                history.analyses = history.analyses.slice(0, CONFIG.maxHistoryItems);
+                
+                localStorage.setItem(CONFIG.storageKey, JSON.stringify(history));
+                renderHistory();
+            } catch (error) {
+                console.warn('Failed to save to localStorage:', error);
+            }
+        }
+
+        function loadFromStorage() {
+            try {
+                const stored = localStorage.getItem(CONFIG.storageKey);
+                if (!stored) return [];
+                
+                const history = JSON.parse(stored);
+                if (history.version !== CONFIG.storageVersion) return [];
+                
+                return history.analyses || [];
+            } catch (error) {
+                console.warn('Failed to load from localStorage:', error);
                 return [];
             }
         }
-        function saveHistory(entry) {
-            let history = loadHistory();
-            history.unshift(entry);
-            history = history.slice(0, 5);
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-        }
+
         function renderHistory() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = '';
-            loadHistory().forEach(item => {
-                const li = document.createElement('li');
-                li.innerHTML = `<strong>${item.title || item.url}</strong><br>Score: ${item.score} (Conf: ${item.confidence}%)<br><small>${new Date(item.timestamp).toLocaleString()}</small>`;
-                list.appendChild(li);
-            });
+            const history = loadFromStorage();
+            
+            if (history.length === 0) {
+                elements.noHistory.style.display = 'block';
+                return;
+            }
+
+            elements.noHistory.style.display = 'none';
+            
+            const historyItems = history.map(item => {
+                const date = new Date(item.timestamp).toLocaleDateString();
+                const scoreColor = item.score > 0 ? 'var(--accent-red)' : item.score < 0 ? 'var(--accent-blue)' : 'var(--text-secondary)';
+                
+                return `
+                    <div class="history-item" tabindex="0" role="button" onclick="restoreAnalysis(${item.timestamp})" onkeydown="handleHistoryKeydown(event, ${item.timestamp})">
+                        <div class="history-meta">
+                            <span class="history-score" style="color: ${scoreColor}">${item.score > 0 ? '+' : ''}${item.score}</span>
+                            <span class="history-time">${date}</span>
+                        </div>
+                        <div class="history-url">${item.url}</div>
+                    </div>
+                `;
+            }).join('');
+
+            elements.historyList.innerHTML = historyItems;
         }
 
-        // Dev panel toggle
-        let tapCount = 0;
-        document.getElementById('about-title').addEventListener('click', () => {
-            tapCount++;
-            if (tapCount >= 5) {
-                document.getElementById('dev-panel').style.display = 'block';
-                tapCount = 0;
+        window.restoreAnalysis = function(timestamp) {
+            const history = loadFromStorage();
+            const item = history.find(h => h.timestamp === timestamp);
+            if (!item) return;
+
+            if (item.url !== 'Manual Text') {
+                elements.urlInput.value = item.url;
             }
-        });
+            
+            // Could restore full analysis here if we saved more details
+            showError(`Restored: ${item.title} (Score: ${item.score})`);
+        };
 
-        // Main analysis with proxy and timeout
-        async function analyze(urlOrText, isUrl = true) {
-            const analyzeBtn = document.getElementById(isUrl ? 'analyze-btn' : 'analyze-paste-btn');
-            analyzeBtn.classList.add('loading');
-            const errorEl = document.getElementById('error-msg');
-            errorEl.textContent = '';
-            document.getElementById('paste-accordion').classList.remove('show');
-            document.getElementById('result-section').classList.remove('show');
+        window.handleHistoryKeydown = function(event, timestamp) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                restoreAnalysis(timestamp);
+            }
+        };
 
-            let text, title = '', hostname = '';
-            let fetchQuality = 1;
+        // Content extraction from HTML
+        function extractContent(html, url) {
             try {
-                if (isUrl) {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 10000);
-                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(urlOrText)}`;
-                    const response = await fetch(proxyUrl, { signal: controller.signal });
-                    clearTimeout(timeoutId);
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    text = await response.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(text, 'text/html');
-                    title = doc.querySelector('title')?.textContent || urlOrText;
-                    const article = doc.querySelector('article') || doc.body;
-                    text = article ? article.innerText : '';
-                    hostname = new URL(urlOrText).hostname;
-                    if (!text.trim()) throw new Error('No content extracted from page.');
-                } else {
-                    text = urlOrText;
-                    fetchQuality = 0.8;
+                // Create a new DOMParser instance for safe parsing
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // Remove scripts, styles, and other unwanted elements
+                const unwanted = doc.querySelectorAll('script, style, nav, footer, aside, header, .ad, .advertisement, .sidebar, .related, .comments, .social, .share');
+                unwanted.forEach(el => el.remove());
+
+                // Extract title
+                let title = '';
+                const titleEl = doc.querySelector('title, h1, .title, .headline');
+                if (titleEl) {
+                    title = titleEl.textContent.trim();
                 }
-                text = text.replace(/\s+/g, ' ').trim().toLowerCase();
-                const sentences = text.split(/[.!?]+/).map(s => s.trim()).filter(s => s);
-                const uniqueSentences = [...new Set(sentences)];
-                text = uniqueSentences.join('. ');
-                if (text.split(' ').length > 2500) text = text.split(' ').slice(0, 2500).join(' ');
-                const headline = title.toLowerCase() || sentences[0] || '';
-            } catch (e) {
-                analyzeBtn.classList.remove('loading');
-                errorEl.textContent = `Error: ${e.message}.`;
-                if (isUrl) {
-                    document.getElementById('paste-accordion').classList.add('show');
-                    errorEl.textContent += ' Try pasting the article text manually.';
+
+                // Extract main content
+                const contentSelectors = [
+                    'article',
+                    '.article-content',
+                    '.content',
+                    '.post-content',
+                    '.entry-content',
+                    'main',
+                    '.main-content',
+                    '.story-body',
+                    '.article-body'
+                ];
+
+                let content = '';
+                for (const selector of contentSelectors) {
+                    const element = doc.querySelector(selector);
+                    if (element) {
+                        content = element.textContent;
+                        break;
+                    }
                 }
-                console.error(e);
-                return;
+
+                // Fallback to body if no specific content found
+                if (!content) {
+                    const body = doc.querySelector('body');
+                    if (body) {
+                        content = body.textContent;
+                    }
+                }
+
+                // Clean and normalize text
+                content = content
+                    .replace(/\s+/g, ' ')
+                    .replace(/[""'']/g, '"')
+                    .replace(/[–—]/g, '-')
+                    .trim();
+
+                // Limit word count
+                const words = content.split(/\s+/);
+                if (words.length > CONFIG.maxWordCount) {
+                    content = words.slice(0, CONFIG.maxWordCount).join(' ') + '...';
+                }
+
+                return { title, content, wordCount: words.length };
+            } catch (error) {
+                throw new Error('Failed to parse HTML content');
             }
+        }
 
-            if (text.length < 100) {
-                analyzeBtn.classList.remove('loading');
-                errorEl.textContent = 'Text too short for analysis. If this is unexpected, try pasting manually.';
-                if (isUrl) document.getElementById('paste-accordion').classList.add('show');
-                return;
-            }
+        // Proxy rotation with timeout and error handling
+        async function fetchWithProxies(url) {
+            const startTime = Date.now();
+            let lastError = null;
+            let proxyUsed = 'Direct';
 
-            // Rest of analysis...
-            const words = text.split(/\s+/);
-            const tokenCount = words.length;
-            let leftScore = 0, rightScore = 0;
-            let contributions = {};
-            let politicalSentences = 0;
-
-            Object.entries(leftCues).forEach(([cue, weight]) => {
-                const count = (text.match(new RegExp('\\b' + cue + '\\b', 'g')) || []).length;
-                if (count > 0) {
-                    const contrib = Math.log(1 + count) * weight;
-                    leftScore += contrib;
-                    contributions[cue] = -contrib;
-                }
-            });
-            Object.entries(rightCues).forEach(([cue, weight]) => {
-                const count = (text.match(new RegExp('\\b' + cue + '\\b', 'g')) || []).length;
-                if (count > 0) {
-                    const contrib = Math.log(1 + count) * weight;
-                    rightScore += contrib;
-                    contributions[cue] = contrib;
-                }
-            });
-
-            Object.entries(loadedWords).forEach(([word, {polarity, weight}]) => {
-                const count = (text.match(new RegExp('\\b' + word + '\\b', 'g')) || []).length;
-                if (count > 0) {
-                    const contrib = Math.log(1 + count) * weight;
-                    if (polarity < 0) leftScore += contrib;
-                    else rightScore += contrib;
-                    contributions[word] = polarity * contrib;
-                }
-            });
-
-            sentences.forEach(sentence => {
-                let hasEntity = false;
-                let sentScore = 0;
-                Object.keys(entities).forEach(ent => {
-                    if (sentence.includes(ent)) {
-                        hasEntity = true;
-                        Object.entries(sentimentLex).forEach(([word, pol]) => {
-                            if (sentence.includes(word)) sentScore += pol;
-                        });
+            // Try direct fetch first (for CORS-enabled sites)
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), CONFIG.proxyTimeout);
+                
+                const response = await fetch(url, {
+                    signal: controller.signal,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15'
                     }
                 });
-                if (hasEntity) {
-                    politicalSentences++;
-                    const entityBias = Object.entries(entities).reduce((sum, [ent, bias]) => sentence.includes(ent) ? sum + bias : sum, 0);
-                    const adjust = sentScore * 0.5 * (entityBias > 0 ? 1 : -1);
-                    if (adjust > 0) rightScore += adjust;
-                    else leftScore -= adjust;
-                    contributions[`sent_${sentence.slice(0,20)}...`] = adjust;
+                
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    updateDevPanel({ proxy: 'Direct', timing: Date.now() - startTime });
+                    return text;
                 }
-            });
-
-            let headlineLeft = 0, headlineRight = 0;
-            Object.entries(leftCues).forEach(([cue, w]) => headlineLeft += headline.includes(cue) ? w * 1.5 : 0);
-            Object.entries(rightCues).forEach(([cue, w]) => headlineRight += headline.includes(cue) ? w * 1.5 : 0);
-            leftScore += headlineLeft;
-            rightScore += headlineRight;
-
-            let priorBias = 0;
-            if (hostname && outletPriors[hostname]) {
-                priorBias = outletPriors[hostname].bias * outletPriors[hostname].weight;
-                contributions[`outlet_${hostname}`] = priorBias;
+            } catch (error) {
+                lastError = error;
             }
 
-            let raw = rightScore - leftScore + priorBias;
-            const maxRaw = 50;
-            let score = (raw / maxRaw) * 100;
-            score = Math.max(-100, Math.min(100, score));
+            // Try proxies
+            for (let i = 0; i < PROXIES.length; i++) {
+                const proxy = PROXIES[i];
+                proxyUsed = `Proxy ${i + 1}`;
+                
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), CONFIG.proxyTimeout);
+                    
+                    const proxyUrl = proxy + encodeURIComponent(url);
+                    const response = await fetch(proxyUrl, {
+                        signal: controller.signal,
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15'
+                        }
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    if (response.ok) {
+                        const text = await response.text();
+                        updateDevPanel({ proxy: proxyUsed, timing: Date.now() - startTime });
+                        return text;
+                    }
+                } catch (error) {
+                    lastError = error;
+                    console.warn(`Proxy ${i + 1} failed:`, error.message);
+                }
+            }
 
-            const effTokens = Math.min(tokenCount, 2500) / 2500;
-            const polShare = politicalSentences / (sentences.length || 1);
-            const featureAgree = Math.abs(leftScore - rightScore) / (leftScore + rightScore + 1);
-            let confidence = (effTokens * 0.4 + polShare * 0.3 + featureAgree * 0.2 + fetchQuality * 0.1) * 100;
+            throw new Error(`All proxies failed. Last error: ${lastError?.message || 'Unknown error'}`);
+        }
+
+        // Bias detection algorithm
+        function analyzeBias(text, title = '', url = '') {
+            const startTime = Date.now();
+            
+            // Normalize text
+            const normalizedText = text.toLowerCase();
+            const normalizedTitle = title.toLowerCase();
+            
+            // Tokenize into sentences
+            const sentences = text.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 10);
+            
+            // Initialize scores
+            let leftScore = 0;
+            let rightScore = 0;
+            let features = {};
+            let lexiconHits = {};
+            let politicalSentences = 0;
+
+            // Feature extraction
+            function countMatches(text, terms, weight = 1) {
+                let count = 0;
+                const hits = [];
+                for (const term of terms) {
+                    const regex = new RegExp('\\b' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+                    const matches = (text.match(regex) || []).length;
+                    if (matches > 0) {
+                        count += matches * weight * Math.log(matches + 1); // Log dampening
+                        hits.push({ term, count: matches });
+                    }
+                }
+                return { score: count, hits };
+            }
+
+            // Policy terms scoring
+            const leftPolicy = countMatches(normalizedText, LEXICONS.left.policy, 1);
+            const rightPolicy = countMatches(normalizedText, LEXICONS.right.policy, 1);
+            leftScore += leftPolicy.score;
+            rightScore += rightPolicy.score;
+            features.leftPolicy = leftPolicy.score;
+            features.rightPolicy = rightPolicy.score;
+            lexiconHits.leftPolicy = leftPolicy.hits;
+            lexiconHits.rightPolicy = rightPolicy.hits;
+
+            // Framing terms
+            const leftFrames = countMatches(normalizedText, LEXICONS.left.frames, 0.8);
+            const rightFrames = countMatches(normalizedText, LEXICONS.right.frames, 0.8);
+            leftScore += leftFrames.score;
+            rightScore += rightFrames.score;
+            features.leftFrames = leftFrames.score;
+            features.rightFrames = rightFrames.score;
+            lexiconHits.leftFrames = leftFrames.hits;
+            lexiconHits.rightFrames = rightFrames.hits;
+
+            // Organization mentions
+            const leftOrgs = countMatches(normalizedText, LEXICONS.left.orgs, 1.2);
+            const rightOrgs = countMatches(normalizedText, LEXICONS.right.orgs, 1.2);
+            leftScore += leftOrgs.score;
+            rightScore += rightOrgs.score;
+            features.leftOrgs = leftOrgs.score;
+            features.rightOrgs = rightOrgs.score;
+            lexiconHits.leftOrgs = leftOrgs.hits;
+            lexiconHits.rightOrgs = rightOrgs.hits;
+
+            // Loaded language analysis
+            const loadedLeft = countMatches(normalizedText, LEXICONS.loaded.left_positive, 0.5);
+            const loadedRight = countMatches(normalizedText, LEXICONS.loaded.right_positive, 0.5);
+            leftScore += loadedLeft.score;
+            rightScore += loadedRight.score;
+
+            // Headline multiplier (1.5x weight for title content)
+            if (title) {
+                const titleLeftPolicy = countMatches(normalizedTitle, LEXICONS.left.policy, 1.5);
+                const titleRightPolicy = countMatches(normalizedTitle, LEXICONS.right.policy, 1.5);
+                leftScore += titleLeftPolicy.score;
+                rightScore += titleRightPolicy.score;
+                features.titleBoost = titleLeftPolicy.score + titleRightPolicy.score;
+            }
+
+            // Count political sentences for confidence
+            for (const sentence of sentences) {
+                const sentenceLower = sentence.toLowerCase();
+                const hasLeftTerms = LEXICONS.left.policy.some(term => sentenceLower.includes(term)) ||
+                                  LEXICONS.left.orgs.some(term => sentenceLower.includes(term));
+                const hasRightTerms = LEXICONS.right.policy.some(term => sentenceLower.includes(term)) ||
+                                    LEXICONS.right.orgs.some(term => sentenceLower.includes(term));
+                
+                if (hasLeftTerms || hasRightTerms) {
+                    politicalSentences++;
+                }
+            }
+
+            // Outlet prior (small influence)
+            let outletPrior = 0;
+            if (url) {
+                try {
+                    const hostname = new URL(url).hostname.toLowerCase().replace('www.', '');
+                    outletPrior = OUTLET_PRIORS[hostname] || 0;
+                } catch (error) {
+                    // Invalid URL, no prior
+                }
+            }
+
+            // Calculate raw bias score
+            const rawScore = rightScore - leftScore + outletPrior;
+            
+            // Normalize to [-100, 100] scale
+            const maxScore = 50; // Heuristic cap for normalization
+            let normalizedScore = Math.max(-100, Math.min(100, (rawScore / maxScore) * 100));
+            normalizedScore = Math.round(normalizedScore);
+
+            // Confidence calculation
+            const wordCount = text.split(/\s+/).length;
+            const politicalDensity = politicalSentences / Math.max(sentences.length, 1);
+            const totalSignals = leftScore + rightScore;
+            const scoreAgreement = Math.abs(rawScore) / (totalSignals + 1); // Agreement across features
+            
+            let confidence = 0;
+            confidence += Math.min(40, wordCount / 25); // Up to 40 points for word count
+            confidence += Math.min(30, politicalDensity * 100); // Up to 30 points for political density  
+            confidence += Math.min(20, totalSignals * 2); // Up to 20 points for signal strength
+            confidence += Math.min(10, scoreAgreement * 10); // Up to 10 points for agreement
+            
             confidence = Math.round(Math.max(0, Math.min(100, confidence)));
 
-            const topContribs = Object.entries(contributions)
-                .sort((a,b) => Math.abs(b[1]) - Math.abs(a[1]))
-                .slice(0,5)
-                .map(([key, val]) => `${key}: ${val.toFixed(2)}`);
+            // Generate explanation and evidence
+            const explanation = generateExplanation(normalizedScore, confidence, features, outletPrior);
+            const evidence = generateEvidence(lexiconHits, normalizedScore);
 
-            document.getElementById('score').textContent = Math.round(score);
-            document.getElementById('confidence').textContent = confidence;
-            document.getElementById('explanation').innerHTML = `Key Evidence:<br>${topContribs.join('<br>')}${priorBias ? `<br>Outlet prior: ${priorBias.toFixed(2)}` : ''}`;
-            const chipsEl = document.getElementById('chips');
-            chipsEl.innerHTML = '';
-            topContribs.forEach(c => {
-                const chip = document.createElement('div');
-                chip.className = 'chip';
-                chip.textContent = c;
-                chipsEl.appendChild(chip);
+            const analysis = {
+                score: normalizedScore,
+                confidence,
+                explanation,
+                evidence,
+                features,
+                lexiconHits,
+                outletPrior,
+                timing: Date.now() - startTime,
+                rawScore,
+                totalSignals,
+                politicalSentences,
+                wordCount,
+                url,
+                title
+            };
+
+            updateDevPanel(analysis);
+            return analysis;
+        }
+
+        function generateExplanation(score, confidence, features, outletPrior) {
+            let explanation = '';
+            
+            if (Math.abs(score) < 10) {
+                explanation = 'This article appears relatively neutral with minimal partisan language or framing.';
+            } else if (score < -25) {
+                explanation = 'This article shows strong left-leaning bias through progressive policy emphasis and liberal framing.';
+            } else if (score < 0) {
+                explanation = 'This article leans left with some progressive policy mentions and liberal perspectives.';
+            } else if (score > 25) {
+                explanation = 'This article shows strong right-leaning bias through conservative policy emphasis and traditional framing.';
+            } else {
+                explanation = 'This article leans right with some conservative policy mentions and traditional perspectives.';
+            }
+
+            if (outletPrior !== 0) {
+                const direction = outletPrior > 0 ? 'conservative' : 'liberal';
+                explanation += ` The outlet's known ${direction} lean influenced the score by ${Math.abs(outletPrior)} points.`;
+            }
+
+            if (confidence < 50) {
+                explanation += ' Confidence is low due to limited political content or weak signals.';
+            }
+
+            return explanation;
+        }
+
+        function generateEvidence(lexiconHits, score) {
+            const evidence = [];
+            const isLeftLeaning = score < 0;
+            
+            // Collect all hits with their bias direction
+            const allHits = [];
+            
+            Object.entries(lexiconHits).forEach(([category, hits]) => {
+                const isLeftCategory = category.includes('left');
+                hits.forEach(hit => {
+                    allHits.push({
+                        term: hit.term,
+                        count: hit.count,
+                        bias: isLeftCategory ? 'left' : 'right',
+                        weight: hit.count
+                    });
+                });
             });
-            const marker = document.getElementById('marker');
-            const pos = ((score + 100) / 200) * 100;
-            marker.style.left = `${pos}%`;
-            document.getElementById('result-section').classList.add('show');
 
-            saveHistory({
-                timestamp: Date.now(),
-                url: isUrl ? urlOrText : '',
-                title,
-                score: Math.round(score),
-                confidence
-            });
-            renderHistory();
+            // Sort by weight and take top 8
+            allHits.sort((a, b) => b.weight - a.weight);
+            const topHits = allHits.slice(0, 8);
 
-            const dev = document.getElementById('dev-panel');
-            dev.innerHTML = `
-                <h3>Debug Info</h3>
-                Left Score: ${leftScore.toFixed(2)}<br>
-                Right Score: ${rightScore.toFixed(2)}<br>
-                Raw Score: ${raw.toFixed(2)}<br>
-                Prior Bias: ${priorBias.toFixed(2)}<br>
-                Political Sentences: ${politicalSentences}/${sentences.length}<br>
-                Token Count: ${tokenCount}<br>
-                Extracted Text Length: ${text.length}
-            `;
+            return topHits.map(hit => ({
+                term: hit.term,
+                bias: hit.bias,
+                count: hit.count
+            }));
+        }
 
-            analyzeBtn.classList.remove('loading');
+        function updateDevPanel(analysis) {
+            if (!analysis) return;
+            
+            elements.devProxy.textContent = analysis.proxy || 'N/A';
+            elements.devFeatures.textContent = analysis.features ? 
+                Object.entries(analysis.features).map(([k, v]) => `${k}: ${v.toFixed(1)}`).join(', ') : 'N/A';
+            elements.devLexicon.textContent = analysis.lexiconHits ? 
+                Object.keys(analysis.lexiconHits).reduce((acc, key) => acc + analysis.lexiconHits[key].length, 0) + ' total hits' : 'N/A';
+            elements.devOutlet.textContent = analysis.outletPrior ? 
+                `${analysis.outletPrior > 0 ? '+' : ''}${analysis.outletPrior}` : '0';
+            elements.devNorm.textContent = analysis.rawScore !== undefined ? 
+                `Raw: ${analysis.rawScore.toFixed(1)} → Normalized: ${analysis.score}` : 'N/A';
+            elements.devTiming.textContent = analysis.timing ? `${analysis.timing}ms` : 'N/A';
+        }
+
+        // Display results
+        function displayResults(analysis) {
+            currentAnalysis = analysis;
+            
+            // Update score display
+            elements.scoreNumber.textContent = analysis.score > 0 ? `+${analysis.score}` : analysis.score;
+            elements.scoreNumber.style.color = analysis.score > 0 ? 'var(--accent-red)' : 
+                                               analysis.score < 0 ? 'var(--accent-blue)' : 'var(--text-primary)';
+            
+            elements.confidenceValue.textContent = analysis.confidence;
+            
+            // Update bias scale marker position
+            const markerPosition = ((analysis.score + 100) / 200) * 100; // Convert [-100,100] to [0,100]%
+            elements.scaleMarker.style.left = `${markerPosition}%`;
+            
+            // Update explanation
+            elements.explanationText.textContent = analysis.explanation;
+            
+            // Update evidence chips
+            if (analysis.evidence && analysis.evidence.length > 0) {
+                elements.evidenceChips.innerHTML = analysis.evidence.map(item => {
+                    const className = item.bias === 'left' ? 'negative' : 'positive';
+                    return `<span class="evidence-chip ${className}">${item.term} (${item.count})</span>`;
+                }).join('');
+            } else {
+                elements.evidenceChips.innerHTML = '<span class="evidence-chip">No significant evidence found</span>';
+            }
+            
+            // Show results with animation
+            elements.resultSection.style.display = 'block';
+            setTimeout(() => {
+                elements.resultSection.classList.add('visible');
+            }, 100);
+            
+            // Save to history
+            saveToStorage(analysis);
+        }
+
+        // Main analysis functions
+        async function analyzeUrl() {
+            const url = sanitizeUrl(elements.urlInput.value);
+            if (!url) {
+                showError('Please enter a valid URL');
+                return;
+            }
+
+            setLoading(true);
+            
+            try {
+                const html = await fetchWithProxies(url);
+                const extracted = extractContent(html, url);
+                
+                if (!extracted.content || extracted.content.length < 100) {
+                    throw new Error('Could not extract meaningful content from the page');
+                }
+
+                const analysis = analyzeBias(extracted.content, extracted.title, url);
+                displayResults(analysis);
+                
+            } catch (error) {
+                console.error('Analysis failed:', error);
+                showError(`Failed to analyze URL: ${error.message}. Try using "Paste Article Text" instead.`);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        async function analyzeText() {
+            const text = elements.articleText.value.trim();
+            if (!text || text.length < 50) {
+                showError('Please paste article text (at least 50 characters)');
+                return;
+            }
+
+            setLoading(true);
+            
+            try {
+                const analysis = analyzeBias(text, '', 'Manual Text');
+                displayResults(analysis);
+            } catch (error) {
+                console.error('Text analysis failed:', error);
+                showError('Failed to analyze text. Please try again.');
+            } finally {
+                setLoading(false);
+            }
         }
 
         // Event listeners
-        document.getElementById('analyze-btn').addEventListener('click', () => {
-            const url = document.getElementById('url-input').value.trim();
-            if (!url || !url.startsWith('http')) {
-                document.getElementById('error-msg').textContent = 'Please enter a valid URL';
-                return;
+        elements.analyzeBtn.addEventListener('click', analyzeUrl);
+        elements.analyzeTextBtn.addEventListener('click', analyzeText);
+
+        // URL input handling
+        elements.urlInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                analyzeUrl();
             }
-            analyze(url);
-        });
-        document.getElementById('analyze-paste-btn').addEventListener('click', () => {
-            const text = document.getElementById('paste-text').value.trim();
-            if (!text) {
-                document.getElementById('error-msg').textContent = 'Please paste some text';
-                return;
-            }
-            analyze(text, false);
         });
 
-        // Init
-        renderHistory();
+        // Collapsible text area
+        document.querySelector('.collapsible-header').addEventListener('click', function() {
+            const content = document.querySelector('.collapsible-content');
+            const chevron = this.querySelector('.chevron');
+            const isOpen = content.classList.contains('open');
+            
+            content.classList.toggle('open');
+            chevron.textContent = isOpen ? '▼' : '▲';
+            this.setAttribute('aria-expanded', !isOpen);
+        });
+
+        // Keyboard navigation for collapsible
+        document.querySelector('.collapsible-header').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                this.click();
+            }
+        });
+
+        // Dev panel toggle
+        elements.aboutTitle.addEventListener('click', () => {
+            devPanelTaps++;
+            if (devPanelTaps >= 5) {
+                devPanelVisible = !devPanelVisible;
+                elements.devPanel.classList.toggle('visible', devPanelVisible);
+                devPanelTaps = 0;
+            }
+            
+            // Reset counter after 2 seconds
+            setTimeout(() => {
+                if (devPanelTaps < 5) devPanelTaps = 0;
+            }, 2000);
+        });
+
+        // Initialize app
+        function initApp() {
+            renderHistory();
+            
+            // Hide results initially
+            elements.resultSection.style.display = 'none';
+            elements.resultSection.classList.remove('visible');
+        }
+
+        // Start the app
+        initApp();
     </script>
 </body>
 </html>
