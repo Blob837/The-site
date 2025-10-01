@@ -347,7 +347,7 @@
 </head>
 <body>
     <header>
-        <h1>⚡ FBS Game Predictor</h1>
+        <h1>⚡ FBS Game Predictor v2</h1>
         <div class="subtitle">Rick's No-Bullshit College Football Oracle</div>
     </header>
 
@@ -404,38 +404,48 @@
         <!-- README -->
         <div class="readme">
             <h3>📋 Technical Documentation</h3>
+            <p><strong>API Version:</strong> CollegeFootballData API v2 (apinext.collegefootballdata.com)</p>
             <p><strong>Algorithm:</strong> Logistic regression (ridge penalty) blended with Elo ratings (K=20). Features: offensive/defensive efficiency, explosiveness, havoc rates, finishing drives, tempo, field position, spread-implied probability, home field advantage, travel distance, rest days.</p>
             <p><strong>Calibration:</strong> Platt scaling applied post-model. Probabilities clamped [0.05, 0.95].</p>
-            <p><strong>Data Sources:</strong></p>
+            <p><strong>Data Sources (v2 API endpoints):</strong></p>
             <ul style="margin-left: 16px; margin-top: 8px;">
                 <li><code>GET /calendar</code> - Current week detection</li>
-                <li><code>GET /games</code> - Schedule and matchups</li>
+                <li><code>GET /games?classification=fbs</code> - Schedule and matchups (v2 uses camelCase: homeTeam, awayTeam, startDate)</li>
                 <li><code>GET /lines</code> - Vegas spreads and totals</li>
                 <li><code>GET /stats/season</code> - Team season stats</li>
-                <li><code>GET /stats/game</code> - Game-level stats</li>
                 <li><code>GET /ratings/elo</code> - Elo ratings</li>
-                <li><code>GET /teams</code> - Team metadata</li>
+                <li><code>GET /teams/fbs</code> - Team metadata</li>
             </ul>
+            <p style="margin-top: 8px;"><strong>Breaking Changes in v2:</strong> API v1 deprecated May 2025. v2 uses camelCase (homeTeam not home_team), 'classification' parameter instead of 'division'.</p>
             <p style="margin-top: 8px;"><strong>Built by:</strong> Rick | West Texas Crisis Management & Software Architecture</p>
+            <p style="margin-top: 8px; font-size: 10px; color: var(--text-secondary);">Debug mode enabled - check browser console for detailed logs</p>
         </div>
     </div>
 
     <script type="module">
         // ===== CONFIGURATION =====
-        const API_BASE = 'https://api.collegefootballdata.com';
-        const CACHE_TTL = 1000 * 60 * 30; // 30 minutes
+        const API_BASE = 'https://apinext.collegefootballdata.com';
+        const CACHE_TTL = 1000 * 60 * 15; // 15 minutes - reduced for more frequent updates
         const MAX_RETRIES = 3;
         const RETRY_DELAY = 1000;
 
         // ===== STATE =====
         let apiKey = localStorage.getItem('cfb_api_key') || '';
         let predictions = [];
+        let debugMode = true; // Enable detailed logging
 
         // ===== UTILITIES =====
+        function debug(message, data = null) {
+            if (debugMode) {
+                console.log(`[DEBUG] ${message}`, data || '');
+            }
+        }
+
         function logStatus(message, type = 'loading') {
             const statusBar = document.getElementById('statusBar');
             statusBar.className = `status-bar ${type}`;
             statusBar.textContent = message;
+            debug(message);
         }
 
         function clamp(val, min, max) {
@@ -496,54 +506,87 @@
         async function getCurrentWeek(year) {
             logStatus('🔍 Detecting current week...', 'loading');
             const calendar = await apiCall('/calendar', { year });
-            const now = new Date();
+            debug('Calendar data:', calendar);
             
+            const now = new Date();
+            debug('Current date:', now.toISOString());
+            
+            // Find the current or next week with games
             for (let entry of calendar) {
                 const start = new Date(entry.firstGameStart);
                 const end = new Date(entry.lastGameStart);
-                if (now >= start && now <= end) {
+                end.setHours(23, 59, 59); // Extend to end of day
+                
+                debug(`Week ${entry.week}: ${start.toISOString()} to ${end.toISOString()}`);
+                
+                // If we're in this week or this week hasn't started yet
+                if (end >= now) {
+                    debug(`Selected week ${entry.week}`);
                     return entry.week;
                 }
             }
             
             // Fallback to week 1
+            debug('Falling back to week 1');
             return 1;
         }
 
         async function fetchAllData(year, week) {
-            logStatus('📡 Fetching games...', 'loading');
-            const games = await apiCall('/games', { 
+            logStatus(`📡 Fetching games for Week ${week}...`, 'loading');
+            
+            // v2 API uses 'classification' instead of 'division'
+            const gamesParams = { 
                 year, 
                 week, 
                 seasonType: 'regular', 
-                division: 'fbs' 
-            });
+                classification: 'fbs'  // CHANGED: v2 uses classification, not division
+            };
+            debug('Fetching games with params:', gamesParams);
+            const games = await apiCall('/games', gamesParams);
+            debug(`Received ${games.length} games`);
+            
+            // Filter out any invalid games
+            const validGames = games.filter(g => 
+                g.homeTeam && g.awayTeam && 
+                g.homeTeam !== 'undefined' && g.awayTeam !== 'undefined'
+            );
+            debug(`Filtered to ${validGames.length} valid games`);
 
-            logStatus('📊 Fetching betting lines...', 'loading');
-            const lines = await apiCall('/lines', { year, week });
+            logStatus(`📊 Fetching betting lines for Week ${week}...`, 'loading');
+            const linesParams = { year, week, seasonType: 'regular' };
+            debug('Fetching lines with params:', linesParams);
+            const lines = await apiCall('/lines', linesParams);
+            debug(`Received ${lines.length} lines`);
 
             logStatus('🎯 Fetching Elo ratings...', 'loading');
             const elo = await apiCall('/ratings/elo', { year });
+            debug(`Received ${elo.length} Elo ratings`);
 
             logStatus('🏈 Fetching team metadata...', 'loading');
             const teams = await apiCall('/teams/fbs', { year });
+            debug(`Received ${teams.length} teams`);
 
             logStatus('📈 Fetching team statistics...', 'loading');
+            // Use the actual team names from v2 API response
             const teamNames = [...new Set([
-                ...games.map(g => g.home_team),
-                ...games.map(g => g.away_team)
+                ...validGames.map(g => g.homeTeam),
+                ...validGames.map(g => g.awayTeam)
             ])];
+            debug('Team names to fetch stats for:', teamNames);
 
             const stats = {};
             for (let team of teamNames) {
                 try {
-                    stats[team] = await apiCall('/stats/season', { year, team });
+                    const teamStats = await apiCall('/stats/season', { year, team });
+                    stats[team] = teamStats;
+                    debug(`Fetched stats for ${team}:`, teamStats?.length || 0);
                 } catch (err) {
+                    debug(`Failed to fetch stats for ${team}:`, err.message);
                     stats[team] = null;
                 }
             }
 
-            return { games, lines, elo, teams, stats };
+            return { games: validGames, lines, elo, teams, stats };
         }
 
         // ===== FEATURE ENGINEERING =====
@@ -580,8 +623,15 @@
         }
 
         function getTeamLocation(teamName, teamsData) {
-            const team = teamsData.find(t => t.school === teamName);
-            return team ? { lat: team.latitude, lon: team.longitude } : { lat: 0, lon: 0 };
+            const team = teamsData.find(t => t.school === teamName || t.name === teamName);
+            if (!team) {
+                debug(`No location found for ${teamName}`);
+                return { lat: 0, lon: 0 };
+            }
+            return { 
+                lat: team.latitude || 0, 
+                lon: team.longitude || 0 
+            };
         }
 
         function getSpreadImpliedProb(spread) {
@@ -603,8 +653,11 @@
         }
 
         function predictGame(game, lines, elo, teams, stats) {
-            const homeTeam = game.home_team;
-            const awayTeam = game.away_team;
+            // v2 API uses camelCase: homeTeam, awayTeam, startDate, neutralSite
+            const homeTeam = game.homeTeam;
+            const awayTeam = game.awayTeam;
+
+            debug(`Predicting ${awayTeam} @ ${homeTeam}`);
 
             // Get statistics
             const homeStats = getTeamStats(homeTeam, stats);
@@ -632,7 +685,7 @@
             const havocMargin = homeStats.havoc - awayStats.havoc;
             const eloDiff = (homeElo - awayElo) / 100;
             const travelDist = distance(awayLoc.lat, awayLoc.lon, homeLoc.lat, homeLoc.lon);
-            const homeAdvantage = game.neutral_site ? 0 : 0.15;
+            const homeAdvantage = game.neutralSite ? 0 : 0.15; // v2 uses camelCase
             const spreadProb = getSpreadImpliedProb(spread);
 
             // Logistic regression weights (tuned empirically)
@@ -720,8 +773,9 @@
                 const card = document.createElement('div');
                 card.className = 'game-card';
 
-                const gameTime = pred.game.start_date ? 
-                    new Date(pred.game.start_date).toLocaleString('en-US', {
+                // v2 API uses camelCase: startDate
+                const gameTime = pred.game.startDate ? 
+                    new Date(pred.game.startDate).toLocaleString('en-US', {
                         weekday: 'short',
                         month: 'short',
                         day: 'numeric',
