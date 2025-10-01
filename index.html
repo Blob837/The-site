@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FBS Game Predictor | Rick's Rig</title>
+    <title>GRIDLOCK | Premium CFB Analytics</title>
     <style>
         * {
             margin: 0;
@@ -12,268 +12,542 @@
         }
 
         :root {
-            --bg-dark: #0a0e14;
-            --bg-card: #151a23;
-            --bg-input: #1c2330;
-            --text-primary: #e6e8eb;
-            --text-secondary: #8b92a0;
-            --accent: #ff6b35;
-            --accent-dim: #cc5529;
-            --success: #4caf50;
-            --warning: #ffa726;
-            --danger: #ef5350;
-            --border: #2a3140;
+            --bg-primary: #0f1419;
+            --bg-secondary: #16181d;
+            --bg-card: rgba(22, 24, 29, 0.8);
+            --bg-glass: rgba(255, 255, 255, 0.05);
+            --text-primary: #ffffff;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --accent-primary: #00d9ff;
+            --accent-secondary: #0099ff;
+            --gradient-primary: linear-gradient(135deg, #00d9ff 0%, #0066ff 100%);
+            --gradient-card: linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(0, 102, 255, 0.1) 100%);
+            --success: #3fb950;
+            --warning: #d29922;
+            --danger: #f85149;
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: var(--bg-dark);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(0, 217, 255, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 102, 255, 0.1) 0px, transparent 50%);
             color: var(--text-primary);
             line-height: 1.6;
             padding: 0;
             margin: 0;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 100%;
-            padding: 12px;
+            padding: 0;
             margin: 0 auto;
         }
 
+        /* HEADER */
         header {
-            background: var(--bg-card);
-            padding: 16px 12px;
-            border-bottom: 2px solid var(--accent);
+            background: rgba(15, 20, 25, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px 16px;
+            border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .logo {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+            letter-spacing: -1px;
         }
 
         h1 {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 4px;
+            font-size: 28px;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
         }
 
-        .subtitle {
-            font-size: 12px;
+        .tagline {
+            font-size: 13px;
             color: var(--text-secondary);
-            font-weight: 400;
+            font-weight: 500;
+            margin-left: 48px;
         }
 
+        /* CONFIG PANEL */
         .config-panel {
             background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px;
-            margin: 12px 0;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .config-panel.collapsed {
+            max-height: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
         }
 
         .input-group {
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
             font-size: 13px;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         input[type="text"],
         input[type="number"],
         select {
             width: 100%;
-            padding: 10px;
-            background: var(--bg-input);
+            padding: 12px 16px;
+            background: var(--bg-secondary);
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 10px;
             color: var(--text-primary);
-            font-size: 14px;
+            font-size: 15px;
+            transition: all 0.2s;
         }
 
         input:focus, select:focus {
             outline: none;
-            border-color: var(--accent);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+        }
+
+        select {
+            cursor: pointer;
         }
 
         button {
             width: 100%;
-            padding: 12px;
-            background: var(--accent);
+            padding: 14px;
+            background: var(--gradient-primary);
             color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        button:active {
-            background: var(--accent-dim);
-        }
-
-        button:disabled {
-            background: var(--text-secondary);
-            cursor: not-allowed;
-        }
-
-        .summary {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin: 12px 0;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 24px;
+            border-radius: 10px;
+            font-size: 16px;
             font-weight: 700;
-            color: var(--accent);
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .game-card {
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 8px rgba(0, 217, 255, 0.3);
+        }
+
+        button:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* FILTERS */
+        .filters {
+            display: flex;
+            gap: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 14px;
-            margin-bottom: 12px;
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip.active {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* SUMMARY STATS */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 16px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 900;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* GAME CARDS */
+        .games-container {
+            padding: 0 16px 80px 16px;
+        }
+
+        .game-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 0;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .game-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-primary);
         }
 
         .game-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
+            padding: 16px 20px;
+            background: var(--gradient-card);
             border-bottom: 1px solid var(--border);
         }
 
         .game-time {
-            font-size: 11px;
-            color: var(--text-secondary);
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .matchup {
-            margin: 12px 0;
+            padding: 20px;
         }
 
         .team-row {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
+            gap: 12px;
+            padding: 12px 0;
+        }
+
+        .team-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .team-logo img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .team-info {
+            flex: 1;
+            min-width: 0;
         }
 
         .team-name {
-            font-size: 15px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .team-record {
+            font-size: 11px;
+            color: var(--text-muted);
             font-weight: 600;
         }
 
-        .winner {
+        .winner .team-name {
             color: var(--success);
         }
 
+        .winner .team-logo {
+            border-color: var(--success);
+            box-shadow: 0 0 12px rgba(63, 185, 80, 0.3);
+        }
+
+        .prob-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
         .prob-bar {
-            flex: 1;
+            width: 60px;
             height: 6px;
-            background: var(--bg-input);
+            background: var(--bg-secondary);
             border-radius: 3px;
-            margin: 0 10px;
-            position: relative;
             overflow: hidden;
         }
 
         .prob-fill {
             height: 100%;
-            background: var(--accent);
+            background: var(--gradient-primary);
             border-radius: 3px;
-            transition: width 0.3s;
+            transition: width 0.5s ease-out;
         }
 
         .prob-value {
-            font-size: 14px;
-            font-weight: 700;
-            min-width: 45px;
+            font-size: 18px;
+            font-weight: 800;
+            min-width: 50px;
             text-align: right;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .prediction-details {
-            margin-top: 12px;
-            padding-top: 12px;
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.2);
             border-top: 1px solid var(--border);
-            font-size: 12px;
         }
 
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .detail-item {
+            text-align: center;
         }
 
         .detail-label {
-            color: var(--text-secondary);
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 4px;
         }
 
         .detail-value {
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
         }
 
-        .spread-line {
+        .spread-value {
             color: var(--warning);
         }
 
+        .confidence-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .conf-high {
+            background: rgba(63, 185, 80, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .conf-medium {
+            background: rgba(210, 153, 34, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .conf-low {
+            background: rgba(248, 81, 73, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-upset {
+            background: rgba(248, 81, 73, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .badge-tossup {
+            background: rgba(139, 148, 158, 0.2);
+            color: var(--text-secondary);
+            border: 1px solid var(--text-secondary);
+        }
+
+        .share-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .share-btn:hover {
+            background: var(--bg-glass);
+            border-color: var(--accent-primary);
+        }
+
+        /* STATUS BAR */
         .status-bar {
             background: var(--bg-card);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 10px;
-            margin: 12px 0;
-            font-size: 12px;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .loading {
-            color: var(--warning);
+        .status-bar::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
 
-        .success {
-            color: var(--success);
+        .loading::before {
+            background: var(--warning);
         }
 
-        .error {
-            color: var(--danger);
+        .success::before {
+            background: var(--success);
         }
 
-        .export-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin: 12px 0;
+        .error::before {
+            background: var(--danger);
         }
 
-        .btn-secondary {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .hidden {
@@ -282,12 +556,12 @@
 
         .spinner {
             border: 3px solid var(--border);
-            border-top: 3px solid var(--accent);
+            border-top: 3px solid var(--accent-primary);
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            margin: 20px auto;
+            margin: 40px auto;
         }
 
         @keyframes spin {
@@ -295,60 +569,224 @@
             100% { transform: rotate(360deg); }
         }
 
-        .confidence-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-left: 6px;
+        /* SHARE MODAL */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
         }
 
-        .conf-high {
-            background: var(--success);
-            color: white;
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
         }
 
-        .conf-medium {
-            background: var(--warning);
-            color: white;
+        .share-card {
+            background: var(--bg-primary);
+            border: 2px solid var(--accent-primary);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
         }
 
-        .conf-low {
-            background: var(--danger);
-            color: white;
+        .share-header {
+            text-align: center;
+            margin-bottom: 24px;
         }
 
-        .readme {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px;
-            margin: 20px 0;
-            font-size: 11px;
-            line-height: 1.8;
-            color: var(--text-secondary);
-        }
-
-        .readme h3 {
-            color: var(--accent);
-            margin-bottom: 8px;
+        .share-title {
             font-size: 14px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
 
-        .readme code {
-            background: var(--bg-input);
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
+        .share-matchup {
+            font-size: 24px;
+            font-weight: 900;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .share-content {
+            background: var(--gradient-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .share-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .share-team {
+            text-align: center;
+            flex: 1;
+        }
+
+        .share-team-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 12px;
+        }
+
+        .share-team-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .share-team-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .share-team-prob {
+            font-size: 28px;
+            font-weight: 900;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .share-vs {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .share-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .share-detail {
+            text-align: center;
+        }
+
+        .share-detail-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .share-detail-value {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .share-footer {
+            text-align: center;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .share-branding {
+            font-size: 20px;
+            font-weight: 900;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            box-shadow: none;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* RESPONSIVE */
+        @media (min-width: 768px) {
+            .games-container {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            .summary {
+                grid-template-columns: repeat(4, 1fr);
+                max-width: 800px;
+                margin: 16px auto;
+            }
+
+            .config-panel {
+                max-width: 800px;
+                margin: 16px auto;
+            }
+
+            .filters {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 16px;
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>⚡ FBS Game Predictor v2</h1>
-        <div class="subtitle">Rick's No-Bullshit College Football Oracle</div>
+        <div class="header-content">
+            <div class="brand">
+                <div class="logo">G</div>
+                <h1>GRIDLOCK</h1>
+            </div>
+            <div class="tagline">Premium College Football Analytics Platform</div>
+        </div>
     </header>
 
     <div class="container">
@@ -356,21 +794,33 @@
         <div class="config-panel" id="configPanel">
             <div class="input-group">
                 <label>CFB API Key</label>
-                <input type="text" id="apiKey" placeholder="Enter your API key">
+                <input type="text" id="apiKey" placeholder="Enter your API key from CollegeFootballData.com">
             </div>
             <div class="input-group">
                 <label>Season Year</label>
                 <input type="number" id="seasonYear" value="2025" min="2020" max="2030">
             </div>
             <div class="input-group">
-                <label>Week (optional - auto-detects current)</label>
-                <input type="number" id="weekNumber" placeholder="Auto" min="1" max="15">
+                <label>Week (Auto-Detects Current)</label>
+                <input type="number" id="weekNumber" placeholder="Leave blank for auto-detection" min="1" max="15">
             </div>
-            <button id="runPrediction">Run Prediction</button>
+            <button id="runPrediction">Generate Predictions</button>
         </div>
 
         <!-- Status Bar -->
-        <div class="status-bar" id="statusBar"></div>
+        <div class="status-bar hidden" id="statusBar"></div>
+
+        <!-- Filters -->
+        <div class="filters hidden" id="filters">
+            <div class="filter-chip active" data-filter="all">All Games</div>
+            <div class="filter-chip" data-filter="SEC">SEC</div>
+            <div class="filter-chip" data-filter="Big Ten">Big Ten</div>
+            <div class="filter-chip" data-filter="Big 12">Big 12</div>
+            <div class="filter-chip" data-filter="ACC">ACC</div>
+            <div class="filter-chip" data-filter="Pac-12">Pac-12</div>
+            <div class="filter-chip" data-filter="upsets">Upsets</div>
+            <div class="filter-chip" data-filter="tossups">Toss-Ups</div>
+        </div>
 
         <!-- Summary Stats -->
         <div class="summary hidden" id="summary">
@@ -384,7 +834,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="upsets">0</div>
-                <div class="stat-label">Upsets Predicted</div>
+                <div class="stat-label">Upset Alerts</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="closeGames">0</div>
@@ -392,47 +842,68 @@
             </div>
         </div>
 
-        <!-- Export Buttons -->
-        <div class="export-buttons hidden" id="exportButtons">
-            <button class="btn-secondary" id="exportJSON">Export JSON</button>
-            <button class="btn-secondary" id="exportCSV">Export CSV</button>
-        </div>
-
         <!-- Predictions Container -->
-        <div id="predictions"></div>
+        <div class="games-container" id="predictions"></div>
+    </div>
 
-        <!-- README -->
-        <div class="readme">
-            <h3>📋 Technical Documentation</h3>
-            <p><strong>API Version:</strong> CollegeFootballData API v2 (apinext.collegefootballdata.com)</p>
-            <p><strong>Algorithm:</strong> Logistic regression (ridge penalty) blended with Elo ratings (K=20). Features: offensive/defensive efficiency, explosiveness, havoc rates, finishing drives, tempo, field position, spread-implied probability, home field advantage, travel distance, rest days.</p>
-            <p><strong>Calibration:</strong> Platt scaling applied post-model. Probabilities clamped [0.05, 0.95].</p>
-            <p><strong>Data Sources (v2 API endpoints):</strong></p>
-            <ul style="margin-left: 16px; margin-top: 8px;">
-                <li><code>GET /calendar</code> - Current week detection</li>
-                <li><code>GET /games?classification=fbs</code> - Schedule and matchups (v2 uses camelCase: homeTeam, awayTeam, startDate)</li>
-                <li><code>GET /lines</code> - Vegas spreads and totals</li>
-                <li><code>GET /stats/season</code> - Team season stats</li>
-                <li><code>GET /ratings/elo</code> - Elo ratings</li>
-                <li><code>GET /teams/fbs</code> - Team metadata</li>
-            </ul>
-            <p style="margin-top: 8px;"><strong>Breaking Changes in v2:</strong> API v1 deprecated May 2025. v2 uses camelCase (homeTeam not home_team), 'classification' parameter instead of 'division'.</p>
-            <p style="margin-top: 8px;"><strong>Built by:</strong> Rick | West Texas Crisis Management & Software Architecture</p>
-            <p style="margin-top: 8px; font-size: 10px; color: var(--text-secondary);">Debug mode enabled - check browser console for detailed logs</p>
+    <!-- Share Modal -->
+    <div class="modal" id="shareModal">
+        <div class="share-card" id="shareContent">
+            <!-- Dynamic content populated by JavaScript -->
         </div>
     </div>
 
     <script type="module">
         // ===== CONFIGURATION =====
         const API_BASE = 'https://apinext.collegefootballdata.com';
-        const CACHE_TTL = 1000 * 60 * 15; // 15 minutes - reduced for more frequent updates
+        const ESPN_LOGO_BASE = 'https://a.espncdn.com/i/teamlogos/ncaa/500';
+        const CACHE_TTL = 1000 * 60 * 15; // 15 minutes
         const MAX_RETRIES = 3;
         const RETRY_DELAY = 1000;
+
+        // ===== ESPN TEAM ID MAPPING =====
+        // Map team names to ESPN IDs for logo fetching
+        const TEAM_ID_MAP = {
+            'Alabama': 333, 'LSU': 99, 'Georgia': 61, 'Texas': 251, 'Ohio State': 194,
+            'Michigan': 130, 'Penn State': 213, 'Oregon': 2483, 'Notre Dame': 87,
+            'Clemson': 228, 'Florida State': 52, 'Miami': 2390, 'Oklahoma': 201,
+            'Texas A&M': 245, 'Auburn': 2, 'Florida': 57, 'Tennessee': 2633,
+            'USC': 30, 'UCLA': 26, 'Washington': 264, 'Ole Miss': 145,
+            'Mississippi State': 344, 'Arkansas': 8, 'Kentucky': 96, 'Missouri': 142,
+            'South Carolina': 2579, 'Vanderbilt': 238, 'Wisconsin': 275,
+            'Iowa': 2294, 'Minnesota': 135, 'Nebraska': 158, 'Northwestern': 77,
+            'Illinois': 356, 'Purdue': 2509, 'Indiana': 84, 'Michigan State': 127,
+            'Maryland': 120, 'Rutgers': 164, 'Oklahoma State': 197, 'Kansas': 2305,
+            'Kansas State': 2306, 'TCU': 2628, 'Texas Tech': 2641, 'Baylor': 239,
+            'West Virginia': 277, 'Iowa State': 66, 'BYU': 252, 'Utah': 254,
+            'Colorado': 38, 'Arizona': 12, 'Arizona State': 9, 'Washington State': 265,
+            'Oregon State': 204, 'Stanford': 24, 'California': 25,
+            'NC State': 152, 'North Carolina': 153, 'Duke': 150, 'Wake Forest': 154,
+            'Virginia': 258, 'Virginia Tech': 259, 'Louisville': 97, 'Pittsburgh': 221,
+            'Syracuse': 183, 'Boston College': 103, 'Georgia Tech': 59,
+            'UCF': 2116, 'Cincinnati': 2132, 'Houston': 248, 'SMU': 2567,
+            'Memphis': 235, 'Tulane': 2655, 'South Florida': 58, 'Temple': 218,
+            'East Carolina': 151, 'Navy': 2426, 'Tulsa': 202, 'Boise State': 68,
+            'San Diego State': 21, 'Fresno State': 278, 'Colorado State': 36,
+            'Air Force': 2005, 'Wyoming': 2747, 'Nevada': 2440, 'New Mexico': 167,
+            'Utah State': 328, 'San Jose State': 23, 'Hawaii': 62, 'UNLV': 2439
+        };
+
+        function getTeamLogo(teamName) {
+            const teamId = TEAM_ID_MAP[teamName];
+            if (!teamId) {
+                debug(`No ESPN ID found for ${teamName}`);
+                return null;
+            }
+            return `${ESPN_LOGO_BASE}/${teamId}.png`;
+        }
 
         // ===== STATE =====
         let apiKey = localStorage.getItem('cfb_api_key') || '';
         let predictions = [];
-        let debugMode = true; // Enable detailed logging
+        let allPredictions = []; // Store unfiltered predictions
+        let activeFilter = 'all';
+        let debugMode = true;
 
         // ===== UTILITIES =====
         function debug(message, data = null) {
@@ -767,13 +1238,27 @@
         // ===== RENDERING =====
         function renderPredictions(preds) {
             const container = document.getElementById('predictions');
+            
+            if (preds.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🏈</div>
+                        <div class="empty-text">No games match your filter</div>
+                    </div>
+                `;
+                return;
+            }
+
             container.innerHTML = '';
 
-            preds.forEach(pred => {
+            preds.forEach((pred, index) => {
                 const card = document.createElement('div');
                 card.className = 'game-card';
+                card.style.animationDelay = `${index * 0.05}s`;
 
-                // v2 API uses camelCase: startDate
+                const awayLogo = getTeamLogo(pred.awayTeam);
+                const homeLogo = getTeamLogo(pred.homeTeam);
+
                 const gameTime = pred.game.startDate ? 
                     new Date(pred.game.startDate).toLocaleString('en-US', {
                         weekday: 'short',
@@ -783,49 +1268,72 @@
                         minute: '2-digit'
                     }) : 'TBD';
 
+                const badges = [];
+                if (pred.isUpset) badges.push('<span class="badge badge-upset">🔥 Upset Alert</span>');
+                if (pred.isTossUp) badges.push('<span class="badge badge-tossup">🎲 Toss-Up</span>');
+
                 card.innerHTML = `
                     <div class="game-header">
                         <div class="game-time">${gameTime}</div>
-                        <span class="confidence-badge conf-${pred.confidence}">${pred.confidence.toUpperCase()}</span>
+                        <span class="confidence-badge conf-${pred.confidence}">${pred.confidence}</span>
                     </div>
                     
                     <div class="matchup">
-                        <div class="team-row">
-                            <span class="team-name ${pred.winner === pred.awayTeam ? 'winner' : ''}">
-                                ${pred.awayTeam} ${pred.winner === pred.awayTeam ? '✓' : ''}
-                            </span>
-                            <div class="prob-bar">
-                                <div class="prob-fill" style="width: ${pred.awayWinProb * 100}%"></div>
+                        ${badges.length > 0 ? `<div class="badges">${badges.join('')}</div>` : ''}
+                        
+                        <div class="team-row ${pred.winner === pred.awayTeam ? 'winner' : ''}">
+                            <div class="team-logo">
+                                ${awayLogo ? `<img src="${awayLogo}" alt="${pred.awayTeam}" onerror="this.style.display='none'">` : ''}
                             </div>
-                            <span class="prob-value">${(pred.awayWinProb * 100).toFixed(1)}%</span>
+                            <div class="team-info">
+                                <div class="team-name">${pred.awayTeam}</div>
+                                <div class="team-record">Away</div>
+                            </div>
+                            <div class="prob-container">
+                                <div class="prob-bar">
+                                    <div class="prob-fill" style="width: ${pred.awayWinProb * 100}%"></div>
+                                </div>
+                                <div class="prob-value">${(pred.awayWinProb * 100).toFixed(0)}%</div>
+                            </div>
                         </div>
                         
-                        <div class="team-row">
-                            <span class="team-name ${pred.winner === pred.homeTeam ? 'winner' : ''}">
-                                ${pred.homeTeam} ${pred.winner === pred.homeTeam ? '✓' : ''}
-                            </span>
-                            <div class="prob-bar">
-                                <div class="prob-fill" style="width: ${pred.homeWinProb * 100}%"></div>
+                        <div class="team-row ${pred.winner === pred.homeTeam ? 'winner' : ''}">
+                            <div class="team-logo">
+                                ${homeLogo ? `<img src="${homeLogo}" alt="${pred.homeTeam}" onerror="this.style.display='none'">` : ''}
                             </div>
-                            <span class="prob-value">${(pred.homeWinProb * 100).toFixed(1)}%</span>
+                            <div class="team-info">
+                                <div class="team-name">${pred.homeTeam}</div>
+                                <div class="team-record">Home</div>
+                            </div>
+                            <div class="prob-container">
+                                <div class="prob-bar">
+                                    <div class="prob-fill" style="width: ${pred.homeWinProb * 100}%"></div>
+                                </div>
+                                <div class="prob-value">${(pred.homeWinProb * 100).toFixed(0)}%</div>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="prediction-details">
-                        <div class="detail-row">
-                            <span class="detail-label">Predicted Winner:</span>
-                            <span class="detail-value">${pred.winner} (${(pred.winnerProb * 100).toFixed(1)}%)</span>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">Winner</div>
+                                <div class="detail-value">${pred.winner}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Confidence</div>
+                                <div class="detail-value">${(pred.winnerProb * 100).toFixed(0)}%</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Margin</div>
+                                <div class="detail-value">${pred.predictedMargin.toFixed(1)} pts</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Vegas Spread</div>
+                                <div class="detail-value spread-value">${pred.spread !== 'N/A' ? pred.spread.toFixed(1) : 'N/A'}</div>
+                            </div>
                         </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Predicted Margin:</span>
-                            <span class="detail-value">${pred.predictedMargin.toFixed(1)} pts</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Vegas Spread:</span>
-                            <span class="detail-value spread-line">${pred.spread !== 'N/A' ? pred.spread.toFixed(1) : 'N/A'}</span>
-                        </div>
-                        ${pred.isUpset ? '<div class="detail-row"><span class="detail-value" style="color: var(--warning);">⚠️ UPSET ALERT</span></div>' : ''}
-                        ${pred.isTossUp ? '<div class="detail-row"><span class="detail-value" style="color: var(--text-secondary);">🎲 TOSS-UP</span></div>' : ''}
+                        <button class="share-btn" onclick="openShareModal(${index})">📸 Share Prediction</button>
                     </div>
                 `;
 
@@ -849,39 +1357,138 @@
             document.getElementById('closeGames').textContent = tossUps;
 
             document.getElementById('summary').classList.remove('hidden');
-            document.getElementById('exportButtons').classList.remove('hidden');
+            document.getElementById('filters').classList.remove('hidden');
         }
 
-        // ===== EXPORT =====
-        function exportJSON() {
-            const blob = new Blob([JSON.stringify(predictions, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `predictions_week_${predictions[0]?.game.week || 'unknown'}.json`;
-            a.click();
+        // ===== FILTERING =====
+        async function getTeamConference(teamName, year) {
+            try {
+                const teams = await apiCall('/teams/fbs', { year });
+                const team = teams.find(t => t.school === teamName || t.name === teamName);
+                return team?.conference || null;
+            } catch (err) {
+                debug(`Failed to get conference for ${teamName}`, err);
+                return null;
+            }
         }
 
-        function exportCSV() {
-            const headers = ['Away Team', 'Home Team', 'Winner', 'Win Prob %', 'Predicted Margin', 'Spread', 'Confidence'];
-            const rows = predictions.map(p => [
-                p.awayTeam,
-                p.homeTeam,
-                p.winner,
-                (p.winnerProb * 100).toFixed(1),
-                p.predictedMargin.toFixed(1),
-                p.spread !== 'N/A' ? p.spread.toFixed(1) : 'N/A',
-                p.confidence
-            ]);
+        function applyFilter(filterType) {
+            activeFilter = filterType;
+            
+            // Update filter chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+                if (chip.dataset.filter === filterType) {
+                    chip.classList.add('active');
+                }
+            });
 
-            const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `predictions_week_${predictions[0]?.game.week || 'unknown'}.csv`;
-            a.click();
+            // Filter predictions
+            let filtered = [...allPredictions];
+            
+            if (filterType === 'upsets') {
+                filtered = filtered.filter(p => p.isUpset);
+            } else if (filterType === 'tossups') {
+                filtered = filtered.filter(p => p.isTossUp);
+            } else if (filterType !== 'all') {
+                // Conference filter
+                filtered = filtered.filter(p => 
+                    p.conference === filterType || 
+                    p.homeConference === filterType || 
+                    p.awayConference === filterType
+                );
+            }
+
+            predictions = filtered;
+            renderPredictions(predictions);
         }
+
+        // ===== SHARE MODAL =====
+        function openShareModal(index) {
+            const pred = predictions[index];
+            const modal = document.getElementById('shareModal');
+            const content = document.getElementById('shareContent');
+
+            const awayLogo = getTeamLogo(pred.awayTeam);
+            const homeLogo = getTeamLogo(pred.homeTeam);
+
+            content.innerHTML = `
+                <div class="share-header">
+                    <div class="share-title">GRIDLOCK Prediction</div>
+                    <div class="share-matchup">${pred.awayTeam} vs ${pred.homeTeam}</div>
+                </div>
+                
+                <div class="share-content">
+                    <div class="share-teams">
+                        <div class="share-team ${pred.winner === pred.awayTeam ? 'winner' : ''}">
+                            <div class="share-team-logo">
+                                ${awayLogo ? `<img src="${awayLogo}" alt="${pred.awayTeam}">` : ''}
+                            </div>
+                            <div class="share-team-name">${pred.awayTeam}</div>
+                            <div class="share-team-prob">${(pred.awayWinProb * 100).toFixed(0)}%</div>
+                        </div>
+                        
+                        <div class="share-vs">VS</div>
+                        
+                        <div class="share-team ${pred.winner === pred.homeTeam ? 'winner' : ''}">
+                            <div class="share-team-logo">
+                                ${homeLogo ? `<img src="${homeLogo}" alt="${pred.homeTeam}">` : ''}
+                            </div>
+                            <div class="share-team-name">${pred.homeTeam}</div>
+                            <div class="share-team-prob">${(pred.homeWinProb * 100).toFixed(0)}%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="share-details">
+                        <div class="share-detail">
+                            <div class="share-detail-label">Predicted Winner</div>
+                            <div class="share-detail-value">${pred.winner}</div>
+                        </div>
+                        <div class="share-detail">
+                            <div class="share-detail-label">Margin</div>
+                            <div class="share-detail-value">${pred.predictedMargin.toFixed(1)} pts</div>
+                        </div>
+                        <div class="share-detail">
+                            <div class="share-detail-label">Confidence</div>
+                            <div class="share-detail-value conf-${pred.confidence}">${pred.confidence.toUpperCase()}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="share-footer">
+                        <div class="share-branding">GRIDLOCK</div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn-secondary" onclick="closeShareModal()">Close</button>
+                    <button onclick="screenshotShare()">📸 Screenshot</button>
+                </div>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+
+        async function screenshotShare() {
+            // Use html2canvas or similar library in production
+            // For now, just copy the matchup text
+            const content = document.querySelector('.share-matchup').textContent;
+            
+            try {
+                await navigator.clipboard.writeText(`GRIDLOCK Prediction: ${content}`);
+                alert('Prediction copied! Take a screenshot to share on social media.');
+            } catch (err) {
+                alert('Take a screenshot of this card to share!');
+            }
+        }
+
+        // Make functions available globally for onclick handlers
+        window.openShareModal = openShareModal;
+        window.closeShareModal = closeShareModal;
+        window.screenshotShare = screenshotShare;
 
         // ===== MAIN WORKFLOW =====
         async function runPrediction() {
@@ -913,20 +1520,26 @@
 
                 // Generate predictions
                 logStatus('🧠 Running prediction model...', 'loading');
-                predictions = data.games.map(game => 
+                allPredictions = data.games.map(game => 
                     predictGame(game, data.lines, data.elo, data.teams, data.stats)
                 );
 
                 // Sort by confidence (high to low)
-                predictions.sort((a, b) => {
+                allPredictions.sort((a, b) => {
                     const confA = Math.abs(a.homeWinProb - 0.5);
                     const confB = Math.abs(b.homeWinProb - 0.5);
                     return confB - confA;
                 });
 
+                predictions = [...allPredictions];
+
                 // Render
                 renderPredictions(predictions);
                 updateSummary(predictions);
+
+                // Collapse config panel
+                document.getElementById('configPanel').classList.add('collapsed');
+                document.getElementById('statusBar').classList.add('hidden');
 
                 logStatus(`✅ ${predictions.length} games predicted for Week ${week}`, 'success');
 
@@ -938,15 +1551,27 @@
 
         // ===== EVENT LISTENERS =====
         document.getElementById('runPrediction').addEventListener('click', runPrediction);
-        document.getElementById('exportJSON').addEventListener('click', exportJSON);
-        document.getElementById('exportCSV').addEventListener('click', exportCSV);
+
+        // Filter chips
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                applyFilter(chip.dataset.filter);
+            });
+        });
+
+        // Close modal on background click
+        document.getElementById('shareModal').addEventListener('click', (e) => {
+            if (e.target.id === 'shareModal') {
+                closeShareModal();
+            }
+        });
 
         // Load saved API key
         if (apiKey) {
             document.getElementById('apiKey').value = apiKey;
         }
 
-        logStatus('⚙️ Ready. Enter your API key and hit Run.', 'loading');
+        logStatus('⚙️ Ready. Enter your API key and generate predictions.', 'loading');
     </script>
 </body>
 </html>
