@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MATADOR METRICS | CFB Predictions</title>
+    <title>Raidline Analytics | College Football Predictions</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         
         * {
             margin: 0;
@@ -14,35 +14,35 @@
         }
 
         :root {
-            --bg-primary: #f5f7fa;
+            --bg-primary: #fafbfc;
             --bg-secondary: #ffffff;
             --bg-card: #ffffff;
-            --text-primary: #1a1d23;
-            --text-secondary: #4a5568;
-            --text-muted: #718096;
-            --accent-primary: #0066ff;
-            --accent-secondary: #0052cc;
-            --gradient-primary: linear-gradient(135deg, #0066ff 0%, #00d9ff 100%);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent-primary: #2563eb;
+            --accent-secondary: #1e40af;
+            --gradient-primary: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
             --border: #e2e8f0;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
-            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2);
+            --border-light: #f1f5f9;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg-primary);
-            background-image: 
-                linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%);
             color: var(--text-primary);
             line-height: 1.6;
             padding: 0;
             margin: 0;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
         }
 
@@ -56,7 +56,7 @@
         header {
             background: var(--bg-secondary);
             padding: 20px 16px;
-            border-bottom: 3px solid #dc2626;
+            border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -72,41 +72,35 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 8px;
         }
 
         .logo {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-primary);
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 900;
-            font-size: 20px;
-            letter-spacing: -1px;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: -0.5px;
             color: white;
-            font-family: 'Bebas Neue', sans-serif;
         }
 
         h1 {
-            font-size: 32px;
-            font-weight: 700;
-            color: #dc2626;
-            letter-spacing: 2px;
-            font-family: 'Bebas Neue', sans-serif;
-            text-transform: uppercase;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
         }
 
         .tagline {
             font-size: 13px;
-            color: var(--text-secondary);
-            font-weight: 600;
-            margin-left: 48px;
-            font-family: 'Oswald', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-left: 44px;
+            letter-spacing: -0.2px;
         }
 
         /* CONFIG PANEL */
@@ -606,9 +600,9 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 2000;
             display: flex;
             align-items: center;
@@ -616,7 +610,7 @@
             padding: 16px;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s;
+            transition: opacity 0.2s ease;
         }
 
         .modal.active {
@@ -630,128 +624,326 @@
         }
 
         .share-card {
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-            border-radius: 16px;
+            background: #ffffff;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: var(--shadow-xl);
-            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border);
         }
 
-        /* Fighting game style header */
+        /* Premium white header */
         .share-header {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            padding: 12px 16px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+            background: #ffffff;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
         }
 
-        /* Football playbook vector graphics */
-        .share-header::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 10px;
-            transform: translateY(-50%);
-            width: 30px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.2);
+        .share-header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
         }
 
-        .share-header::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 10px;
-            transform: translateY(-50%);
-            width: 0;
-            height: 0;
-            border-left: 8px solid rgba(255, 255, 255, 0.3);
-            border-top: 5px solid transparent;
-            border-bottom: 5px solid transparent;
-            margin-left: 30px;
+        .share-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .playbook-line-left {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            width: 40px;
-            height: 40px;
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 50%;
-        }
-
-        .playbook-line-left::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            right: -15px;
-            width: 15px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-50%) rotate(-30deg);
-        }
-
-        .playbook-line-right {
-            position: absolute;
-            top: 50%;
-            right: 10px;
-            transform: translateY(-50%);
-            width: 30px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .playbook-line-right::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            right: 0;
-            transform: translateY(-50%);
-            width: 0;
-            height: 0;
-            border-left: 8px solid rgba(255, 255, 255, 0.3);
-            border-top: 5px solid transparent;
-            border-bottom: 5px solid transparent;
-        }
-
-        .playbook-x {
-            position: absolute;
-            bottom: 8px;
-            right: 12px;
-            font-size: 16px;
-            font-weight: 900;
-            color: rgba(255, 255, 255, 0.2);
-            font-family: 'Bebas Neue', sans-serif;
-        }
-
-        .share-week {
-            font-size: 9px;
-            color: rgba(255,255,255,0.6);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
+        .share-logo {
+            width: 24px;
+            height: 24px;
+            background: var(--gradient-primary);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 700;
-            margin-bottom: 3px;
-            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            color: white;
+            letter-spacing: -0.3px;
         }
 
         .share-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #ffffff;
-            letter-spacing: 3px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.4px;
+        }
+
+        .share-week {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: -0.1px;
+        }
+
+        .share-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: -0.2px;
+        }
+
+        /* VS Section */
+        .share-matchup {
+            position: relative;
+            padding: 20px 16px;
+            background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+        }
+
+        .share-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .share-team {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .share-team-logo-container {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 10px;
+            background: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border-light);
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .share-team.winner .share-team-logo-container {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1), var(--shadow-md);
+        }
+
+        .share-team-logo {
+            width: 58px;
+            height: 58px;
+        }
+
+        .share-team-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .share-team-label {
+            font-size: 9px;
+            color: var(--text-muted);
             text-transform: uppercase;
-            font-family: 'Bebas Neue', sans-serif;
-            text-shadow: 0 2px 8px rgba(220, 38, 38, 0.5);
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .share-team-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .share-team.winner .share-team-name {
+            color: var(--success);
+        }
+
+        .share-team-prob {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+
+        .share-team.winner .share-team-prob {
+            color: var(--success);
+        }
+
+        /* VS Badge - minimal */
+        .share-vs {
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .vs-badge {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-primary);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        /* Stats Section */
+        .share-details {
+            padding: 16px 20px 20px;
+            background: #ffffff;
+        }
+
+        .share-prediction {
+            text-align: center;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.08));
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.15);
+        }
+
+        .share-prediction-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .share-prediction-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--success);
+            letter-spacing: -0.3px;
+        }
+
+        .share-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .share-stat {
+            text-align: center;
+            padding: 10px 8px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .share-stat-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .share-stat-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .share-stat-value.highlight {
+            color: var(--accent-primary);
+        }
+
+        .share-venue {
+            text-align: center;
+            padding: 8px 12px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            border: 1px solid var(--border-light);
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 6px;
+            letter-spacing: -0.2px;
+        }
+
+        .share-venue::before {
+            content: '📍';
+            font-size: 11px;
+        }
+
+        .share-game-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-align: center;
+            letter-spacing: -0.1px;
+        }
+
+        .share-badges {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .share-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .share-badge-upset {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .share-badge-tossup {
+            background: rgba(100, 116, 139, 0.1);
+            color: var(--text-secondary);
+            border: 1px solid rgba(100, 116, 139, 0.2);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn-close {
+            flex: 1;
+            background: white;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            padding: 10px;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: -0.2px;
+        }
+
+        .btn-close:hover {
+            background: var(--bg-primary);
+            border-color: var(--accent-primary);
         }
 
         /* VS Section - Fighting game style */
-        .share-matchup {
-            position: relative;
-            padding: 16px 12px;
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-        }
 
         .share-teams {
             display: flex;
@@ -986,87 +1178,6 @@
             border: 1.5px solid var(--text-secondary);
         }
 
-        /* Footer */
-        .share-footer {
-            text-align: center;
-            padding: 12px 16px;
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            border-top: 3px solid #dc2626;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Football playbook lines in footer */
-        .playbook-footer-left {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            width: 35px;
-            height: 35px;
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 4px;
-            transform: rotate(45deg);
-        }
-
-        .playbook-footer-right {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 25px;
-            height: 25px;
-        }
-
-        .playbook-footer-right::before,
-        .playbook-footer-right::after {
-            content: '';
-            position: absolute;
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .playbook-footer-right::before {
-            width: 2px;
-            height: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .playbook-footer-right::after {
-            width: 100%;
-            height: 2px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .playbook-o {
-            position: absolute;
-            top: 50%;
-            left: 12px;
-            transform: translateY(-50%);
-            width: 12px;
-            height: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-        }
-
-        .share-branding {
-            font-size: 24px;
-            font-weight: 700;
-            color: #ffffff;
-            letter-spacing: 3px;
-            margin-bottom: 3px;
-            font-family: 'Bebas Neue', sans-serif;
-            text-shadow: 0 2px 8px rgba(220, 38, 38, 0.5);
-        }
-
-        .share-tagline {
-            font-size: 8px;
-            color: rgba(255,255,255,0.6);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 600;
-            font-family: 'Oswald', sans-serif;
-        }
-
         .modal-actions {
             display: flex;
             gap: 10px;
@@ -1142,10 +1253,10 @@
     <header>
         <div class="header-content">
             <div class="brand">
-                <div class="logo">M</div>
-                <h1>MATADOR METRICS</h1>
+                <div class="logo">R</div>
+                <h1>Raidline Analytics</h1>
             </div>
-            <div class="tagline">College Football Analytics</div>
+            <div class="tagline">College Football Predictions</div>
         </div>
     </header>
 
@@ -1831,12 +1942,14 @@
             wrapper.innerHTML = `
                 <div class="share-card">
                     <div class="share-header">
-                        <div class="playbook-line-left"></div>
-                        <div class="playbook-line-right"></div>
-                        <div class="playbook-x">X</div>
-                        <div class="playbook-o"></div>
-                        <div class="share-week">Week ${pred.game.week || '?'} • FBS</div>
-                        <div class="share-title">MATADOR METRICS</div>
+                        <div class="share-header-top">
+                            <div class="share-brand">
+                                <div class="share-logo">R</div>
+                                <div class="share-title">Raidline Analytics</div>
+                            </div>
+                            <div class="share-week">Week ${pred.game.week || '?'}</div>
+                        </div>
+                        <div class="share-meta">${gameTime}</div>
                     </div>
                     
                     <div class="share-matchup">
@@ -1897,14 +2010,7 @@
                         </div>
                         
                         <div class="share-venue">${venue}</div>
-                        <div class="share-game-time">${gameTime}</div>
-                    </div>
-                    
-                    <div class="share-footer">
-                        <div class="playbook-footer-left"></div>
-                        <div class="playbook-footer-right"></div>
-                        <div class="share-branding">MATADOR METRICS</div>
-                        <div class="share-tagline">College Football Analytics</div>
+                        <div class="share-game-time">Powered by Raidline Analytics</div>
                     </div>
                 </div>
                 
