@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GRIDIRON | Premium CFB Predictions</title>
+    <title>MATADOR METRICS | CFB Predictions</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;700&display=swap');
+        
         * {
             margin: 0;
             padding: 0;
@@ -54,7 +56,7 @@
         header {
             background: var(--bg-secondary);
             padding: 20px 16px;
-            border-bottom: 2px solid var(--border);
+            border-bottom: 3px solid #dc2626;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -76,32 +78,35 @@
         .logo {
             width: 36px;
             height: 36px;
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 900;
-            font-size: 18px;
+            font-size: 20px;
             letter-spacing: -1px;
             color: white;
+            font-family: 'Bebas Neue', sans-serif;
         }
 
         h1 {
-            font-size: 28px;
-            font-weight: 800;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.5px;
+            font-size: 32px;
+            font-weight: 700;
+            color: #dc2626;
+            letter-spacing: 2px;
+            font-family: 'Bebas Neue', sans-serif;
+            text-transform: uppercase;
         }
 
         .tagline {
             font-size: 13px;
             color: var(--text-secondary);
-            font-weight: 500;
+            font-weight: 600;
             margin-left: 48px;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         /* CONFIG PANEL */
@@ -641,26 +646,84 @@
             overflow: hidden;
         }
 
+        /* Football playbook vector graphics */
         .share-header::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                rgba(255,255,255,0.03) 10px,
-                rgba(255,255,255,0.03) 20px
-            );
-            animation: scan 20s linear infinite;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
         }
 
-        @keyframes scan {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50%, 50%); }
+        .share-header::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            margin-left: 30px;
+        }
+
+        .playbook-line-left {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+        }
+
+        .playbook-line-left::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -15px;
+            width: 15px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-50%) rotate(-30deg);
+        }
+
+        .playbook-line-right {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .playbook-line-right::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .playbook-x {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-size: 16px;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.2);
+            font-family: 'Bebas Neue', sans-serif;
         }
 
         .share-week {
@@ -670,15 +733,17 @@
             letter-spacing: 1.5px;
             font-weight: 700;
             margin-bottom: 3px;
+            font-family: 'Oswald', sans-serif;
         }
 
         .share-title {
-            font-size: 18px;
-            font-weight: 900;
+            font-size: 22px;
+            font-weight: 700;
             color: #ffffff;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            text-shadow: 0 2px 8px rgba(0, 102, 255, 0.5);
+            font-family: 'Bebas Neue', sans-serif;
+            text-shadow: 0 2px 8px rgba(220, 38, 38, 0.5);
         }
 
         /* VS Section - Fighting game style */
@@ -926,16 +991,71 @@
             text-align: center;
             padding: 12px 16px;
             background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            border-top: 2px solid #0066ff;
+            border-top: 3px solid #dc2626;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Football playbook lines in footer */
+        .playbook-footer-left {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            width: 35px;
+            height: 35px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            transform: rotate(45deg);
+        }
+
+        .playbook-footer-right {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 25px;
+            height: 25px;
+        }
+
+        .playbook-footer-right::before,
+        .playbook-footer-right::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .playbook-footer-right::before {
+            width: 2px;
+            height: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .playbook-footer-right::after {
+            width: 100%;
+            height: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .playbook-o {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
         }
 
         .share-branding {
-            font-size: 20px;
-            font-weight: 900;
+            font-size: 24px;
+            font-weight: 700;
             color: #ffffff;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             margin-bottom: 3px;
-            text-shadow: 0 2px 8px rgba(0, 102, 255, 0.5);
+            font-family: 'Bebas Neue', sans-serif;
+            text-shadow: 0 2px 8px rgba(220, 38, 38, 0.5);
         }
 
         .share-tagline {
@@ -944,6 +1064,7 @@
             text-transform: uppercase;
             letter-spacing: 1.5px;
             font-weight: 600;
+            font-family: 'Oswald', sans-serif;
         }
 
         .modal-actions {
@@ -1021,10 +1142,10 @@
     <header>
         <div class="header-content">
             <div class="brand">
-                <div class="logo">G</div>
-                <h1>GRIDIRON</h1>
+                <div class="logo">M</div>
+                <h1>MATADOR METRICS</h1>
             </div>
-            <div class="tagline">Premium College Football Predictions</div>
+            <div class="tagline">College Football Analytics</div>
         </div>
     </header>
 
@@ -1710,8 +1831,12 @@
             wrapper.innerHTML = `
                 <div class="share-card">
                     <div class="share-header">
+                        <div class="playbook-line-left"></div>
+                        <div class="playbook-line-right"></div>
+                        <div class="playbook-x">X</div>
+                        <div class="playbook-o"></div>
                         <div class="share-week">Week ${pred.game.week || '?'} • FBS</div>
-                        <div class="share-title">GRIDIRON</div>
+                        <div class="share-title">MATADOR METRICS</div>
                     </div>
                     
                     <div class="share-matchup">
@@ -1776,8 +1901,10 @@
                     </div>
                     
                     <div class="share-footer">
-                        <div class="share-branding">GRIDIRON</div>
-                        <div class="share-tagline">Premium College Football Predictions</div>
+                        <div class="playbook-footer-left"></div>
+                        <div class="playbook-footer-right"></div>
+                        <div class="share-branding">MATADOR METRICS</div>
+                        <div class="share-tagline">College Football Analytics</div>
                     </div>
                 </div>
                 
