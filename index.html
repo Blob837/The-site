@@ -80,10 +80,10 @@
 
     .hero-logo {
       justify-self: center;
-      width: min(420px, 80vw);
-      max-width: 420px;
-      filter: drop-shadow(0 28px 60px rgba(0, 170, 255, 0.45))
-        drop-shadow(0 12px 28px rgba(255, 255, 255, 0.18));
+      width: min(560px, 92vw);
+      max-width: 560px;
+      filter: drop-shadow(0 32px 68px rgba(0, 170, 255, 0.5))
+        drop-shadow(0 16px 34px rgba(255, 255, 255, 0.24));
       animation: float 8s ease-in-out infinite;
     }
 
@@ -240,23 +240,55 @@
     .texas-map {
       display: flex;
       justify-content: center;
+      padding: clamp(1.25rem, 3vw, 1.75rem);
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 28% 32%, rgba(0, 170, 255, 0.12), transparent 70%),
+        radial-gradient(circle at 72% 68%, rgba(0, 255, 204, 0.16), transparent 75%),
+        rgba(5, 10, 22, 0.65);
+      border: 1px solid rgba(0, 170, 255, 0.22);
+      box-shadow: 0 26px 60px rgba(0, 170, 255, 0.22);
     }
 
     .texas-map svg {
-      width: min(360px, 90vw);
-      filter: drop-shadow(0 20px 48px rgba(0, 170, 255, 0.35));
+      width: min(420px, 95vw);
+      filter: drop-shadow(0 28px 56px rgba(0, 170, 255, 0.38));
+    }
+
+    .map-outline {
+      fill: url(#mapFill);
+      stroke: url(#mapGradient);
+      stroke-width: 3;
+      stroke-linejoin: round;
+    }
+
+    .map-point circle:last-of-type {
+      stroke: rgba(5, 10, 22, 0.75);
+      stroke-width: 1.4;
     }
 
     .map-point text {
-      fill: #9db5d8;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
+      fill: #f5fbff;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
+      paint-order: stroke fill;
+      stroke: rgba(5, 10, 22, 0.9);
+      stroke-width: 4px;
+      stroke-linejoin: round;
     }
 
     .map-point .map-glow {
       fill: url(#dotGlow);
+    }
+
+    .map-connector {
+      stroke: rgba(0, 255, 204, 0.7);
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-dasharray: 4 6;
+      filter: drop-shadow(0 6px 18px rgba(0, 170, 255, 0.45));
     }
 
     .architecture {
@@ -609,6 +641,11 @@
       <div class="texas-map" aria-hidden="true">
         <svg viewBox="0 0 320 260" role="presentation" focusable="false">
           <defs>
+            <linearGradient id="mapFill" x1="28%" y1="0%" x2="72%" y2="100%">
+              <stop offset="0%" stop-color="rgba(18, 44, 72, 0.95)" />
+              <stop offset="55%" stop-color="rgba(9, 30, 58, 0.92)" />
+              <stop offset="100%" stop-color="rgba(7, 20, 40, 0.9)" />
+            </linearGradient>
             <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="rgba(0, 170, 255, 0.65)" />
               <stop offset="100%" stop-color="rgba(0, 255, 204, 0.65)" />
@@ -623,25 +660,26 @@
           </defs>
           <path
             d="M161.89,42.84 L161.89,47.39 L169.35,51.84 L176.38,51.98 L177.61,50.28 L181.66,55.82 L196.10,57.16 L199.15,59.51 L201.86,57.24 L206.62,58.29 L212.08,61.33 L211.29,63.77 L213.75,64.74 L218.77,61.29 L224.76,65.49 L230.03,63.13 L232.22,67.99 L237.08,62.07 L238.70,64.80 L243.52,63.52 L250.58,68.00 L255.99,65.04 L269.39,62.68 L277.01,64.16 L278.68,62.02 L299.77,72.24 L307.40,72.01 L307.42,109.95 L312.37,114.80 L312.49,120.04 L317.24,125.26 L318.26,130.09 L319.90,129.94 L319.13,138.79 L314.81,145.63 L315.49,157.14 L311.13,162.62 L312.42,166.34 L289.44,174.38 L296.37,170.39 L289.39,170.24 L291.53,166.25 L290.36,163.99 L286.65,167.06 L284.87,166.11 L283.59,169.66 L286.25,171.08 L286.81,175.94 L290.81,175.12 L274.69,186.48 L250.36,198.26 L260.13,191.75 L254.02,193.45 L254.16,190.58 L247.69,193.73 L245.34,189.98 L243.37,190.62 L249.74,196.83 L243.18,199.44 L240.65,197.73 L240.06,202.17 L234.51,204.60 L230.61,211.94 L225.92,211.60 L228.98,215.05 L225.36,223.87 L219.54,225.45 L224.82,225.62 L221.42,235.92 L223.66,237.96 L227.97,253.85 L230.30,254.61 L229.88,256.65 L231.47,254.98 L231.62,257.20 L225.21,260.00 L218.78,255.67 L204.85,254.67 L183.74,245.78 L179.76,235.90 L175.42,231.51 L173.09,217.27 L165.72,213.15 L159.86,204.12 L154.78,200.91 L145.42,180.78 L131.72,170.39 L127.60,164.71 L105.14,161.84 L103.60,164.61 L96.20,165.57 L91.87,177.72 L85.80,183.57 L79.25,182.62 L51.60,167.54 L47.58,160.72 L46.87,153.03 L41.48,144.15 L30.12,137.81 L0.00,113.34 L0.71,109.91 L87.04,109.92 L88.56,0.00 L161.89,0.02 L161.89,42.84 Z"
-            fill="rgba(8, 15, 30, 0.92)"
-            stroke="url(#mapGradient)"
-            stroke-width="3"
+            class="map-outline"
             filter="url(#mapShadow)"
           />
           <g class="map-point">
+            <line class="map-connector" x1="113.0" y1="112.4" x2="168.0" y2="90.0"></line>
             <circle cx="113.0" cy="112.4" r="12" class="map-glow"></circle>
             <circle cx="113.0" cy="112.4" r="5" fill="#00ffcc"></circle>
-            <text x="129.0" y="108.4">Permian Basin</text>
+            <text x="174.0" y="90.0" dominant-baseline="middle">Permian Basin</text>
           </g>
           <g class="map-point">
+            <line class="map-connector" x1="52.0" y1="122.2" x2="120.0" y2="146.0"></line>
             <circle cx="52.0" cy="122.2" r="12" class="map-glow"></circle>
             <circle cx="52.0" cy="122.2" r="5" fill="#00d1ff"></circle>
-            <text x="68.0" y="116.2">Delaware Basin</text>
+            <text x="126.0" y="146.0" dominant-baseline="middle">Delaware Basin</text>
           </g>
           <g class="map-point">
+            <line class="map-connector" x1="198.5" y1="195.4" x2="252.0" y2="218.0"></line>
             <circle cx="198.5" cy="195.4" r="12" class="map-glow"></circle>
             <circle cx="198.5" cy="195.4" r="5" fill="#00ffd5"></circle>
-            <text x="214.5" y="195.4">Eagle Ford</text>
+            <text x="258.0" y="218.0" dominant-baseline="middle">Eagle Ford</text>
           </g>
         </svg>
       </div>
