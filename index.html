@@ -1205,29 +1205,38 @@
 
         async function fetchSeasonGames(year) {
             logStatus('Fetching season history...', 'loading');
-            const url = `${ESPN_CORE}/seasons/${year}/types/2/events?limit=1000`;
-            const data = await fetchESPN(url);
             
-            if (!data.items) return [];
+            // Instead of using the Core API, fetch weeks 1-5 from scoreboard
+            // This is more reliable
+            const allGames = [];
+            const currentWeekNum = await getCurrentWeek(year);
             
-            // Fetch details for each game
-            const games = [];
-            for (let i = 0; i < Math.min(data.items.length, 200); i++) {
+            // Fetch completed weeks (up to current week - 1)
+            const weeksToFetch = Math.max(1, currentWeekNum - 1);
+            
+            for (let week = 1; week <= Math.min(weeksToFetch, 10); week++) {
                 try {
-                    const gameData = await fetchESPN(data.items[i].$ref);
-                    if (gameData.competitions && gameData.competitions[0].competitors) {
-                        games.push(gameData);
+                    logStatus(`Loading Week ${week} history...`, 'loading');
+                    const url = `${ESPN_BASE}/scoreboard?week=${week}&seasontype=2&limit=300`;
+                    const data = await fetchESPN(url);
+                    
+                    if (data.events && data.events.length > 0) {
+                        // Only keep completed games
+                        const completedGames = data.events.filter(event => 
+                            event.status && event.status.type && event.status.type.completed
+                        );
+                        allGames.push(...completedGames);
+                        debug(`Week ${week}: ${completedGames.length} completed games`);
                     }
-                    if (i % 10 === 0) {
-                        logStatus(`Loading season data: ${i + 1}/${Math.min(data.items.length, 200)}`, 'loading');
-                    }
-                    await delay(50);
+                    
+                    await delay(100); // Small delay to be nice to ESPN
                 } catch (err) {
-                    debug(`Failed to fetch game: ${err.message}`);
+                    debug(`Failed to fetch week ${week}: ${err.message}`);
                 }
             }
             
-            return games;
+            debug(`Total games fetched: ${allGames.length}`);
+            return allGames;
         }
 
         // ===== ELO RATING SYSTEM =====
@@ -1256,34 +1265,39 @@
             const teams = new Set();
             const completedGames = [];
             
-            // Extract completed games
-            games.forEach(game => {
-                if (game.status.type.completed && game.competitions && game.competitions[0]) {
-                    const comp = game.competitions[0];
-                    if (comp.competitors && comp.competitors.length === 2) {
-                        const home = comp.competitors.find(c => c.homeAway === 'home');
-                        const away = comp.competitors.find(c => c.homeAway === 'away');
+            // Extract completed games from ESPN scoreboard events
+            games.forEach(event => {
+                if (event.status && event.status.type && event.status.type.completed) {
+                    if (event.competitions && event.competitions[0] && event.competitions[0].competitors) {
+                        const comp = event.competitions[0];
                         
-                        if (home && away) {
-                            const homeTeam = home.team.displayName;
-                            const awayTeam = away.team.displayName;
-                            const homeScore = parseInt(home.score);
-                            const awayScore = parseInt(away.score);
+                        if (comp.competitors.length === 2) {
+                            const home = comp.competitors.find(c => c.homeAway === 'home');
+                            const away = comp.competitors.find(c => c.homeAway === 'away');
                             
-                            teams.add(homeTeam);
-                            teams.add(awayTeam);
-                            
-                            completedGames.push({
-                                home: homeTeam,
-                                away: awayTeam,
-                                homeScore,
-                                awayScore,
-                                date: new Date(game.date)
-                            });
+                            if (home && away && home.team && away.team) {
+                                const homeTeam = home.team.displayName;
+                                const awayTeam = away.team.displayName;
+                                const homeScore = parseInt(home.score || 0);
+                                const awayScore = parseInt(away.score || 0);
+                                
+                                teams.add(homeTeam);
+                                teams.add(awayTeam);
+                                
+                                completedGames.push({
+                                    home: homeTeam,
+                                    away: awayTeam,
+                                    homeScore,
+                                    awayScore,
+                                    date: new Date(event.date)
+                                });
+                            }
                         }
                     }
                 }
             });
+            
+            debug(`Processing ${completedGames.length} games for Elo calculation`);
             
             // Sort by date
             completedGames.sort((a, b) => a.date - b.date);
@@ -1308,7 +1322,7 @@
                 }
             });
             
-            debug('Elo ratings calculated', elo);
+            debug('Elo ratings calculated', Object.keys(elo).length + ' teams');
             return elo;
         }
 
@@ -1318,63 +1332,66 @@
             
             const stats = {};
             
-            games.forEach(game => {
-                if (game.status.type.completed && game.competitions && game.competitions[0]) {
-                    const comp = game.competitions[0];
-                    if (comp.competitors && comp.competitors.length === 2) {
-                        const home = comp.competitors.find(c => c.homeAway === 'home');
-                        const away = comp.competitors.find(c => c.homeAway === 'away');
+            games.forEach(event => {
+                if (event.status && event.status.type && event.status.type.completed) {
+                    if (event.competitions && event.competitions[0] && event.competitions[0].competitors) {
+                        const comp = event.competitions[0];
                         
-                        if (home && away) {
-                            const homeTeam = home.team.displayName;
-                            const awayTeam = away.team.displayName;
-                            const homeScore = parseInt(home.score);
-                            const awayScore = parseInt(away.score);
+                        if (comp.competitors.length === 2) {
+                            const home = comp.competitors.find(c => c.homeAway === 'home');
+                            const away = comp.competitors.find(c => c.homeAway === 'away');
                             
-                            // Initialize stats
-                            if (!stats[homeTeam]) {
-                                stats[homeTeam] = {
-                                    games: [],
-                                    wins: 0,
-                                    losses: 0,
-                                    pointsFor: 0,
-                                    pointsAgainst: 0,
-                                    homeGames: 0,
-                                    homeWins: 0,
-                                    conference: home.team.conferenceId
-                                };
-                            }
-                            if (!stats[awayTeam]) {
-                                stats[awayTeam] = {
-                                    games: [],
-                                    wins: 0,
-                                    losses: 0,
-                                    pointsFor: 0,
-                                    pointsAgainst: 0,
-                                    homeGames: 0,
-                                    homeWins: 0,
-                                    conference: away.team.conferenceId
-                                };
-                            }
-                            
-                            // Update stats
-                            stats[homeTeam].games.push({ score: homeScore, allowed: awayScore, home: true });
-                            stats[awayTeam].games.push({ score: awayScore, allowed: homeScore, home: false });
-                            
-                            stats[homeTeam].pointsFor += homeScore;
-                            stats[homeTeam].pointsAgainst += awayScore;
-                            stats[awayTeam].pointsFor += awayScore;
-                            stats[awayTeam].pointsAgainst += homeScore;
-                            
-                            stats[homeTeam].homeGames++;
-                            
-                            if (homeScore > awayScore) {
-                                stats[homeTeam].wins++;
-                                stats[homeTeam].homeWins++;
-                                stats[awayTeam].losses++;
-                            } else if (awayScore > homeScore) {
-                                stats[awayTeam].wins++;
-                                stats[homeTeam].losses++;
+                            if (home && away && home.team && away.team) {
+                                const homeTeam = home.team.displayName;
+                                const awayTeam = away.team.displayName;
+                                const homeScore = parseInt(home.score || 0);
+                                const awayScore = parseInt(away.score || 0);
+                                
+                                // Initialize stats
+                                if (!stats[homeTeam]) {
+                                    stats[homeTeam] = {
+                                        games: [],
+                                        wins: 0,
+                                        losses: 0,
+                                        pointsFor: 0,
+                                        pointsAgainst: 0,
+                                        homeGames: 0,
+                                        homeWins: 0,
+                                        conference: home.team.conferenceId || null
+                                    };
+                                }
+                                if (!stats[awayTeam]) {
+                                    stats[awayTeam] = {
+                                        games: [],
+                                        wins: 0,
+                                        losses: 0,
+                                        pointsFor: 0,
+                                        pointsAgainst: 0,
+                                        homeGames: 0,
+                                        homeWins: 0,
+                                        conference: away.team.conferenceId || null
+                                    };
+                                }
+                                
+                                // Update stats
+                                stats[homeTeam].games.push({ score: homeScore, allowed: awayScore, home: true });
+                                stats[awayTeam].games.push({ score: awayScore, allowed: homeScore, home: false });
+                                
+                                stats[homeTeam].pointsFor += homeScore;
+                                stats[homeTeam].pointsAgainst += awayScore;
+                                stats[awayTeam].pointsFor += awayScore;
+                                stats[awayTeam].pointsAgainst += homeScore;
+                                
+                                stats[homeTeam].homeGames++;
+                                
+                                if (homeScore > awayScore) {
+                                    stats[homeTeam].wins++;
+                                    stats[homeTeam].homeWins++;
+                                    stats[awayTeam].losses++;
+                                } else if (awayScore > homeScore) {
+                                    stats[awayTeam].wins++;
+                                    stats[homeTeam].losses++;
+                                }
                             }
                         }
                     }
@@ -1403,7 +1420,7 @@
                 }
             });
             
-            debug('Team stats calculated', stats);
+            debug('Team stats calculated', Object.keys(stats).length + ' teams');
             return stats;
         }
 
