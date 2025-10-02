@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#050a16" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Praeco | Predictive Intelligence for the Oilfield</title>
@@ -42,6 +42,7 @@
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       min-height: 100vh;
+      padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
     }
 
     ::selection {
@@ -57,7 +58,8 @@
       display: flex;
       flex-direction: column;
       gap: 6rem;
-      padding: calc(4rem + env(safe-area-inset-top, 0px)) 1.25rem 6rem;
+      padding: calc(4rem + env(safe-area-inset-top, 0px)) calc(1.75rem + env(safe-area-inset-right, 0px)) 6rem
+        calc(1.75rem + env(safe-area-inset-left, 0px));
     }
 
     section {
@@ -358,6 +360,123 @@
       display: grid;
       gap: 1.25rem;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .market-chart {
+      margin-top: 1rem;
+      display: grid;
+      gap: 1rem;
+      background: rgba(4, 14, 28, 0.82);
+      border-radius: 24px;
+      border: 1px solid rgba(0, 170, 255, 0.2);
+      padding: clamp(1.5rem, 4vw, 2.25rem);
+      box-shadow: inset 0 0 0 1px rgba(0, 255, 204, 0.08);
+    }
+
+    .market-chart-heading {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .market-chart-heading h3 {
+      margin: 0;
+      font-size: clamp(1.2rem, 3vw, 1.65rem);
+      letter-spacing: -0.01em;
+    }
+
+    .market-chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.5rem;
+      color: rgba(198, 213, 245, 0.8);
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .legend-swatch.actual {
+      background: var(--accent-blue);
+      box-shadow: 0 0 12px rgba(0, 170, 255, 0.45);
+    }
+
+    .legend-swatch.forecast {
+      background: var(--accent-teal);
+      box-shadow: 0 0 12px rgba(0, 255, 204, 0.45);
+    }
+
+    .market-chart svg {
+      width: 100%;
+      height: auto;
+      max-height: 360px;
+    }
+
+    .market-chart figcaption {
+      font-size: 0.8rem;
+      color: rgba(180, 196, 232, 0.7);
+    }
+
+    .market-chart svg .chart-grid line {
+      stroke: rgba(255, 255, 255, 0.08);
+    }
+
+    .market-chart svg .chart-axis-line {
+      stroke: rgba(255, 255, 255, 0.14);
+    }
+
+    .market-chart svg .chart-axis-label {
+      fill: rgba(198, 213, 245, 0.75);
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+
+    .market-chart svg .line-actual {
+      fill: none;
+      stroke: var(--accent-blue);
+      stroke-width: 2.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .market-chart svg .line-forecast {
+      fill: none;
+      stroke: var(--accent-teal);
+      stroke-width: 2.6;
+      stroke-dasharray: 6 8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .market-chart svg .chart-point {
+      stroke: #050a16;
+      stroke-width: 2;
+    }
+
+    .market-chart svg .chart-point.actual {
+      fill: var(--accent-blue);
+    }
+
+    .market-chart svg .chart-point.forecast {
+      fill: var(--accent-teal);
+    }
+
+    .market-chart svg .chart-divider {
+      stroke: rgba(0, 255, 204, 0.4);
+      stroke-width: 1.5;
+      stroke-dasharray: 4 6;
     }
 
     .market-card {
@@ -688,7 +807,8 @@
 
     @media (min-width: 768px) {
       main {
-        padding: 5rem 2rem 6rem;
+        padding: 5rem calc(2.25rem + env(safe-area-inset-right, 0px)) 6rem
+          calc(2.25rem + env(safe-area-inset-left, 0px));
       }
 
       .hero {
@@ -715,6 +835,14 @@
 
       .vision {
         text-align: left;
+      }
+    }
+
+    @media (min-width: 640px) {
+      .market-chart-heading {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
       }
     }
 
@@ -823,9 +951,25 @@
           <p class="market-note" data-wti-accuracy-note>Measuring variance...</p>
         </article>
       </div>
+      <figure class="market-chart" data-wti-chart>
+        <div class="market-chart-heading">
+          <h3 id="wti-chart-title">Short-term WTI Trajectory</h3>
+          <div class="market-chart-legend" aria-hidden="true">
+            <span class="legend-item"><span class="legend-swatch actual"></span>Last 5 closes</span>
+            <span class="legend-item"><span class="legend-swatch forecast"></span>7-day projection</span>
+          </div>
+        </div>
+        <p class="market-note" data-wti-chart-note>Awaiting market feed to build the curve.</p>
+        <svg viewBox="0 0 600 260" role="img" aria-labelledby="wti-chart-title wti-chart-caption" focusable="false"
+          data-wti-chart-svg></svg>
+        <figcaption id="wti-chart-caption" data-wti-chart-caption>
+          The visualization will highlight how Praeco blends price momentum with recent trend lines.
+        </figcaption>
+      </figure>
       <footer>
         <p>The outlook uses a short-term momentum signal: tomorrow's forecast equals today's close plus the latest delta.</p>
         <p>Yesterday's accuracy checks that same method against today's settlement so teams can calibrate confidence in the signal.</p>
+        <p>The trajectory chart damps that momentum and blends it with a fresh regression to illuminate the next seven sessions.</p>
       </footer>
     </section>
 
@@ -1078,6 +1222,14 @@
       const forecastNoteEl = wtiSection.querySelector('[data-wti-forecast-note]');
       const accuracyEl = wtiSection.querySelector('[data-wti-accuracy]');
       const accuracyNoteEl = wtiSection.querySelector('[data-wti-accuracy-note]');
+      const chartEl = wtiSection.querySelector('[data-wti-chart]');
+      const chartSvg = chartEl?.querySelector('[data-wti-chart-svg]');
+      const chartNoteEl = chartEl?.querySelector('[data-wti-chart-note]');
+      const chartCaptionEl = chartEl?.querySelector('[data-wti-chart-caption]');
+
+      const CHART_ACTUAL_DAYS = 5;
+      const CHART_FORECAST_DAYS = 7;
+      const SVG_NS = 'http://www.w3.org/2000/svg';
 
       if (statusWrapper) {
         statusWrapper.setAttribute('role', 'status');
@@ -1095,6 +1247,10 @@
         day: 'numeric',
         year: 'numeric'
       });
+      const chartDateFormatter = new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric'
+      });
 
       const formatPrice = (value) => `$${value.toFixed(2)}`;
       const formatDelta = (value) => `${value >= 0 ? '+' : '−'}$${Math.abs(value).toFixed(2)}`;
@@ -1105,6 +1261,12 @@
         const deltaText = `Δ ${formatDelta(value)} (${formatPercent(percent)})`;
         element.textContent = deltaText;
         element.classList.toggle('negative', value < 0);
+      };
+
+      const clearChart = () => {
+        if (chartSvg) {
+          chartSvg.replaceChildren();
+        }
       };
 
       const handleError = (error) => {
@@ -1136,12 +1298,187 @@
         if (accuracyNoteEl) {
           accuracyNoteEl.textContent = 'Forecast accuracy tracking is paused until we have the latest settlement.';
         }
+        if (chartNoteEl) {
+          chartNoteEl.textContent = 'Price visualization unavailable until the feed returns.';
+        }
+        if (chartCaptionEl) {
+          chartCaptionEl.textContent = 'The hybrid regression chart will render once pricing updates resume.';
+        }
+        clearChart();
       };
 
       const addDays = (isoDate, amount) => {
         const date = new Date(`${isoDate}T00:00:00Z`);
         date.setUTCDate(date.getUTCDate() + amount);
         return date;
+      };
+
+      const renderChart = (actualSeries, forecastSeries) => {
+        if (!chartSvg || !Array.isArray(actualSeries) || actualSeries.length === 0) {
+          return;
+        }
+
+        const combinedSeries = [...actualSeries, ...forecastSeries];
+        if (combinedSeries.length < 2) {
+          clearChart();
+          return;
+        }
+
+        chartSvg.replaceChildren();
+
+        const width = 600;
+        const height = 260;
+        const padding = { top: 24, right: 28, bottom: 48, left: 68 };
+        const innerWidth = width - padding.left - padding.right;
+        const innerHeight = height - padding.top - padding.bottom;
+        const totalSegments = combinedSeries.length - 1 || 1;
+
+        chartSvg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        chartSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+        const prices = combinedSeries.map((point) => point.price);
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
+        const buffer = Math.max((maxPrice - minPrice) * 0.12, 1.25);
+        const domainMin = minPrice - buffer;
+        const domainMax = maxPrice + buffer;
+        const domainRange = domainMax - domainMin || 1;
+
+        const xScale = (index) => padding.left + (index / totalSegments) * innerWidth;
+        const yScale = (value) => padding.top + innerHeight - ((value - domainMin) / domainRange) * innerHeight;
+
+        const latestActual = actualSeries[actualSeries.length - 1];
+        const finalForecast = forecastSeries[forecastSeries.length - 1];
+
+        const titleNode = document.createElementNS(SVG_NS, 'title');
+        if (finalForecast) {
+          titleNode.textContent = `WTI closes through ${statusFormatter.format(latestActual.date)} with projection pointing to ${formatPrice(finalForecast.price)} on ${statusFormatter.format(finalForecast.date)}.`;
+        } else {
+          titleNode.textContent = `WTI closes through ${statusFormatter.format(latestActual.date)}.`;
+        }
+        const descNode = document.createElementNS(SVG_NS, 'desc');
+        descNode.textContent = 'Solid line reflects observed settlements; dashed line applies Praeco\'s momentum-regression blend for the next week.';
+        chartSvg.append(titleNode, descNode);
+
+        const gridGroup = document.createElementNS(SVG_NS, 'g');
+        gridGroup.setAttribute('class', 'chart-grid');
+
+        const axisGroup = document.createElementNS(SVG_NS, 'g');
+        axisGroup.setAttribute('class', 'chart-axis');
+
+        const yTicks = 4;
+        for (let i = 0; i <= yTicks; i += 1) {
+          const y = padding.top + (innerHeight * i) / yTicks;
+          const line = document.createElementNS(SVG_NS, 'line');
+          line.setAttribute('x1', padding.left);
+          line.setAttribute('x2', width - padding.right);
+          line.setAttribute('y1', y);
+          line.setAttribute('y2', y);
+          gridGroup.appendChild(line);
+
+          const label = document.createElementNS(SVG_NS, 'text');
+          label.setAttribute('x', padding.left - 12);
+          label.setAttribute('y', y + 4);
+          label.setAttribute('text-anchor', 'end');
+          label.setAttribute('class', 'chart-axis-label');
+          const value = domainMin + (domainRange * i) / yTicks;
+          label.textContent = formatPrice(value);
+          axisGroup.appendChild(label);
+        }
+
+        const axisBaseline = padding.top + innerHeight;
+        const xAxis = document.createElementNS(SVG_NS, 'line');
+        xAxis.setAttribute('x1', padding.left);
+        xAxis.setAttribute('x2', width - padding.right);
+        xAxis.setAttribute('y1', axisBaseline);
+        xAxis.setAttribute('y2', axisBaseline);
+        xAxis.setAttribute('class', 'chart-axis-line');
+
+        const tickIndexes = new Set([0, actualSeries.length - 1, combinedSeries.length - 1]);
+        if (forecastSeries.length > 0) {
+          tickIndexes.add(actualSeries.length);
+          tickIndexes.add(actualSeries.length + Math.floor(forecastSeries.length / 2));
+        }
+
+        const sortedTicks = Array.from(tickIndexes)
+          .filter((index) => index >= 0 && index < combinedSeries.length)
+          .sort((a, b) => a - b);
+
+        sortedTicks.forEach((index) => {
+          const point = combinedSeries[index];
+          const x = xScale(index);
+          const tick = document.createElementNS(SVG_NS, 'line');
+          tick.setAttribute('x1', x);
+          tick.setAttribute('x2', x);
+          tick.setAttribute('y1', axisBaseline);
+          tick.setAttribute('y2', axisBaseline + 6);
+          tick.setAttribute('class', 'chart-axis-line');
+          axisGroup.appendChild(tick);
+
+          const label = document.createElementNS(SVG_NS, 'text');
+          label.setAttribute('x', x);
+          label.setAttribute('y', axisBaseline + 20);
+          label.setAttribute('text-anchor', 'middle');
+          label.setAttribute('class', 'chart-axis-label');
+          label.textContent = point?.label ?? '';
+          axisGroup.appendChild(label);
+        });
+
+        chartSvg.append(gridGroup);
+
+        let actualPathData = '';
+        actualSeries.forEach((point, index) => {
+          actualPathData += `${index === 0 ? 'M' : 'L'}${xScale(index)} ${yScale(point.price)} `;
+        });
+        const actualPath = document.createElementNS(SVG_NS, 'path');
+        actualPath.setAttribute('d', actualPathData.trim());
+        actualPath.setAttribute('class', 'line-actual');
+        chartSvg.appendChild(actualPath);
+
+        if (forecastSeries.length > 0) {
+          let forecastPathData = `M${xScale(actualSeries.length - 1)} ${yScale(actualSeries[actualSeries.length - 1].price)}`;
+          forecastSeries.forEach((point, index) => {
+            const xIndex = actualSeries.length + index;
+            forecastPathData += ` L${xScale(xIndex)} ${yScale(point.price)}`;
+          });
+          const forecastPath = document.createElementNS(SVG_NS, 'path');
+          forecastPath.setAttribute('d', forecastPathData.trim());
+          forecastPath.setAttribute('class', 'line-forecast');
+          chartSvg.appendChild(forecastPath);
+
+          const divider = document.createElementNS(SVG_NS, 'line');
+          const dividerX = xScale(actualSeries.length - 1);
+          divider.setAttribute('x1', dividerX);
+          divider.setAttribute('x2', dividerX);
+          divider.setAttribute('y1', padding.top);
+          divider.setAttribute('y2', axisBaseline);
+          divider.setAttribute('class', 'chart-divider');
+          chartSvg.appendChild(divider);
+        }
+
+        const pointGroup = document.createElementNS(SVG_NS, 'g');
+        actualSeries.forEach((point, index) => {
+          const circle = document.createElementNS(SVG_NS, 'circle');
+          circle.setAttribute('cx', xScale(index));
+          circle.setAttribute('cy', yScale(point.price));
+          circle.setAttribute('r', 4);
+          circle.setAttribute('class', 'chart-point actual');
+          circle.setAttribute('aria-hidden', 'true');
+          pointGroup.appendChild(circle);
+        });
+        forecastSeries.forEach((point, index) => {
+          const circle = document.createElementNS(SVG_NS, 'circle');
+          circle.setAttribute('cx', xScale(actualSeries.length + index));
+          circle.setAttribute('cy', yScale(point.price));
+          circle.setAttribute('r', 4);
+          circle.setAttribute('class', 'chart-point forecast');
+          circle.setAttribute('aria-hidden', 'true');
+          pointGroup.appendChild(circle);
+        });
+        chartSvg.appendChild(pointGroup);
+
+        axisGroup.appendChild(xAxis);
+        chartSvg.appendChild(axisGroup);
       };
 
       const loadWTIData = async () => {
@@ -1157,7 +1494,7 @@
           }
 
           const entries = lines
-            .slice(-6)
+            .slice(-40)
             .map((line) => {
               const [date, price] = line.split(',');
               const value = parseFloat(price);
@@ -1168,8 +1505,8 @@
             })
             .filter(Boolean);
 
-          if (entries.length < 3) {
-            throw new Error('Unable to parse WTI pricing feed');
+          if (entries.length < Math.max(CHART_ACTUAL_DAYS + 2, 3)) {
+            throw new Error('Unable to parse sufficient WTI pricing data');
           }
 
           const latest = entries[entries.length - 1];
@@ -1216,6 +1553,77 @@
           if (statusWrapper) {
             statusWrapper.title = `Latest WTI close recorded on ${dateFormatter.format(new Date(`${latest.date}T00:00:00Z`))}`;
           }
+
+          const chartActual = entries
+            .slice(-CHART_ACTUAL_DAYS)
+            .map((entry) => {
+              const date = new Date(`${entry.date}T00:00:00Z`);
+              return {
+                isoDate: entry.date,
+                date,
+                price: entry.price,
+                label: chartDateFormatter.format(date)
+              };
+            });
+
+          const deltas = [];
+          for (let i = 1; i < chartActual.length; i += 1) {
+            deltas.push(chartActual[i].price - chartActual[i - 1].price);
+          }
+          const averageDelta = deltas.length ? deltas.reduce((sum, value) => sum + value, 0) / deltas.length : 0;
+          const latestDelta = deltas.length ? deltas[deltas.length - 1] : averageDelta;
+
+          let sumX = 0;
+          let sumY = 0;
+          let sumXY = 0;
+          let sumX2 = 0;
+          chartActual.forEach((point, index) => {
+            sumX += index;
+            sumY += point.price;
+            sumXY += index * point.price;
+            sumX2 += index * index;
+          });
+          const n = chartActual.length;
+          const denominator = n * sumX2 - sumX * sumX;
+          const slope = n > 1 && denominator !== 0 ? (n * sumXY - sumX * sumY) / denominator : 0;
+          const intercept = n > 0 ? (sumY - slope * sumX) / n : 0;
+
+          const chartForecast = [];
+          let runningPrice = chartActual[chartActual.length - 1].price;
+          const lastIso = chartActual[chartActual.length - 1].isoDate;
+
+          for (let i = 0; i < CHART_FORECAST_DAYS; i += 1) {
+            const regressionTarget = intercept + slope * (chartActual.length + i);
+            const decay = Math.pow(0.85, i);
+            const blendedDelta = (averageDelta * 0.55 + latestDelta * 0.45) * decay;
+            const projectedPrice = (runningPrice + blendedDelta) * 0.65 + regressionTarget * 0.35;
+            runningPrice = Math.max(projectedPrice, 0);
+            const projectionDate = addDays(lastIso, i + 1);
+            chartForecast.push({
+              date: projectionDate,
+              price: runningPrice,
+              label: chartDateFormatter.format(projectionDate)
+            });
+          }
+
+          if (chartNoteEl) {
+            if (chartForecast.length > 0) {
+              const horizonEnd = chartForecast[chartForecast.length - 1];
+              chartNoteEl.textContent = `Last five settlements through ${statusFormatter.format(chartActual[chartActual.length - 1].date)}; projection extends to ${statusFormatter.format(horizonEnd.date)}.`;
+            } else {
+              chartNoteEl.textContent = 'Awaiting sufficient market history to render the trajectory.';
+            }
+          }
+          if (chartCaptionEl) {
+            if (chartForecast.length > 0) {
+              const horizonEnd = chartForecast[chartForecast.length - 1];
+              chartCaptionEl.textContent = `Hybrid of linear regression and damped momentum guides pricing toward ${formatPrice(horizonEnd.price)} by ${dateFormatter.format(horizonEnd.date)}.`;
+            } else {
+              chartCaptionEl.textContent = 'The visualization will activate once enough pricing data is available.';
+            }
+          }
+
+          renderChart(chartActual, chartForecast);
         } catch (error) {
           handleError(error);
         }
