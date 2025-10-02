@@ -1,1 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Praeco | Predictive Intelligence for the Oilfield</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050a16;
+      --bg-alt: #0a0f1a;
+      --accent-blue: #00aaff;
+      --accent-teal: #00ffcc;
+      --text-primary: #f0f5ff;
+      --text-secondary: #94a3c7;
+      --card-bg: rgba(10, 15, 26, 0.75);
+      --glass-border: rgba(0, 170, 255, 0.2);
+      --transition: 220ms ease;
+      --max-width: 1200px;
+    }
 
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(0, 170, 255, 0.12), transparent 55%),
+        radial-gradient(circle at 80% 10%, rgba(0, 255, 204, 0.15), transparent 45%),
+        var(--bg);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+      background: rgba(0, 170, 255, 0.35);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 6rem;
+      padding: 4rem 1.25rem 6rem;
+    }
+
+    section {
+      position: relative;
+      max-width: var(--max-width);
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    h1, h2, h3 {
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 1rem;
+    }
+
+    p {
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin: 0 0 1rem;
+    }
+
+    .hero {
+      display: grid;
+      gap: 2.5rem;
+      text-align: center;
+      padding-top: 2rem;
+    }
+
+    .hero-logo {
+      justify-self: center;
+      width: min(320px, 70vw);
+      filter: drop-shadow(0 16px 32px rgba(0, 170, 255, 0.35));
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.75rem, 6vw, 4.5rem);
+      font-weight: 800;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      background: linear-gradient(120deg, var(--accent-blue), var(--accent-teal));
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      font-size: clamp(1rem, 2.3vw, 1.35rem);
+      max-width: 720px;
+      margin: 0 auto 2rem;
+    }
+
+    .cta-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      padding: 0.95rem 2.75rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(0, 170, 255, 0.95), rgba(0, 255, 204, 0.95));
+      color: #050a16;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      box-shadow: 0 18px 35px rgba(0, 170, 255, 0.35);
+      transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(255, 255, 255, 0.35), transparent 60%);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .cta-primary:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 24px 48px rgba(0, 170, 255, 0.45);
+      filter: saturate(1.1);
+    }
+
+    .cta-primary:hover::after {
+      opacity: 1;
+    }
+
+    .wave-divider {
+      position: relative;
+      height: 80px;
+      overflow: hidden;
+      margin: 0 auto;
+      max-width: var(--max-width);
+    }
+
+    .wave-divider svg {
+      width: 180%;
+      height: 100%;
+      animation: wave-flow 16s linear infinite;
+      opacity: 0.55;
+    }
+
+    .section-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .section-eyebrow {
+      font-size: 0.85rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--accent-teal);
+      font-weight: 600;
+    }
+
+    .story-grid {
+      display: grid;
+      gap: 2rem;
+      background: linear-gradient(160deg, rgba(0, 170, 255, 0.08), rgba(0, 255, 204, 0.05));
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: clamp(1.75rem, 4vw, 3rem);
+      backdrop-filter: blur(16px);
+    }
+
+    .story-grid p {
+      margin-bottom: 1.5rem;
+    }
+
+    .story-grid strong {
+      color: var(--accent-blue);
+    }
+
+    .product-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .product-card {
+      position: relative;
+      padding: 1.75rem;
+      border-radius: 24px;
+      background: var(--card-bg);
+      border: 1px solid rgba(0, 170, 255, 0.1);
+      overflow: hidden;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .product-card::before {
+      content: '';
+      position: absolute;
+      inset: -40% 30%;
+      background: radial-gradient(circle, rgba(0, 170, 255, 0.25), transparent 55%);
+      transform: translateY(60%);
+      opacity: 0;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(0, 255, 204, 0.45);
+      box-shadow: 0 22px 44px rgba(0, 170, 255, 0.18);
+    }
+
+    .product-card:hover::before {
+      opacity: 1;
+      transform: translateY(0%);
+    }
+
+    .basins {
+      display: grid;
+      gap: 2rem;
+      align-items: center;
+      border-radius: 28px;
+      padding: clamp(1.75rem, 4vw, 3rem);
+      background: linear-gradient(135deg, rgba(0, 170, 255, 0.1), rgba(0, 255, 204, 0.07));
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+    }
+
+    .texas-map {
+      display: flex;
+      justify-content: center;
+    }
+
+    .texas-map svg {
+      width: min(320px, 90vw);
+      filter: drop-shadow(0 10px 24px rgba(0, 170, 255, 0.35));
+    }
+
+    .architecture {
+      display: grid;
+      gap: 2.5rem;
+    }
+
+    .diagram {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .diagram-flow {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .diagram-node {
+      position: relative;
+      flex: 1 1 220px;
+      min-height: 120px;
+      background: var(--card-bg);
+      border-radius: 18px;
+      border: 1px solid rgba(0, 170, 255, 0.15);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      text-align: left;
+      overflow: hidden;
+    }
+
+    .diagram-node::after {
+      display: none;
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -18px;
+      width: 30px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-teal));
+      opacity: 0.6;
+    }
+
+    .diagram-flow::after {
+      display: none;
+      content: '';
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(0, 170, 255, 0.25), rgba(0, 255, 204, 0.25));
+      opacity: 0.4;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .timeline-item {
+      display: grid;
+      gap: 0.35rem;
+      background: rgba(5, 10, 22, 0.8);
+      border: 1px solid rgba(0, 255, 204, 0.2);
+      border-radius: 18px;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .timeline-year {
+      font-size: 0.85rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--accent-teal);
+      font-weight: 600;
+    }
+
+    .vision {
+      background: linear-gradient(180deg, rgba(0, 170, 255, 0.1), rgba(0, 170, 255, 0));
+      border-radius: 28px;
+      border: 1px solid rgba(0, 255, 204, 0.18);
+      padding: clamp(1.75rem, 4vw, 3rem);
+      text-align: center;
+    }
+
+    .closing {
+      text-align: center;
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    .footer {
+      border-top: 1px solid rgba(0, 170, 255, 0.08);
+      padding: 2.5rem 1.25rem 3rem;
+      text-align: center;
+      color: rgba(148, 163, 199, 0.65);
+      font-size: 0.85rem;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(5, 10, 22, 0.85);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 280ms ease;
+      z-index: 20;
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: rgba(7, 13, 24, 0.95);
+      border: 1px solid rgba(0, 255, 204, 0.25);
+      border-radius: 24px;
+      padding: 2.5rem;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 30px 60px rgba(0, 170, 255, 0.28);
+      animation: fade-up 380ms ease;
+    }
+
+    .modal-card h3 {
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+
+    .modal-card button {
+      margin-top: 1.5rem;
+      padding: 0.75rem 2rem;
+      border-radius: 999px;
+      border: none;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      background: linear-gradient(135deg, rgba(0, 170, 255, 0.95), rgba(0, 255, 204, 0.95));
+      color: #041120;
+      cursor: pointer;
+      transition: transform var(--transition);
+    }
+
+    .modal-card button:hover {
+      transform: translateY(-2px);
+    }
+
+    .floating-wave {
+      position: fixed;
+      top: -160px;
+      left: -20%;
+      width: 140%;
+      height: 320px;
+      background: radial-gradient(circle at 20% 40%, rgba(0, 170, 255, 0.16), transparent 55%),
+        radial-gradient(circle at 80% 60%, rgba(0, 255, 204, 0.18), transparent 55%);
+      filter: blur(120px);
+      opacity: 0.45;
+      animation: float-slow 30s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    .floating-wave.bottom {
+      top: auto;
+      bottom: -200px;
+      animation-direction: reverse;
+      opacity: 0.35;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-12px);
+      }
+    }
+
+    @keyframes fade-up {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes wave-flow {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-30%);
+      }
+    }
+
+    @keyframes float-slow {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+      50% {
+        transform: translate3d(2%, 3%, 0) scale(1.05);
+      }
+      100% {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+    }
+
+    @media (min-width: 768px) {
+      main {
+        padding: 5rem 2rem 6rem;
+      }
+
+      .hero {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: center;
+        text-align: left;
+      }
+
+      .hero-cta {
+        justify-self: flex-start;
+      }
+
+      .story-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .basins {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .vision {
+        text-align: left;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .product-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .diagram-flow {
+        flex-wrap: nowrap;
+      }
+
+      .diagram-node::after {
+        display: block;
+      }
+
+      .diagram-node:last-child::after {
+        display: none;
+      }
+
+      .diagram-flow::after {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-wave"></div>
+  <div class="floating-wave bottom"></div>
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <img src="Logo.svg" alt="Praeco logo" class="hero-logo" />
+      </div>
+      <div>
+        <h1 id="hero-title">Predicting Production. Powering Throughput.</h1>
+        <p>Praeco delivers AI-driven production forecasts and real-time throughput visibility for the oilfield. Founded in Houston in 2025, starting in Texas, expanding across the U.S. in 2027.</p>
+        <div class="hero-cta">
+          <button class="cta-primary" id="cta-main" type="button">Request Early Access</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="wave-divider" aria-hidden="true">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,60 C200,20 400,100 600,60 C800,20 1000,100 1200,60" fill="none" stroke="url(#waveGradient)" stroke-width="6" stroke-linecap="round" />
+        <defs>
+          <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.6)" />
+            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.6)" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <section class="story" aria-labelledby="story-title">
+      <div class="section-header">
+        <span class="section-eyebrow">Origin Story</span>
+        <h2 id="story-title">Born in Houston. Built for the Oilfield.</h2>
+      </div>
+      <div class="story-grid">
+        <div>
+          <p><strong>Houston, 2025</strong> — Praeco emerged in the energy capital to bring predictive intelligence to the field. Cut from the same cloth as the crews that keep America powered, we build systems that withstand the pressure.</p>
+          <p>Mission-critical work demands more than dashboards. We deliver <strong>predictive clarity</strong> and <strong>operational foresight</strong> so every decision is grounded in data you can trust.</p>
+        </div>
+        <div>
+          <p>Roadmap: Texas-first. We started with the Permian, Eagle Ford, and Delaware basins, and we will have the entire U.S. network lit up by 2027.</p>
+          <p>Cutting through the fog like a laser-guided bit, we've seen too many ops fly blind. Praeco is here to change that—no more guessing, no more drift.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="products" aria-labelledby="product-title">
+      <div class="section-header">
+        <span class="section-eyebrow">Products</span>
+        <h2 id="product-title">Flagship Intelligence Modules</h2>
+      </div>
+      <div class="product-grid">
+        <article class="product-card">
+          <h3>Predictive Outputs</h3>
+          <p>Accurate ML forecasts trained on completions, decline curves, artificial lift, and environmental data.</p>
+          <p>Optimize every barrel without guesswork – reliable as a triple-backed blowout preventer.</p>
+        </article>
+        <article class="product-card">
+          <h3>Real-time Throughput</h3>
+          <p>Continuous visibility into pad, battery, and LACT station performance.</p>
+          <p>Spot bottlenecks faster than a roughneck spots trouble.</p>
+        </article>
+        <article class="product-card">
+          <h3>Scalable Deployment</h3>
+          <p>Texas-first, national expansion with hardened infrastructure and support.</p>
+          <p>Scales like a multi-stage frac job.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="basins" aria-labelledby="basins-title">
+      <div>
+        <div class="section-header">
+          <span class="section-eyebrow">Basins</span>
+          <h2 id="basins-title">Texas-first, U.S.-next</h2>
+        </div>
+        <p>Mastering the Permian, Eagle Ford, and Delaware basins before nationwide rollout in 2027. We build in the basins that power Texas—then scale to every operator across the States.</p>
+      </div>
+      <div class="texas-map" aria-hidden="true">
+        <svg viewBox="0 0 300 300">
+          <defs>
+            <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="rgba(0, 170, 255, 0.6)" />
+              <stop offset="100%" stop-color="rgba(0, 255, 204, 0.6)" />
+            </linearGradient>
+            <radialGradient id="dotGlow" r="50%">
+              <stop offset="0%" stop-color="rgba(0, 255, 204, 0.8)" />
+              <stop offset="100%" stop-color="rgba(0, 255, 204, 0)" />
+            </radialGradient>
+          </defs>
+          <path d="M90 20 L130 20 L155 70 L200 85 L215 140 L240 180 L220 210 L180 190 L170 230 L120 210 L110 160 L80 140 L60 90 Z" fill="rgba(10, 18, 35, 0.95)" stroke="url(#mapGradient)" stroke-width="3" />
+          <g>
+            <circle cx="180" cy="110" r="12" fill="url(#dotGlow)"></circle>
+            <circle cx="180" cy="110" r="4" fill="#00ffcc"></circle>
+            <text x="190" y="110" fill="#9db5d8" font-size="12" font-weight="600">Permian</text>
+          </g>
+          <g>
+            <circle cx="145" cy="160" r="12" fill="url(#dotGlow)"></circle>
+            <circle cx="145" cy="160" r="4" fill="#00aaff"></circle>
+            <text x="155" y="160" fill="#9db5d8" font-size="12" font-weight="600">Eagle Ford</text>
+          </g>
+          <g>
+            <circle cx="205" cy="150" r="12" fill="url(#dotGlow)"></circle>
+            <circle cx="205" cy="150" r="4" fill="#00ffcc"></circle>
+            <text x="215" y="150" fill="#9db5d8" font-size="12" font-weight="600">Delaware</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <section class="architecture" aria-labelledby="architecture-title">
+      <div class="section-header">
+        <span class="section-eyebrow">Architecture & Roadmap</span>
+        <h2 id="architecture-title">Encrypted, Audited, Redundant</h2>
+      </div>
+      <div class="diagram">
+        <h3>How Praeco Flows</h3>
+        <div class="diagram-flow">
+          <div class="diagram-node">
+            <strong>SCADA & Historian Ingest</strong>
+            <p>Secure pipelines bringing in sensor, completion, lift, and market data streams.</p>
+          </div>
+          <div class="diagram-node">
+            <strong>Feature Store</strong>
+            <p>Curated features engineered for decline curve analytics and throughput signatures.</p>
+          </div>
+          <div class="diagram-node">
+            <strong>Predictive Ensemble Models</strong>
+            <p>Ensembles tuned on basin-specific realities with guardrails for drift.</p>
+          </div>
+          <div class="diagram-node">
+            <strong>Throughput Dashboards</strong>
+            <p>Mission control views with alerting, audit trails, and ops-ready playbooks.</p>
+          </div>
+        </div>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <span class="timeline-year">2025</span>
+          <p>Texas launch across Permian, Eagle Ford, Delaware. Hardened ingestion and forecasting stack deployed.</p>
+        </div>
+        <div class="timeline-item">
+          <span class="timeline-year">2026</span>
+          <p>Expanded features, refined ensembles, logistics integrations, automated anomaly response.</p>
+        </div>
+        <div class="timeline-item">
+          <span class="timeline-year">2027</span>
+          <p>Nationwide rollout with enterprise integrations. Praeco as the predictive layer for U.S. energy infrastructure.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="vision" aria-labelledby="vision-title">
+      <div class="section-header" style="align-items:center;">
+        <span class="section-eyebrow">Future Vision</span>
+        <h2 id="vision-title">The Predictive Layer for U.S. Energy</h2>
+      </div>
+      <p>Praeco becomes the AI control tower for operators, investors, and partners—eyes in the sky for your bottom line. Predictive intelligence that keeps every barrel accounted for, every throughput optimized, every stakeholder aligned.</p>
+    </section>
+
+    <div class="wave-divider" aria-hidden="true">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M0,60 C200,20 400,100 600,60 C800,20 1000,100 1200,60" fill="none" stroke="url(#waveGradient2)" stroke-width="6" stroke-linecap="round" />
+        <defs>
+          <linearGradient id="waveGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(0, 255, 204, 0.5)" />
+            <stop offset="100%" stop-color="rgba(0, 170, 255, 0.5)" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <section class="closing" aria-labelledby="closing-title">
+      <h2 id="closing-title">Predicting Production. Powering Throughput.</h2>
+      <p>Join the operators shaping the next decade of energy. Precision forecasting and real-time throughput visibility—ready when you are.</p>
+      <button class="cta-primary" id="cta-bottom" type="button">Request Early Access</button>
+    </section>
+  </main>
+
+  <footer class="footer">
+    &copy; 2025 Praeco, Houston. All rights reserved.
+  </footer>
+
+  <div class="modal" id="cta-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-card">
+      <h3 id="modal-title">Early Access Request</h3>
+      <p>Praeco's early access program opens soon. Drop us a line at <a href="mailto:intel@praeco.ai">intel@praeco.ai</a> and we'll schedule a briefing.</p>
+      <button type="button" id="modal-close">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('cta-modal');
+    const openButtons = [document.getElementById('cta-main'), document.getElementById('cta-bottom')];
+    const closeButton = document.getElementById('modal-close');
+
+    const openModal = () => {
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden', 'false');
+    };
+
+    const closeModal = () => {
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
+    };
+
+    openButtons.forEach(btn => btn.addEventListener('click', openModal));
+    closeButton.addEventListener('click', closeModal);
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        closeModal();
+      }
+    });
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && modal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
