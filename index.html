@@ -1,1509 +1,1604 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CFB Predictions | AI/ML Models</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            overflow-x: hidden;
-            width: 100%;
-            position: relative;
-        }
-
-        :root {
-            --gray-50: #fafafa;
-            --gray-100: #f5f5f5;
-            --gray-200: #e5e5e5;
-            --gray-300: #d4d4d4;
-            --gray-400: #a3a3a3;
-            --gray-500: #737373;
-            --gray-600: #525252;
-            --gray-700: #404040;
-            --gray-800: #262626;
-            --gray-900: #171717;
-            
-            --blue-50: #eff6ff;
-            --blue-100: #dbeafe;
-            --blue-500: #3b82f6;
-            --blue-600: #2563eb;
-            --blue-700: #1d4ed8;
-            
-            --success: #10b981;
-            --success-light: #d1fae5;
-            --warning: #f59e0b;
-            --warning-light: #fef3c7;
-            --danger: #ef4444;
-            --danger-light: #fee2e2;
-            
-            --bg-primary: #ffffff;
-            --bg-secondary: var(--gray-50);
-            --bg-tertiary: var(--gray-100);
-            --text-primary: var(--gray-900);
-            --text-secondary: var(--gray-600);
-            --text-tertiary: var(--gray-400);
-            --border: var(--gray-200);
-            --border-light: var(--gray-100);
-            
-            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            
-            --radius-sm: 6px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --radius-xl: 16px;
-            
-            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 100%;
-            padding: 0;
-            margin: 0 auto;
-            overflow-x: hidden;
-        }
-
-        header {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px) saturate(180%);
-            -webkit-backdrop-filter: blur(12px) saturate(180%);
-            border-bottom: 1px solid var(--border-light);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            transition: all var(--transition-base);
-        }
-
-        .header-content {
-            max-width: 100vw;
-            margin: 0 auto;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            overflow: hidden;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-logo {
-            height: 48px;
-            width: auto;
-            display: block;
-        }
-
-        .brand-text {
-            font-size: 14px;
-            font-weight: 400;
-            color: var(--text-secondary);
-            letter-spacing: -0.01em;
-        }
-
-        .tagline {
-            font-size: 13px;
-            color: var(--text-tertiary);
-            font-weight: 500;
-            letter-spacing: -0.01em;
-            margin-left: auto;
-            padding-right: 8px;
-        }
-
-        @media (max-width: 640px) {
-            .tagline {
-                display: none;
-            }
-            .brand-text {
-                font-size: 12px;
-            }
-        }
-
-        .api-key-panel {
-            background: var(--bg-primary);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            margin: 12px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .api-key-panel.hidden {
-            display: none;
-        }
-
-        .input-group {
-            margin-bottom: 16px;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-            letter-spacing: -0.01em;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        select {
-            width: 100%;
-            padding: 12px 14px;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            color: var(--text-primary);
-            font-size: 15px;
-            font-family: 'Inter', sans-serif;
-            transition: all var(--transition-fast);
-            letter-spacing: -0.01em;
-        }
-
-        input:hover, select:hover {
-            border-color: var(--gray-300);
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--blue-500);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, var(--blue-500), var(--blue-600));
-            color: white;
-            border: none;
-            border-radius: var(--radius-md);
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
-            letter-spacing: -0.01em;
-            font-family: 'Inter', sans-serif;
-        }
-
-        button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            background: var(--gray-300);
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
-        .filters {
-            display: flex;
-            gap: 8px;
-            padding: 12px 16px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            max-width: 100vw;
-            width: 100%;
-            margin: 0;
-            box-sizing: border-box;
-        }
-
-        .filters::-webkit-scrollbar {
-            display: none;
-        }
-
-        .filter-chip {
-            padding: 6px 12px;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            color: var(--text-secondary);
-            font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            letter-spacing: -0.01em;
-            flex-shrink: 0;
-        }
-
-        .filter-chip:hover {
-            border-color: var(--gray-300);
-            background: var(--bg-secondary);
-        }
-
-        .filter-chip.active {
-            background: linear-gradient(135deg, var(--blue-500), var(--blue-600));
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
-        }
-
-        .summary {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            max-width: 100vw;
-            width: 100%;
-            margin: 0;
-            padding: 0 16px 12px;
-            box-sizing: border-box;
-        }
-
-        .stat-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 14px 12px;
-            text-align: center;
-            transition: all var(--transition-base);
-            box-shadow: var(--shadow-xs);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--gray-300);
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--blue-500), var(--blue-600));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.03em;
-            font-feature-settings: 'tnum';
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: var(--text-tertiary);
-            margin-top: 4px;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-        }
-
-        .games-container {
-            max-width: 100vw;
-            width: 100%;
-            margin: 0;
-            padding: 16px 16px 60px;
-            box-sizing: border-box;
-        }
-
-        .game-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            margin-bottom: 12px;
-            transition: all var(--transition-base);
-            box-shadow: var(--shadow-xs);
-        }
-
-        .game-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--gray-300);
-        }
-
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 16px;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .game-time {
-            font-size: 11px;
-            color: var(--text-secondary);
-            font-weight: 600;
-            letter-spacing: -0.01em;
-        }
-
-        .game-venue {
-            font-size: 11px;
-            color: var(--text-tertiary);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            letter-spacing: -0.01em;
-        }
-
-        .matchup {
-            padding: 16px;
-        }
-
-        .team-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 0;
-            position: relative;
-            transition: all var(--transition-fast);
-        }
-
-        .team-row:hover {
-            background: var(--bg-secondary);
-            margin: 0 -8px;
-            padding: 10px 8px;
-            border-radius: var(--radius-md);
-        }
-
-        .home-indicator {
-            position: absolute;
-            left: -12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 3px;
-            height: 60%;
-            background: var(--blue-500);
-            border-radius: 3px;
-        }
-
-        .team-logo {
-            width: 56px;
-            height: 56px;
-            border-radius: var(--radius-md);
-            background: var(--bg-primary);
-            border: 1px solid var(--border-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            flex-shrink: 0;
-            transition: all var(--transition-fast);
-        }
-
-        .team-logo img {
-            width: 48px;
-            height: 48px;
-            object-fit: contain;
-        }
-
-        .team-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .team-name {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            letter-spacing: -0.01em;
-            margin-bottom: 2px;
-        }
-
-        .team-record {
-            font-size: 12px;
-            color: var(--text-tertiary);
-            font-weight: 500;
-            letter-spacing: -0.01em;
-        }
-
-        .winner .team-name {
-            color: var(--success);
-        }
-
-        .winner .team-logo {
-            border-color: var(--success);
-            box-shadow: 0 0 0 3px var(--success-light);
-        }
-
-        .prob-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-
-        .prob-bar {
-            width: 60px;
-            height: 6px;
-            background: var(--gray-100);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .prob-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--blue-500), var(--blue-600));
-            border-radius: 3px;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .prob-value {
-            font-size: 17px;
-            font-weight: 700;
-            min-width: 48px;
-            text-align: right;
-            color: var(--text-primary);
-            letter-spacing: -0.02em;
-            font-feature-settings: 'tnum';
-        }
-
-        .prediction-details {
-            padding: 16px;
-            background: var(--bg-primary);
-            border-top: 1px solid var(--border-light);
-        }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-
-        .detail-item {
-            text-align: center;
-            padding: 10px 8px;
-            background: var(--bg-secondary);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-light);
-            transition: all var(--transition-fast);
-        }
-
-        .detail-item:hover {
-            background: var(--bg-tertiary);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .detail-label {
-            font-size: 10px;
-            color: var(--text-tertiary);
-            font-weight: 600;
-            letter-spacing: 0.02em;
-            margin-bottom: 6px;
-        }
-
-        .detail-value {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.01em;
-            font-feature-settings: 'tnum';
-        }
-
-        .badges {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
-
-        .badge {
-            padding: 6px 12px;
-            border-radius: var(--radius-sm);
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.01em;
-        }
-
-        .badge-upset {
-            background: var(--danger-light);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-
-        .badge-tossup {
-            background: var(--warning-light);
-            color: var(--warning);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 80px 24px;
-        }
-
-        .empty-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-            opacity: 0.4;
-        }
-
-        .empty-text {
-            font-size: 16px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            letter-spacing: -0.01em;
-        }
-
-        .status-bar {
-            background: var(--bg-primary);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px 14px;
-            margin: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .status-bar::before {
-            content: '';
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        .loading::before {
-            background: var(--warning);
-        }
-
-        .success::before {
-            background: var(--success);
-        }
-
-        .error::before {
-            background: var(--danger);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .spinner {
-            border: 3px solid var(--border);
-            border-top: 3px solid var(--blue-500);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 40px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* SHARE MODAL */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(23, 23, 23, 0.75);
-            backdrop-filter: blur(8px) saturate(120%);
-            -webkit-backdrop-filter: blur(8px) saturate(120%);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity var(--transition-base);
-        }
-
-        .modal.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .share-card-wrapper {
-            max-width: 340px;
-            width: 100%;
-            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .share-card {
-            background: var(--bg-primary);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid var(--border);
-        }
-
-        .share-header {
-            background: var(--bg-primary);
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .share-header-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 6px;
-        }
-
-        .share-brand {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .share-brand-logo {
-            height: 28px;
-            width: auto;
-            display: block;
-        }
-
-        .share-brand-text {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.01em;
-        }
-
-        .share-week {
-            font-size: 10px;
-            color: var(--text-tertiary);
-            font-weight: 600;
-            letter-spacing: -0.01em;
-            padding: 3px 8px;
-            background: var(--bg-secondary);
-            border-radius: var(--radius-sm);
-        }
-
-        .share-meta {
-            font-size: 11px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            letter-spacing: -0.01em;
-        }
-
-        .share-matchup {
-            padding: 16px 14px;
-            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-        }
-
-        .share-teams {
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-
-        .share-team {
-            flex: 1;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .share-team-logo-container {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto 10px;
-            background: var(--bg-primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border-light);
-            box-shadow: var(--shadow-sm);
-            transition: all var(--transition-fast);
-            flex-shrink: 0;
-        }
-
-        .share-team.winner .share-team-logo-container {
-            border-color: var(--success);
-            box-shadow: 0 0 0 2px var(--success-light), var(--shadow-sm);
-        }
-
-        .share-team-logo {
-            width: 48px;
-            height: 48px;
-        }
-
-        .share-team-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .share-team-label {
-            font-size: 9px;
-            color: var(--text-tertiary);
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-        }
-
-        .share-team-name {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--text-primary);
-            letter-spacing: -0.01em;
-        }
-
-        .share-team.winner .share-team-name {
-            color: var(--success);
-        }
-
-        .share-team-prob {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.02em;
-            font-feature-settings: 'tnum';
-        }
-
-        .share-team.winner .share-team-prob {
-            color: var(--success);
-        }
-
-        .share-vs {
-            position: relative;
-            z-index: 10;
-            flex-shrink: 0;
-        }
-
-        .vs-badge {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 900;
-            color: white;
-            border: 2px solid #ffffff;
-            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4), 0 0 0 1px #fecaca;
-            letter-spacing: 0.5px;
-        }
-
-        .share-details {
-            padding: 14px 16px 16px;
-            background: #ffffff;
-        }
-
-        .share-prediction {
-            text-align: center;
-            padding: 10px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.08));
-            border-radius: 6px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(16, 185, 129, 0.15);
-        }
-
-        .share-prediction-label {
-            font-size: 9px;
-            color: var(--text-tertiary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-
-        .share-prediction-value {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--success);
-            letter-spacing: -0.3px;
-        }
-
-        .share-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .share-stat {
-            text-align: center;
-            padding: 8px 6px;
-            background: var(--bg-primary);
-            border-radius: 6px;
-            border: 1px solid var(--border-light);
-        }
-
-        .share-stat-label {
-            font-size: 8px;
-            color: var(--text-tertiary);
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-
-        .share-stat-value {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-primary);
-            letter-spacing: -0.3px;
-        }
-
-        .share-venue {
-            text-align: center;
-            padding: 6px 10px;
-            background: var(--bg-primary);
-            border-radius: 6px;
-            border: 1px solid var(--border-light);
-            font-size: 10px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            margin-bottom: 8px;
-            letter-spacing: -0.2px;
-        }
-
-        .share-footer {
-            font-size: 10px;
-            color: var(--text-tertiary);
-            font-weight: 500;
-            text-align: center;
-            letter-spacing: -0.1px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .share-footer-logo {
-            height: 16px;
-            width: auto;
-            display: inline-block;
-            vertical-align: middle;
-        }
-
-        .share-badges {
-            display: flex;
-            gap: 6px;
-            justify-content: center;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-
-        .share-badge {
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 9px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-
-        .share-badge-upset {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-
-        .share-badge-tossup {
-            background: rgba(100, 116, 139, 0.1);
-            color: var(--text-secondary);
-            border: 1px solid rgba(100, 116, 139, 0.2);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 8px;
-            padding: 0 16px 16px;
-        }
-
-        .btn-close {
-            flex: 1;
-            background: white;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
-            padding: 8px;
-            border-radius: 6px;
-            color: var(--text-primary);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: -0.2px;
-        }
-
-        .btn-close:hover {
-            background: var(--bg-secondary);
-            border-color: var(--blue-500);
-        }
-
-        .share-btn {
-            width: 100%;
-            padding: 10px;
-            background: linear-gradient(135deg, var(--blue-500), var(--blue-600));
-            border: none;
-            border-radius: var(--radius-md);
-            color: white;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            letter-spacing: -0.01em;
-            font-family: 'Inter', sans-serif;
-            box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
-        }
-
-        .share-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-        }
-
-        .share-btn:active {
-            transform: translateY(0);
-        }
-
-        @media (min-width: 768px) {
-            .games-container {
-                max-width: min(800px, 100vw);
-                margin: 0 auto;
-            }
-
-            .summary {
-                grid-template-columns: repeat(4, 1fr);
-                max-width: min(800px, 100vw);
-                margin: 16px auto;
-                padding: 0 16px 12px;
-            }
-
-            .api-key-panel {
-                max-width: min(800px, 100vw);
-                margin: 16px auto;
-            }
-
-            .filters {
-                max-width: min(800px, 100vw);
-                margin: 0 auto;
-                padding: 16px;
-            }
-            
-            .header-content {
-                max-width: min(1280px, 100vw);
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Praeco — Predictive Intelligence</title>
+<meta name="description" content="Praeco builds calibrated predictive systems. Sports today. Markets in Q1 2026. Transparent signals, measurable outcomes.">
+<meta property="og:title" content="Praeco — Predictive Intelligence">
+<meta property="og:description" content="Praeco builds calibrated predictive systems. Sports today. Markets in Q1 2026. Transparent signals, measurable outcomes.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='630'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%236bf0ff'/%3E%3Cstop offset='100%25' style='stop-color:%239b8aff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='630' fill='url(%23g)'/%3E%3C/svg%3E">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Praeco — Predictive Intelligence">
+<meta name="twitter:description" content="Praeco builds calibrated predictive systems. Sports today. Markets in Q1 2026. Transparent signals, measurable outcomes.">
+<meta name="twitter:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='630'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%236bf0ff'/%3E%3Cstop offset='100%25' style='stop-color:%239b8aff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='630' fill='url(%23g)'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Praeco",
+  "url": "https://praeco.com",
+  "logo": "https://praeco.com/Logo.svg",
+  "description": "Praeco builds calibrated predictive systems for sports and markets."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Praeco",
+  "url": "https://praeco.com"
+}
+</script>
+<style>
+:root {
+  --bg: #0b0b0e;
+  --panel: #111217;
+  --elev: #151720;
+  --text: #e9e9ef;
+  --muted: #a8adba;
+  --brand: #6bf0ff;
+  --brand-2: #9b8aff;
+  --accent: #2ef2a3;
+  --warn: #ffcc66;
+  --danger: #ff6b6b;
+  --border: #242630;
+  --glow: rgba(107,240,255,0.18);
+  --fs-xxl: clamp(28px, 6vw, 44px);
+  --fs-xl: clamp(20px, 4.5vw, 28px);
+  --fs-lg: clamp(16px, 3.8vw, 20px);
+  --fs-md: 15px;
+  --fs-sm: 13px;
+  --fs-xs: 11px;
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --panel: #f8f9fa;
+  --elev: #eef0f2;
+  --text: #1a1a1f;
+  --muted: #5a5f6d;
+  --brand: #0099aa;
+  --brand-2: #6b5bd0;
+  --accent: #00b976;
+  --warn: #d99700;
+  --danger: #d92e2e;
+  --border: #d8dade;
+  --glow: rgba(0,153,170,0.12);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, ui-sans-serif, system-ui, "Apple Color Emoji", "Segoe UI Emoji";
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  transition: all 0.25s ease;
+}
+
+.header.scrolled {
+  transform: scaleY(0.88);
+  transform-origin: top;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+.nav {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-img {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+.wordmark {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.nav-links {
+  display: none;
+  gap: 24px;
+  font-size: var(--fs-sm);
+}
+
+.nav-links a {
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.nav-links a:hover {
+  opacity: 1;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--elev);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+}
+
+.theme-toggle:hover {
+  background: var(--border);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.icon-sun, .icon-moon {
+  width: 18px;
+  height: 18px;
+  display: none;
+}
+
+[data-theme="dark"] .icon-moon {
+  display: block;
+}
+
+[data-theme="light"] .icon-sun {
+  display: block;
+}
+
+.hero {
+  position: relative;
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 60px 20px 80px;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 20%, rgba(107,240,255,0.08), transparent 60%),
+              radial-gradient(ellipse at 80% 60%, rgba(155,138,255,0.06), transparent 50%);
+  opacity: 0.6;
+}
+
+.hero-wave {
+  position: absolute;
+  inset: 0;
+  opacity: 0.15;
+  overflow: hidden;
+}
+
+.hero-wave::before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: 
+    repeating-linear-gradient(0deg, transparent, transparent 40px, var(--brand) 40px, var(--brand) 41px),
+    repeating-linear-gradient(90deg, transparent, transparent 40px, var(--brand) 40px, var(--brand) 41px);
+  animation: wave 20s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes wave {
+  0% { transform: rotate(0deg) scale(1); }
+  100% { transform: rotate(360deg) scale(1.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-wave::before {
+    animation: none;
+  }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: var(--fs-xxl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, var(--text), var(--brand));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  font-size: var(--fs-lg);
+  color: var(--muted);
+  margin-bottom: 32px;
+  line-height: 1.7;
+}
+
+.cta-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 48px;
+}
+
+.btn {
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  transition: all 0.22s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: var(--bg);
+  box-shadow: 0 4px 16px var(--glow);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px var(--glow);
+}
+
+.btn-secondary {
+  background: var(--elev);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--border);
+  transform: translateY(-1px);
+}
+
+.social-proof {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.social-proof span {
+  padding: 6px 12px;
+  background: var(--elev);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+section {
+  padding: 80px 20px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.section-header {
+  margin-bottom: 48px;
+}
+
+.eyebrow {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--brand);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+}
+
+.section-desc {
+  font-size: var(--fs-md);
+  color: var(--muted);
+  max-width: 640px;
+}
+
+.cards {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 48px;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  transition: all 0.24s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--glow);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.card:focus-within {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.card-icon::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: var(--panel);
+  border-radius: 50%;
+}
+
+.card h3 {
+  font-size: var(--fs-lg);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.card p {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.demo {
+  background: var(--elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 32px;
+}
+
+.demo h4 {
+  font-size: var(--fs-md);
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.demo-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.slider-label {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+input[type="range"] {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--brand);
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--brand);
+  cursor: pointer;
+  border: none;
+}
+
+input[type="range"]:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.demo-chart {
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#probChart {
+  width: 100%;
+  height: 150px;
+}
+
+.kpi-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.badge {
+  padding: 10px 16px;
+  background: var(--elev);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin: 32px 0;
+}
+
+.pill {
+  padding: 12px 20px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  text-align: center;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.pill:hover {
+  background: var(--elev);
+  border-color: var(--brand);
+}
+
+.arch-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin: 40px 0;
+  flex-wrap: wrap;
+}
+
+.arch-step {
+  flex: 1;
+  min-width: 140px;
+  text-align: center;
+  position: relative;
+}
+
+.arch-box {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 12px;
+  background: var(--elev);
+  border: 2px solid var(--brand);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.arch-box::before {
+  content: '';
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  border-radius: 50%;
+}
+
+.arch-step:not(:last-child)::after {
+  content: '→';
+  position: absolute;
+  right: -30px;
+  top: 35px;
+  color: var(--brand);
+  font-size: 24px;
+}
+
+.arch-label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.feature-list {
+  list-style: none;
+  margin: 32px 0;
+}
+
+.feature-list li {
+  padding: 12px 0;
+  padding-left: 28px;
+  position: relative;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.feature-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.microcopy {
+  padding: 16px;
+  background: var(--elev);
+  border-left: 3px solid var(--brand);
+  border-radius: 6px;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  margin: 24px 0;
+}
+
+.story-content {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.story-content p {
+  font-size: var(--fs-md);
+  line-height: 1.8;
+  margin-bottom: 24px;
+  color: var(--muted);
+}
+
+.photo-placeholder {
+  width: 100%;
+  height: 240px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  border-radius: 12px;
+  margin: 32px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bg);
+  font-size: var(--fs-sm);
+  opacity: 0.3;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.timeline-item {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.timeline-header {
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.timeline-header:hover {
+  background: var(--elev);
+}
+
+.timeline-header:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: -2px;
+}
+
+.timeline-left {
+  flex: 1;
+}
+
+.timeline-date {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.timeline-title {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.timeline-status {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-on-track {
+  background: rgba(46,242,163,0.15);
+  color: var(--accent);
+}
+
+.status-planned {
+  background: rgba(107,240,255,0.15);
+  color: var(--brand);
+}
+
+.timeline-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.timeline-item.expanded .timeline-content {
+  max-height: 500px;
+}
+
+.timeline-details {
+  padding: 0 24px 24px;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.timeline-details h5 {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+  margin: 16px 0 8px;
+}
+
+.pricing-cards {
+  display: grid;
+  gap: 20px;
+  margin-top: 32px;
+}
+
+.pricing-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+}
+
+.pricing-card h3 {
+  font-size: var(--fs-lg);
+  margin-bottom: 12px;
+}
+
+.pricing-card p {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.about-grid {
+  display: grid;
+  gap: 32px;
+  margin-top: 32px;
+}
+
+.about-item h4 {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--brand);
+}
+
+.about-item p {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.form {
+  max-width: 520px;
+  margin: 32px auto 0;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: var(--fs-md);
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--brand);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 16px 24px;
+  background: var(--accent);
+  color: var(--bg);
+  border-radius: 10px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 2000;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.footer {
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  padding: 48px 20px 32px;
+}
+
+.footer-content {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  gap: 32px;
+}
+
+.footer-section h4 {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.6;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-links a {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: var(--text);
+}
+
+.footer-bottom {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}
+
+.logo-mask {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  -webkit-mask: url(./Logo.svg) no-repeat center;
+  mask: url(./Logo.svg) no-repeat center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  margin: 0 auto 24px;
+  opacity: 0.2;
+}
+
+@media (min-width: 640px) {
+  .nav-links {
+    display: flex;
+  }
+  
+  .cards {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  
+  .demo-controls {
+    flex-direction: row;
+  }
+  
+  .footer-content {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  .pricing-cards {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  section {
+    padding: 120px 40px;
+  }
+  
+  .hero {
+    padding: 100px 40px 120px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
 </head>
-<body>
-    <header>
-        <div class="header-content">
-            <div class="brand">
-                <img src="Logo.svg" alt="Logo" class="brand-logo">
-                <span class="brand-text">CFB AI/ML Models</span>
-            </div>
-            <div class="tagline">College Football Predictions</div>
-        </div>
-    </header>
+<body data-theme="dark">
 
-    <div class="container">
-        <div class="api-key-panel" id="apiKeyPanel">
-            <div class="input-group">
-                <label>CollegeFootballData API Key</label>
-                <input type="text" id="apiKey" placeholder="Enter your API key">
-                <small style="display: block; margin-top: 6px; color: var(--text-tertiary); font-size: 11px;">
-                    Get your free API key at <a href="https://collegefootballdata.com" target="_blank" style="color: var(--blue-500);">collegefootballdata.com</a>
-                </small>
-            </div>
-            <button id="saveApiKey">Save & Load Predictions</button>
-        </div>
+<header class="header" id="header">
+  <nav class="nav">
+    <div class="nav-left">
+      <img src="./Logo.svg" alt="Praeco Logo" class="logo-img">
+      <div class="wordmark">Praeco</div>
+    </div>
+    <div class="nav-links">
+      <a href="#product">Product</a>
+      <a href="#story">Story</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#about">Careers</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+    </div>
+  </nav>
+</header>
 
-        <div class="status-bar hidden" id="statusBar">
-            <span id="statusText"></span>
-        </div>
+<main>
+  <section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-wave"></div>
+    <div class="hero-content">
+      <h1>Predict Tomorrow. Decide Today.</h1>
+      <p>Praeco is a predictive intelligence company. We start where outcomes are scored every day—sports—and expand to markets in Q1 2026. Our promise: measured, calibrated predictions over vibes.</p>
+      <div class="cta-group">
+        <button class="btn btn-primary" id="accessBtn">Request Early Access</button>
+        <a href="#roadmap" class="btn btn-secondary">View Roadmap</a>
+      </div>
+      <div class="social-proof">
+        <span>Seed-backed</span>
+        <span>Austin, TX</span>
+        <span>15 Leagues</span>
+      </div>
+    </div>
+  </section>
 
-        <div class="filters hidden" id="filters">
-            <div class="filter-chip active" data-filter="all">All Games</div>
-            <div class="filter-chip" data-filter="SEC">SEC</div>
-            <div class="filter-chip" data-filter="Big Ten">Big Ten</div>
-            <div class="filter-chip" data-filter="Big 12">Big 12</div>
-            <div class="filter-chip" data-filter="ACC">ACC</div>
-            <div class="filter-chip" data-filter="upsets">Upsets</div>
-            <div class="filter-chip" data-filter="tossups">Toss-Ups</div>
-        </div>
-
-        <div class="summary hidden" id="summary">
-            <div class="stat-card">
-                <div class="stat-value" id="totalGames">0</div>
-                <div class="stat-label">Games</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="avgConfidence">0%</div>
-                <div class="stat-label">Avg Confidence</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="upsets">0</div>
-                <div class="stat-label">Upset Alerts</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="closeGames">0</div>
-                <div class="stat-label">Toss-Ups</div>
-            </div>
-        </div>
-
-        <div class="games-container" id="predictions"></div>
+  <section id="product">
+    <div class="section-header">
+      <div class="eyebrow">Sports Predictive Outcomes</div>
+      <h2 class="section-title">From signal to decision—transparent, calibrated, verifiable.</h2>
+      <p class="section-desc">State-of-the-art predictive outcomes built on foundation-model intelligence.</p>
+    </div>
+    
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon"></div>
+        <h3>Signal Quality</h3>
+        <p>Calibrated win-probability curves with confidence intervals. Every prediction includes uncertainty quantification and temporal stability metrics.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon"></div>
+        <h3>Transparent Rationale</h3>
+        <p>Model features surfaced in real-time. Post-game attribution shows what moved the needle. No black boxes.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon"></div>
+        <h3>Operator APIs</h3>
+        <p>Real-time endpoints and batch simulation infrastructure. Webhook support for live in-game updates and scenario analysis.</p>
+      </div>
     </div>
 
-    <!-- Share Modal -->
-    <div class="modal" id="shareModal"></div>
+    <div class="demo">
+      <h4>Interactive Prediction Demo</h4>
+      <div class="demo-controls">
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>Game Strength</span>
+            <span id="strengthVal">50</span>
+          </div>
+          <input type="range" id="strengthSlider" min="0" max="100" value="50" aria-label="Game strength">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label">
+            <span>Injury Impact</span>
+            <span id="injuryVal">30</span>
+          </div>
+          <input type="range" id="injurySlider" min="0" max="100" value="30" aria-label="Injury impact">
+        </div>
+      </div>
+      <div class="demo-chart">
+        <canvas id="probChart"></canvas>
+      </div>
+    </div>
 
-    <script>
-        // Configuration
-        const CFB_API_BASE = 'https://api.collegefootballdata.com';
-        const CURRENT_YEAR = 2025;
-        const CACHE_TTL = 1000 * 60 * 30;
-        
-        let predictions = [];
-        let allPredictions = [];
-        let activeFilter = 'all';
-        let apiKey = '';
+    <div class="kpi-strip">
+      <div class="badge">Accuracy: 63.4% (spread-adjusted)</div>
+      <div class="badge">Brier Score: 0.167</div>
+      <div class="badge">15 Leagues Covered</div>
+      <div class="badge">12-Month Backtest</div>
+    </div>
+  </section>
 
-        function debug(msg, data) {
-            console.log(`[DEBUG] ${msg}`, data || '');
-        }
+  <section id="markets">
+    <div class="section-header">
+      <div class="eyebrow">Expansion — Q1 2026</div>
+      <h2 class="section-title">Cross-domain signals, one predictive stack.</h2>
+      <p class="section-desc">Praeco Markets begins Q1 2026, bringing calibrated prediction infrastructure to multi-market signal fusion.</p>
+    </div>
 
-        function logStatus(msg, type = 'loading') {
-            const bar = document.getElementById('statusBar');
-            const text = document.getElementById('statusText');
-            bar.className = `status-bar ${type}`;
-            text.textContent = msg;
-            bar.classList.remove('hidden');
-            debug(msg);
-        }
+    <div class="pill-grid">
+      <div class="pill">Energy</div>
+      <div class="pill">Equities</div>
+      <div class="pill">Commodities</div>
+      <div class="pill">FX</div>
+      <div class="pill">Logistics</div>
+      <div class="pill">Retail Demand</div>
+    </div>
 
-        function delay(ms) {
-            return new Promise(r => setTimeout(r, ms));
-        }
+    <p style="font-size: var(--fs-md); color: var(--muted); line-height: 1.8; margin: 32px 0;">
+      Multi-signal fusion powered by alternative data streams, on-chain metrics, macro time series, and order flow proxies. Temporal cross-attention architecture with conformal prediction for calibrated uncertainty intervals.
+    </p>
 
-        function getCacheKey(endpoint) {
-            return `cfb_cache_${endpoint}`;
-        }
+    <div style="text-align: center; margin-top: 32px;">
+      <button class="btn btn-primary" id="betaBtn">Join Markets Beta</button>
+    </div>
+  </section>
 
-        function getCache(endpoint) {
-            const key = getCacheKey(endpoint);
-            const cached = localStorage.getItem(key);
-            if (!cached) return null;
-            
-            const { data, timestamp } = JSON.parse(cached);
-            if (Date.now() - timestamp > CACHE_TTL) {
-                localStorage.removeItem(key);
-                return null;
-            }
-            return data;
-        }
+  <section id="tech">
+    <div class="section-header">
+      <div class="eyebrow">Technical Architecture</div>
+      <h2 class="section-title">Built for transparency and reliability.</h2>
+      <p class="section-desc">Production-grade infrastructure designed for continuous calibration and auditability.</p>
+    </div>
 
-        function setCache(endpoint, data) {
-            const key = getCacheKey(endpoint);
-            localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
-        }
+    <div class="arch-diagram">
+      <div class="arch-step">
+        <div class="arch-box"></div>
+        <div class="arch-label">Ingest</div>
+      </div>
+      <div class="arch-step">
+        <div class="arch-box"></div>
+        <div class="arch-label">Temporal Modeling</div>
+      </div>
+      <div class="arch-step">
+        <div class="arch-box"></div>
+        <div class="arch-label">Decision Layer</div>
+      </div>
+    </div>
 
-        async function fetchCFB(endpoint, params = {}) {
-            const url = new URL(`${CFB_API_BASE}${endpoint}`);
-            Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
-            
-            const cached = getCache(url.toString());
-            if (cached) {
-                debug('Cache hit: ' + endpoint);
-                return cached;
-            }
+    <ul class="feature-list">
+      <li>Feature store with time-aligned joins and versioned schemas</li>
+      <li>Sequence models plus tree ensembles for robustness under distribution shift</li>
+      <li>Continuous drift monitoring with automated backtesting harness</li>
+      <li>Human-in-the-loop override system with full audit trails</li>
+    </ul>
 
-            debug(`Fetching: ${url.toString()}`);
-            
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Accept': 'application/json'
-                }
-            });
+    <div class="microcopy">
+      <strong>Security & Privacy:</strong> Customer data stays scoped, encrypted, and isolated. We minimize PII and log every model decision pathway needed for audit. SOC 2 Type I roadmap in progress for Q3 2026.
+    </div>
+  </section>
 
-            if (!response.ok) {
-                if (response.status === 401) throw new Error('Invalid API key');
-                if (response.status === 429) throw new Error('Rate limit exceeded');
-                throw new Error(`API error: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            setCache(url.toString(), data);
-            return data;
-        }
+  <section id="story">
+    <div class="logo-mask"></div>
+    <div class="section-header" style="text-align: center;">
+      <div class="eyebrow">Our Story</div>
+      <h2 class="section-title">Built on calibration, not hype.</h2>
+    </div>
+    
+    <div class="story-content">
+      <p>Praeco began with a simple constraint: prediction quality must be measured, audited, and improved—continuously. Our team built trading and scheduling systems that lived or died on calibration. "Praeco"—Latin for "herald"—captures our job: announce tomorrow's odds with the humility of uncertainty. We ship models that explain themselves, improve with scrutiny, and earn trust the hard way—over time.</p>
+      
+      <div class="photo-placeholder">Team Photo</div>
+      
+      <p style="text-align: center; font-size: var(--fs-sm);">Founded in Austin, remote-friendly, focused on measurable outcomes.</p>
+    </div>
+  </section>
 
-        async function getCurrentWeek() {
-            logStatus('Detecting current week...', 'loading');
-            const calendar = await fetchCFB('/calendar', { year: CURRENT_YEAR });
-            const now = new Date();
-            const currentWeek = calendar.find(week => {
-                const start = new Date(week.firstGameStart);
-                const end = new Date(week.lastGameStart);
-                end.setDate(end.getDate() + 2);
-                return now >= start && now <= end;
-            });
-            const week = currentWeek ? currentWeek.week : 1;
-            debug(`Current week: ${week}`);
-            return week;
-        }
+  <section id="roadmap">
+    <div class="section-header">
+      <div class="eyebrow">Product Roadmap</div>
+      <h2 class="section-title">Shipping with discipline.</h2>
+      <p class="section-desc">Transparent milestones with defined success metrics.</p>
+    </div>
 
-        async function fetchGames(year, week) {
-            logStatus(`Fetching Week ${week} games...`, 'loading');
-            return await fetchCFB('/games', { year, week, seasonType: 'regular' });
-        }
+    <div class="timeline">
+      <div class="timeline-item" data-expanded="false">
+        <div class="timeline-header" tabindex="0" role="button" aria-expanded="false">
+          <div class="timeline-left">
+            <div class="timeline-date">Q4 2025</div>
+            <div class="timeline-title">Sports v1 General Availability</div>
+          </div>
+          <div class="timeline-status status-on-track">On Track</div>
+        </div>
+        <div class="timeline-content">
+          <div class="timeline-details">
+            <h5>Scope</h5>
+            <p>Production API launch with 15-league coverage, real-time webhooks, dashboard for operators, and comprehensive documentation.</p>
+            <h5>Success Metrics</h5>
+            <p>Brier score under 0.170, API uptime above 99.5%, first 50 paying customers onboarded.</p>
+            <h5>Risks</h5>
+            <p>Data provider stability during playoff season; scaling inference under peak load.</p>
+          </div>
+        </div>
+      </div>
 
-        async function fetchAdvancedStats(year) {
-            logStatus('Fetching advanced metrics...', 'loading');
-            const [spRatings, fpi] = await Promise.all([
-                fetchCFB('/ratings/sp', { year }),
-                fetchCFB('/ratings/fpi', { year })
-            ]);
-            return { spRatings, fpi };
-        }
+      <div class="timeline-item" data-expanded="false">
+        <div class="timeline-header" tabindex="0" role="button" aria-expanded="false">
+          <div class="timeline-left">
+            <div class="timeline-date">Q1 2026</div>
+            <div class="timeline-title">Markets Beta Launch</div>
+          </div>
+          <div class="timeline-status status-planned">Planned</div>
+        </div>
+        <div class="timeline-content">
+          <div class="timeline-details">
+            <h5>Scope</h5>
+            <p>Closed beta for energy and equities verticals. Multi-signal fusion pipeline, conformal prediction intervals, operator dashboard expansion.</p>
+            <h5>Success Metrics</h5>
+            <p>Beta cohort of 10-15 institutional users; calibration metrics validated on out-of-sample data.</p>
+            <h5>Risks</h5>
+            <p>Regulatory clarity on prediction as a service; data licensing for alt-data streams.</p>
+          </div>
+        </div>
+      </div>
 
-        async function fetchTeamRecords(year) {
-            logStatus('Fetching team records...', 'loading');
-            return await fetchCFB('/records', { year });
-        }
+      <div class="timeline-item" data-expanded="false">
+        <div class="timeline-header" tabindex="0" role="button" aria-expanded="false">
+          <div class="timeline-left">
+            <div class="timeline-date">Q2 2026</div>
+            <div class="timeline-title">Multi-Industry Expansion Pilots</div>
+          </div>
+          <div class="timeline-status status-planned">Planned</div>
+        </div>
+        <div class="timeline-content">
+          <div class="timeline-details">
+            <h5>Scope</h5>
+            <p>Pilot programs in energy operations and retail demand forecasting. Custom feature engineering and vertical-specific modeling.</p>
+            <h5>Success Metrics</h5>
+            <p>Two pilot contracts signed; measurable forecast improvement over baseline methods.</p>
+          </div>
+        </div>
+      </div>
 
-        function sigmoid(z) {
-            return 1 / (1 + Math.exp(-z));
-        }
+      <div class="timeline-item" data-expanded="false">
+        <div class="timeline-header" tabindex="0" role="button" aria-expanded="false">
+          <div class="timeline-left">
+            <div class="timeline-date">Q3 2026</div>
+            <div class="timeline-title">SOC 2 Type I Certification</div>
+          </div>
+          <div class="timeline-status status-planned">Planned</div>
+        </div>
+        <div class="timeline-content">
+          <div class="timeline-details">
+            <h5>Scope</h5>
+            <p>Complete SOC 2 Type I audit with focus on data handling, access controls, and audit logging.</p>
+            <h5>Success Metrics</h5>
+            <p>Certification achieved; enterprise sales motion unlocked.</p>
+          </div>
+        </div>
+      </div>
 
-        function predictGame(game, advanced, records) {
-            const homeTeam = game.home_team;
-            const awayTeam = game.away_team;
-            
-            const homeSP = advanced.spRatings.find(r => r.team === homeTeam);
-            const awaySP = advanced.spRatings.find(r => r.team === awayTeam);
-            const homeFPI = advanced.fpi.find(f => f.team === homeTeam);
-            const awayFPI = advanced.fpi.find(f => f.team === awayTeam);
-            const homeRecord = records.find(r => r.team === homeTeam);
-            const awayRecord = records.find(r => r.team === awayTeam);
-            
-            const spDiff = (homeSP?.rating || 0) - (awaySP?.rating || 0);
-            const fpiDiff = (homeFPI?.fpi || 0) - (awayFPI?.fpi || 0);
-            
-            const homeWinPct = homeRecord ? homeRecord.total.wins / (homeRecord.total.wins + homeRecord.total.losses) : 0.5;
-            const awayWinPct = awayRecord ? awayRecord.total.wins / (awayRecord.total.wins + awayRecord.total.losses) : 0.5;
-            const winPctDiff = homeWinPct - awayWinPct;
-            
-            let logit = 0.35 * (spDiff / 10) + 0.30 * (fpiDiff / 5) + 0.20 * winPctDiff + 0.15;
-            let homeWinProb = sigmoid(logit);
-            homeWinProb = 0.5 + 0.85 * (homeWinProb - 0.5);
-            homeWinProb = Math.max(0.10, Math.min(0.90, homeWinProb));
-            
-            const winner = homeWinProb > 0.5 ? homeTeam : awayTeam;
-            const winnerProb = homeWinProb > 0.5 ? homeWinProb : 1 - homeWinProb;
-            const predictedMargin = Math.abs((homeWinProb - 0.5) * 24);
-            
-            const confidence = Math.abs(homeWinProb - 0.5) * 2;
-            let confLabel = 'low';
-            if (confidence > 0.7) confLabel = 'high';
-            else if (confidence > 0.4) confLabel = 'medium';
-            
-            const homeExpected = (homeFPI?.fpi || 0) > (awayFPI?.fpi || 0);
-            const isUpset = (homeExpected && homeWinProb < 0.5) || (!homeExpected && homeWinProb > 0.5);
-            
-            return {
-                game,
-                homeTeam,
-                awayTeam,
-                homeConference: game.home_conference || 'FBS Independents',
-                awayConference: game.away_conference || 'FBS Independents',
-                homeWinProb,
-                awayWinProb: 1 - homeWinProb,
-                winner,
-                winnerProb,
-                predictedMargin,
-                favoredTeam: homeWinProb > 0.5 ? homeTeam : awayTeam,
-                confidence: confLabel,
-                isUpset,
-                isTossUp: confidence < 0.2,
-                homeRecord: homeRecord ? `${homeRecord.total.wins}-${homeRecord.total.losses}` : '0-0',
-                awayRecord: awayRecord ? `${awayRecord.total.wins}-${awayRecord.total.losses}` : '0-0',
-                venue: game.venue || 'TBD',
-                startDate: game.start_date
-            };
-        }
+      <div class="timeline-item" data-expanded="false">
+        <div class="timeline-header" tabindex="0" role="button" aria-expanded="false">
+          <div class="timeline-left">
+            <div class="timeline-date">Q4 2026</div>
+            <div class="timeline-title">EU Expansion & Multilingual Dashboards</div>
+          </div>
+          <div class="timeline-status status-planned">Planned</div>
+        </div>
+        <div class="timeline-content">
+          <div class="timeline-details">
+            <h5>Scope</h5>
+            <p>EU data residency compliance, multilingual UI (EN, DE, FR, ES), expanded sports coverage for European markets.</p>
+            <h5>Success Metrics</h5>
+            <p>Launch in three EU markets; localized support and documentation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        function getTeamLogo(team) {
-            const slug = team.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-            return `https://a.espncdn.com/i/teamlogos/ncaa/500/${slug}.png`;
-        }
+  <section id="pricing">
+    <div class="section-header" style="text-align: center;">
+      <div class="eyebrow">Pricing</div>
+      <h2 class="section-title">Built for operators and researchers.</h2>
+    </div>
 
-        function renderPredictions(preds) {
-            const container = document.getElementById('predictions');
-            
-            if (preds.length === 0) {
-                container.innerHTML = `<div class="empty-state"><div class="empty-icon">🏈</div><div class="empty-text">No games match your filter</div></div>`;
-                return;
-            }
+    <div class="pricing-cards">
+      <div class="pricing-card">
+        <h3>Contact Sales</h3>
+        <p>Enterprise API access with custom SLAs, dedicated support, and on-premise deployment options.</p>
+        <button class="btn btn-secondary" id="salesBtn">Contact Sales</button>
+      </div>
+      <div class="pricing-card">
+        <h3>Researcher Program</h3>
+        <p>Academic and non-profit access to historical data and model APIs for calibration research.</p>
+        <button class="btn btn-secondary" id="researchBtn">Apply for Access</button>
+      </div>
+    </div>
+  </section>
 
-            container.innerHTML = '';
-            preds.forEach((pred, idx) => {
-                const homeLogo = getTeamLogo(pred.homeTeam);
-                const awayLogo = getTeamLogo(pred.awayTeam);
-                const gameTime = new Date(pred.startDate).toLocaleString('en-US', {
-                    weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
-                });
-                const badges = [];
-                if (pred.isUpset) badges.push('<span class="badge badge-upset">🔥 Upset</span>');
-                if (pred.isTossUp) badges.push('<span class="badge badge-tossup">🎲 Toss-Up</span>');
+  <section id="about">
+    <div class="section-header">
+      <div class="eyebrow">About Praeco</div>
+      <h2 class="section-title">Calibration over hype.</h2>
+    </div>
 
-                const card = document.createElement('div');
-                card.className = 'game-card';
-                card.innerHTML = `
-                    <div class="game-header">
-                        <div class="game-time">${gameTime}</div>
-                        <div class="game-venue">${pred.venue}</div>
-                    </div>
-                    <div class="matchup">
-                        ${badges.length > 0 ? `<div class="badges">${badges.join('')}</div>` : ''}
-                        <div class="team-row ${pred.winner === pred.awayTeam ? 'winner' : ''}">
-                            <div class="team-logo"><img src="${awayLogo}" alt="${pred.awayTeam}" onerror="this.style.display='none'"></div>
-                            <div class="team-info">
-                                <div class="team-name">${pred.awayTeam}</div>
-                                <div class="team-record">${pred.awayRecord}</div>
-                            </div>
-                            <div class="prob-container">
-                                <div class="prob-bar"><div class="prob-fill" style="width: ${pred.awayWinProb * 100}%"></div></div>
-                                <div class="prob-value">${(pred.awayWinProb * 100).toFixed(0)}%</div>
-                            </div>
-                        </div>
-                        <div class="team-row ${pred.winner === pred.homeTeam ? 'winner' : ''}">
-                            <div class="home-indicator"></div>
-                            <div class="team-logo"><img src="${homeLogo}" alt="${pred.homeTeam}" onerror="this.style.display='none'"></div>
-                            <div class="team-info">
-                                <div class="team-name">${pred.homeTeam}</div>
-                                <div class="team-record">${pred.homeRecord}</div>
-                            </div>
-                            <div class="prob-container">
-                                <div class="prob-bar"><div class="prob-fill" style="width: ${pred.homeWinProb * 100}%"></div></div>
-                                <div class="prob-value">${(pred.homeWinProb * 100).toFixed(0)}%</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="prediction-details">
-                        <div class="detail-grid">
-                            <div class="detail-item"><div class="detail-label">Winner</div><div class="detail-value">${pred.winner}</div></div>
-                            <div class="detail-item"><div class="detail-label">Confidence</div><div class="detail-value">${(pred.winnerProb * 100).toFixed(0)}%</div></div>
-                            <div class="detail-item"><div class="detail-label">Margin</div><div class="detail-value">${pred.predictedMargin.toFixed(1)} pts</div></div>
-                            <div class="detail-item"><div class="detail-label">Model</div><div class="detail-value">${pred.confidence.toUpperCase()}</div></div>
-                        </div>
-                        <button class="share-btn" onclick="window.openShareModal(${idx})">📸 Share Prediction</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
+    <div class="about-grid">
+      <div class="about-item">
+        <h4>Location</h4>
+        <p>Headquartered in Austin, Texas. Remote-friendly culture with team members across North America.</p>
+      </div>
+      <div class="about-item">
+        <h4>Hiring</h4>
+        <p>Open roles in ML Engineering, Data Infrastructure, Frontend Development, and Site Reliability. We value clarity, rigor, and humility.</p>
+      </div>
+      <div class="about-item">
+        <h4>Investors</h4>
+        <p>Seed-stage backing from operators and technologists who understand the discipline of prediction systems.</p>
+      </div>
+      <div class="about-item">
+        <h4>Ethics</h4>
+        <p>We believe calibrated predictions serve decision-makers better than overconfident forecasts. Transparency and continuous measurement are non-negotiable.</p>
+      </div>
+    </div>
+  </section>
 
-        function updateSummary(preds) {
-            document.getElementById('totalGames').textContent = preds.length;
-            const avgConf = preds.reduce((s, p) => s + Math.abs(p.homeWinProb - 0.5) * 2, 0) / preds.length;
-            document.getElementById('avgConfidence').textContent = (avgConf * 100).toFixed(0) + '%';
-            document.getElementById('upsets').textContent = preds.filter(p => p.isUpset).length;
-            document.getElementById('closeGames').textContent = preds.filter(p => p.isTossUp).length;
-            document.getElementById('summary').classList.remove('hidden');
-            document.getElementById('filters').classList.remove('hidden');
-        }
+  <section id="contact">
+    <div class="section-header" style="text-align: center;">
+      <div class="eyebrow">Get in Touch</div>
+      <h2 class="section-title">Request Early Access</h2>
+      <p class="section-desc">Join operators and analysts using Praeco for calibrated predictions.</p>
+    </div>
 
-        function applyFilter(filterType) {
-            activeFilter = filterType;
-            document.querySelectorAll('.filter-chip').forEach(chip => {
-                chip.classList.remove('active');
-                if (chip.dataset.filter === filterType) chip.classList.add('active');
-            });
+    <form class="form" id="accessForm">
+      <div class="form-group">
+        <label class="form-label" for="name">Name</label>
+        <input type="text" id="name" class="form-input" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input type="email" id="email" class="form-input" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="org">Organization</label>
+        <input type="text" id="org" class="form-input" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="usecase">Use Case</label>
+        <textarea id="usecase" class="form-textarea" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Request</button>
+    </form>
+  </section>
+</main>
 
-            let filtered = [...allPredictions];
-            if (filterType === 'upsets') filtered = filtered.filter(p => p.isUpset);
-            else if (filterType === 'tossups') filtered = filtered.filter(p => p.isTossUp);
-            else if (filterType !== 'all') filtered = filtered.filter(p => p.homeConference === filterType || p.awayConference === filterType);
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-section">
+      <h4>Product</h4>
+      <div class="footer-links">
+        <a href="#product">Sports</a>
+        <a href="#markets">Markets</a>
+        <a href="#tech">Architecture</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+    </div>
+    <div class="footer-section">
+      <h4>Company</h4>
+      <div class="footer-links">
+        <a href="#story">Story</a>
+        <a href="#about">About</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#about">Careers</a>
+      </div>
+    </div>
+    <div class="footer-section">
+      <h4>Legal</h4>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Security</a>
+      </div>
+    </div>
+    <div class="footer-section">
+      <h4>Contact</h4>
+      <div class="footer-links">
+        <a href="#contact">Request Access</a>
+        <a href="mailto:hello@praeco.com">hello@praeco.com</a>
+        <a href="#">Austin, TX</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    © 2025 Praeco. Calibrated predictions over vibes.
+  </div>
+</footer>
 
-            predictions = filtered;
-            renderPredictions(predictions);
-            updateSummary(predictions);
-        }
+<div class="toast" id="toast"></div>
 
-        function openShareModal(idx) {
-            const pred = predictions[idx];
-            const modal = document.getElementById('shareModal');
-            const homeLogo = getTeamLogo(pred.homeTeam);
-            const awayLogo = getTeamLogo(pred.awayTeam);
-            const gameTime = new Date(pred.startDate).toLocaleString('en-US', {
-                weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
-            });
-            const badges = [];
-            if (pred.isUpset) badges.push('<span class="share-badge share-badge-upset">🔥 UPSET</span>');
-            if (pred.isTossUp) badges.push('<span class="share-badge share-badge-tossup">🎲 TOSS-UP</span>');
+<script>
+// Theme toggle
+const themeToggle = document.getElementById('themeToggle');
+const html = document.documentElement;
+const body = document.body;
 
-            modal.innerHTML = `
-                <div class="share-card-wrapper">
-                    <div class="share-card">
-                        <div class="share-header">
-                            <div class="share-header-top">
-                                <div class="share-brand">
-                                    <img src="Logo.svg" alt="Logo" class="share-brand-logo">
-                                    <span class="share-brand-text">Game Prediction</span>
-                                </div>
-                                <div class="share-week">Week ${pred.game.week || '?'}</div>
-                            </div>
-                            <div class="share-meta">${gameTime}</div>
-                        </div>
-                        <div class="share-matchup">
-                            ${badges.length > 0 ? `<div class="share-badges">${badges.join('')}</div>` : ''}
-                            <div class="share-teams">
-                                <div class="share-team ${pred.winner === pred.awayTeam ? 'winner' : ''}">
-                                    <div class="share-team-label">Away</div>
-                                    <div class="share-team-logo-container"><div class="share-team-logo"><img src="${awayLogo}" alt="${pred.awayTeam}" onerror="this.style.display='none'"></div></div>
-                                    <div class="share-team-name">${pred.awayTeam}</div>
-                                    <div class="share-team-prob">${(pred.awayWinProb * 100).toFixed(0)}%</div>
-                                </div>
-                                <div class="share-vs"><div class="vs-badge">VS</div></div>
-                                <div class="share-team ${pred.winner === pred.homeTeam ? 'winner' : ''}">
-                                    <div class="share-team-label">Home</div>
-                                    <div class="share-team-logo-container"><div class="share-team-logo"><img src="${homeLogo}" alt="${pred.homeTeam}" onerror="this.style.display='none'"></div></div>
-                                    <div class="share-team-name">${pred.homeTeam}</div>
-                                    <div class="share-team-prob">${(pred.homeWinProb * 100).toFixed(0)}%</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="share-details">
-                            <div class="share-prediction">
-                                <div class="share-prediction-label">Predicted Winner</div>
-                                <div class="share-prediction-value">${pred.winner}</div>
-                            </div>
-                            <div class="share-stats-grid">
-                                <div class="share-stat"><div class="share-stat-label">Win Probability</div><div class="share-stat-value">${(pred.winnerProb * 100).toFixed(0)}%</div></div>
-                                <div class="share-stat"><div class="share-stat-label">Predicted Margin</div><div class="share-stat-value">${pred.predictedMargin.toFixed(1)}</div></div>
-                                <div class="share-stat"><div class="share-stat-label">${pred.homeTeam} Record</div><div class="share-stat-value">${pred.homeRecord}</div></div>
-                                <div class="share-stat"><div class="share-stat-label">${pred.awayTeam} Record</div><div class="share-stat-value">${pred.awayRecord}</div></div>
-                            </div>
-                            <div class="share-venue">📍 ${pred.venue}</div>
-                            <div class="share-footer">
-                                <span>Powered by</span>
-                                <img src="Logo.svg" alt="Logo" class="share-footer-logo">
-                                <span>CFB AI/ML Models</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-actions"><button class="btn-close" onclick="window.closeShareModal()">Close</button></div>
-                </div>
-            `;
-            modal.classList.add('active');
-        }
+const savedTheme = localStorage.getItem('theme') || 'dark';
+body.setAttribute('data-theme', savedTheme);
 
-        function closeShareModal() {
-            document.getElementById('shareModal').classList.remove('active');
-        }
+themeToggle.addEventListener('click', () => {
+  const currentTheme = body.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  body.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+});
 
-        window.openShareModal = openShareModal;
-        window.closeShareModal = closeShareModal;
+// Scroll header behavior
+const header = document.getElementById('header');
+let lastScroll = 0;
 
-        async function runPrediction() {
-            try {
-                const week = await getCurrentWeek();
-                const [games, advanced, records] = await Promise.all([
-                    fetchGames(CURRENT_YEAR, week),
-                    fetchAdvancedStats(CURRENT_YEAR),
-                    fetchTeamRecords(CURRENT_YEAR)
-                ]);
-                
-                if (games.length === 0) {
-                    logStatus('No games found for this week', 'error');
-                    return;
-                }
+window.addEventListener('scroll', () => {
+  const currentScroll = window.pageYOffset;
+  if (currentScroll > 80) {
+    header.classList.add('scrolled');
+  } else {
+    header.classList.remove('scrolled');
+  }
+  lastScroll = currentScroll;
+});
 
-                logStatus('Generating predictions...', 'loading');
-                allPredictions = games.filter(g => !g.completed).map(game => predictGame(game, advanced, records)).filter(p => p !== null);
-                allPredictions.sort((a, b) => Math.abs(b.homeWinProb - 0.5) - Math.abs(a.homeWinProb - 0.5));
-                predictions = [...allPredictions];
-                renderPredictions(predictions);
-                updateSummary(predictions);
-                document.getElementById('apiKeyPanel').classList.add('hidden');
-                document.getElementById('statusBar').classList.add('hidden');
-                debug(`✅ ${predictions.length} predictions generated`);
-            } catch (err) {
-                console.error(err);
-                logStatus(`Error: ${err.message}`, 'error');
-            }
-        }
+// Smooth scroll
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        document.getElementById('saveApiKey').addEventListener('click', () => {
-            const key = document.getElementById('apiKey').value.trim();
-            if (!key) { alert('Please enter an API key'); return; }
-            apiKey = key;
-            localStorage.setItem('cfb_api_key', key);
-            runPrediction();
-        });
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+        block: 'start'
+      });
+    }
+  });
+});
 
-        document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.addEventListener('click', () => applyFilter(chip.dataset.filter));
-        });
+// Demo chart
+const canvas = document.getElementById('probChart');
+const ctx = canvas.getContext('2d');
+const strengthSlider = document.getElementById('strengthSlider');
+const injurySlider = document.getElementById('injurySlider');
+const strengthVal = document.getElementById('strengthVal');
+const injuryVal = document.getElementById('injuryVal');
 
-        document.getElementById('shareModal').addEventListener('click', (e) => {
-            if (e.target.id === 'shareModal') closeShareModal();
-        });
+function resizeCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  drawChart();
+}
 
-        const savedKey = localStorage.getItem('cfb_api_key');
-        if (savedKey) {
-            apiKey = savedKey;
-            document.getElementById('apiKey').value = savedKey;
-            setTimeout(() => runPrediction(), 500);
-        } else {
-            logStatus('Enter your API key to start', 'success');
-        }
-    </script>
+function drawChart() {
+  const w = canvas.width / (window.devicePixelRatio || 1);
+  const h = canvas.height / (window.devicePixelRatio || 1);
+  
+  ctx.clearRect(0, 0, w, h);
+  
+  const strength = parseInt(strengthSlider.value);
+  const injury = parseInt(injurySlider.value);
+  
+  const baseProb = 0.5;
+  const strengthEffect = (strength - 50) * 0.004;
+  const injuryEffect = (injury - 50) * -0.003;
+  const prob = Math.max(0.1, Math.min(0.9, baseProb + strengthEffect + injuryEffect));
+  
+  const points = 50;
+  const padding = 40;
+  const chartW = w - padding * 2;
+  const chartH = h - padding * 2;
+  
+  ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--border');
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padding, padding);
+  ctx.lineTo(padding, h - padding);
+  ctx.lineTo(w - padding, h - padding);
+  ctx.stroke();
+  
+  ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--brand');
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  
+  for (let i = 0; i <= points; i++) {
+    const x = padding + (i / points) * chartW;
+    const variance = 0.08;
+    const curveProb = prob + variance * Math.sin((i / points) * Math.PI * 4) * (1 - i / points);
+    const y = h - padding - curveProb * chartH;
+    
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  }
+  ctx.stroke();
+  
+  const finalX = w - padding;
+  const finalY = h - padding - prob * chartH;
+  ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--brand');
+  ctx.beginPath();
+  ctx.arc(finalX, finalY, 4, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text');
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText((prob * 100).toFixed(1) + '%', finalX - 10, finalY - 8);
+}
+
+strengthSlider.addEventListener('input', (e) => {
+  strengthVal.textContent = e.target.value;
+  requestAnimationFrame(drawChart);
+});
+
+injurySlider.addEventListener('input', (e) => {
+  injuryVal.textContent = e.target.value;
+  requestAnimationFrame(drawChart);
+});
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// Timeline accordion
+const timelineItems = document.querySelectorAll('.timeline-item');
+
+timelineItems.forEach(item => {
+  const header = item.querySelector('.timeline-header');
+  
+  header.addEventListener('click', () => {
+    const isExpanded = item.getAttribute('data-expanded') === 'true';
+    
+    timelineItems.forEach(i => {
+      i.classList.remove('expanded');
+      i.setAttribute('data-expanded', 'false');
+      i.querySelector('.timeline-header').setAttribute('aria-expanded', 'false');
+    });
+    
+    if (!isExpanded) {
+      item.classList.add('expanded');
+      item.setAttribute('data-expanded', 'true');
+      header.setAttribute('aria-expanded', 'true');
+      sessionStorage.setItem('expandedTimeline', item.querySelector('.timeline-date').textContent);
+    } else {
+      sessionStorage.removeItem('expandedTimeline');
+    }
+  });
+  
+  header.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      header.click();
+    }
+  });
+});
+
+const savedExpanded = sessionStorage.getItem('expandedTimeline');
+if (savedExpanded) {
+  timelineItems.forEach(item => {
+    if (item.querySelector('.timeline-date').textContent === savedExpanded) {
+      item.classList.add('expanded');
+      item.setAttribute('data-expanded', 'true');
+      item.querySelector('.timeline-header').setAttribute('aria-expanded', 'true');
+    }
+  });
+}
+
+// Form handling
+const accessForm = document.getElementById('accessForm');
+const toast = document.getElementById('toast');
+
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+accessForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  
+  setTimeout(() => {
+    showToast('Request submitted successfully!');
+    accessForm.reset();
+  }, 800);
+});
+
+// Button handlers
+document.getElementById('accessBtn').addEventListener('click', () => {
+  document.getElementById('contact').scrollIntoView({ 
+    behavior: prefersReducedMotion ? 'auto' : 'smooth' 
+  });
+});
+
+document.getElementById('betaBtn').addEventListener('click', () => {
+  document.getElementById('contact').scrollIntoView({ 
+    behavior: prefersReducedMotion ? 'auto' : 'smooth' 
+  });
+});
+
+document.getElementById('salesBtn').addEventListener('click', () => {
+  document.getElementById('contact').scrollIntoView({ 
+    behavior: prefersReducedMotion ? 'auto' : 'smooth' 
+  });
+});
+
+document.getElementById('researchBtn').addEventListener('click', () => {
+  document.getElementById('contact').scrollIntoView({ 
+    behavior: prefersReducedMotion ? 'auto' : 'smooth' 
+  });
+});
+
+// Hash routing
+window.addEventListener('hashchange', () => {
+  const hash = window.location.hash;
+  if (hash === '#about') {
+    document.getElementById('about').scrollIntoView({ 
+      behavior: prefersReducedMotion ? 'auto' : 'smooth' 
+    });
+    document.getElementById('about').focus();
+  }
+});
+
+// Analytics placeholder
+// window.dataLayer = window.dataLayer || [];
+// function gtag(){dataLayer.push(arguments);}
+// gtag('js', new Date());
+// gtag('config', 'GA_MEASUREMENT_ID');
+</script>
+
 </body>
 </html>
