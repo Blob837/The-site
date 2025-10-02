@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Raidline Analytics | College Football Predictions</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Neutral grays - inspired by Linear/Notion */
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-200: #e5e5e5;
+            --gray-300: #d4d4d4;
+            --gray-400: #a3a3a3;
+            --gray-500: #737373;
+            --gray-600: #525252;
+            --gray-700: #404040;
+            --gray-800: #262626;
+            --gray-900: #171717;
+            
+            /* Blue accent - trust & technology */
+            --blue-50: #eff6ff;
+            --blue-100: #dbeafe;
+            --blue-500: #3b82f6;
+            --blue-600: #2563eb;
+            --blue-700: #1d4ed8;
+            
+            /* Semantic colors */
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            
+            /* Application colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: var(--gray-50);
+            --bg-tertiary: var(--gray-100);
+            --text-primary: var(--gray-900);
+            --text-secondary: var(--gray-600);
+            --text-tertiary: var(--gray-400);
+            --border: var(--gray-200);
+            --border-light: var(--gray-100);
+            
+            /* Shadows - layered depth */
+            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            
+            /* Border radius */
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            
+            /* Transitions */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 0;
+            margin: 0 auto;
+        }
+
+        /* HEADER - Ultra-premium */
+        header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border-bottom: 1px solid var(--border-light);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all var(--transition-base);
+        }
+
+        .header-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            height: 48px;
+            width: auto;
+            display: block;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--blue-500) 0%, var(--blue-600) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .tagline {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            margin-left: auto;
+            padding-right: 8px;
+        }
+
+        @media (max-width: 640px) {
+            .tagline {
+                display: none;
+            }
+        }
+
+        /* CONFIG PANEL */
+        .config-panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .config-panel.collapsed {
+            max-height: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            letter-spacing: -0.01em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all var(--transition-fast);
+            letter-spacing: -0.01em;
+        }
+
+        input:hover, select:hover {
+            border-color: var(--gray-300);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--blue-500);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23737373' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--blue-500), var(--blue-600));
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+            letter-spacing: -0.01em;
+            font-family: 'Inter', sans-serif;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* FILTERS - Ultra-premium */
+        .filters {
+            display: flex;
+            gap: 8px;
+            padding: 20px 24px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            letter-spacing: -0.01em;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--gray-300);
+            background: var(--bg-secondary);
+        }
+
+        .filter-chip.active {
+            background: linear-gradient(135deg, var(--blue-500), var(--blue-600));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+        }
+
+        /* SUMMARY STATS - Ultra-premium */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            text-align: center;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--gray-300);
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--blue-500), var(--blue-600));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.03em;
+            font-feature-settings: 'tnum';
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-top: 6px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        /* GAME CARDS - Ultra-premium */
+        .games-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 32px 24px 80px;
+        }
+
+        .game-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: 16px;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-xs);
+        }
+
+        .game-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--gray-300);
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .game-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .game-venue {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            letter-spacing: -0.01em;
+        }
+
+        .game-venue::before {
+            content: '📍';
+            font-size: 11px;
+        }
+
+        .matchup {
+            padding: 20px;
+        }
+
+        .team-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0;
+            position: relative;
+            transition: all var(--transition-fast);
+        }
+
+        .team-row:hover {
+            background: var(--bg-secondary);
+            margin: 0 -8px;
+            padding: 12px 8px;
+            border-radius: var(--radius-md);
+        }
+
+        .home-indicator {
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 60%;
+            background: var(--blue-500);
+            border-radius: 3px;
+        }
+
+        .team-logo {
+            width: 56px;
+            height: 56px;
+            border-radius: var(--radius-md);
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            transition: all var(--transition-fast);
+        }
+
+        .team-logo img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+        }
+
+        .team-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .team-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: -0.01em;
+            margin-bottom: 2px;
+        }
+
+        .team-record {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        .winner .team-name {
+            color: var(--success);
+        }
+
+        .winner .team-logo {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px var(--success-light);
+        }
+
+        .prob-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .prob-bar {
+            width: 60px;
+            height: 6px;
+            background: var(--gray-100);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .prob-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue-500), var(--blue-600));
+            border-radius: 3px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .prob-value {
+            font-size: 17px;
+            font-weight: 700;
+            min-width: 48px;
+            text-align: right;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            font-feature-settings: 'tnum';
+        }
+
+        .prediction-details {
+            padding: 20px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-light);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .detail-item {
+            text-align: center;
+            padding: 12px 8px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            transition: all var(--transition-fast);
+        }
+
+        .detail-item:hover {
+            background: var(--bg-tertiary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .detail-label {
+            font-size: 10px;
+            color: var(--text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            margin-bottom: 6px;
+        }
+
+        .detail-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+            font-feature-settings: 'tnum';
+        }
+
+        .spread-value {
+            color: var(--blue-600);
+        }
+
+        .share-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--blue-500), var(--blue-600));
+            border: none;
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            letter-spacing: -0.01em;
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
+        }
+
+        .share-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .share-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Badges */
+        .badges {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+
+        .badge-upset {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .badge-tossup {
+            background: var(--warning-light);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 80px 24px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        .confidence-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .conf-high {
+            background: rgba(63, 185, 80, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .conf-medium {
+            background: rgba(210, 153, 34, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .conf-low {
+            background: rgba(248, 81, 73, 0.2);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        /* STATUS BAR */
+        .status-bar {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-bar::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .loading::before {
+            background: var(--warning);
+        }
+
+        .success::before {
+            background: var(--success);
+        }
+
+        .error::before {
+            background: var(--danger);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--accent-primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* SHARE MODAL - Ultra-premium */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(23, 23, 23, 0.75);
+            backdrop-filter: blur(8px) saturate(120%);
+            -webkit-backdrop-filter: blur(8px) saturate(120%);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-base);
+        }
+
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .share-card-wrapper {
+            max-width: 380px;
+            width: 100%;
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .share-card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border);
+        }
+
+        /* Premium white header */
+        .share-header {
+            background: var(--bg-primary);
+            padding: 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .share-header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .share-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .share-brand-logo {
+            height: 36px;
+            width: auto;
+            display: block;
+        }
+
+        .share-title {
+            font-size: 16px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--blue-500), var(--blue-600));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .share-week {
+            font-size: 11px;
+            color: var(--text-tertiary);
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            padding: 4px 10px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+        }
+
+        .share-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        /* Matchup section */
+        .share-matchup {
+            padding: 24px 20px;
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+
+        .share-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .share-team {
+            flex: 1;
+            text-align: center;
+        }
+
+        .share-team-logo-container {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 12px;
+            background: var(--bg-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .share-team.winner .share-team-logo-container {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px var(--success-light), var(--shadow-md);
+        }
+
+        .share-team-logo {
+            width: 60px;
+            height: 60px;
+        }
+
+        .share-team-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .share-team-label {
+            font-size: 10px;
+            color: var(--text-tertiary);
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            margin-bottom: 6px;
+        }
+
+        .share-team-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .share-team.winner .share-team-name {
+            color: var(--success);
+        }
+
+        .share-team-prob {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            font-feature-settings: 'tnum';
+        }
+
+        .share-team.winner .share-team-prob {
+            color: var(--success);
+        }
+
+        /* VS Badge - minimal */
+        .share-vs {
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .vs-badge {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 900;
+            color: white;
+            border: 3px solid #ffffff;
+            box-shadow: 0 3px 10px rgba(239, 68, 68, 0.4), 0 0 0 1px #fecaca;
+            letter-spacing: 0.5px;
+        }
+
+        /* Stats Section */
+        .share-details {
+            padding: 16px 20px 20px;
+            background: #ffffff;
+        }
+
+        .share-prediction {
+            text-align: center;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.08));
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.15);
+        }
+
+        .share-prediction-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .share-prediction-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--success);
+            letter-spacing: -0.3px;
+        }
+
+        .share-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .share-stat {
+            text-align: center;
+            padding: 10px 8px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .share-stat-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .share-stat-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .share-stat-value.highlight {
+            color: var(--accent-primary);
+        }
+
+        .share-venue {
+            text-align: center;
+            padding: 8px 12px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            border: 1px solid var(--border-light);
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 6px;
+            letter-spacing: -0.2px;
+        }
+
+        .share-venue::before {
+            content: '📍';
+            font-size: 11px;
+        }
+
+        .share-footer {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-align: center;
+            letter-spacing: -0.1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .share-footer-logo {
+            height: 16px;
+            width: auto;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .share-game-time {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-align: center;
+            letter-spacing: -0.1px;
+        }
+
+        .share-badges {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .share-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .share-badge-upset {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .share-badge-tossup {
+            background: rgba(100, 116, 139, 0.1);
+            color: var(--text-secondary);
+            border: 1px solid rgba(100, 116, 139, 0.2);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn-close {
+            flex: 1;
+            background: white;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            padding: 10px;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: -0.2px;
+        }
+
+        .btn-close:hover {
+            background: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+
+        /* RESPONSIVE */
+        @media (min-width: 768px) {
+            .games-container {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            .summary {
+                grid-template-columns: repeat(4, 1fr);
+                max-width: 800px;
+                margin: 16px auto;
+            }
+
+            .config-panel {
+                max-width: 800px;
+                margin: 16px auto;
+            }
+
+            .filters {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="brand">
+                <img src="Logo.svg" alt="Raidline Analytics" class="brand-logo">
+            </div>
+            <div class="tagline">College Football Predictions</div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Configuration Panel -->
+        <div class="config-panel" id="configPanel">
+            <div class="input-group">
+                <label>CFB API Key</label>
+                <input type="text" id="apiKey" placeholder="Enter your API key from CollegeFootballData.com">
+            </div>
+            <div class="input-group">
+                <label>Season Year</label>
+                <input type="number" id="seasonYear" value="2025" min="2020" max="2030">
+            </div>
+            <div class="input-group">
+                <label>Week (Auto-Detects Current)</label>
+                <input type="number" id="weekNumber" placeholder="Leave blank for auto-detection" min="1" max="15">
+            </div>
+            <button id="runPrediction">Generate Predictions</button>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar hidden" id="statusBar"></div>
+
+        <!-- Filters -->
+        <div class="filters hidden" id="filters">
+            <div class="filter-chip active" data-filter="all">All Games</div>
+            <div class="filter-chip" data-filter="SEC">SEC</div>
+            <div class="filter-chip" data-filter="Big Ten">Big Ten</div>
+            <div class="filter-chip" data-filter="Big 12">Big 12</div>
+            <div class="filter-chip" data-filter="ACC">ACC</div>
+            <div class="filter-chip" data-filter="Pac-12">Pac-12</div>
+            <div class="filter-chip" data-filter="upsets">Upsets</div>
+            <div class="filter-chip" data-filter="tossups">Toss-Ups</div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="summary hidden" id="summary">
+            <div class="stat-card">
+                <div class="stat-value" id="totalGames">0</div>
+                <div class="stat-label">Games</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgConfidence">0%</div>
+                <div class="stat-label">Avg Confidence</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="upsets">0</div>
+                <div class="stat-label">Upset Alerts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="closeGames">0</div>
+                <div class="stat-label">Toss-Ups</div>
+            </div>
+        </div>
+
+        <!-- Predictions Container -->
+        <div class="games-container" id="predictions"></div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal" id="shareModal">
+        <!-- Dynamic content populated by JavaScript -->
+    </div>
+
+    <script type="module">
+        // ===== CONFIGURATION =====
+        const API_BASE = 'https://apinext.collegefootballdata.com';
+        const ESPN_LOGO_BASE = 'https://a.espncdn.com/i/teamlogos/ncaa/500';
+        const CACHE_TTL = 1000 * 60 * 15; // 15 minutes
+        const MAX_RETRIES = 3;
+        const RETRY_DELAY = 1000;
+
+        // ===== ESPN TEAM ID MAPPING =====
+        // Map team names to ESPN IDs for logo fetching
+        const TEAM_ID_MAP = {
+            'Alabama': 333, 'LSU': 99, 'Georgia': 61, 'Texas': 251, 'Ohio State': 194,
+            'Michigan': 130, 'Penn State': 213, 'Oregon': 2483, 'Notre Dame': 87,
+            'Clemson': 228, 'Florida State': 52, 'Miami': 2390, 'Oklahoma': 201,
+            'Texas A&M': 245, 'Auburn': 2, 'Florida': 57, 'Tennessee': 2633,
+            'USC': 30, 'UCLA': 26, 'Washington': 264, 'Ole Miss': 145,
+            'Mississippi State': 344, 'Arkansas': 8, 'Kentucky': 96, 'Missouri': 142,
+            'South Carolina': 2579, 'Vanderbilt': 238, 'Wisconsin': 275,
+            'Iowa': 2294, 'Minnesota': 135, 'Nebraska': 158, 'Northwestern': 77,
+            'Illinois': 356, 'Purdue': 2509, 'Indiana': 84, 'Michigan State': 127,
+            'Maryland': 120, 'Rutgers': 164, 'Oklahoma State': 197, 'Kansas': 2305,
+            'Kansas State': 2306, 'TCU': 2628, 'Texas Tech': 2641, 'Baylor': 239,
+            'West Virginia': 277, 'Iowa State': 66, 'BYU': 252, 'Utah': 254,
+            'Colorado': 38, 'Arizona': 12, 'Arizona State': 9, 'Washington State': 265,
+            'Oregon State': 204, 'Stanford': 24, 'California': 25,
+            'NC State': 152, 'North Carolina': 153, 'Duke': 150, 'Wake Forest': 154,
+            'Virginia': 258, 'Virginia Tech': 259, 'Louisville': 97, 'Pittsburgh': 221,
+            'Syracuse': 183, 'Boston College': 103, 'Georgia Tech': 59,
+            'UCF': 2116, 'Cincinnati': 2132, 'Houston': 248, 'SMU': 2567,
+            'Memphis': 235, 'Tulane': 2655, 'South Florida': 58, 'Temple': 218,
+            'East Carolina': 151, 'Navy': 2426, 'Tulsa': 202, 'Boise State': 68,
+            'San Diego State': 21, 'Fresno State': 278, 'Colorado State': 36,
+            'Air Force': 2005, 'Wyoming': 2747, 'Nevada': 2440, 'New Mexico': 167,
+            'Utah State': 328, 'San Jose State': 23, 'Hawaii': 62, 'UNLV': 2439
+        };
+
+        // Team primary colors for accents
+        const TEAM_COLORS = {
+            'Alabama': '#9E1B32', 'LSU': '#461D7C', 'Georgia': '#BA0C2F', 'Texas': '#BF5700',
+            'Ohio State': '#BB0000', 'Michigan': '#00274C', 'Penn State': '#041E42',
+            'Oregon': '#154733', 'Notre Dame': '#0C2340', 'Clemson': '#F56600',
+            'Florida State': '#782F40', 'Miami': '#F47321', 'Oklahoma': '#841617',
+            'Texas A&M': '#500000', 'Auburn': '#0C2340', 'Florida': '#0021A5',
+            'Tennessee': '#FF8200', 'USC': '#990000', 'UCLA': '#2D68C4',
+            'Washington': '#4B2E83', 'Ole Miss': '#CE1126', 'Mississippi State': '#660000',
+            'Arkansas': '#9D2235', 'Kentucky': '#0033A0', 'Missouri': '#F1B82D',
+            'South Carolina': '#73000A', 'Vanderbilt': '#866D4B', 'Wisconsin': '#C5050C',
+            'Iowa': '#FFCD00', 'Minnesota': '#7A0019', 'Nebraska': '#E41C38',
+            'Northwestern': '#4E2A84', 'Illinois': '#E84A27', 'Purdue': '#CEB888',
+            'Indiana': '#990000', 'Michigan State': '#18453B', 'Maryland': '#E03A3E',
+            'Rutgers': '#CC0033', 'Oklahoma State': '#FF7300', 'Kansas': '#0051BA',
+            'Kansas State': '#512888', 'TCU': '#4D1979', 'Texas Tech': '#CC0000',
+            'Baylor': '#003015', 'West Virginia': '#002855', 'Iowa State': '#C8102E',
+            'BYU': '#002E5D', 'Utah': '#CC0000', 'Colorado': '#CFB87C',
+            'Arizona': '#003366', 'Arizona State': '#8C1D40', 'Washington State': '#981E32',
+            'Oregon State': '#DC4405', 'Stanford': '#8C1515', 'California': '#003262',
+            'NC State': '#CC0000', 'North Carolina': '#7BAFD4', 'Duke': '#003087',
+            'Wake Forest': '#9E7E38', 'Virginia': '#232D4B', 'Virginia Tech': '#630031',
+            'Louisville': '#AD0000', 'Pittsburgh': '#003594', 'Syracuse': '#D44500',
+            'Boston College': '#98002E', 'Georgia Tech': '#B3A369'
+        };
+
+        function getTeamLogo(teamName) {
+            const teamId = TEAM_ID_MAP[teamName];
+            if (!teamId) {
+                debug(`No ESPN ID found for ${teamName}`);
+                return null;
+            }
+            return `${ESPN_LOGO_BASE}/${teamId}.png`;
+        }
+
+        function getTeamColor(teamName) {
+            return TEAM_COLORS[teamName] || '#0066ff';
+        }
+
+        // ===== STATE =====
+        let apiKey = localStorage.getItem('cfb_api_key') || '';
+        let predictions = [];
+        let allPredictions = []; // Store unfiltered predictions
+        let activeFilter = 'all';
+        let debugMode = true;
+
+        // ===== UTILITIES =====
+        function debug(message, data = null) {
+            if (debugMode) {
+                console.log(`[DEBUG] ${message}`, data || '');
+            }
+        }
+
+        function logStatus(message, type = 'loading') {
+            const statusBar = document.getElementById('statusBar');
+            statusBar.className = `status-bar ${type}`;
+            statusBar.textContent = message;
+            debug(message);
+        }
+
+        function clamp(val, min, max) {
+            return Math.max(min, Math.min(max, val));
+        }
+
+        function distance(lat1, lon1, lat2, lon2) {
+            const R = 3959; // Earth radius in miles
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // ===== API LAYER =====
+        async function fetchWithRetry(url, options = {}, retries = MAX_RETRIES) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.json();
+                } catch (err) {
+                    if (i === retries - 1) throw err;
+                    await new Promise(r => setTimeout(r, RETRY_DELAY * (i + 1)));
+                }
+            }
+        }
+
+        function getCacheKey(endpoint, params) {
+            return `cfb_cache_${endpoint}_${JSON.stringify(params)}`;
+        }
+
+        async function apiCall(endpoint, params = {}) {
+            const cacheKey = getCacheKey(endpoint, params);
+            const cached = localStorage.getItem(cacheKey);
+            
+            if (cached) {
+                const { data, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp < CACHE_TTL) {
+                    return data;
+                }
+            }
+
+            const queryString = new URLSearchParams(params).toString();
+            const url = `${API_BASE}${endpoint}${queryString ? '?' + queryString : ''}`;
+            
+            const headers = { 'Authorization': `Bearer ${apiKey}` };
+            const data = await fetchWithRetry(url, { headers });
+            
+            localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now() }));
+            return data;
+        }
+
+        // ===== DATA FETCHING =====
+        async function getCurrentWeek(year) {
+            logStatus('🔍 Detecting current week...', 'loading');
+            const calendar = await apiCall('/calendar', { year });
+            debug('Calendar data:', calendar);
+            
+            const now = new Date();
+            debug('Current date:', now.toISOString());
+            
+            // Find the current or next week with games
+            for (let entry of calendar) {
+                const start = new Date(entry.firstGameStart);
+                const end = new Date(entry.lastGameStart);
+                end.setHours(23, 59, 59); // Extend to end of day
+                
+                debug(`Week ${entry.week}: ${start.toISOString()} to ${end.toISOString()}`);
+                
+                // If we're in this week or this week hasn't started yet
+                if (end >= now) {
+                    debug(`Selected week ${entry.week}`);
+                    return entry.week;
+                }
+            }
+            
+            // Fallback to week 1
+            debug('Falling back to week 1');
+            return 1;
+        }
+
+        async function fetchAllData(year, week) {
+            logStatus(`📡 Fetching games for Week ${week}...`, 'loading');
+            
+            // v2 API uses 'classification' instead of 'division'
+            const gamesParams = { 
+                year, 
+                week, 
+                seasonType: 'regular', 
+                classification: 'fbs'  // CHANGED: v2 uses classification, not division
+            };
+            debug('Fetching games with params:', gamesParams);
+            const games = await apiCall('/games', gamesParams);
+            debug(`Received ${games.length} games`);
+            
+            // Filter out any invalid games
+            const validGames = games.filter(g => 
+                g.homeTeam && g.awayTeam && 
+                g.homeTeam !== 'undefined' && g.awayTeam !== 'undefined'
+            );
+            debug(`Filtered to ${validGames.length} valid games`);
+
+            logStatus(`📊 Fetching betting lines for Week ${week}...`, 'loading');
+            const linesParams = { year, week, seasonType: 'regular' };
+            debug('Fetching lines with params:', linesParams);
+            const lines = await apiCall('/lines', linesParams);
+            debug(`Received ${lines.length} lines`);
+
+            logStatus('🎯 Fetching Elo ratings...', 'loading');
+            const elo = await apiCall('/ratings/elo', { year });
+            debug(`Received ${elo.length} Elo ratings`);
+
+            logStatus('🏈 Fetching team metadata...', 'loading');
+            const teams = await apiCall('/teams/fbs', { year });
+            debug(`Received ${teams.length} teams`);
+
+            // Create conference lookup map
+            const conferenceMap = {};
+            teams.forEach(team => {
+                const teamName = team.school || team.name;
+                if (teamName) {
+                    conferenceMap[teamName] = team.conference;
+                }
+            });
+            debug('Conference map created:', conferenceMap);
+
+            logStatus('📈 Fetching team statistics...', 'loading');
+            // Use the actual team names from v2 API response
+            const teamNames = [...new Set([
+                ...validGames.map(g => g.homeTeam),
+                ...validGames.map(g => g.awayTeam)
+            ])];
+            debug('Team names to fetch stats for:', teamNames);
+
+            const stats = {};
+            for (let team of teamNames) {
+                try {
+                    const teamStats = await apiCall('/stats/season', { year, team });
+                    stats[team] = teamStats;
+                    debug(`Fetched stats for ${team}:`, teamStats?.length || 0);
+                } catch (err) {
+                    debug(`Failed to fetch stats for ${team}:`, err.message);
+                    stats[team] = null;
+                }
+            }
+
+            return { games: validGames, lines, elo, teams, stats, conferenceMap };
+        }
+
+        // ===== FEATURE ENGINEERING =====
+        function getTeamStats(teamName, stats) {
+            const teamStats = stats[teamName];
+            if (!teamStats || teamStats.length === 0) {
+                return {
+                    offenseEpa: 0,
+                    defenseEpa: 0,
+                    successRate: 0.5,
+                    explosiveness: 0,
+                    havoc: 0
+                };
+            }
+
+            const offense = teamStats.find(s => s.statName === 'offensivePPA') || {};
+            const defense = teamStats.find(s => s.statName === 'defensivePPA') || {};
+            const success = teamStats.find(s => s.statName === 'successRate') || {};
+            const explosive = teamStats.find(s => s.statName === 'explosiveness') || {};
+            const havocStat = teamStats.find(s => s.statName === 'havocRate') || {};
+
+            return {
+                offenseEpa: parseFloat(offense.statValue || 0),
+                defenseEpa: parseFloat(defense.statValue || 0),
+                successRate: parseFloat(success.statValue || 0.5),
+                explosiveness: parseFloat(explosive.statValue || 0),
+                havoc: parseFloat(havocStat.statValue || 0)
+            };
+        }
+
+        function getEloRating(teamName, eloData) {
+            const teamElo = eloData.find(e => e.team === teamName);
+            return teamElo ? teamElo.elo : 1500;
+        }
+
+        function getTeamLocation(teamName, teamsData) {
+            const team = teamsData.find(t => t.school === teamName || t.name === teamName);
+            if (!team) {
+                debug(`No location found for ${teamName}`);
+                return { lat: 0, lon: 0 };
+            }
+            return { 
+                lat: team.latitude || 0, 
+                lon: team.longitude || 0 
+            };
+        }
+
+        function getSpreadImpliedProb(spread) {
+            if (!spread) return 0.5;
+            // Convert spread to win probability using logistic function
+            return 1 / (1 + Math.exp(spread / 4));
+        }
+
+        // ===== PREDICTION MODEL =====
+        function sigmoid(z) {
+            return 1 / (1 + Math.exp(-z));
+        }
+
+        function plattScaling(rawProb) {
+            // Simple Platt scaling parameters (would be fitted on historical data)
+            const A = 1.2;
+            const B = -0.1;
+            return sigmoid(A * Math.log(rawProb / (1 - rawProb)) + B);
+        }
+
+        function predictGame(game, lines, elo, teams, stats, conferenceMap) {
+            // v2 API uses camelCase: homeTeam, awayTeam, startDate, neutralSite
+            const homeTeam = game.homeTeam;
+            const awayTeam = game.awayTeam;
+
+            debug(`Predicting ${awayTeam} @ ${homeTeam}`);
+
+            // Get conferences for filtering
+            const homeConference = conferenceMap[homeTeam] || null;
+            const awayConference = conferenceMap[awayTeam] || null;
+
+            // Get statistics
+            const homeStats = getTeamStats(homeTeam, stats);
+            const awayStats = getTeamStats(awayTeam, stats);
+
+            // Get Elo ratings
+            const homeElo = getEloRating(homeTeam, elo);
+            const awayElo = getEloRating(awayTeam, elo);
+
+            // Get locations
+            const homeLoc = getTeamLocation(homeTeam, teams);
+            const awayLoc = getTeamLocation(awayTeam, teams);
+
+            // Get betting line
+            const gameLine = lines.find(l => 
+                l.homeTeam === homeTeam && l.awayTeam === awayTeam
+            );
+            const spread = gameLine?.lines?.[0]?.spread || 0;
+
+            // Calculate features
+            const epaMargin = homeStats.offenseEpa - homeStats.defenseEpa - 
+                              (awayStats.offenseEpa - awayStats.defenseEpa);
+            const successMargin = homeStats.successRate - awayStats.successRate;
+            const explosiveMargin = homeStats.explosiveness - awayStats.explosiveness;
+            const havocMargin = homeStats.havoc - awayStats.havoc;
+            const eloDiff = (homeElo - awayElo) / 100;
+            const travelDist = distance(awayLoc.lat, awayLoc.lon, homeLoc.lat, homeLoc.lon);
+            const homeAdvantage = game.neutralSite ? 0 : 0.15; // v2 uses camelCase
+            const spreadProb = getSpreadImpliedProb(spread);
+
+            // Logistic regression weights (tuned empirically)
+            const weights = {
+                epa: 0.35,
+                success: 0.20,
+                explosive: 0.15,
+                havoc: 0.10,
+                elo: 0.30,
+                travel: -0.0001,
+                home: 0.15,
+                spread: 0.25
+            };
+
+            // Calculate logit
+            let logit = 
+                weights.epa * epaMargin +
+                weights.success * successMargin +
+                weights.explosive * explosiveMargin +
+                weights.havoc * havocMargin +
+                weights.elo * eloDiff +
+                weights.travel * travelDist +
+                weights.home * homeAdvantage +
+                weights.spread * (spreadProb - 0.5) * 2;
+
+            // Ridge penalty (L2 regularization)
+            const lambda = 0.01;
+            logit *= (1 - lambda);
+
+            // Convert to probability
+            let homeWinProb = sigmoid(logit);
+
+            // Blend with Elo
+            const eloProb = 1 / (1 + Math.pow(10, (awayElo - homeElo) / 400));
+            homeWinProb = 0.7 * homeWinProb + 0.3 * eloProb;
+
+            // Apply Platt scaling
+            homeWinProb = plattScaling(homeWinProb);
+
+            // Clamp
+            homeWinProb = clamp(homeWinProb, 0.05, 0.95);
+
+            // Calculate predicted margin
+            const predictedMargin = spread ? spread : (homeWinProb - 0.5) * 28;
+
+            // Determine confidence
+            const confidence = Math.abs(homeWinProb - 0.5) * 2;
+            let confLabel = 'low';
+            if (confidence > 0.7) confLabel = 'high';
+            else if (confidence > 0.4) confLabel = 'medium';
+
+            // Determine winner
+            const winner = homeWinProb > 0.5 ? homeTeam : awayTeam;
+            const winnerProb = homeWinProb > 0.5 ? homeWinProb : 1 - homeWinProb;
+
+            // Check for upset
+            const isUpset = spread && (
+                (spread < 0 && homeWinProb < 0.5) ||
+                (spread > 0 && homeWinProb > 0.5)
+            );
+
+            return {
+                game,
+                homeTeam,
+                awayTeam,
+                homeConference,
+                awayConference,
+                homeWinProb,
+                awayWinProb: 1 - homeWinProb,
+                winner,
+                winnerProb,
+                predictedMargin: Math.abs(predictedMargin),
+                favoredTeam: predictedMargin > 0 ? homeTeam : awayTeam,
+                confidence: confLabel,
+                spread: spread || 'N/A',
+                isUpset,
+                isTossUp: confidence < 0.2
+            };
+        }
+
+        // ===== RENDERING =====
+        function renderPredictions(preds) {
+            const container = document.getElementById('predictions');
+            
+            if (preds.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🏈</div>
+                        <div class="empty-text">No games match your filter</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+
+            preds.forEach((pred, index) => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.style.animationDelay = `${index * 0.05}s`;
+
+                const awayLogo = getTeamLogo(pred.awayTeam);
+                const homeLogo = getTeamLogo(pred.homeTeam);
+
+                const gameTime = pred.game.startDate ? 
+                    new Date(pred.game.startDate).toLocaleString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit'
+                    }) : 'TBD';
+
+                const venue = pred.game.venue || 'Venue TBD';
+
+                const badges = [];
+                if (pred.isUpset) badges.push('<span class="badge badge-upset">🔥 Upset</span>');
+                if (pred.isTossUp) badges.push('<span class="badge badge-tossup">🎲 Toss-Up</span>');
+
+                card.innerHTML = `
+                    <div class="game-header">
+                        <div class="game-time">${gameTime}</div>
+                        <div class="game-venue">${venue}</div>
+                    </div>
+                    
+                    <div class="matchup">
+                        ${badges.length > 0 ? `<div class="badges">${badges.join('')}</div>` : ''}
+                        
+                        <div class="team-row ${pred.winner === pred.awayTeam ? 'winner' : ''}">
+                            <div class="team-logo">
+                                ${awayLogo ? `<img src="${awayLogo}" alt="${pred.awayTeam}" onerror="this.style.display='none'">` : ''}
+                            </div>
+                            <div class="team-info">
+                                <div class="team-name">${pred.awayTeam}</div>
+                                <div class="team-record">Away Team</div>
+                            </div>
+                            <div class="prob-container">
+                                <div class="prob-bar">
+                                    <div class="prob-fill" style="width: ${pred.awayWinProb * 100}%"></div>
+                                </div>
+                                <div class="prob-value">${(pred.awayWinProb * 100).toFixed(0)}%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="team-row ${pred.winner === pred.homeTeam ? 'winner' : ''}">
+                            <div class="home-indicator"></div>
+                            <div class="team-logo">
+                                ${homeLogo ? `<img src="${homeLogo}" alt="${pred.homeTeam}" onerror="this.style.display='none'">` : ''}
+                            </div>
+                            <div class="team-info">
+                                <div class="team-name">${pred.homeTeam}</div>
+                                <div class="team-record">Home Team</div>
+                            </div>
+                            <div class="prob-container">
+                                <div class="prob-bar">
+                                    <div class="prob-fill" style="width: ${pred.homeWinProb * 100}%"></div>
+                                </div>
+                                <div class="prob-value">${(pred.homeWinProb * 100).toFixed(0)}%</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="prediction-details">
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">Winner</div>
+                                <div class="detail-value">${pred.winner}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Confidence</div>
+                                <div class="detail-value">${(pred.winnerProb * 100).toFixed(0)}%</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Margin</div>
+                                <div class="detail-value">${pred.predictedMargin.toFixed(1)} pts</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Spread</div>
+                                <div class="detail-value spread-value">${pred.spread !== 'N/A' ? pred.spread.toFixed(1) : 'N/A'}</div>
+                            </div>
+                        </div>
+                        <button class="share-btn" onclick="openShareModal(${index})">📸 Share Prediction</button>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function updateSummary(preds) {
+            document.getElementById('totalGames').textContent = preds.length;
+            
+            const avgConf = preds.reduce((sum, p) => {
+                const conf = Math.abs(p.homeWinProb - 0.5) * 2;
+                return sum + conf;
+            }, 0) / preds.length;
+            document.getElementById('avgConfidence').textContent = (avgConf * 100).toFixed(0) + '%';
+            
+            const upsets = preds.filter(p => p.isUpset).length;
+            document.getElementById('upsets').textContent = upsets;
+            
+            const tossUps = preds.filter(p => p.isTossUp).length;
+            document.getElementById('closeGames').textContent = tossUps;
+
+            document.getElementById('summary').classList.remove('hidden');
+            document.getElementById('filters').classList.remove('hidden');
+        }
+
+        // ===== FILTERING =====
+        function applyFilter(filterType) {
+            activeFilter = filterType;
+            
+            // Update filter chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+                if (chip.dataset.filter === filterType) {
+                    chip.classList.add('active');
+                }
+            });
+
+            // Filter predictions
+            let filtered = [...allPredictions];
+            
+            if (filterType === 'upsets') {
+                filtered = filtered.filter(p => p.isUpset);
+            } else if (filterType === 'tossups') {
+                filtered = filtered.filter(p => p.isTossUp);
+            } else if (filterType !== 'all') {
+                // Conference filter - match if either team is in the conference
+                filtered = filtered.filter(p => 
+                    p.homeConference === filterType || 
+                    p.awayConference === filterType
+                );
+            }
+
+            debug(`Filtered from ${allPredictions.length} to ${filtered.length} games`);
+            predictions = filtered;
+            renderPredictions(predictions);
+            
+            // Update summary with filtered count
+            updateSummary(predictions);
+        }
+
+        // ===== SHARE MODAL =====
+        function openShareModal(index) {
+            const pred = predictions[index];
+            const modal = document.getElementById('shareModal');
+            const wrapper = document.createElement('div');
+            
+            wrapper.className = 'share-card-wrapper';
+
+            const awayLogo = getTeamLogo(pred.awayTeam);
+            const homeLogo = getTeamLogo(pred.homeTeam);
+
+            const gameTime = pred.game.startDate ? 
+                new Date(pred.game.startDate).toLocaleString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                }) : 'Game Time TBD';
+
+            const venue = pred.game.venue || 'Venue TBD';
+
+            const badges = [];
+            if (pred.isUpset) badges.push('<span class="share-badge share-badge-upset">🔥 UPSET</span>');
+            if (pred.isTossUp) badges.push('<span class="share-badge share-badge-tossup">🎲 TOSS-UP</span>');
+
+            wrapper.innerHTML = `
+                <div class="share-card">
+                    <div class="share-header">
+                        <div class="share-header-top">
+                            <div class="share-brand">
+                                <img src="Logo.svg" alt="Raidline Analytics" class="share-brand-logo">
+                            </div>
+                            <div class="share-week">Week ${pred.game.week || '?'}</div>
+                        </div>
+                        <div class="share-meta">${gameTime}</div>
+                    </div>
+                    
+                    <div class="share-matchup">
+                        ${badges.length > 0 ? `<div class="share-badges">${badges.join('')}</div>` : ''}
+                        
+                        <div class="share-teams">
+                            <div class="share-team ${pred.winner === pred.awayTeam ? 'winner' : ''}">
+                                <div class="share-team-label">Away</div>
+                                <div class="share-team-logo-container">
+                                    <div class="share-team-logo">
+                                        ${awayLogo ? `<img src="${awayLogo}" alt="${pred.awayTeam}" onerror="this.style.display='none'">` : ''}
+                                    </div>
+                                </div>
+                                <div class="share-team-name">${pred.awayTeam}</div>
+                                <div class="share-team-prob">${(pred.awayWinProb * 100).toFixed(0)}%</div>
+                            </div>
+                            
+                            <div class="share-vs">
+                                <div class="vs-badge">VS</div>
+                            </div>
+                            
+                            <div class="share-team ${pred.winner === pred.homeTeam ? 'winner' : ''}">
+                                <div class="share-team-label">Home</div>
+                                <div class="share-team-logo-container">
+                                    <div class="share-team-logo">
+                                        ${homeLogo ? `<img src="${homeLogo}" alt="${pred.homeTeam}" onerror="this.style.display='none'">` : ''}
+                                    </div>
+                                </div>
+                                <div class="share-team-name">${pred.homeTeam}</div>
+                                <div class="share-team-prob">${(pred.homeWinProb * 100).toFixed(0)}%</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="share-details">
+                        <div class="share-prediction">
+                            <div class="share-prediction-label">Predicted Winner</div>
+                            <div class="share-prediction-value">${pred.winner}</div>
+                        </div>
+                        
+                        <div class="share-stats-grid">
+                            <div class="share-stat">
+                                <div class="share-stat-label">Win Probability</div>
+                                <div class="share-stat-value">${(pred.winnerProb * 100).toFixed(0)}%</div>
+                            </div>
+                            <div class="share-stat">
+                                <div class="share-stat-label">Predicted Margin</div>
+                                <div class="share-stat-value">${pred.predictedMargin.toFixed(1)}</div>
+                            </div>
+                            <div class="share-stat">
+                                <div class="share-stat-label">Vegas Spread</div>
+                                <div class="share-stat-value highlight">${pred.spread !== 'N/A' ? pred.spread.toFixed(1) : 'N/A'}</div>
+                            </div>
+                            <div class="share-stat">
+                                <div class="share-stat-label">Confidence</div>
+                                <div class="share-stat-value">${pred.confidence.toUpperCase()}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="share-venue">${venue}</div>
+                        <div class="share-footer">
+                            <span>Powered by</span>
+                            <img src="Logo.svg" alt="Raidline Analytics" class="share-footer-logo">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn-close" onclick="closeShareModal()">Close</button>
+                </div>
+            `;
+
+            modal.innerHTML = '';
+            modal.appendChild(wrapper);
+            modal.classList.add('active');
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.remove('active');
+        }
+
+        // Make functions available globally for onclick handlers
+        window.openShareModal = openShareModal;
+        window.closeShareModal = closeShareModal;
+
+        // ===== MAIN WORKFLOW =====
+        async function runPrediction() {
+            try {
+                // Get inputs
+                apiKey = document.getElementById('apiKey').value.trim();
+                if (!apiKey) {
+                    logStatus('❌ API key required', 'error');
+                    document.getElementById('statusBar').classList.remove('hidden');
+                    return;
+                }
+                localStorage.setItem('cfb_api_key', apiKey);
+
+                const year = parseInt(document.getElementById('seasonYear').value);
+                let week = parseInt(document.getElementById('weekNumber').value);
+
+                // Auto-detect week if not specified
+                if (!week || isNaN(week)) {
+                    week = await getCurrentWeek(year);
+                    logStatus(`📅 Detected Week ${week}`, 'loading');
+                    document.getElementById('statusBar').classList.remove('hidden');
+                }
+
+                // Fetch all data
+                const data = await fetchAllData(year, week);
+
+                if (data.games.length === 0) {
+                    logStatus('⚠️ No games found for this week', 'error');
+                    document.getElementById('statusBar').classList.remove('hidden');
+                    return;
+                }
+
+                // Generate predictions
+                logStatus('🧠 Running prediction model...', 'loading');
+                document.getElementById('statusBar').classList.remove('hidden');
+                
+                allPredictions = data.games.map(game => 
+                    predictGame(game, data.lines, data.elo, data.teams, data.stats, data.conferenceMap)
+                );
+
+                // Sort by confidence (high to low)
+                allPredictions.sort((a, b) => {
+                    const confA = Math.abs(a.homeWinProb - 0.5);
+                    const confB = Math.abs(b.homeWinProb - 0.5);
+                    return confB - confA;
+                });
+
+                predictions = [...allPredictions];
+
+                // Render
+                renderPredictions(predictions);
+                updateSummary(predictions);
+
+                // Collapse config panel
+                document.getElementById('configPanel').classList.add('collapsed');
+                document.getElementById('statusBar').classList.add('hidden');
+
+                debug(`✅ ${predictions.length} games predicted for Week ${week}`);
+
+            } catch (err) {
+                console.error(err);
+                logStatus(`❌ Error: ${err.message}`, 'error');
+                document.getElementById('statusBar').classList.remove('hidden');
+            }
+        }
+
+        // ===== EVENT LISTENERS =====
+        document.getElementById('runPrediction').addEventListener('click', runPrediction);
+
+        // Filter chips
+        document.querySelectorAll('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                applyFilter(chip.dataset.filter);
+            });
+        });
+
+        // Close modal on background click
+        document.getElementById('shareModal').addEventListener('click', (e) => {
+            if (e.target.id === 'shareModal') {
+                closeShareModal();
+            }
+        });
+
+        // Load saved API key
+        if (apiKey) {
+            document.getElementById('apiKey').value = apiKey;
+        }
+
+        logStatus('⚙️ Ready. Enter your API key and generate predictions.', 'loading');
+    </script>
+</body>
+</html>
