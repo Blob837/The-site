@@ -1,1 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Praeco | Predict production. Power throughput.</title>
+  <meta name="description" content="Praeco delivers Houston-born energy AI for operators with production forecasts, custody-transfer visibility, and operator-grade reliability.">
+  <link rel="icon" type="image/svg+xml" href="Logo.svg">
+  <link rel="canonical" href="https://praeco.ai/">
+  <meta property="og:title" content="Praeco | Predict production. Power throughput.">
+  <meta property="og:description" content="Houston-founded energy AI forecasting wellhead production and custody-transfer throughput for operators.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="Logo.svg">
+  <style>
+    :root {
+      color-scheme: dark;
+      --color-bg: #030b16;
+      --color-surface: #0c1624;
+      --color-surface-alt: #0f1f33;
+      --color-text: #e9f1ff;
+      --color-text-muted: #b1c4de;
+      --color-accent: #29b6c9;
+      --color-accent-soft: rgba(41, 182, 201, 0.16);
+      --color-focus: #73e1ff;
+      --border-soft: rgba(116, 146, 180, 0.24);
+      --font-display: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      --header-height: 64px;
+    }
 
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--color-bg);
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.55;
+      color: var(--color-text);
+      background: radial-gradient(circle at top right, rgba(41, 182, 201, 0.14), transparent 55%),
+        var(--color-bg);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='64' viewBox='0 0 320 64'%3E%3Cpath d='M0 48c26.7-16 53.3-16 80 0s53.3 16 80 0 53.3-16 80 0 53.3 16 80 0' fill='none' stroke='%231c3a57' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x top;
+      opacity: 0.4;
+    }
+
+    body:has(.nav__toggle[aria-expanded="true"]) {
+      overflow: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--color-focus);
+      outline-offset: 3px;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 16px;
+      padding: 8px 16px;
+      background: var(--color-text);
+      color: #041021;
+      border-radius: 6px;
+      transition: top 0.2s ease;
+      z-index: 1000;
+    }
+
+    .skip-link:focus {
+      top: 16px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      backdrop-filter: blur(14px);
+      background: rgba(3, 11, 22, 0.88);
+      border-bottom: 1px solid rgba(74, 105, 141, 0.28);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px clamp(16px, 6vw, 48px);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .nav__brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav__brand img {
+      width: 128px;
+      height: auto;
+    }
+
+    .nav__links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .nav__links a {
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      position: relative;
+      padding-block: 6px;
+    }
+
+    .nav__links a::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 0;
+      height: 2px;
+      background: var(--color-accent);
+      transition: width 160ms ease, left 160ms ease;
+    }
+
+    .nav__links a:focus-visible::after,
+    .nav__links a:hover::after {
+      width: 100%;
+      left: 0;
+    }
+
+    .nav__cta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      font: 600 1rem/1.2 var(--font-body);
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+      text-decoration: none;
+    }
+
+    .btn--primary {
+      background: var(--color-accent);
+      color: #041021;
+      box-shadow: 0 4px 12px rgba(41, 182, 201, 0.22);
+    }
+
+    .btn--primary:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 6px rgba(41, 182, 201, 0.25);
+    }
+
+    .btn--primary:hover {
+      box-shadow: 0 6px 18px rgba(41, 182, 201, 0.26);
+    }
+
+    .btn--ghost {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      background: transparent;
+    }
+
+    .btn--ghost:hover {
+      background: rgba(41, 182, 201, 0.12);
+    }
+
+    .nav__toggle {
+      display: none;
+      background: none;
+      border: 1px solid var(--border-soft);
+      color: var(--color-text);
+      border-radius: 999px;
+      padding: 10px 14px;
+    }
+
+    .nav__menu {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav__drawer {
+      display: none;
+    }
+
+    main {
+      display: block;
+    }
+
+    .section {
+      padding: clamp(56px, 18vw, 120px) clamp(16px, 6vw, 48px);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section__heading {
+      font: 600 clamp(1.4rem, 4vw, 2.4rem)/1.2 var(--font-display);
+      letter-spacing: -0.01em;
+      margin-bottom: 24px;
+    }
+
+    .section__subhead {
+      color: var(--color-text-muted);
+      max-width: 640px;
+      margin-bottom: 40px;
+    }
+
+    .hero {
+      position: relative;
+      padding-top: clamp(88px, 22vw, 140px);
+      text-align: left;
+    }
+
+    .hero__grid {
+      display: grid;
+      gap: 32px;
+    }
+
+    .hero__heading {
+      font: 600 clamp(2.2rem, 9vw, 3.8rem)/1.05 var(--font-display);
+      letter-spacing: -0.02em;
+      margin: 0 0 20px;
+    }
+
+    .hero__lead {
+      color: var(--color-text-muted);
+      max-width: 540px;
+      margin-bottom: 28px;
+    }
+
+    .hero__actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .hero__motif {
+      position: absolute;
+      inset-inline: clamp(16px, 6vw, 48px);
+      bottom: -24px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(41, 182, 201, 0.3) 0%, rgba(41, 182, 201, 0) 100%);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .metric {
+      background: var(--color-surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 20px;
+      display: grid;
+      gap: 8px;
+      transition: transform 140ms ease, box-shadow 140ms ease;
+    }
+
+    .metric:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(4, 16, 33, 0.4);
+    }
+
+    .metric__value {
+      font: 600 1.6rem/1 var(--font-display);
+      letter-spacing: -0.015em;
+    }
+
+    .metric__label {
+      color: var(--color-text-muted);
+      font-size: 0.92rem;
+    }
+
+    .products {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--color-surface-alt);
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      padding: 24px;
+      display: grid;
+      gap: 12px;
+      transition: transform 140ms ease, box-shadow 140ms ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 28px rgba(3, 12, 24, 0.35);
+    }
+
+    .card__title {
+      font: 600 1.2rem/1.2 var(--font-display);
+      letter-spacing: -0.01em;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(41, 182, 201, 0.12);
+      color: var(--color-accent);
+      font-size: 0.82rem;
+      letter-spacing: 0.02em;
+    }
+
+    .chart {
+      background: var(--color-surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 18px;
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .chart__header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chart__metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      color: var(--color-text-muted);
+      font-size: 0.92rem;
+    }
+
+    .chart__metrics strong {
+      color: var(--color-text);
+    }
+
+    .chart__canvas {
+      width: 100%;
+      height: 220px;
+    }
+
+    .chart__legend {
+      display: flex;
+      gap: 16px;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+    }
+
+    .chart__legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .legend-dot--actual {
+      background: var(--color-accent);
+    }
+
+    .legend-dot--projection {
+      border: 2px solid var(--color-accent);
+      background: transparent;
+    }
+
+    .regions {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .region {
+      position: relative;
+      padding-bottom: 16px;
+    }
+
+    .region::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      height: 3px;
+      background: linear-gradient(90deg, rgba(41, 182, 201, 0.6), transparent);
+    }
+
+    .architecture {
+      display: grid;
+      gap: 16px;
+    }
+
+    .architecture__grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .architecture__node {
+      position: relative;
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid var(--border-soft);
+      background: var(--color-surface);
+      min-height: 132px;
+    }
+
+    .architecture__node::before {
+      content: "";
+      position: absolute;
+      inset-inline: 20px;
+      bottom: 18px;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(41, 182, 201, 0.5), rgba(41, 182, 201, 0));
+    }
+
+    .architecture__node-title {
+      font: 600 1rem/1.2 var(--font-display);
+      margin-bottom: 12px;
+    }
+
+    .feature-callouts {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+    }
+
+    .timeline__item {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      align-items: baseline;
+      gap: 16px;
+      padding: 16px 20px;
+      border-radius: 16px;
+      border: 1px solid var(--border-soft);
+      background: var(--color-surface-alt);
+    }
+
+    .contact {
+      display: grid;
+      gap: 24px;
+    }
+
+    .contact form {
+      display: grid;
+      gap: 16px;
+      background: var(--color-surface);
+      border: 1px solid var(--border-soft);
+      border-radius: 18px;
+      padding: 24px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    input,
+    textarea {
+      font: inherit;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(112, 140, 174, 0.5);
+      background: rgba(6, 16, 32, 0.6);
+      color: var(--color-text);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(177, 196, 222, 0.5);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form__note {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+    }
+
+    footer {
+      border-top: 1px solid rgba(74, 105, 141, 0.28);
+      background: rgba(3, 11, 22, 0.92);
+    }
+
+    .footer {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 32px clamp(16px, 6vw, 48px);
+      max-width: 1200px;
+      margin: 0 auto;
+      font-size: 0.88rem;
+      color: var(--color-text-muted);
+    }
+
+    .footer__links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer__links a {
+      color: var(--color-text-muted);
+    }
+
+    @media (max-width: 880px) {
+      .nav__menu {
+        display: none;
+      }
+
+      .nav__toggle {
+        display: inline-flex;
+      }
+
+      .nav__drawer {
+        position: fixed;
+        inset: 72px 16px auto 16px;
+        background: rgba(3, 14, 28, 0.98);
+        border: 1px solid var(--border-soft);
+        border-radius: 18px;
+        padding: 24px;
+        display: grid;
+        gap: 16px;
+        transform: translateY(-12px);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 160ms ease;
+      }
+
+      .nav__drawer[aria-hidden="false"] {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .nav__drawer a {
+        font-size: 1.05rem;
+      }
+
+      .nav__drawer .btn {
+        justify-self: start;
+      }
+    }
+
+    @media (min-width: 900px) {
+      .hero__grid {
+        grid-template-columns: 3fr 2fr;
+        align-items: center;
+      }
+
+      .hero__motif {
+        bottom: -48px;
+      }
+
+      .chart__canvas {
+        height: 280px;
+      }
+
+      .section.hero {
+        padding-bottom: clamp(64px, 12vw, 120px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header>
+    <nav class="nav" aria-label="Primary navigation">
+      <div class="nav__brand">
+        <a href="#top" aria-label="Praeco home">
+          <img src="Logo.svg" alt="Praeco logo">
+        </a>
+      </div>
+      <div class="nav__menu" role="menubar">
+        <a role="menuitem" href="#product">Product</a>
+        <a role="menuitem" href="#basins">Basins</a>
+        <a role="menuitem" href="#architecture">Architecture</a>
+        <a role="menuitem" href="#security">Security</a>
+        <a role="menuitem" href="#sre">SRE</a>
+        <a role="menuitem" href="#timeline">Timeline</a>
+        <a role="menuitem" href="#contact">Contact</a>
+      </div>
+      <div class="nav__cta">
+        <a class="btn btn--ghost" href="#product">See Product</a>
+        <a class="btn btn--primary" href="#contact">Request Early Access</a>
+        <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-drawer" aria-label="Toggle navigation">
+          Menu
+        </button>
+      </div>
+    </nav>
+    <div class="nav__drawer" id="nav-drawer" aria-hidden="true">
+      <a href="#product">Product</a>
+      <a href="#basins">Basins</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#security">Security</a>
+      <a href="#sre">SRE</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#contact">Contact</a>
+      <a class="btn btn--primary" href="#contact">Request Early Access</a>
+    </div>
+  </header>
+  <main id="main">
+    <section class="section hero" id="top">
+      <div class="hero__grid">
+        <div>
+          <h1 class="hero__heading">Predict production. Power throughput.</h1>
+          <p class="hero__lead">Houston-founded energy AI delivering wellhead forecasts and custody-transfer visibility—from pad to pipeline.</p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#contact">Request Early Access</a>
+            <a class="btn btn--ghost" href="#product">See Product</a>
+          </div>
+        </div>
+        <div class="card" aria-label="Praeco scope">
+          <h2 class="card__title">Built for operators</h2>
+          <p>Praeco deploys in Texas-first basins today with a roadmap to U.S. expansion by 2027. Active-active uptime, signed data lineage, and custody-grade reconciliation put control rooms and field teams on the same page.</p>
+          <p class="form__note">Founded 2025 · Houston, Texas</p>
+        </div>
+      </div>
+      <div class="hero__motif" aria-hidden="true"></div>
+    </section>
+
+    <section class="section" aria-labelledby="metrics-title">
+      <h2 class="section__heading" id="metrics-title">Proof of performance</h2>
+      <div class="metrics" role="list">
+        <article class="metric" role="listitem">
+          <span class="metric__value">2.7%</span>
+          <span class="metric__label">Forecast MAE · 30-day rolling, custody-validated</span>
+        </article>
+        <article class="metric" role="listitem">
+          <span class="metric__value">&lt;90s</span>
+          <span class="metric__label">Ingest → forecast latency</span>
+        </article>
+        <article class="metric" role="listitem">
+          <span class="metric__value">99.8%</span>
+          <span class="metric__label">Uptime · active-active Texas regions</span>
+        </article>
+        <article class="metric" role="listitem">
+          <span class="metric__value">sha256</span>
+          <span class="metric__label">Lineage · signed artifacts</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="product" aria-labelledby="product-title">
+      <h2 class="section__heading" id="product-title">Operator-grade modules</h2>
+      <p class="section__subhead">Praeco forecasts pad-level production, reconciles custody-transfer throughput, and keeps control room telemetry signed and traceable.</p>
+      <div class="products" role="list">
+        <article class="card" role="listitem">
+          <h3 class="card__title">Predictive outputs</h3>
+          <p>Pad-level forecasts, decline curves, and probabilistic intervals to support completions scheduling and lift planning.</p>
+        </article>
+        <article class="card" role="listitem">
+          <h3 class="card__title">Real-time throughput</h3>
+          <p>Wellhead-to-custody visibility with pressure, volume, and event detection tuned for control-room response.</p>
+        </article>
+        <article class="card" role="listitem">
+          <h3 class="card__title">Industrial-grade integration</h3>
+          <p>Read-only SCADA and historian adapters, reconciled audit trails, and controls-safe APIs.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="market-title">
+      <div class="chart" role="region" aria-labelledby="market-title" aria-describedby="market-note">
+        <div class="chart__header">
+          <h2 class="section__heading" id="market-title">WTI settlement insight</h2>
+          <p class="section__subhead" id="market-note">Last 30 settlements with a seven-day linear-momentum projection. Illustrative projection; not trading advice.</p>
+        </div>
+        <div class="chart__metrics" id="chart-metrics">
+          <span><strong>Loading market data…</strong></span>
+        </div>
+        <svg class="chart__canvas" viewBox="0 0 640 320" role="img" aria-labelledby="chart-title" aria-describedby="chart-desc">
+          <title id="chart-title">WTI settlements actuals and projected values</title>
+          <desc id="chart-desc">Chart compares thirty days of actual WTI settlements with a seven day projection generated by Praeco.</desc>
+          <g id="chart-grid"></g>
+          <path id="chart-actual" fill="none" stroke="var(--color-accent)" stroke-width="2.6" stroke-linecap="round"></path>
+          <path id="chart-projection" fill="none" stroke="var(--color-accent)" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="6 6"></path>
+          <g id="chart-axis"></g>
+        </svg>
+        <div class="chart__legend">
+          <span><span class="legend-dot legend-dot--actual" aria-hidden="true"></span> Actual</span>
+          <span><span class="legend-dot legend-dot--projection" aria-hidden="true"></span> Projection</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="basins" aria-labelledby="basins-title">
+      <h2 class="section__heading" id="basins-title">Texas-first basins</h2>
+      <p class="section__subhead">Focused coverage across the Permian, Eagle Ford, and Delaware with sub-regions aligned to operations.</p>
+      <div class="regions" role="list">
+        <article class="card region" role="listitem">
+          <h3 class="card__title">Permian</h3>
+          <div class="chips" aria-label="Permian sub-regions">
+            <span class="chip">Midland</span>
+            <span class="chip">Central Basin</span>
+            <span class="chip">New Mexico Shelf</span>
+          </div>
+        </article>
+        <article class="card region" role="listitem">
+          <h3 class="card__title">Eagle Ford</h3>
+          <div class="chips" aria-label="Eagle Ford sub-regions">
+            <span class="chip">La Salle</span>
+            <span class="chip">Karnes</span>
+            <span class="chip">Dimmit</span>
+          </div>
+        </article>
+        <article class="card region" role="listitem">
+          <h3 class="card__title">Delaware</h3>
+          <div class="chips" aria-label="Delaware sub-regions">
+            <span class="chip">Loving</span>
+            <span class="chip">Reeves</span>
+            <span class="chip">Wolfcamp</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="architecture" aria-labelledby="architecture-title">
+      <h2 class="section__heading" id="architecture-title">Pipeline architecture</h2>
+      <p class="section__subhead">Operator-safe design from ingest to dashboards with auditable lineage and Houston-based SRE coverage.</p>
+      <div class="architecture__grid" role="list">
+        <article class="architecture__node" role="listitem">
+          <h3 class="architecture__node-title">Ingest</h3>
+          <p>Secure collectors pull SCADA and historian feeds over read-only links with transport encryption.</p>
+        </article>
+        <article class="architecture__node" role="listitem">
+          <h3 class="architecture__node-title">Normalize / QA</h3>
+          <p>Schema harmonization, anomaly screens, and custody tags ensure field-ready data.</p>
+        </article>
+        <article class="architecture__node" role="listitem">
+          <h3 class="architecture__node-title">Feature store</h3>
+          <p>Versioned features with lineage hashes and decline parameters synced to basins.</p>
+        </article>
+        <article class="architecture__node" role="listitem">
+          <h3 class="architecture__node-title">Ensembles</h3>
+          <p>Physics + ML ensembles with Bayesian calibration and uncertainty quantification.</p>
+        </article>
+        <article class="architecture__node" role="listitem">
+          <h3 class="architecture__node-title">Forecasts / PI</h3>
+          <p>Pad-level and system rollups with probabilistic intervals and signed artifacts.</p>
+        </article>
+        <article class="architecture__node" role="listitem">
+          <h3 class="architecture__node-title">Reconciliation / Throughput</h3>
+          <p>Custody-transfer balancing with throughput deltas and event journaling.</p>
+        </article>
+        <article class="architecture__node" role="listitem">
+          <h3 class="architecture__node-title">Dashboards / Alerts</h3>
+          <p>Role-based dashboards, webhook routing, and Houston SRE escalation hooks.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="security" aria-labelledby="security-title">
+      <h2 class="section__heading" id="security-title">Security posture</h2>
+      <div class="feature-callouts">
+        <article class="card">
+          <h3 class="card__title">Signed custody trail</h3>
+          <p>Least-privilege access with hardware-backed keys and signed artifacts across each model run.</p>
+        </article>
+        <article class="card" id="sre">
+          <h3 class="card__title">Resilient operations</h3>
+          <p>Backpressure-aware streaming, idempotent replays, and SLIs tuned for field resilience.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="timeline" aria-labelledby="timeline-title">
+      <h2 class="section__heading" id="timeline-title">Roadmap</h2>
+      <div class="timeline">
+        <div class="timeline__item">
+          <span>2025</span>
+          <span>Launch across Texas basins with custody-grade reconciliation.</span>
+        </div>
+        <div class="timeline__item">
+          <span>2026</span>
+          <span>Hardening, logistics integration, and expanded control-room playbooks.</span>
+        </div>
+        <div class="timeline__item">
+          <span>2027</span>
+          <span>Nationwide rollout with U.S. midstream coverage.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact" aria-labelledby="contact-title">
+      <h2 class="section__heading" id="contact-title">Request early access</h2>
+      <div class="contact">
+        <p class="section__subhead">Ready to evaluate Praeco across your pads and custody points? Share a contact and scope; the team will follow up from Houston.</p>
+        <form id="contact-form" method="post" action="mailto:intel@praeco.ai?subject=Praeco%20Early%20Access%20Inquiry" novalidate>
+          <label for="name">
+            Name
+            <input id="name" name="name" type="text" autocomplete="name" required placeholder="Full name">
+          </label>
+          <label for="email">
+            Email
+            <input id="email" name="email" type="email" autocomplete="email" required placeholder="name@company.com">
+          </label>
+          <label for="notes">
+            Notes
+            <textarea id="notes" name="notes" placeholder="Project scope, assets, timeline"></textarea>
+          </label>
+          <p class="form__note" role="status" id="form-status" aria-live="polite"></p>
+          <button class="btn btn--primary" type="submit">Request Early Access</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer">
+      <span>© 2025 Praeco, Houston. All rights reserved.</span>
+      <div class="footer__links" aria-label="Footer links">
+        <a href="#product">Product</a>
+        <a href="#basins">Basins</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#security">Security</a>
+        <a href="#timeline">Timeline</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      const drawer = document.getElementById('nav-drawer');
+      const toggle = document.querySelector('.nav__toggle');
+      if (!drawer || !toggle) return;
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        drawer.setAttribute('aria-hidden', String(expanded));
+      });
+      drawer.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          toggle.setAttribute('aria-expanded', 'false');
+          drawer.setAttribute('aria-hidden', 'true');
+        });
+      });
+    })();
+
+    const offlineSeries = [
+      { date: '2025-02-10', settle: 75.12 },
+      { date: '2025-02-11', settle: 75.45 },
+      { date: '2025-02-12', settle: 74.98 },
+      { date: '2025-02-13', settle: 75.63 },
+      { date: '2025-02-14', settle: 76.01 },
+      { date: '2025-02-17', settle: 75.44 },
+      { date: '2025-02-18', settle: 75.28 },
+      { date: '2025-02-19', settle: 76.05 },
+      { date: '2025-02-20', settle: 76.26 },
+      { date: '2025-02-21', settle: 76.72 },
+      { date: '2025-02-24', settle: 76.34 },
+      { date: '2025-02-25', settle: 77.02 },
+      { date: '2025-02-26', settle: 77.28 },
+      { date: '2025-02-27', settle: 77.90 },
+      { date: '2025-02-28', settle: 78.12 },
+      { date: '2025-03-03', settle: 78.46 },
+      { date: '2025-03-04', settle: 78.81 },
+      { date: '2025-03-05', settle: 78.39 },
+      { date: '2025-03-06', settle: 79.04 },
+      { date: '2025-03-07', settle: 79.42 },
+      { date: '2025-03-10', settle: 78.88 },
+      { date: '2025-03-11', settle: 79.33 },
+      { date: '2025-03-12', settle: 79.80 },
+      { date: '2025-03-13', settle: 80.12 },
+      { date: '2025-03-14', settle: 80.35 },
+      { date: '2025-03-17', settle: 80.18 },
+      { date: '2025-03-18', settle: 80.54 },
+      { date: '2025-03-19', settle: 80.93 },
+      { date: '2025-03-20', settle: 81.14 },
+      { date: '2025-03-21', settle: 81.46 }
+    ];
+
+    const chartState = {
+      reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    };
+
+    const analytics = {
+      track(eventName, payload) {
+        console.debug('[analytics]', eventName, payload);
+      }
+    };
+
+    document.querySelectorAll('.btn--primary').forEach(button => {
+      button.addEventListener('click', () => analytics.track('cta_click', { id: button.textContent?.trim() }));
+    });
+
+    function parseEiaSeries(raw) {
+      if (!raw || !raw.series || !raw.series[0] || !raw.series[0].data) return [];
+      const rows = raw.series[0].data.slice(0, 90);
+      const parsed = rows.map(([dateStr, value]) => {
+        const y = parseInt(dateStr.slice(0, 4), 10);
+        const m = parseInt(dateStr.slice(4, 6), 10) - 1;
+        const d = parseInt(dateStr.slice(6, 8), 10);
+        const date = new Date(Date.UTC(y, m, d));
+        return { date: date.toISOString().split('T')[0], settle: Number(value) };
+      });
+      return parsed.reverse();
+    }
+
+    function computeProjection(series) {
+      const actual = series.slice(-30);
+      const n = actual.length;
+      if (n < 2) return { actual, projection: [] };
+      let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+      for (let i = 0; i < n; i++) {
+        const x = i;
+        const y = actual[i].settle;
+        sumX += x;
+        sumY += y;
+        sumXY += x * y;
+        sumXX += x * x;
+      }
+      const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX || 1);
+      const intercept = (sumY - slope * sumX) / n;
+      const last = actual[n - 1];
+      const previous = actual[n - 2];
+      const momentum = last.settle - previous.settle;
+      const projection = [];
+      for (let i = 1; i <= 7; i++) {
+        const base = slope * (n - 1 + i) + intercept;
+        const blended = 0.7 * base + 0.3 * (last.settle + momentum * i);
+        const nextDate = new Date(last.date + 'T00:00:00Z');
+        nextDate.setUTCDate(nextDate.getUTCDate() + i);
+        projection.push({ date: nextDate.toISOString().split('T')[0], settle: Number(blended.toFixed(2)) });
+      }
+      return { actual, projection };
+    }
+
+    function drawChart(actual, projection) {
+      const svg = document.querySelector('.chart__canvas');
+      const gridGroup = document.getElementById('chart-grid');
+      const axisGroup = document.getElementById('chart-axis');
+      const actualPath = document.getElementById('chart-actual');
+      const projectionPath = document.getElementById('chart-projection');
+      if (!svg || !actualPath || !projectionPath) return;
+
+      const width = 640;
+      const height = 320;
+      const margin = { top: 24, right: 32, bottom: 36, left: 54 };
+      const plotWidth = width - margin.left - margin.right;
+      const plotHeight = height - margin.top - margin.bottom;
+
+      const combined = actual.concat(projection);
+      const xScale = (dateStr) => {
+        const min = new Date(actual[0].date + 'T00:00:00Z');
+        const max = new Date(combined[combined.length - 1].date + 'T00:00:00Z');
+        const current = new Date(dateStr + 'T00:00:00Z');
+        const span = max - min || 1;
+        return margin.left + ((current - min) / span) * plotWidth;
+      };
+
+      const values = combined.map(p => p.settle);
+      const minValue = Math.min(...values) * 0.98;
+      const maxValue = Math.max(...values) * 1.02;
+      const yScale = (value) => {
+        const span = maxValue - minValue || 1;
+        return margin.top + plotHeight - ((value - minValue) / span) * plotHeight;
+      };
+
+      function buildPath(points) {
+        return points.map((point, index) => {
+          const x = xScale(point.date);
+          const y = yScale(point.settle);
+          return `${index === 0 ? 'M' : 'L'}${x.toFixed(2)},${y.toFixed(2)}`;
+        }).join(' ');
+      }
+
+      actualPath.setAttribute('d', buildPath(actual));
+      projectionPath.setAttribute('d', buildPath([actual[actual.length - 1]].concat(projection)));
+
+      if (!chartState.reducedMotion) {
+        const length = actualPath.getTotalLength();
+        actualPath.style.transition = 'stroke-dashoffset 360ms ease';
+        actualPath.style.strokeDasharray = length;
+        actualPath.style.strokeDashoffset = length;
+        requestAnimationFrame(() => {
+          actualPath.style.strokeDashoffset = '0';
+        });
+      }
+
+      gridGroup.innerHTML = '';
+      const steps = 4;
+      for (let i = 0; i <= steps; i++) {
+        const y = margin.top + (plotHeight / steps) * i;
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', margin.left.toString());
+        line.setAttribute('x2', (width - margin.right).toString());
+        line.setAttribute('y1', y.toFixed(2));
+        line.setAttribute('y2', y.toFixed(2));
+        line.setAttribute('stroke', 'rgba(150, 179, 205, 0.18)');
+        line.setAttribute('stroke-width', '1');
+        gridGroup.appendChild(line);
+      }
+
+      axisGroup.innerHTML = '';
+      const tickCount = Math.min(actual.length, 5);
+      const interval = Math.max(1, Math.floor(actual.length / tickCount));
+      for (let i = 0; i < actual.length; i += interval) {
+        const point = actual[i];
+        const x = xScale(point.date);
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', x.toFixed(2));
+        text.setAttribute('y', (height - margin.bottom + 20).toString());
+        text.setAttribute('fill', 'rgba(185, 205, 228, 0.7)');
+        text.setAttribute('font-size', '12');
+        text.setAttribute('text-anchor', 'middle');
+        const date = new Date(point.date + 'T00:00:00Z');
+        text.textContent = `${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
+        axisGroup.appendChild(text);
+      }
+
+      const priceTicks = 4;
+      for (let i = 0; i <= priceTicks; i++) {
+        const value = minValue + ((maxValue - minValue) / priceTicks) * i;
+        const y = yScale(value);
+        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        label.setAttribute('x', (margin.left - 12).toString());
+        label.setAttribute('y', (y + 4).toFixed(2));
+        label.setAttribute('fill', 'rgba(185, 205, 228, 0.7)');
+        label.setAttribute('font-size', '12');
+        label.setAttribute('text-anchor', 'end');
+        label.textContent = `$${value.toFixed(0)}`;
+        axisGroup.appendChild(label);
+      }
+    }
+
+    function setMetrics(actual, projection, sourceLabel) {
+      const metricsEl = document.getElementById('chart-metrics');
+      if (!metricsEl) return;
+      const last = actual[actual.length - 1];
+      const previous = actual[actual.length - 2] || last;
+      const delta = last.settle - previous.settle;
+      const deltaSign = delta >= 0 ? '+' : '';
+      const next = projection[0];
+      metricsEl.innerHTML = `
+        <span><strong>Last settlement:</strong> $${last.settle.toFixed(2)} (${last.date})</span>
+        <span><strong>Daily change:</strong> ${deltaSign}${delta.toFixed(2)}</span>
+        <span><strong>Next 7-day outlook:</strong> $${next ? next.settle.toFixed(2) : last.settle.toFixed(2)}</span>
+        <span><strong>Source:</strong> ${sourceLabel}</span>
+      `;
+    }
+
+    async function loadData() {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 4000);
+      try {
+        const response = await fetch('https://api.eia.gov/series/?api_key=DEMO_KEY&series_id=PET.RWTC.D', {
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json' }
+        });
+        clearTimeout(timeout);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        const parsed = parseEiaSeries(data);
+        if (!parsed.length) throw new Error('No data');
+        const { actual, projection } = computeProjection(parsed);
+        drawChart(actual, projection);
+        setMetrics(actual, projection, 'EIA PET.RWTC.D');
+        analytics.track('market_data_loaded', { mode: 'live' });
+      } catch (error) {
+        clearTimeout(timeout);
+        console.warn('Falling back to offline series', error);
+        const { actual, projection } = computeProjection(offlineSeries);
+        drawChart(actual, projection);
+        setMetrics(actual, projection, 'Offline sample');
+        const metricsEl = document.getElementById('chart-metrics');
+        if (metricsEl) {
+          metricsEl.insertAdjacentHTML('beforeend', '<span><strong>Status:</strong> Offline sample</span>');
+        }
+        analytics.track('market_data_loaded', { mode: 'offline' });
+      }
+    }
+
+    loadData();
+
+    document.getElementById('contact-form')?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const notes = document.getElementById('notes').value.trim();
+      const status = document.getElementById('form-status');
+      if (!name || !email) {
+        status.textContent = 'Please provide your name and a valid email.';
+        return;
+      }
+      const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nNotes: ${notes}`);
+      const mailto = `mailto:intel@praeco.ai?subject=${encodeURIComponent('Praeco Early Access Inquiry')}&body=${body}`;
+      window.location.href = mailto;
+      status.textContent = 'Opening your email client…';
+      analytics.track('form_submit', { nameLength: name.length });
+    });
+  </script>
+</body>
+</html>
