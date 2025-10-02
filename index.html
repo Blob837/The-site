@@ -2,52 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#050a16" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#030b1b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Praeco | Predictive Intelligence for the Oilfield</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta name="description" content="Praeco predicts production and powers throughput visibility for energy operators from Houston to the nationwide grid." />
+  <meta property="og:title" content="Praeco | Predicting Production. Powering Throughput." />
+  <meta property="og:description" content="Houston-founded energy AI that forecasts output and provides custody transfer visibility." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="Logo.svg" />
+  <title>Praeco | Predicting Production. Powering Throughput.</title>
   <style>
     :root {
-      --bg: #050a16;
-      --bg-alt: #0a0f1a;
-      --accent-blue: #00aaff;
-      --accent-teal: #00ffcc;
-      --text-primary: #f0f5ff;
-      --text-secondary: #c0cae7;
-      --transition: 220ms ease;
-      --max-width: 1080px;
-    }
-
-    html {
-      background: var(--bg);
       color-scheme: dark;
+      --font-sans: 'SF Pro Display', 'Inter', 'Segoe UI', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
+      --color-bg: #010612;
+      --color-surface: rgba(6, 18, 36, 0.72);
+      --color-surface-strong: rgba(10, 28, 52, 0.92);
+      --color-border: rgba(36, 74, 120, 0.28);
+      --color-text: #ecf3ff;
+      --color-subtle: rgba(198, 216, 255, 0.72);
+      --color-muted: rgba(153, 180, 222, 0.52);
+      --accent-blue: #00a7ff;
+      --accent-teal: #00ffd1;
+      --accent-gradient: linear-gradient(120deg, rgba(0, 167, 255, 0.8), rgba(0, 255, 209, 0.65));
+      --shadow-soft: 0 18px 48px rgba(0, 0, 0, 0.45);
+      --shadow-hard: 0 42px 80px rgba(0, 34, 68, 0.55);
+      --radius-lg: 28px;
+      --radius-md: 20px;
+      --radius-sm: 14px;
+      --space-xs: clamp(0.5rem, 0.5vw, 0.75rem);
+      --space-sm: clamp(0.75rem, 0.9vw, 1.1rem);
+      --space-md: clamp(1.25rem, 1.6vw, 1.8rem);
+      --space-lg: clamp(2rem, 4vw, 3.5rem);
+      --space-xl: clamp(3rem, 6vw, 5rem);
+      --transition-fast: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-medium: 280ms cubic-bezier(0.4, 0, 0.2, 1);
+      --backdrop: blur(22px) saturate(140%);
     }
 
     * {
       box-sizing: border-box;
     }
 
-    body {
-      margin: 0;
-      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: radial-gradient(circle at 20% 20%, rgba(0, 170, 255, 0.18), transparent 58%),
-        radial-gradient(circle at 72% 18%, rgba(0, 255, 204, 0.18), transparent 48%),
-        linear-gradient(180deg, #040810 0%, #050a16 40%, #02040b 100%);
-      color: var(--text-primary);
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px)
-        env(safe-area-inset-left, 0px);
+    html {
+      font-size: 16px;
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      scroll-behavior: smooth;
+      text-rendering: optimizeLegibility;
+      -webkit-text-size-adjust: 100%;
     }
 
-    ::selection {
-      background: rgba(0, 170, 255, 0.35);
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--color-text);
+      background:
+        radial-gradient(circle at 20% -10%, rgba(0, 143, 255, 0.25), transparent 45%),
+        radial-gradient(circle at 80% -5%, rgba(0, 255, 209, 0.18), transparent 40%),
+        linear-gradient(180deg, rgba(1, 6, 18, 0.92), #010612 65%, #01030a 100%);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" opacity="0.18"%3E%3Cfilter id="n" x="0" y="0" width="1" height="1"%3E%3CfeTurbulence baseFrequency="0.65" numOctaves="3" seed="7"/%3E%3C/filter%3E%3Crect width="240" height="240" filter="url(%23n)"/%3E%3C/svg%3E');
+      background-size: 240px;
+      mix-blend-mode: screen;
+      z-index: 0;
     }
 
     a {
@@ -55,633 +82,635 @@
       text-decoration: none;
     }
 
-    main {
-      flex: 1 1 auto;
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page-shell {
+      position: relative;
+      z-index: 1;
       display: flex;
       flex-direction: column;
-      gap: 5rem;
-      padding: calc(3.5rem + env(safe-area-inset-top, 0px)) calc(1.5rem + env(safe-area-inset-right, 0px))
-        calc(5rem + env(safe-area-inset-bottom, 0px)) calc(1.5rem + env(safe-area-inset-left, 0px));
+      min-height: 100vh;
+      background: linear-gradient(160deg, rgba(5, 16, 32, 0.76), rgba(2, 8, 18, 0.92));
+      backdrop-filter: var(--backdrop);
     }
 
-    section {
-      position: relative;
-      max-width: var(--max-width);
-      width: 100%;
-      margin: 0 auto;
+    .top-nav-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 8;
+      padding: calc(env(safe-area-inset-top) + 0.75rem) clamp(1.1rem, 5vw, 3rem) 0.75rem;
     }
 
-    h1, h2, h3 {
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      margin: 0 0 1rem;
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: rgba(8, 18, 34, 0.78);
+      border: 1px solid rgba(40, 92, 140, 0.32);
+      border-radius: calc(var(--radius-md) + 6px);
+      padding: 0.9rem clamp(1rem, 4vw, 2rem);
+      box-shadow: 0 22px 52px rgba(2, 12, 28, 0.5);
+      backdrop-filter: blur(22px) saturate(140%);
     }
 
-    p {
-      line-height: 1.6;
-      color: var(--text-secondary);
-      margin: 0 0 1rem;
-    }
-
-    .hero {
-      display: grid;
-      gap: 2.5rem;
-      text-align: center;
-      padding-top: calc(2rem + env(safe-area-inset-top, 0px));
-    }
-
-    .hero-logo {
-      justify-self: center;
-      width: min(560px, 92vw);
-      max-width: 560px;
-      filter: drop-shadow(0 32px 68px rgba(0, 170, 255, 0.5))
-        drop-shadow(0 16px 34px rgba(255, 255, 255, 0.24));
-      animation: float 8s ease-in-out infinite;
-    }
-
-    .hero h1 {
-      font-size: clamp(2.75rem, 6vw, 4.5rem);
-      font-weight: 800;
-      margin-bottom: 1rem;
+    .logo-lockup {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.24em;
       text-transform: uppercase;
-      background: linear-gradient(120deg, var(--accent-blue), var(--accent-teal));
-      -webkit-background-clip: text;
-      color: transparent;
+      font-size: 0.72rem;
+      color: var(--color-subtle);
     }
 
-    .hero p {
-      font-size: clamp(0.95rem, 1.9vw, 1.15rem);
-      font-weight: 400;
-      letter-spacing: 0.02em;
-      max-width: 640px;
-      margin: 0 auto 1.75rem;
-      color: #e2e9ff;
+    .logo-lockup img {
+      height: 28px;
+      width: auto;
+      filter: drop-shadow(0 10px 24px rgba(0, 255, 209, 0.25));
+    }
+
+    .nav-links {
+      display: flex;
+      gap: clamp(0.65rem, 2.5vw, 1.75rem);
+      align-items: center;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-links a {
+      position: relative;
+      padding: 0.35rem 0;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -0.25rem;
+      width: 100%;
+      height: 2px;
+      background: var(--accent-gradient);
+      border-radius: 999px;
+      opacity: 0;
+      transform: scaleX(0.4);
+      transition: opacity var(--transition-medium), transform var(--transition-medium);
+      transform-origin: center;
+    }
+
+    .nav-links a:focus-visible,
+    .nav-links a:hover {
+      color: var(--color-text);
+    }
+
+    .nav-links a:focus-visible::after,
+    .nav-links a:hover::after {
+      opacity: 1;
+      transform: scaleX(1);
     }
 
     .cta-primary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      padding: 0.95rem 2.75rem;
+      background: var(--accent-gradient);
+      color: #041220;
+      border: none;
       border-radius: 999px;
-      background: linear-gradient(135deg, rgba(0, 170, 255, 0.95), rgba(0, 255, 204, 0.95));
-      color: #050a16;
-      font-weight: 700;
-      letter-spacing: 0.08em;
+      padding: 0.8rem 1.8rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      box-shadow: 0 18px 35px rgba(0, 170, 255, 0.35);
-      transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
-      position: relative;
-      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(0, 255, 209, 0.26);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
     }
 
-    .cta-primary::after {
+    .cta-primary:focus-visible,
+    .cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 42px rgba(0, 255, 209, 0.32);
+    }
+
+    .cta-primary:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .cta-secondary {
+      border-radius: 999px;
+      padding: 0.75rem 1.6rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border: 1px solid rgba(0, 191, 255, 0.4);
+      background: rgba(5, 16, 36, 0.8);
+      color: var(--color-text);
+      cursor: pointer;
+      transition: border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .cta-secondary:hover,
+    .cta-secondary:focus-visible {
+      border-color: rgba(0, 255, 209, 0.6);
+      color: var(--accent-teal);
+      transform: translateY(-1px);
+    }
+
+    .layout-container {
+      width: min(1120px, calc(100% - 2.4rem));
+      margin: 0 auto;
+      padding: var(--space-lg) 0 var(--space-xl);
+    }
+
+    section {
+      margin-bottom: var(--space-xl);
+    }
+
+    .hero {
+      position: relative;
+      border-radius: var(--radius-lg);
+      padding: calc(var(--space-xl) + env(safe-area-inset-top)) clamp(1.5rem, 5vw, 3.5rem) var(--space-xl);
+      background:
+        linear-gradient(160deg, rgba(6, 18, 40, 0.94), rgba(4, 12, 26, 0.9)),
+        radial-gradient(ellipse at 30% 20%, rgba(0, 255, 209, 0.16), transparent 60%);
+      box-shadow: var(--shadow-hard);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .hero::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(120deg, rgba(255, 255, 255, 0.35), transparent 60%);
-      opacity: 0;
-      transition: opacity var(--transition);
+      background: radial-gradient(circle at 75% 15%, rgba(0, 167, 255, 0.28), transparent 55%);
+      mix-blend-mode: screen;
+      opacity: 0.8;
+      pointer-events: none;
     }
 
-    .cta-primary:hover {
-      transform: translateY(-4px) scale(1.01);
-      box-shadow: 0 24px 48px rgba(0, 170, 255, 0.45);
-      filter: saturate(1.1);
-    }
-
-    .cta-primary:hover::after {
-      opacity: 1;
-    }
-
-    .section-header {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .section-eyebrow {
-      font-size: 0.85rem;
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      color: var(--accent-teal);
-      font-weight: 600;
-    }
-
-    .story-grid {
-      display: grid;
-      gap: 2rem;
-      background: linear-gradient(145deg, rgba(6, 18, 36, 0.92), rgba(12, 30, 56, 0.75));
-      border-radius: 28px;
-      padding: clamp(1.75rem, 4vw, 3rem);
-      box-shadow: 0 32px 90px rgba(2, 10, 22, 0.6);
-    }
-
-    .story-grid p {
-      margin-bottom: 1.5rem;
-    }
-
-    .story-grid strong {
-      color: var(--accent-blue);
-    }
-
-    .product-grid {
-      display: grid;
-      gap: 1.5rem;
-    }
-
-    .product-card {
-      position: relative;
-      padding: 1.75rem;
-      border-radius: 24px;
-      background: linear-gradient(160deg, rgba(8, 20, 38, 0.92), rgba(4, 14, 32, 0.88));
-      overflow: hidden;
-      transition: transform var(--transition), box-shadow var(--transition);
-      box-shadow: 0 30px 70px rgba(3, 12, 28, 0.55);
-    }
-
-    .product-card::before {
-      content: '';
+    #hero-wave {
       position: absolute;
-      inset: -40% 30%;
-      background: radial-gradient(circle, rgba(0, 170, 255, 0.25), transparent 55%);
-      transform: translateY(60%);
-      opacity: 0;
-      transition: opacity 0.6s ease, transform 0.6s ease;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.45;
     }
 
-    .product-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 36px 80px rgba(0, 170, 255, 0.32);
-    }
-
-    .product-card:hover::before {
-      opacity: 1;
-      transform: translateY(0%);
-    }
-
-    .basins {
+    .hero-grid {
       display: grid;
-      gap: 2rem;
-      align-items: center;
-      border-radius: 28px;
-      padding: clamp(1.75rem, 4vw, 3rem);
-      background: linear-gradient(160deg, rgba(8, 24, 46, 0.92), rgba(12, 34, 60, 0.85));
-      box-shadow: 0 34px 90px rgba(3, 15, 30, 0.58);
+      gap: clamp(1.75rem, 4vw, 3rem);
+      align-items: start;
     }
 
-    .texas-map {
+    .hero-intro {
+      display: grid;
+      gap: var(--space-sm);
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    #hero-title {
+      font-size: clamp(2.5rem, 5vw, 3.9rem);
+      line-height: 1.05;
+    }
+
+    .hero-subhead {
+      font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+      color: var(--color-subtle);
+      max-width: 32ch;
+    }
+
+    .hero-ctas {
       display: flex;
-      justify-content: center;
-      padding: clamp(1.25rem, 3vw, 1.75rem);
-      border-radius: 24px;
-      background: radial-gradient(circle at 28% 32%, rgba(0, 170, 255, 0.18), transparent 70%),
-        radial-gradient(circle at 72% 68%, rgba(0, 255, 204, 0.22), transparent 75%),
-        rgba(4, 12, 26, 0.88);
-      box-shadow: inset 0 0 30px rgba(0, 170, 255, 0.25), 0 28px 70px rgba(0, 170, 255, 0.32);
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      align-items: center;
     }
 
-    .texas-map svg {
-      width: clamp(260px, 82vw, 460px);
-      height: auto;
-      filter: drop-shadow(0 28px 56px rgba(0, 170, 255, 0.38));
+    .hero-meta {
+      display: grid;
+      gap: var(--space-sm);
     }
 
-    .map-outline {
-      fill: url(#mapFill);
-      stroke: url(#mapGradient);
-      stroke-width: 3;
-      stroke-linejoin: round;
+    .meta-card {
+      border-radius: var(--radius-md);
+      padding: 1.25rem 1.4rem;
+      background: rgba(6, 18, 38, 0.88);
+      border: 1px solid rgba(34, 78, 130, 0.36);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      display: grid;
+      gap: 0.45rem;
     }
 
-    .map-point circle:last-of-type {
-      stroke: rgba(5, 10, 22, 0.75);
-      stroke-width: 1.4;
-    }
-
-    .map-point text {
-      fill: #f5fbff;
-      font-size: clamp(0.7rem, 1.9vw, 0.85rem);
-      font-weight: 700;
-      letter-spacing: 0.08em;
+    .meta-card small {
+      font-size: 0.75rem;
+      letter-spacing: 0.24em;
       text-transform: uppercase;
-      paint-order: stroke fill;
-      stroke: rgba(5, 10, 22, 0.85);
-      stroke-width: 3.5px;
-      stroke-linejoin: round;
+      color: var(--color-muted);
     }
 
-    .map-point .map-glow {
-      fill: url(#dotGlow);
+    .meta-card strong {
+      font-size: clamp(1.05rem, 2vw, 1.35rem);
     }
 
-    .map-connector {
-      stroke: rgba(0, 255, 204, 0.7);
-      stroke-width: 1.75;
-      stroke-linecap: round;
-      stroke-dasharray: 4 6;
-      vector-effect: non-scaling-stroke;
-      filter: drop-shadow(0 6px 18px rgba(0, 170, 255, 0.45));
+    .meta-grid {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .proof-strip {
+      display: grid;
+      gap: 0.9rem;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    }
+
+    .proof-card {
+      background: rgba(4, 12, 26, 0.9);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(44, 98, 140, 0.38);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-soft);
+      display: grid;
+      gap: 0.45rem;
+      transition: transform var(--transition-medium), border-color var(--transition-medium);
+    }
+
+    .proof-card:hover,
+    .proof-card:focus-within {
+      transform: translateY(-4px);
+      border-color: rgba(0, 255, 209, 0.48);
+    }
+
+    .proof-card span {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(120, 198, 255, 0.65);
+    }
+
+    .proof-card strong {
+      font-size: clamp(1.25rem, 2.5vw, 1.7rem);
+      color: var(--color-text);
+    }
+
+    .proof-card em {
+      font-style: normal;
+      font-size: 0.9rem;
+      color: var(--color-muted);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: var(--space-md);
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--color-muted);
+      max-width: 48ch;
+      font-size: 0.95rem;
+    }
+
+    #market-intel-title,
+    #story-title,
+    #product-title,
+    #basins-title,
+    #architecture-title,
+    #vision-title,
+    #closing-title {
+      font-size: clamp(1.75rem, 3vw, 2.25rem);
     }
 
     .market-intel {
       display: grid;
-      gap: clamp(1.75rem, 4vw, 3rem);
-      background: linear-gradient(155deg, rgba(8, 24, 46, 0.94), rgba(3, 10, 24, 0.92));
-      border-radius: 32px;
-      padding: clamp(1.75rem, 4vw, 3.25rem);
-      box-shadow: 0 36px 100px rgba(2, 12, 28, 0.65);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .market-intel::before {
-      content: '';
-      position: absolute;
-      inset: -30% -10% auto -20%;
-      height: 60%;
-      background: radial-gradient(circle, rgba(0, 170, 255, 0.35), transparent 65%);
-      opacity: 0.6;
-      pointer-events: none;
-      filter: blur(30px);
-    }
-
-    .market-intel::after {
-      content: '';
-      position: absolute;
-      inset: auto -30% -30% 40%;
-      height: 70%;
-      background: radial-gradient(circle, rgba(0, 255, 204, 0.32), transparent 70%);
-      opacity: 0.5;
-      pointer-events: none;
-      filter: blur(40px);
-    }
-
-    .market-intel > * {
-      position: relative;
-      z-index: 1;
-    }
-
-    .market-intel header {
-      display: grid;
-      gap: 0.75rem;
-    }
-
-    .market-tagline {
-      color: var(--accent-teal);
-      font-size: 0.85rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    .market-grid {
-      display: grid;
-      gap: 1.5rem;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    }
-
-    .market-chart {
-      margin-top: 1rem;
-      display: grid;
-      gap: 1.25rem;
-      background: linear-gradient(165deg, rgba(5, 18, 38, 0.9), rgba(2, 8, 20, 0.92));
-      border-radius: 28px;
-      padding: clamp(1.5rem, 4vw, 2.5rem);
-      box-shadow: inset 0 0 50px rgba(0, 170, 255, 0.08), 0 26px 70px rgba(0, 0, 0, 0.35);
-    }
-
-    .market-chart-heading {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .market-chart-heading h3 {
-      margin: 0;
-      font-size: clamp(1.2rem, 3vw, 1.65rem);
-      letter-spacing: -0.01em;
-    }
-
-    .market-chart-legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem 1.5rem;
-      color: rgba(198, 213, 245, 0.8);
-      font-size: 0.85rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .legend-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .legend-swatch {
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      display: inline-block;
-    }
-
-    .legend-swatch.actual {
-      background: var(--accent-blue);
-      box-shadow: 0 0 12px rgba(0, 170, 255, 0.45);
-    }
-
-    .legend-swatch.forecast {
-      background: var(--accent-teal);
-      box-shadow: 0 0 12px rgba(0, 255, 204, 0.45);
-    }
-
-    .market-chart svg {
-      width: 100%;
-      height: auto;
-      max-height: 360px;
-    }
-
-    .market-chart figcaption {
-      font-size: 0.8rem;
-      color: rgba(180, 196, 232, 0.7);
-    }
-
-    .market-chart svg .chart-grid line {
-      stroke: rgba(255, 255, 255, 0.08);
-    }
-
-    .market-chart svg .chart-axis-line {
-      stroke: rgba(255, 255, 255, 0.14);
-    }
-
-    .market-chart svg .chart-axis-label {
-      fill: rgba(198, 213, 245, 0.75);
-      font-size: 11px;
-      letter-spacing: 0.05em;
-    }
-
-    .market-chart svg .line-actual {
-      fill: none;
-      stroke: var(--accent-blue);
-      stroke-width: 2.6;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .market-chart svg .line-forecast {
-      fill: none;
-      stroke: var(--accent-teal);
-      stroke-width: 2.6;
-      stroke-dasharray: 6 8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .market-chart svg .chart-point {
-      stroke: #050a16;
-      stroke-width: 2;
-    }
-
-    .market-chart svg .chart-point.actual {
-      fill: var(--accent-blue);
-    }
-
-    .market-chart svg .chart-point.forecast {
-      fill: var(--accent-teal);
-    }
-
-    .market-chart svg .chart-divider {
-      stroke: rgba(0, 255, 204, 0.4);
-      stroke-width: 1.5;
-      stroke-dasharray: 4 6;
-    }
-
-    .market-card {
-      position: relative;
-      display: grid;
-      gap: 0.75rem;
-      background: linear-gradient(150deg, rgba(4, 16, 34, 0.92), rgba(2, 8, 20, 0.9));
-      border-radius: 24px;
-      padding: 1.6rem;
-      box-shadow: 0 22px 50px rgba(0, 0, 0, 0.35);
-      overflow: hidden;
-    }
-
-    .market-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 12% 20%, rgba(0, 255, 204, 0.35), transparent 60%),
-        radial-gradient(circle at 88% 80%, rgba(0, 170, 255, 0.28), transparent 65%);
-      opacity: 0.45;
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
-
-    .market-card.highlight {
-      background: linear-gradient(140deg, rgba(0, 255, 204, 0.32), rgba(0, 170, 255, 0.24));
-      box-shadow: 0 30px 80px rgba(0, 255, 204, 0.38);
-    }
-
-    .market-card.highlight::after {
-      opacity: 0.6;
-    }
-
-    .market-card strong {
-      font-size: clamp(1.75rem, 7.5vw, 2.4rem);
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--text-primary);
-    }
-
-    .market-card span {
-      font-size: 0.85rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(198, 213, 245, 0.75);
-    }
-
-    .market-card.highlight span,
-    .market-card.highlight .market-note {
-      color: rgba(11, 39, 54, 0.7);
-    }
-
-    .market-delta {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-weight: 600;
-      color: var(--accent-teal);
-      font-size: 0.95rem;
-    }
-
-    .market-delta.negative {
-      color: #ff7a8a;
-    }
-
-    .market-card strong.market-delta {
-      font-size: clamp(1.4rem, 6.5vw, 2rem);
-      font-weight: 700;
-      justify-content: flex-start;
-      display: inline-flex;
-      align-items: baseline;
-    }
-
-    .market-card.highlight strong {
-      font-size: clamp(2.1rem, 9vw, 2.85rem);
-      color: #04121e;
-    }
-
-    .market-note {
-      font-size: 0.85rem;
-      color: rgba(205, 218, 246, 0.85);
-    }
-
-    .market-intel footer {
-      display: grid;
-      gap: 0.35rem;
-      font-size: 0.8rem;
-      color: rgba(180, 196, 232, 0.65);
+      gap: var(--space-md);
+      background: rgba(4, 16, 32, 0.82);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(42, 96, 140, 0.32);
+      box-shadow: var(--shadow-soft);
     }
 
     .market-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.5rem 0.95rem;
-      border-radius: 999px;
-      background: linear-gradient(120deg, rgba(0, 255, 204, 0.18), rgba(0, 170, 255, 0.2));
-      box-shadow: 0 12px 30px rgba(0, 255, 204, 0.25);
-      width: fit-content;
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #031521;
-      font-weight: 700;
-    }
-
-    .market-status svg {
-      width: 14px;
-      height: 14px;
-    }
-
-    .market-intel.is-error {
-      box-shadow: 0 28px 80px rgba(60, 10, 24, 0.45);
-    }
-
-    .market-intel.is-error .market-status {
-      background: linear-gradient(120deg, rgba(255, 122, 138, 0.22), rgba(255, 196, 204, 0.22));
-      color: #3c0a18;
-    }
-
-    .market-intel.is-error .market-status circle:last-of-type {
-      fill: #ff7a8a;
-    }
-
-    .market-intel.is-error .market-note {
-      color: rgba(255, 205, 214, 0.85);
-    }
-
-    .architecture {
       display: grid;
-      gap: 2.5rem;
-    }
-
-    .diagram {
-      display: grid;
-      gap: 1.25rem;
-    }
-
-    .diagram-flow {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 1rem;
     }
 
-    .diagram-node {
-      position: relative;
-      flex: 1 1 220px;
-      min-height: 120px;
-      background: linear-gradient(150deg, rgba(4, 16, 34, 0.92), rgba(2, 8, 20, 0.88));
-      border-radius: 20px;
-      padding: 1.35rem;
+    .status-inline {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
-      text-align: left;
-      overflow: hidden;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(160, 210, 255, 0.68);
     }
 
-    .diagram-node::after {
-      display: none;
+    .status-tile {
+      background: rgba(6, 18, 34, 0.9);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(46, 104, 160, 0.4);
+      padding: 1.2rem 1.4rem;
+      display: grid;
+      gap: 0.35rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .status-tile::before {
       content: '';
       position: absolute;
-      top: 50%;
-      right: -18px;
-      width: 30px;
+      inset: 0;
+      background: radial-gradient(circle at 20% 15%, rgba(0, 255, 209, 0.18), transparent 60%);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .status-tile strong {
+      font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+      z-index: 1;
+    }
+
+    .status-tile .label {
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(128, 198, 255, 0.68);
+      z-index: 1;
+    }
+
+    .status-tile .market-note,
+    .status-tile .market-delta {
+      font-size: 0.85rem;
+      color: var(--color-muted);
+      z-index: 1;
+    }
+
+    .market-delta.negative {
+      color: #ff7a7a;
+    }
+
+    .market-chart {
+      background: rgba(6, 18, 36, 0.94);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(52, 108, 160, 0.45);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-soft);
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .chart-frame {
+      position: relative;
+      width: 100%;
+      height: clamp(260px, 65vw, 360px);
+    }
+
+    .chart-grid path {
+      stroke: rgba(88, 138, 180, 0.25);
+      stroke-dasharray: 4 6;
+    }
+
+    .chart-line-actual {
+      fill: none;
+      stroke: rgba(0, 167, 255, 0.9);
+      stroke-width: 2.4;
+      filter: drop-shadow(0 0 12px rgba(0, 167, 255, 0.45));
+    }
+
+    .chart-line-forecast {
+      fill: none;
+      stroke: rgba(0, 255, 209, 0.85);
+      stroke-width: 2.4;
+      stroke-dasharray: 8 6;
+      filter: drop-shadow(0 0 12px rgba(0, 255, 209, 0.4));
+    }
+
+    .chart-axis text {
+      font-size: 0.7rem;
+      fill: rgba(178, 208, 248, 0.7);
+    }
+
+    .chart-axis path,
+    .chart-axis line {
+      stroke: rgba(88, 138, 180, 0.28);
+    }
+
+    .product-grid,
+    .basin-grid,
+    .architecture-grid {
+      display: grid;
+      gap: var(--space-md);
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .product-card,
+    .basin-card,
+    .architecture-node,
+    .callout-card {
+      background: rgba(6, 18, 34, 0.9);
+      border: 1px solid rgba(48, 102, 160, 0.42);
+      border-radius: var(--radius-md);
+      padding: 1.4rem 1.6rem;
+      box-shadow: var(--shadow-soft);
+      display: grid;
+      gap: 0.55rem;
+      transition: transform var(--transition-medium), border-color var(--transition-medium);
+    }
+
+    .product-card:hover,
+    .product-card:focus-within,
+    .basin-card:hover,
+    .basin-card:focus-within,
+    .architecture-node:hover,
+    .architecture-node:focus-within,
+    .callout-card:hover,
+    .callout-card:focus-within {
+      transform: translateY(-4px);
+      border-color: rgba(0, 255, 209, 0.45);
+    }
+
+    .product-card h3,
+    .basin-card h3,
+    .architecture-node h3,
+    .callout-card h3 {
+      font-size: 1.2rem;
+    }
+
+    .product-card p,
+    .basin-card p,
+    .architecture-node p,
+    .callout-card p {
+      margin: 0;
+      color: var(--color-muted);
+      font-size: 0.95rem;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .chip {
+      padding: 0.35rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: rgba(0, 167, 255, 0.18);
+      color: rgba(202, 240, 255, 0.82);
+    }
+
+    .architecture-flow {
+      position: relative;
+      display: grid;
+      gap: var(--space-sm);
+    }
+
+    .architecture-node {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .architecture-node::after {
+      content: '';
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
       height: 2px;
-      background: linear-gradient(90deg, var(--accent-blue), var(--accent-teal));
+      background: linear-gradient(90deg, rgba(0, 167, 255, 0), rgba(0, 167, 255, 0.8), rgba(0, 255, 209, 0));
       opacity: 0.6;
     }
 
-    .diagram-flow::after {
-      display: none;
+    .architecture-grid {
+      position: relative;
+    }
+
+    .architecture-grid::before {
       content: '';
-      width: 100%;
+      position: absolute;
+      inset-inline: -2rem;
+      top: 50%;
       height: 2px;
-      background: linear-gradient(90deg, rgba(0, 170, 255, 0.25), rgba(0, 255, 204, 0.25));
-      opacity: 0.4;
+      background: linear-gradient(90deg, rgba(0, 167, 255, 0.25), rgba(0, 255, 209, 0.25));
+      opacity: 0.7;
+      display: none;
+    }
+
+    .callouts {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-top: var(--space-md);
     }
 
     .timeline {
       display: grid;
-      gap: 1.25rem;
+      gap: 1.1rem;
     }
 
     .timeline-item {
       display: grid;
       gap: 0.35rem;
-      background: linear-gradient(150deg, rgba(4, 16, 34, 0.9), rgba(2, 10, 26, 0.88));
-      border-radius: 20px;
-      padding: 1.35rem 1.6rem;
-      box-shadow: 0 22px 55px rgba(2, 12, 28, 0.5);
+      background: rgba(4, 12, 26, 0.9);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(46, 100, 150, 0.42);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow-soft);
     }
 
     .timeline-year {
-      font-size: 0.85rem;
-      letter-spacing: 0.28em;
+      font-size: 0.78rem;
+      letter-spacing: 0.32em;
       text-transform: uppercase;
-      color: var(--accent-teal);
-      font-weight: 600;
+      color: rgba(120, 198, 255, 0.68);
     }
 
-    .vision {
-      background: linear-gradient(170deg, rgba(6, 18, 36, 0.92), rgba(0, 170, 255, 0.12));
-      border-radius: 28px;
-      padding: clamp(1.75rem, 4vw, 3rem);
-      text-align: center;
-      box-shadow: 0 30px 80px rgba(2, 10, 28, 0.55);
-    }
-
-    .closing {
-      text-align: center;
+    .contact-card {
+      background: rgba(6, 18, 34, 0.92);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(48, 102, 160, 0.4);
+      padding: var(--space-lg);
+      box-shadow: var(--shadow-hard);
       display: grid;
-      gap: 1.25rem;
+      gap: var(--space-md);
+    }
+
+    .contact-form {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .form-row {
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(160, 208, 255, 0.7);
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(60, 120, 170, 0.48);
+      padding: 0.85rem 1rem;
+      background: rgba(4, 12, 26, 0.85);
+      color: var(--color-text);
+      font: inherit;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: none;
+      border-color: rgba(0, 255, 209, 0.65);
+      box-shadow: 0 0 0 3px rgba(0, 255, 209, 0.18);
+    }
+
+    textarea {
+      min-height: 140px;
+      resize: vertical;
     }
 
     .footer {
-      margin-top: 4rem;
-      padding: 2.75rem 1.25rem 3.5rem;
+      margin-top: auto;
+      padding: 3rem clamp(1.5rem, 6vw, 3.5rem) calc(3.5rem + env(safe-area-inset-bottom));
       text-align: center;
-      color: rgba(180, 198, 236, 0.68);
+      color: rgba(148, 188, 228, 0.68);
       font-size: 0.85rem;
-      background: linear-gradient(180deg, rgba(4, 16, 30, 0) 0%, rgba(4, 16, 30, 0.55) 100%);
+    }
+
+    .footer a {
+      color: var(--color-subtle);
+      text-decoration: underline;
     }
 
     .modal {
@@ -690,12 +719,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: rgba(5, 10, 22, 0.85);
-      backdrop-filter: blur(6px);
+      background: rgba(4, 10, 20, 0.85);
+      backdrop-filter: blur(12px);
       opacity: 0;
       pointer-events: none;
-      transition: opacity 280ms ease;
-      z-index: 20;
+      transition: opacity var(--transition-medium);
+      z-index: 15;
+      padding: 1.5rem;
     }
 
     .modal.active {
@@ -704,433 +734,387 @@
     }
 
     .modal-card {
-      background: linear-gradient(160deg, rgba(6, 16, 34, 0.96), rgba(2, 8, 20, 0.94));
-      border-radius: 24px;
-      padding: 2.5rem;
+      background: rgba(6, 18, 36, 0.96);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(48, 102, 160, 0.5);
+      padding: 2.2rem clamp(1.5rem, 4vw, 2.75rem);
       max-width: 420px;
-      width: 90%;
+      width: min(100%, 420px);
       text-align: center;
-      box-shadow: 0 40px 80px rgba(0, 170, 255, 0.3);
-      animation: fade-up 380ms ease;
+      box-shadow: 0 34px 84px rgba(0, 34, 64, 0.55);
+      animation: fade-up var(--transition-medium);
     }
 
     .modal-card h3 {
-      margin-bottom: 1rem;
-      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 1.35rem;
     }
 
     .modal-card button {
       margin-top: 1.5rem;
-      padding: 0.75rem 2rem;
-      border-radius: 999px;
-      border: none;
-      font-weight: 600;
+    }
+
+    .nav-cta {
+      display: none;
+    }
+
+    .status-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
-      background: linear-gradient(135deg, rgba(0, 170, 255, 0.95), rgba(0, 255, 204, 0.95));
-      color: #041120;
-      cursor: pointer;
-      transition: transform var(--transition);
-    }
-
-    .modal-card button:hover {
-      transform: translateY(-2px);
-    }
-
-    .floating-wave {
-      position: fixed;
-      top: -160px;
-      left: 50%;
-      width: min(140vw, 1600px);
-      height: 320px;
-      transform: translateX(-50%);
-      background: radial-gradient(circle at 20% 40%, rgba(0, 170, 255, 0.18), transparent 55%),
-        radial-gradient(circle at 80% 60%, rgba(0, 255, 204, 0.22), transparent 55%);
-      filter: blur(140px);
-      opacity: 0.35;
-      animation: float-slow 30s ease-in-out infinite;
-      z-index: -2;
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
-
-    .floating-wave.bottom {
-      top: auto;
-      bottom: -220px;
-      animation-direction: reverse;
-      opacity: 0.28;
-    }
-
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0px);
-      }
-      50% {
-        transform: translateY(-12px);
-      }
+      color: rgba(160, 210, 255, 0.68);
     }
 
     @keyframes fade-up {
       from {
+        transform: translateY(12px);
         opacity: 0;
-        transform: translateY(10px);
       }
       to {
-        opacity: 1;
         transform: translateY(0);
+        opacity: 1;
       }
     }
 
-    @keyframes float-slow {
-      0% {
-        transform: translate3d(0, 0, 0) scale(1);
-      }
-      50% {
-        transform: translate3d(2%, 3%, 0) scale(1.05);
-      }
-      100% {
-        transform: translate3d(0, 0, 0) scale(1);
-      }
-    }
-
-    @media (min-width: 768px) {
-      main {
-        padding: calc(5rem + env(safe-area-inset-top, 0px))
-          calc(2.5rem + env(safe-area-inset-right, 0px))
-          calc(6.25rem + env(safe-area-inset-bottom, 0px))
-          calc(2.5rem + env(safe-area-inset-left, 0px));
+    @media (min-width: 720px) {
+      .hero-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr);
       }
 
-      .hero {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        align-items: center;
-        text-align: left;
-      }
-
-      .hero-cta {
-        justify-self: flex-start;
-      }
-
-      .story-grid {
+      .meta-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .product-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+      .nav-cta {
+        display: inline-flex;
       }
 
-      .basins {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .vision {
-        text-align: left;
-      }
-    }
-
-    @media (min-width: 640px) {
-      .market-chart-heading {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .market-card {
-        padding: 1.35rem;
-      }
-
-      .market-note {
-        font-size: 0.8rem;
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .product-grid {
+      .architecture-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
-      .diagram-flow {
-        flex-wrap: nowrap;
-      }
-
-      .diagram-node::after {
+      .architecture-grid::before {
         display: block;
       }
+    }
 
-      .diagram-node:last-child::after {
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+      }
+
+      #hero-wave {
         display: none;
-      }
-
-      .diagram-flow::after {
-        display: block;
       }
     }
   </style>
 </head>
 <body>
-  <div class="floating-wave"></div>
-  <div class="floating-wave bottom"></div>
-  <main>
-    <section class="hero" aria-labelledby="hero-title">
-      <div>
-        <img src="Logo.svg" alt="Praeco logo" class="hero-logo" />
-      </div>
-      <div>
-        <h1 id="hero-title">Predicting Production. Powering Throughput.</h1>
-        <p>Praeco delivers AI-driven production forecasts and real-time throughput visibility for the oilfield. Founded in Houston in 2025, starting in Texas, expanding across the U.S. in 2027.</p>
-        <div class="hero-cta">
-          <button class="cta-primary" id="cta-main" type="button">Request Early Access</button>
+  <div class="page-shell">
+    <div class="top-nav-wrap">
+      <nav class="top-nav" aria-label="Primary">
+        <a class="logo-lockup" href="#hero" aria-label="Praeco home">
+          <img src="Logo.svg" alt="Praeco" height="32" width="128" />
+          Praeco Energy AI
+        </a>
+        <div class="nav-links">
+          <a href="#product">Product</a>
+          <a href="#basins">Basins</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#contact">Contact</a>
+          <button class="cta-primary nav-cta" id="nav-cta" type="button">Request Early Access</button>
         </div>
-      </div>
-    </section>
-
-    <section class="market-intel" aria-labelledby="market-intel-title" data-wti-card>
-      <header>
-        <span class="market-tagline">Live Market Intelligence</span>
-        <h2 id="market-intel-title">WTI Outlook & Accuracy</h2>
-        <p class="market-note">Praeco's forecast engine keeps hedging and production plans aligned with benchmark crude pricing.</p>
-      </header>
-      <div class="market-status" data-wti-status>
-        <svg viewBox="0 0 16 16" aria-hidden="true">
-          <circle cx="8" cy="8" r="7" fill="none" stroke="rgba(0, 255, 204, 0.35)" stroke-width="1.5" />
-          <circle cx="8" cy="8" r="4" fill="var(--accent-teal)" opacity="0.35">
-            <animate attributeName="opacity" values="0.35;0.7;0.35" dur="2.8s" repeatCount="indefinite" />
-          </circle>
-        </svg>
-        <span>Updating markets</span>
-      </div>
-      <div class="market-grid">
-        <article class="market-card" aria-live="polite">
-          <span>Last Close</span>
-          <strong data-wti-last-price>--</strong>
-          <div class="market-delta" data-wti-delta>Δ --</div>
-          <p class="market-note" data-wti-last-date>Awaiting market data.</p>
-        </article>
-        <article class="market-card highlight">
-          <span>Tomorrow's Forecast</span>
-          <strong data-wti-forecast>--</strong>
-          <p class="market-note" data-wti-forecast-note>Generating projection...</p>
-        </article>
-        <article class="market-card">
-          <span>Yesterday's Prediction vs Actual</span>
-          <strong class="market-delta" data-wti-accuracy>Δ --</strong>
-          <p class="market-note" data-wti-accuracy-note>Measuring variance...</p>
-        </article>
-      </div>
-      <figure class="market-chart" data-wti-chart>
-        <div class="market-chart-heading">
-          <h3 id="wti-chart-title">Short-term WTI Trajectory</h3>
-          <div class="market-chart-legend" aria-hidden="true">
-            <span class="legend-item"><span class="legend-swatch actual"></span>Last 5 closes</span>
-            <span class="legend-item"><span class="legend-swatch forecast"></span>7-day projection</span>
-          </div>
-        </div>
-        <p class="market-note" data-wti-chart-note>Awaiting market feed to build the curve.</p>
-        <svg viewBox="0 0 600 260" role="img" aria-labelledby="wti-chart-title wti-chart-caption" focusable="false"
-          data-wti-chart-svg></svg>
-        <figcaption id="wti-chart-caption" data-wti-chart-caption>
-          The visualization will highlight how Praeco blends price momentum with recent trend lines.
-        </figcaption>
-      </figure>
-      <footer>
-        <p>The outlook uses a short-term momentum signal: tomorrow's forecast equals today's close plus the latest delta.</p>
-        <p>Yesterday's accuracy checks that same method against today's settlement so teams can calibrate confidence in the signal.</p>
-        <p>The trajectory chart damps that momentum and blends it with a fresh regression to illuminate the next seven sessions.</p>
-      </footer>
-    </section>
-
-    <section class="story" aria-labelledby="story-title">
-      <div class="section-header">
-        <span class="section-eyebrow">Origin Story</span>
-        <h2 id="story-title">Born in Houston. Built for the Oilfield.</h2>
-      </div>
-      <div class="story-grid">
-        <div>
-          <p><strong>Houston, 2025</strong> — Praeco emerged in the energy capital to bring predictive intelligence to the field. Cut from the same cloth as the crews that keep America powered, we build systems that withstand the pressure.</p>
-          <p>Mission-critical work demands more than dashboards. We deliver <strong>predictive clarity</strong> and <strong>operational foresight</strong> so every decision is grounded in data you can trust.</p>
-        </div>
-        <div>
-          <p>Roadmap: Texas-first. We started with the Permian, Eagle Ford, and Delaware basins, and we will have the entire U.S. network lit up by 2027.</p>
-          <p>Cutting through the fog like a laser-guided bit, we've seen too many ops fly blind. Praeco is here to change that—no more guessing, no more drift.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="products" aria-labelledby="product-title">
-      <div class="section-header">
-        <span class="section-eyebrow">Products</span>
-        <h2 id="product-title">Flagship Intelligence Modules</h2>
-      </div>
-      <div class="product-grid">
-        <article class="product-card">
-          <h3>Predictive Outputs</h3>
-          <p>Accurate ML forecasts trained on completions, decline curves, artificial lift, and environmental data.</p>
-          <p>Optimize every barrel without guesswork – reliable as a triple-backed blowout preventer.</p>
-        </article>
-        <article class="product-card">
-          <h3>Real-time Throughput</h3>
-          <p>Continuous visibility into pad, battery, and LACT station performance.</p>
-          <p>Spot bottlenecks faster than a roughneck spots trouble.</p>
-        </article>
-        <article class="product-card">
-          <h3>Scalable Deployment</h3>
-          <p>Texas-first, national expansion with hardened infrastructure and support.</p>
-          <p>Scales like a multi-stage frac job.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="basins" aria-labelledby="basins-title">
-      <div>
-        <div class="section-header">
-          <span class="section-eyebrow">Basins</span>
-          <h2 id="basins-title">Texas-first, U.S.-next</h2>
-        </div>
-        <p>Mastering the Permian, Eagle Ford, and Delaware basins before nationwide rollout in 2027. We build in the basins that power Texas—then scale to every operator across the States.</p>
-      </div>
-      <div class="texas-map" aria-hidden="true">
-        <svg viewBox="0 0 320 260" role="presentation" focusable="false">
-          <defs>
-            <linearGradient id="mapFill" x1="28%" y1="0%" x2="72%" y2="100%">
-              <stop offset="0%" stop-color="rgba(18, 44, 72, 0.95)" />
-              <stop offset="55%" stop-color="rgba(9, 30, 58, 0.92)" />
-              <stop offset="100%" stop-color="rgba(7, 20, 40, 0.9)" />
-            </linearGradient>
-            <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="rgba(0, 170, 255, 0.65)" />
-              <stop offset="100%" stop-color="rgba(0, 255, 204, 0.65)" />
-            </linearGradient>
-            <radialGradient id="dotGlow" r="55%">
-              <stop offset="0%" stop-color="rgba(0, 255, 204, 0.85)" />
-              <stop offset="100%" stop-color="rgba(0, 255, 204, 0)" />
-            </radialGradient>
-            <filter id="mapShadow" x="-15%" y="-15%" width="140%" height="150%">
-              <feDropShadow dx="0" dy="24" stdDeviation="18" flood-color="#00aaff" flood-opacity="0.35" />
-            </filter>
-          </defs>
-          <path
-            d="M161.89,42.84 L161.89,47.39 L169.35,51.84 L176.38,51.98 L177.61,50.28 L181.66,55.82 L196.10,57.16 L199.15,59.51 L201.86,57.24 L206.62,58.29 L212.08,61.33 L211.29,63.77 L213.75,64.74 L218.77,61.29 L224.76,65.49 L230.03,63.13 L232.22,67.99 L237.08,62.07 L238.70,64.80 L243.52,63.52 L250.58,68.00 L255.99,65.04 L269.39,62.68 L277.01,64.16 L278.68,62.02 L299.77,72.24 L307.40,72.01 L307.42,109.95 L312.37,114.80 L312.49,120.04 L317.24,125.26 L318.26,130.09 L319.90,129.94 L319.13,138.79 L314.81,145.63 L315.49,157.14 L311.13,162.62 L312.42,166.34 L289.44,174.38 L296.37,170.39 L289.39,170.24 L291.53,166.25 L290.36,163.99 L286.65,167.06 L284.87,166.11 L283.59,169.66 L286.25,171.08 L286.81,175.94 L290.81,175.12 L274.69,186.48 L250.36,198.26 L260.13,191.75 L254.02,193.45 L254.16,190.58 L247.69,193.73 L245.34,189.98 L243.37,190.62 L249.74,196.83 L243.18,199.44 L240.65,197.73 L240.06,202.17 L234.51,204.60 L230.61,211.94 L225.92,211.60 L228.98,215.05 L225.36,223.87 L219.54,225.45 L224.82,225.62 L221.42,235.92 L223.66,237.96 L227.97,253.85 L230.30,254.61 L229.88,256.65 L231.47,254.98 L231.62,257.20 L225.21,260.00 L218.78,255.67 L204.85,254.67 L183.74,245.78 L179.76,235.90 L175.42,231.51 L173.09,217.27 L165.72,213.15 L159.86,204.12 L154.78,200.91 L145.42,180.78 L131.72,170.39 L127.60,164.71 L105.14,161.84 L103.60,164.61 L96.20,165.57 L91.87,177.72 L85.80,183.57 L79.25,182.62 L51.60,167.54 L47.58,160.72 L46.87,153.03 L41.48,144.15 L30.12,137.81 L0.00,113.34 L0.71,109.91 L87.04,109.92 L88.56,0.00 L161.89,0.02 L161.89,42.84 Z"
-            class="map-outline"
-            filter="url(#mapShadow)"
-          />
-          <g class="map-point">
-            <line class="map-connector" x1="113.0" y1="112.4" x2="168.0" y2="90.0"></line>
-            <circle cx="113.0" cy="112.4" r="12" class="map-glow"></circle>
-            <circle cx="113.0" cy="112.4" r="5" fill="#00ffcc"></circle>
-            <text x="174.0" y="90.0" dominant-baseline="middle">Permian Basin</text>
-          </g>
-          <g class="map-point">
-            <line class="map-connector" x1="52.0" y1="122.2" x2="120.0" y2="146.0"></line>
-            <circle cx="52.0" cy="122.2" r="12" class="map-glow"></circle>
-            <circle cx="52.0" cy="122.2" r="5" fill="#00d1ff"></circle>
-            <text x="126.0" y="146.0" dominant-baseline="middle">Delaware Basin</text>
-          </g>
-          <g class="map-point">
-            <line class="map-connector" x1="198.5" y1="195.4" x2="252.0" y2="218.0"></line>
-            <circle cx="198.5" cy="195.4" r="12" class="map-glow"></circle>
-            <circle cx="198.5" cy="195.4" r="5" fill="#00ffd5"></circle>
-            <text x="258.0" y="218.0" dominant-baseline="middle">Eagle Ford</text>
-          </g>
-        </svg>
-      </div>
-    </section>
-
-    <section class="architecture" aria-labelledby="architecture-title">
-      <div class="section-header">
-        <span class="section-eyebrow">Architecture & Roadmap</span>
-        <h2 id="architecture-title">Encrypted, Audited, Redundant</h2>
-      </div>
-      <div class="diagram">
-        <h3>How Praeco Flows</h3>
-        <div class="diagram-flow">
-          <div class="diagram-node">
-            <strong>SCADA & Historian Ingest</strong>
-            <p>Secure pipelines bringing in sensor, completion, lift, and market data streams.</p>
-          </div>
-          <div class="diagram-node">
-            <strong>Feature Store</strong>
-            <p>Curated features engineered for decline curve analytics and throughput signatures.</p>
-          </div>
-          <div class="diagram-node">
-            <strong>Predictive Ensemble Models</strong>
-            <p>Ensembles tuned on basin-specific realities with guardrails for drift.</p>
-          </div>
-          <div class="diagram-node">
-            <strong>Throughput Dashboards</strong>
-            <p>Mission control views with alerting, audit trails, and ops-ready playbooks.</p>
-          </div>
-        </div>
-      </div>
-      <div class="timeline">
-        <div class="timeline-item">
-          <span class="timeline-year">2025</span>
-          <p>Texas launch across Permian, Eagle Ford, Delaware. Hardened ingestion and forecasting stack deployed.</p>
-        </div>
-        <div class="timeline-item">
-          <span class="timeline-year">2026</span>
-          <p>Expanded features, refined ensembles, logistics integrations, automated anomaly response.</p>
-        </div>
-        <div class="timeline-item">
-          <span class="timeline-year">2027</span>
-          <p>Nationwide rollout with enterprise integrations. Praeco as the predictive layer for U.S. energy infrastructure.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="vision" aria-labelledby="vision-title">
-      <div class="section-header" style="align-items:center;">
-        <span class="section-eyebrow">Future Vision</span>
-        <h2 id="vision-title">The Predictive Layer for U.S. Energy</h2>
-      </div>
-      <p>Praeco becomes the AI control tower for operators, investors, and partners—eyes in the sky for your bottom line. Predictive intelligence that keeps every barrel accounted for, every throughput optimized, every stakeholder aligned.</p>
-    </section>
-
-    <div class="wave-divider" aria-hidden="true">
-      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="waveGradientC" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="rgba(0, 255, 204, 0.55)" />
-            <stop offset="100%" stop-color="rgba(0, 170, 255, 0.55)" />
-          </linearGradient>
-          <linearGradient id="waveGradientSoftC" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.4)" />
-            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.4)" />
-          </linearGradient>
-          <linearGradient id="waveGradientGlowC" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.3)" />
-            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.3)" />
-          </linearGradient>
-        </defs>
-        <path class="wave-path" d="M0,62 C200,26 400,96 600,62 C800,28 1000,98 1200,62" stroke="url(#waveGradientC)" />
-        <path class="wave-path" d="M0,58 C220,18 380,94 600,58 C820,22 980,102 1200,58" stroke="url(#waveGradientSoftC)" />
-        <path class="wave-path" d="M0,68 C210,32 420,104 600,68 C780,32 990,104 1200,68" stroke="url(#waveGradientGlowC)" />
-      </svg>
+      </nav>
     </div>
 
-    <section class="closing" aria-labelledby="closing-title">
-      <h2 id="closing-title">Predicting Production. Powering Throughput.</h2>
-      <p>Join the operators shaping the next decade of energy. Precision forecasting and real-time throughput visibility—ready when you are.</p>
-      <button class="cta-primary" id="cta-bottom" type="button">Request Early Access</button>
-    </section>
-  </main>
+    <main id="hero" class="layout-container" role="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <canvas id="hero-wave" aria-hidden="true"></canvas>
+        <div class="hero-grid">
+          <div class="hero-intro">
+            <img src="Logo.svg" alt="Praeco wordmark" width="180" height="48" style="max-width:180px; opacity:0.92;" />
+            <h1 id="hero-title">Predicting Production. Powering Throughput.</h1>
+            <p class="hero-subhead">Houston-founded in 2025. Texas-first deployments across Permian, Eagle Ford, and Delaware. U.S. expansion accelerating in 2027.</p>
+            <div class="hero-ctas">
+              <button class="cta-primary" id="cta-main" type="button">Request Early Access</button>
+              <a class="cta-secondary" href="#product">See Product</a>
+            </div>
+          </div>
+          <div class="hero-meta" aria-labelledby="story-title">
+            <div class="meta-card" role="group" aria-label="Mission">
+              <small>Mission</small>
+              <strong id="story-title">Born in Houston. Built for the oilfield.</strong>
+              <p>Praeco forecasts wellhead production and keeps custody transfer operators in lockstep, from pad to pipeline.</p>
+            </div>
+            <div class="meta-grid">
+              <div class="meta-card">
+                <small>Coverage</small>
+                <strong>Texas First</strong>
+                <p>Permian, Eagle Ford, Delaware — partner pilots underway.</p>
+              </div>
+              <div class="meta-card">
+                <small>Scale</small>
+                <strong>Nationwide 2027</strong>
+                <p>Scaling eastward with logistics-ready throughput intelligence.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-  <footer class="footer">
-    &copy; 2025 Praeco, Houston. All rights reserved.
-  </footer>
+      <section class="proof" aria-label="Proof and metrics">
+        <div class="section-heading">
+          <h2 id="market-intel-title">WTI Outlook &amp; Accuracy</h2>
+          <p>Pilot-grade signal fidelity and transparent performance telemetry so operators can trust automation in the field.</p>
+        </div>
+        <section class="market-intel" aria-labelledby="market-intel-title" data-wti-card>
+          <div class="market-status" data-wti-status>
+            <div class="status-inline">
+              <span class="status-label" data-wti-status-label>Streaming live benchmarks…</span>
+            </div>
+            <div class="status-tile">
+              <span class="label">Latest Settle</span>
+              <strong data-wti-last-price>--</strong>
+              <p class="market-note" data-wti-last-date>Awaiting market data.</p>
+            </div>
+            <div class="status-tile">
+              <span class="label">Daily Delta</span>
+              <div class="market-delta" data-wti-delta>Δ --</div>
+              <p class="market-note">Change vs prior settlement.</p>
+            </div>
+            <div class="status-tile">
+              <span class="label">Next 7-Day Outlook</span>
+              <strong data-wti-forecast>--</strong>
+              <p class="market-note" data-wti-forecast-note>Generating projection...</p>
+            </div>
+            <div class="status-tile">
+              <span class="label">Last Forecast Accuracy</span>
+              <strong class="market-delta" data-wti-accuracy>Δ --</strong>
+              <p class="market-note" data-wti-accuracy-note>Measuring variance...</p>
+            </div>
+          </div>
+          <figure class="market-chart" data-wti-chart>
+            <header style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+              <div>
+                <h3 id="wti-chart-title">Short-term WTI Trajectory</h3>
+                <p class="market-note" data-wti-chart-note>Awaiting market feed to build the curve.</p>
+              </div>
+            </header>
+            <div class="chart-frame">
+              <svg data-wti-chart-svg viewBox="0 0 1000 400" role="img" aria-labelledby="wti-chart-title" preserveAspectRatio="none"></svg>
+            </div>
+            <figcaption id="wti-chart-caption" data-wti-chart-caption>Once live, the hybrid regression and momentum blend will render here.</figcaption>
+          </figure>
+        </section>
+      </section>
+
+      <section id="proof" aria-label="Proof points">
+        <div class="proof-strip">
+          <article class="proof-card" tabindex="0">
+            <span>Pilot Metric</span>
+            <strong>MAE 2.7%</strong>
+            <em>30-day rolling error against custody transfer validated daily.</em>
+          </article>
+          <article class="proof-card" tabindex="0">
+            <span>Latency</span>
+            <strong>&lt; 90 sec</strong>
+            <em>Ingest-to-forecast path pinned by edge aggregation buffers.</em>
+          </article>
+          <article class="proof-card" tabindex="0">
+            <span>Uptime</span>
+            <strong>99.8%</strong>
+            <em>Active-active compute with auto failover across Texas regions.</em>
+          </article>
+          <article class="proof-card" tabindex="0">
+            <span>Lineage Hash</span>
+            <strong>sha256-verified</strong>
+            <em>Signed artifacts and reconciled backtests for every deployment.</em>
+          </article>
+        </div>
+      </section>
+
+      <section id="product" aria-labelledby="product-title">
+        <div class="section-heading">
+          <h2 id="product-title">Flagship Intelligence Modules</h2>
+          <p>Praeco unifies physics-informed ensembles, live SCADA reads, and custody transfer telemetry into a single predictive layer.</p>
+        </div>
+        <div class="product-grid">
+          <article class="product-card">
+            <h3>Predictive Outputs</h3>
+            <p>Pad-level production forecasts, decline curves, and probabilistic intervals tuned for completions and lift-planning teams.</p>
+          </article>
+          <article class="product-card">
+            <h3>Real-time Throughput</h3>
+            <p>Visibility from wellhead to custody transfer with pressure, volume, and event detection dashboards tailored to control rooms.</p>
+          </article>
+          <article class="product-card">
+            <h3>Industrial-grade Integration</h3>
+            <p>Read-only SCADA and historian adapters, reconciled audit trails, and controls-safe APIs engineered for regulated operations.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="basins" aria-labelledby="basins-title">
+        <div class="section-heading">
+          <h2 id="basins-title">Texas-first, U.S.-next</h2>
+          <p>Deploying with Texas operators before expanding to nationwide basins and downstream logistics in 2027.</p>
+        </div>
+        <div class="basin-grid">
+          <article class="basin-card">
+            <h3>Permian Basin</h3>
+            <p>Midland &amp; Delaware sub-basins with pad clusters prioritized for associated gas balancing.</p>
+            <div class="chip-row">
+              <span class="chip">Midland</span>
+              <span class="chip">Central Basin</span>
+              <span class="chip">New Mexico</span>
+            </div>
+          </article>
+          <article class="basin-card">
+            <h3>Eagle Ford</h3>
+            <p>Liquids-rich windows harmonized with midstream pressure management and trucking logistics.</p>
+            <div class="chip-row">
+              <span class="chip">La Salle</span>
+              <span class="chip">Karnes</span>
+              <span class="chip">Dimmit</span>
+            </div>
+          </article>
+          <article class="basin-card">
+            <h3>Delaware</h3>
+            <p>High-variance wells instrumented with rapid reforecasting and compression-aware throughput views.</p>
+            <div class="chip-row">
+              <span class="chip">Loving</span>
+              <span class="chip">Reeves</span>
+              <span class="chip">Wolfcamp</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="architecture" aria-labelledby="architecture-title">
+        <div class="section-heading">
+          <h2 id="architecture-title">Encrypted, Audited, Redundant</h2>
+          <p>Clear handoffs from ingest to dashboards keep Praeco accountable from model lineage to operator actions.</p>
+        </div>
+        <div class="architecture-grid architecture-flow">
+          <article class="architecture-node">
+            <h3>Ingest</h3>
+            <p>Edge collectors stream SCADA, historian, and market feeds via signed TLS tunnels.</p>
+          </article>
+          <article class="architecture-node">
+            <h3>Normalize / QA</h3>
+            <p>Schema harmonization, unit normalization, and anomaly gating before feature entry.</p>
+          </article>
+          <article class="architecture-node">
+            <h3>Feature Store</h3>
+            <p>Temporal joins with completions, weather, and grid demand history under version control.</p>
+          </article>
+          <article class="architecture-node">
+            <h3>Ensembles</h3>
+            <p>Hybrid physics + ML ensembles run on GPU-backed clusters with Bayesian calibration.</p>
+          </article>
+          <article class="architecture-node">
+            <h3>Forecasts / PIs</h3>
+            <p>Quantile forecasts with uncertainty bands streaming into throughput reconciliation.</p>
+          </article>
+          <article class="architecture-node">
+            <h3>Reconciliation / Throughput Views</h3>
+            <p>Custody transfer comparisons and alerting for variances, flaring, and power quality.</p>
+          </article>
+          <article class="architecture-node">
+            <h3>Dashboards / Alerts</h3>
+            <p>Role-based consoles, API webhooks, and Houston SRE on-call coverage.</p>
+          </article>
+        </div>
+        <div class="callouts">
+          <article class="callout-card">
+            <h3>Security</h3>
+            <p>Least-privilege access, hardware-backed keys, and signed artifacts across the pipeline.</p>
+          </article>
+          <article class="callout-card">
+            <h3>SRE</h3>
+            <p>Backpressure-aware streaming, idempotent replays, and SLIs tuned for field resilience.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="vision" aria-labelledby="vision-title">
+        <div class="section-heading">
+          <h2 id="vision-title">The Predictive Layer for U.S. Energy</h2>
+          <p>Grounded in Houston, engineered for the operators that keep North America supplied.</p>
+        </div>
+        <div class="timeline">
+          <article class="timeline-item">
+            <span class="timeline-year">2025</span>
+            <h3>Texas Launch</h3>
+            <p>Production pilots with Permian and Eagle Ford partners, telemetry hardening, and custody transfer validation.</p>
+          </article>
+          <article class="timeline-item">
+            <span class="timeline-year">2026</span>
+            <h3>Hardening &amp; Logistics</h3>
+            <p>Feature store scale-out, operations automation, and integration with midstream logistics and power markets.</p>
+          </article>
+          <article class="timeline-item">
+            <span class="timeline-year">2027</span>
+            <h3>Nationwide Rollout</h3>
+            <p>Expansion into Rockies, Mid-Con, and Gulf Coast hubs with nationwide throughput visibility.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="contact" aria-labelledby="closing-title">
+        <div class="contact-card">
+          <div class="section-heading" style="margin-bottom:var(--space-sm);">
+            <h2 id="closing-title">Predicting Production. Powering Throughput.</h2>
+            <p>Let Houston’s energy AI team brief your operations leadership.</p>
+          </div>
+          <form class="contact-form" id="contact-form" action="mailto:intel@praeco.ai" method="post">
+            <div class="form-row">
+              <label for="contact-name">Name</label>
+              <input id="contact-name" name="name" type="text" autocomplete="name" required />
+            </div>
+            <div class="form-row">
+              <label for="contact-email">Email</label>
+              <input id="contact-email" name="email" type="email" autocomplete="email" required />
+            </div>
+            <div class="form-row">
+              <label for="contact-notes">Notes</label>
+              <textarea id="contact-notes" name="notes" placeholder="Tell us about your basins, assets, or throughput targets."></textarea>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;">
+              <button class="cta-primary" id="cta-bottom" type="submit">Request Early Access</button>
+              <p style="margin:0;font-size:0.85rem;color:var(--color-muted);">Or email <a href="mailto:intel@praeco.ai">intel@praeco.ai</a></p>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+      &copy; 2025 Praeco, Houston. All rights reserved. · <a href="#product">Product</a> · <a href="#basins">Basins</a> · <a href="#architecture">Architecture</a> · <a href="#contact">Contact</a>
+    </footer>
+  </div>
 
   <div class="modal" id="cta-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-card">
       <h3 id="modal-title">Early Access Request</h3>
       <p>Praeco's early access program opens soon. Drop us a line at <a href="mailto:intel@praeco.ai">intel@praeco.ai</a> and we'll schedule a briefing.</p>
-      <button type="button" id="modal-close">Close</button>
+      <button class="cta-primary" type="button" id="modal-close">Close</button>
     </div>
   </div>
 
   <script>
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const modal = document.getElementById('cta-modal');
-    const openButtons = [document.getElementById('cta-main'), document.getElementById('cta-bottom')];
+    const openButtons = [document.getElementById('cta-main'), document.getElementById('cta-bottom'), document.getElementById('nav-cta')].filter(Boolean);
     const closeButton = document.getElementById('modal-close');
 
     const openModal = () => {
@@ -1143,24 +1127,118 @@
       modal.setAttribute('aria-hidden', 'true');
     };
 
-    openButtons.forEach(btn => btn.addEventListener('click', openModal));
-    closeButton.addEventListener('click', closeModal);
+    openButtons.forEach((btn) => btn.addEventListener('click', (event) => {
+      if (btn.type === 'button') {
+        event.preventDefault();
+      }
+      openModal();
+    }));
+
+    closeButton?.addEventListener('click', closeModal);
+
     modal.addEventListener('click', (event) => {
       if (event.target === modal) {
         closeModal();
       }
     });
+
     window.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && modal.classList.contains('active')) {
         closeModal();
       }
     });
 
+    const smoothScrollLinks = document.querySelectorAll('a[href^="#"]');
+    smoothScrollLinks.forEach((link) => {
+      link.addEventListener('click', (event) => {
+        const targetId = link.getAttribute('href')?.substring(1);
+        const targetEl = targetId ? document.getElementById(targetId) : null;
+        if (targetEl) {
+          event.preventDefault();
+          const yOffset = -32;
+          const y = targetEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+        }
+      });
+    });
+
+    const heroCanvas = document.getElementById('hero-wave');
+    if (heroCanvas && !prefersReducedMotion) {
+      const ctx = heroCanvas.getContext('2d');
+      let animationFrame;
+      const deviceRatio = window.devicePixelRatio || 1;
+      const amplitude = 28;
+      const wavelength = 420;
+      const speed = 0.015;
+      const gradientStops = [
+        { offset: 0, color: 'rgba(0, 167, 255, 0.08)' },
+        { offset: 0.5, color: 'rgba(0, 255, 209, 0.18)' },
+        { offset: 1, color: 'rgba(0, 167, 255, 0.04)' }
+      ];
+      let tick = 0;
+
+      const resizeCanvas = () => {
+        const rect = heroCanvas.getBoundingClientRect();
+        heroCanvas.width = rect.width * deviceRatio;
+        heroCanvas.height = rect.height * deviceRatio;
+        ctx.setTransform(deviceRatio, 0, 0, deviceRatio, 0, 0);
+      };
+
+      const draw = () => {
+        const rect = heroCanvas.getBoundingClientRect();
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        const gradient = ctx.createLinearGradient(0, 0, rect.width, rect.height);
+        gradientStops.forEach(({ offset, color }) => gradient.addColorStop(offset, color));
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        const baseY = rect.height * 0.72;
+        ctx.moveTo(0, rect.height);
+        ctx.lineTo(0, baseY);
+        for (let x = 0; x <= rect.width; x += 4) {
+          const angle = (tick * speed + x) / wavelength;
+          const y = baseY + Math.sin(angle) * amplitude * Math.cos(angle * 0.8);
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(rect.width, rect.height);
+        ctx.closePath();
+        ctx.fill();
+        tick += 1;
+        animationFrame = window.requestAnimationFrame(draw);
+      };
+
+      const debouncedResize = () => {
+        window.cancelAnimationFrame(animationFrame);
+        resizeCanvas();
+        draw();
+      };
+
+      resizeCanvas();
+      draw();
+      window.addEventListener('resize', debouncedResize, { passive: true });
+      window.addEventListener('orientationchange', debouncedResize);
+    }
+
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+      contactForm.addEventListener('submit', (event) => {
+        const form = event.currentTarget;
+        const data = new FormData(form);
+        const name = data.get('name');
+        const email = data.get('email');
+        const notes = data.get('notes');
+        const subject = encodeURIComponent('Praeco Early Access Inquiry');
+        const body = encodeURIComponent(`Name: ${name}
+Email: ${email}
+Notes: ${notes}`);
+        form.action = `mailto:intel@praeco.ai?subject=${subject}&body=${body}`;
+      });
+    }
+
     const wtiSection = document.querySelector('[data-wti-card]');
     if (wtiSection) {
       const WTI_DATA_URL = 'https://raw.githubusercontent.com/datasets/oil-prices/master/data/wti-daily.csv';
-      const statusEl = wtiSection.querySelector('[data-wti-status] span');
       const statusWrapper = wtiSection.querySelector('[data-wti-status]');
+      const statusLabelEl = wtiSection.querySelector('[data-wti-status-label]');
       const lastPriceEl = wtiSection.querySelector('[data-wti-last-price]');
       const lastDateEl = wtiSection.querySelector('[data-wti-last-date]');
       const deltaEl = wtiSection.querySelector('[data-wti-delta]');
@@ -1173,7 +1251,7 @@
       const chartNoteEl = chartEl?.querySelector('[data-wti-chart-note]');
       const chartCaptionEl = chartEl?.querySelector('[data-wti-chart-caption]');
 
-      const CHART_ACTUAL_DAYS = 5;
+      const CHART_ACTUAL_DAYS = 30;
       const CHART_FORECAST_DAYS = 7;
       const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -1181,6 +1259,8 @@
         statusWrapper.setAttribute('role', 'status');
         statusWrapper.setAttribute('aria-live', 'polite');
       }
+
+      const parseDate = (iso) => new Date(`${iso}T12:00:00Z`);
 
       const dateFormatter = new Intl.DateTimeFormat('en-US', {
         weekday: 'long',
@@ -1218,16 +1298,11 @@
       const handleError = (error) => {
         console.error('Unable to load WTI data', error);
         wtiSection.classList.add('is-error');
-        if (statusEl) {
-          statusEl.textContent = 'Live feed unavailable';
+        if (statusWrapper) {
+          statusWrapper.setAttribute('aria-busy', 'false');
         }
-        if (deltaEl) {
-          deltaEl.textContent = 'Δ --';
-          deltaEl.classList.remove('negative');
-        }
-        if (accuracyEl) {
-          accuracyEl.textContent = 'Δ --';
-          accuracyEl.classList.remove('negative');
+        if (statusLabelEl) {
+          statusLabelEl.textContent = 'Live feed unavailable';
         }
         if (lastPriceEl) {
           lastPriceEl.textContent = '--';
@@ -1235,254 +1310,163 @@
         if (lastDateEl) {
           lastDateEl.textContent = 'Unable to load WTI benchmark pricing right now.';
         }
+        if (deltaEl) {
+          deltaEl.textContent = 'Δ --';
+          deltaEl.classList.remove('negative');
+        }
         if (forecastEl) {
           forecastEl.textContent = '--';
         }
         if (forecastNoteEl) {
-          forecastNoteEl.textContent = 'We will refresh the projection once pricing is back online.';
+          forecastNoteEl.textContent = 'Forecast paused until pricing resumes.';
+        }
+        if (accuracyEl) {
+          accuracyEl.textContent = 'Δ --';
+          accuracyEl.classList.remove('negative');
         }
         if (accuracyNoteEl) {
-          accuracyNoteEl.textContent = 'Forecast accuracy tracking is paused until we have the latest settlement.';
+          accuracyNoteEl.textContent = 'Accuracy pending next settlement.';
         }
         if (chartNoteEl) {
-          chartNoteEl.textContent = 'Price visualization unavailable until the feed returns.';
+          chartNoteEl.textContent = 'Unable to retrieve historical WTI settlements at the moment.';
         }
         if (chartCaptionEl) {
-          chartCaptionEl.textContent = 'The hybrid regression chart will render once pricing updates resume.';
+          chartCaptionEl.textContent = 'The visualization will refresh once the feed returns.';
         }
         clearChart();
       };
 
-      const addDays = (isoDate, amount) => {
-        const date = new Date(`${isoDate}T00:00:00Z`);
-        date.setUTCDate(date.getUTCDate() + amount);
-        return date;
+      const addDays = (isoDate, days) => {
+        const date = parseDate(isoDate);
+        date.setUTCDate(date.getUTCDate() + days);
+        return new Date(date);
       };
 
       const renderChart = (actualSeries, forecastSeries) => {
-        if (!chartSvg || !Array.isArray(actualSeries) || actualSeries.length === 0) {
-          return;
-        }
-
-        const combinedSeries = [...actualSeries, ...forecastSeries];
-        if (combinedSeries.length < 2) {
-          clearChart();
-          return;
-        }
-
-        chartSvg.replaceChildren();
-
-        const width = 600;
-        const height = 260;
-        const padding = { top: 24, right: 28, bottom: 48, left: 68 };
-        const innerWidth = width - padding.left - padding.right;
-        const innerHeight = height - padding.top - padding.bottom;
-        const totalSegments = combinedSeries.length - 1 || 1;
-
-        chartSvg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-        chartSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-
-        const prices = combinedSeries.map((point) => point.price);
-        const minPrice = Math.min(...prices);
-        const maxPrice = Math.max(...prices);
-        const buffer = Math.max((maxPrice - minPrice) * 0.12, 1.25);
-        const domainMin = minPrice - buffer;
-        const domainMax = maxPrice + buffer;
-        const domainRange = domainMax - domainMin || 1;
-
-        const xScale = (index) => padding.left + (index / totalSegments) * innerWidth;
-        const yScale = (value) => padding.top + innerHeight - ((value - domainMin) / domainRange) * innerHeight;
-
-        const latestActual = actualSeries[actualSeries.length - 1];
-        const finalForecast = forecastSeries[forecastSeries.length - 1];
-
-        const titleNode = document.createElementNS(SVG_NS, 'title');
-        if (finalForecast) {
-          titleNode.textContent = `WTI closes through ${statusFormatter.format(latestActual.date)} with projection pointing to ${formatPrice(finalForecast.price)} on ${statusFormatter.format(finalForecast.date)}.`;
-        } else {
-          titleNode.textContent = `WTI closes through ${statusFormatter.format(latestActual.date)}.`;
-        }
-        const descNode = document.createElementNS(SVG_NS, 'desc');
-        descNode.textContent = 'Solid line reflects observed settlements; dashed line applies Praeco\'s momentum-regression blend for the next week.';
-        chartSvg.append(titleNode, descNode);
+        if (!chartSvg) return;
+        clearChart();
+        const width = 1000;
+        const height = 400;
+        const padding = { top: 32, right: 48, bottom: 56, left: 72 };
+        const allPoints = [...actualSeries, ...forecastSeries];
+        if (!allPoints.length) return;
+        const prices = allPoints.map((p) => p.price);
+        const minPrice = Math.min(...prices) * 0.98;
+        const maxPrice = Math.max(...prices) * 1.02;
+        const yScale = (price) => {
+          const ratio = (price - minPrice) / (maxPrice - minPrice || 1);
+          return height - padding.bottom - ratio * (height - padding.top - padding.bottom);
+        };
+        const xScale = (index, total) => {
+          const ratio = total > 1 ? index / (total - 1) : 0;
+          return padding.left + ratio * (width - padding.left - padding.right);
+        };
 
         const gridGroup = document.createElementNS(SVG_NS, 'g');
         gridGroup.setAttribute('class', 'chart-grid');
+        const horizontalLines = 4;
+        for (let i = 0; i <= horizontalLines; i += 1) {
+          const y = padding.top + ((height - padding.top - padding.bottom) / horizontalLines) * i;
+          const path = document.createElementNS(SVG_NS, 'path');
+          path.setAttribute('d', `M${padding.left} ${y} H${width - padding.right}`);
+          gridGroup.appendChild(path);
+        }
+        chartSvg.appendChild(gridGroup);
 
         const axisGroup = document.createElementNS(SVG_NS, 'g');
         axisGroup.setAttribute('class', 'chart-axis');
+        const axisPath = document.createElementNS(SVG_NS, 'path');
+        axisPath.setAttribute('d', `M${padding.left} ${padding.top} V${height - padding.bottom}`);
+        axisGroup.appendChild(axisPath);
 
         const yTicks = 4;
         for (let i = 0; i <= yTicks; i += 1) {
-          const valueRatio = i / yTicks;
-          const value = domainMin + domainRange * valueRatio;
-          const y = yScale(value);
-          const line = document.createElementNS(SVG_NS, 'line');
-          line.setAttribute('x1', padding.left);
-          line.setAttribute('x2', width - padding.right);
-          line.setAttribute('y1', y);
-          line.setAttribute('y2', y);
-          gridGroup.appendChild(line);
-
+          const price = minPrice + ((maxPrice - minPrice) / yTicks) * i;
+          const y = yScale(price);
           const label = document.createElementNS(SVG_NS, 'text');
-          label.setAttribute('x', padding.left - 12);
+          label.setAttribute('x', padding.left - 16);
           label.setAttribute('y', y + 4);
           label.setAttribute('text-anchor', 'end');
-          label.setAttribute('class', 'chart-axis-label');
-          label.textContent = formatPrice(value);
+          label.textContent = formatPrice(price);
           axisGroup.appendChild(label);
         }
 
-        const axisBaseline = padding.top + innerHeight;
-        const xAxis = document.createElementNS(SVG_NS, 'line');
-        xAxis.setAttribute('x1', padding.left);
-        xAxis.setAttribute('x2', width - padding.right);
-        xAxis.setAttribute('y1', axisBaseline);
-        xAxis.setAttribute('y2', axisBaseline);
-        xAxis.setAttribute('class', 'chart-axis-line');
-
-        const tickIndexes = new Set([0, actualSeries.length - 1, combinedSeries.length - 1]);
-        if (forecastSeries.length > 0) {
-          tickIndexes.add(actualSeries.length);
-          tickIndexes.add(actualSeries.length + Math.floor(forecastSeries.length / 2));
-        }
-
-        const sortedTicks = Array.from(tickIndexes)
-          .filter((index) => index >= 0 && index < combinedSeries.length)
-          .sort((a, b) => a - b);
-
-        sortedTicks.forEach((index) => {
-          const point = combinedSeries[index];
-          const x = xScale(index);
-          const tick = document.createElementNS(SVG_NS, 'line');
-          tick.setAttribute('x1', x);
-          tick.setAttribute('x2', x);
-          tick.setAttribute('y1', axisBaseline);
-          tick.setAttribute('y2', axisBaseline + 6);
-          tick.setAttribute('class', 'chart-axis-line');
-          axisGroup.appendChild(tick);
-
-          const label = document.createElementNS(SVG_NS, 'text');
-          label.setAttribute('x', x);
-          label.setAttribute('y', axisBaseline + 20);
-          label.setAttribute('text-anchor', 'middle');
-          label.setAttribute('class', 'chart-axis-label');
-          label.textContent = point?.label ?? '';
-          axisGroup.appendChild(label);
+        const xLabels = [...actualSeries, ...forecastSeries].map((point) => point.label);
+        const totalPoints = xLabels.length;
+        const xStep = Math.max(1, Math.floor(totalPoints / 6));
+        xLabels.forEach((label, index) => {
+          if (index % xStep !== 0 && index !== totalPoints - 1) return;
+          const x = xScale(index, totalPoints);
+          const text = document.createElementNS(SVG_NS, 'text');
+          text.setAttribute('x', x);
+          text.setAttribute('y', height - padding.bottom + 28);
+          text.setAttribute('text-anchor', 'middle');
+          text.textContent = label;
+          axisGroup.appendChild(text);
         });
 
-        chartSvg.append(gridGroup);
+        chartSvg.appendChild(axisGroup);
 
-        let actualPathData = '';
-        actualSeries.forEach((point, index) => {
-          actualPathData += `${index === 0 ? 'M' : 'L'}${xScale(index)} ${yScale(point.price)} `;
-        });
+        const pathFromSeries = (series, offset = 0) => {
+          if (!series.length) return '';
+          return series
+            .map((point, index) => {
+              const x = xScale(index + offset, actualSeries.length + forecastSeries.length);
+              const y = yScale(point.price);
+              return `${index === 0 ? 'M' : 'L'}${x} ${y}`;
+            })
+            .join(' ');
+        };
+
         const actualPath = document.createElementNS(SVG_NS, 'path');
-        actualPath.setAttribute('d', actualPathData.trim());
-        actualPath.setAttribute('class', 'line-actual');
+        actualPath.setAttribute('class', 'chart-line-actual');
+        actualPath.setAttribute('d', pathFromSeries(actualSeries));
         chartSvg.appendChild(actualPath);
 
-        if (forecastSeries.length > 0) {
-          let forecastPathData = `M${xScale(actualSeries.length - 1)} ${yScale(actualSeries[actualSeries.length - 1].price)}`;
-          forecastSeries.forEach((point, index) => {
-            const xIndex = actualSeries.length + index;
-            forecastPathData += ` L${xScale(xIndex)} ${yScale(point.price)}`;
-          });
-          const forecastPath = document.createElementNS(SVG_NS, 'path');
-          forecastPath.setAttribute('d', forecastPathData.trim());
-          forecastPath.setAttribute('class', 'line-forecast');
-          chartSvg.appendChild(forecastPath);
-
-          const divider = document.createElementNS(SVG_NS, 'line');
-          const dividerX = xScale(actualSeries.length - 1);
-          divider.setAttribute('x1', dividerX);
-          divider.setAttribute('x2', dividerX);
-          divider.setAttribute('y1', padding.top);
-          divider.setAttribute('y2', axisBaseline);
-          divider.setAttribute('class', 'chart-divider');
-          chartSvg.appendChild(divider);
-        }
-
-        const pointGroup = document.createElementNS(SVG_NS, 'g');
-        actualSeries.forEach((point, index) => {
-          const circle = document.createElementNS(SVG_NS, 'circle');
-          circle.setAttribute('cx', xScale(index));
-          circle.setAttribute('cy', yScale(point.price));
-          circle.setAttribute('r', 4);
-          circle.setAttribute('class', 'chart-point actual');
-          circle.setAttribute('aria-hidden', 'true');
-          pointGroup.appendChild(circle);
-        });
-        forecastSeries.forEach((point, index) => {
-          const circle = document.createElementNS(SVG_NS, 'circle');
-          circle.setAttribute('cx', xScale(actualSeries.length + index));
-          circle.setAttribute('cy', yScale(point.price));
-          circle.setAttribute('r', 4);
-          circle.setAttribute('class', 'chart-point forecast');
-          circle.setAttribute('aria-hidden', 'true');
-          pointGroup.appendChild(circle);
-        });
-        chartSvg.appendChild(pointGroup);
-
-        axisGroup.appendChild(xAxis);
-        chartSvg.appendChild(axisGroup);
+        const forecastPath = document.createElementNS(SVG_NS, 'path');
+        forecastPath.setAttribute('class', 'chart-line-forecast');
+        forecastPath.setAttribute('d', pathFromSeries(forecastSeries, actualSeries.length));
+        chartSvg.appendChild(forecastPath);
       };
 
       const loadWTIData = async () => {
         try {
+          if (statusWrapper) {
+            statusWrapper.setAttribute('aria-busy', 'true');
+          }
+          if (statusLabelEl) {
+            statusLabelEl.textContent = 'Loading WTI settlements…';
+          }
           const response = await fetch(WTI_DATA_URL, { cache: 'no-store' });
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
           }
-          const text = await response.text();
-          const lines = text.trim().split('\n').filter((line) => line && !line.startsWith('Date'));
-          if (lines.length < 3) {
-            throw new Error('Not enough historical pricing data');
-          }
-
-          const entriesSorted = lines
-            .slice(-80)
-            .map((line) => {
-              const [date, price] = line.split(',');
-              const value = parseFloat(price);
-              if (!date || Number.isNaN(value)) {
-                return undefined;
-              }
-              return { date, price: value };
-            })
-            .filter(Boolean)
-            .sort((a, b) => new Date(`${a.date}T00:00:00Z`) - new Date(`${b.date}T00:00:00Z`));
-
-          const entries = [];
-          const seenDates = new Set();
-          entriesSorted.forEach((entry) => {
-            if (!seenDates.has(entry.date)) {
-              seenDates.add(entry.date);
-              entries.push(entry);
-            }
-          });
+          const csvText = await response.text();
+          const rows = csvText.trim().split('\n');
+          const entries = rows.slice(1).map((row) => {
+            const [date, price] = row.split(',');
+            return { date, price: Number.parseFloat(price) };
+          }).filter((entry) => Number.isFinite(entry.price));
 
           if (entries.length < Math.max(CHART_ACTUAL_DAYS + 2, 3)) {
-            throw new Error('Unable to parse sufficient WTI pricing data');
+            throw new Error('Insufficient WTI data');
           }
 
+          entries.sort((a, b) => new Date(a.date) - new Date(b.date));
           const latest = entries[entries.length - 1];
           const previous = entries[entries.length - 2];
           const prior = entries[entries.length - 3];
-
           const dailyDelta = latest.price - previous.price;
           const dailyPercent = (dailyDelta / previous.price) * 100;
           const forecastTomorrow = latest.price + dailyDelta;
           const forecastToday = previous.price + (previous.price - prior.price);
           const accuracyDelta = latest.price - forecastToday;
           const accuracyPercent = (accuracyDelta / latest.price) * 100;
-          const tomorrowDate = addDays(latest.date, 1);
-
           if (lastPriceEl) {
             lastPriceEl.textContent = formatPrice(latest.price);
           }
           if (lastDateEl) {
-            lastDateEl.textContent = `${dateFormatter.format(new Date(`${latest.date}T00:00:00Z`))}`;
+            lastDateEl.textContent = `${dateFormatter.format(parseDate(latest.date))}`;
           }
           setDeltaBlock(deltaEl, dailyDelta, dailyPercent);
 
@@ -1490,7 +1474,7 @@
             forecastEl.textContent = formatPrice(forecastTomorrow);
           }
           if (forecastNoteEl) {
-            forecastNoteEl.textContent = `Momentum outlook for ${dateFormatter.format(tomorrowDate)} using ${formatDelta(dailyDelta)} delta.`;
+            forecastNoteEl.textContent = `Seven-day hybrid using last 30 settlements as of ${statusFormatter.format(parseDate(latest.date))}.`;
           }
 
           if (accuracyEl) {
@@ -1504,17 +1488,18 @@
             accuracyNoteEl.textContent = `${comparison} Market ${direction}.`;
           }
 
-          if (statusEl) {
-            statusEl.textContent = `Updated ${statusFormatter.format(new Date(`${latest.date}T00:00:00Z`))}`;
-          }
           if (statusWrapper) {
-            statusWrapper.title = `Latest WTI close recorded on ${dateFormatter.format(new Date(`${latest.date}T00:00:00Z`))}`;
+            statusWrapper.setAttribute('aria-busy', 'false');
+            statusWrapper.title = `Latest WTI close recorded on ${dateFormatter.format(parseDate(latest.date))}`;
+          }
+          if (statusLabelEl) {
+            statusLabelEl.textContent = `Updated ${statusFormatter.format(parseDate(latest.date))}`;
           }
 
           const chartActual = entries
             .slice(-CHART_ACTUAL_DAYS)
             .map((entry) => {
-              const date = new Date(`${entry.date}T00:00:00Z`);
+              const date = parseDate(entry.date);
               return {
                 isoDate: entry.date,
                 date,
@@ -1566,7 +1551,7 @@
           if (chartNoteEl) {
             if (chartForecast.length > 0) {
               const horizonEnd = chartForecast[chartForecast.length - 1];
-              chartNoteEl.textContent = `Last five settlements through ${statusFormatter.format(chartActual[chartActual.length - 1].date)}; projection extends to ${statusFormatter.format(horizonEnd.date)}.`;
+              chartNoteEl.textContent = `Last 30 settlements through ${statusFormatter.format(parseDate(chartActual[chartActual.length - 1].isoDate))}; projection extends to ${statusFormatter.format(horizonEnd.date)}.`;
             } else {
               chartNoteEl.textContent = 'Awaiting sufficient market history to render the trajectory.';
             }
