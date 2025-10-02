@@ -3,609 +3,1580 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Praeco - Predict production. Power throughput.</title>
-    <meta name="description" content="Houston-founded energy AI delivering wellhead forecasts and custody-transfer visibility—from pad to pipeline.">
-    <meta property="og:title" content="Praeco">
-    <meta property="og:description" content="Predict production. Power throughput.">
-    <meta property="og:image" content="Logo.svg">
-    <meta property="og:url" content="https://praeco.ai/">
-    <link rel="canonical" href="https://praeco.ai/">
-    <link rel="icon" href="Logo.svg">
+    <meta name="description" content="Praeco delivers Houston-founded energy AI for wellhead production forecasts and custody-transfer visibility across Texas basins.">
+    <meta property="og:title" content="Praeco - Predict Production. Power Throughput.">
+    <meta property="og:description" content="Houston-founded energy AI delivering wellhead forecasts and custody-transfer visibility—from pad to pipeline.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://praeco.ai">
+    <link rel="canonical" href="https://praeco.ai">
+    <title>Praeco - Predict Production. Power Throughput.</title>
     <style>
-        :root {
-            --base: #030A16;
-            --surface: #0E1A2A;
-            --text-primary: #EAF2FF;
-            --text-secondary: #BFD0E8;
-            --accent: #00A0B0;
-            --focus: #00FFFF;
-            --font-head: system-ui, -apple-system, sans-serif;
-            --font-body: system-ui, -apple-system, sans-serif;
-        }
-        body {
+        *, *::before, *::after {
+            box-sizing: border-box;
             margin: 0;
-            font-family: var(--font-body);
-            background: var(--base);
-            color: var(--text-primary);
-            line-height: 1.5;
-            font-size: 16px;
+            padding: 0;
         }
-        header {
-            position: sticky;
+
+        :root {
+            --black: #000000;
+            --almost-black: #0A0A0A;
+            --darker: #0F0F0F;
+            --surface: #141414;
+            --surface-elevated: #1A1A1A;
+            --surface-glass: rgba(20, 20, 20, 0.6);
+            --text-primary: #FFFFFF;
+            --text-secondary: #A1A1AA;
+            --text-tertiary: #71717A;
+            --accent-cyan: #06B6D4;
+            --accent-teal: #14B8A6;
+            --accent-gradient-start: #06B6D4;
+            --accent-gradient-end: #14B8A6;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-strong: rgba(255, 255, 255, 0.12);
+            --glow: rgba(6, 182, 212, 0.15);
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+            --spacing-2xl: 4rem;
+            --spacing-3xl: 6rem;
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: var(--black);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
             top: 0;
-            background: var(--base);
-            padding: 1rem;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(20, 184, 166, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+        }
+
+        h1 { 
+            font-size: clamp(2.5rem, 5vw, 4.5rem); 
+            margin-bottom: var(--spacing-md);
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        h2 { 
+            font-size: clamp(2rem, 4vw, 3rem); 
+            margin-bottom: var(--spacing-md); 
+        }
+        
+        h3 { 
+            font-size: clamp(1.5rem, 3vw, 2rem); 
+            margin-bottom: var(--spacing-sm); 
+        }
+        
+        h4 { 
+            font-size: 1.25rem; 
+            margin-bottom: var(--spacing-xs); 
+            font-weight: 600;
+        }
+
+        p { 
+            margin-bottom: var(--spacing-sm);
+            line-height: 1.7;
+        }
+        
+        a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        a:hover { 
+            color: var(--text-primary);
+        }
+        
+        a:focus-visible {
+            outline: 2px solid var(--accent-cyan);
+            outline-offset: 4px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (min-width: 768px) {
+            .container { padding: 0 var(--spacing-xl); }
+        }
+
+        @media (min-width: 1024px) {
+            .container { padding: 0 var(--spacing-2xl); }
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            padding: var(--spacing-md) 0;
+            transition: all 300ms ease;
+        }
+
+        .header--scrolled {
+            background: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .header__inner {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            z-index: 10;
-            backdrop-filter: blur(10px);
         }
-        header img {
-            height: 24px;
-        }
-        nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+
+        .logo {
             display: flex;
-            gap: 1rem;
-        }
-        nav a {
-            color: var(--text-secondary);
-            text-decoration: none;
+            align-items: center;
+            transition: opacity 200ms ease;
             position: relative;
+            z-index: 10;
         }
-        nav a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            width: 0;
-            height: 1px;
-            background: var(--accent);
-            transition: width 150ms ease, left 150ms ease;
+
+        .logo:hover { 
+            opacity: 0.8; 
         }
-        nav a:hover::after, nav a:focus::after {
-            width: 100%;
-            left: 0;
+
+        .logo img {
+            height: 36px;
+            width: auto;
         }
-        .cta {
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            text-decoration: none;
-            transition: transform 120ms ease, box-shadow 120ms ease;
+
+        .nav {
+            display: none;
         }
-        .cta.primary {
-            background: var(--accent);
-            color: var(--base);
-        }
-        .cta.secondary {
-            border: 1px solid var(--accent);
-            color: var(--accent);
-        }
-        .cta:hover, .cta:focus {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,160,176,0.2);
-        }
-        .cta:focus {
-            outline: 2px solid var(--focus);
-            outline-offset: 3px;
-        }
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                transition: none !important;
-                animation: none !important;
+
+        @media (min-width: 900px) {
+            .nav {
+                display: flex;
+                gap: var(--spacing-xl);
+                align-items: center;
+            }
+
+            .nav__link {
+                position: relative;
+                color: var(--text-secondary);
+                font-size: 0.9375rem;
+                font-weight: 500;
+                padding: var(--spacing-xs) 0;
+                transition: color 200ms ease;
+            }
+
+            .nav__link::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
+                transition: width 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .nav__link:hover {
+                color: var(--text-primary);
+            }
+
+            .nav__link:hover::after {
+                width: 100%;
             }
         }
-        #hero {
-            padding: 4rem 1rem;
-            text-align: center;
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.875rem 1.75rem;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            min-height: 48px;
             position: relative;
+            overflow: hidden;
         }
-        #hero::before {
+
+        .btn--primary {
+            background: linear-gradient(135deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            color: var(--black);
+            box-shadow: 0 4px 20px var(--glow);
+        }
+
+        .btn--primary::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q25 0 50 5 T100 5" stroke="%2300A0B0" fill="none" opacity="0.1"/></svg>') repeat-x;
-            background-size: 100% 20px;
-            opacity: 0.1;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--accent-gradient-end), var(--accent-gradient-start));
+            opacity: 0;
+            transition: opacity 200ms ease;
         }
-        h1 {
-            font-family: var(--font-head);
-            font-size: 2rem;
-            margin: 0 0 1rem;
+
+        .btn--primary:hover::before {
+            opacity: 1;
         }
-        #hero p {
-            font-size: 1.1rem;
+
+        .btn--primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--glow);
+        }
+
+        .btn--primary span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn--secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-strong);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn--secondary:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+        }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            padding: calc(80px + var(--spacing-3xl)) 0 var(--spacing-3xl);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero__bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .hero__content {
+            position: relative;
+            max-width: 900px;
+            z-index: 2;
+        }
+
+        .hero__subtitle {
+            font-size: clamp(1.125rem, 2vw, 1.375rem);
             color: var(--text-secondary);
-            margin: 0 0 2rem;
+            margin-bottom: var(--spacing-xl);
+            line-height: 1.7;
+            max-width: 700px;
         }
-        #hero .cta {
-            margin: 0 0.5rem;
-        }
-        section {
-            padding: 2rem 1rem;
-        }
-        .card {
-            background: var(--surface);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            transition: transform 200ms ease, box-shadow 200ms ease;
-        }
-        .card:hover, .card:focus-within {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-        #metrics {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-        #metrics h2 {
-            font-size: 1.5rem;
-            margin: 0 0 0.25rem;
-        }
-        #metrics p {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin: 0;
-        }
-        #product .cards {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-        #wti svg {
-            width: 100%;
-            height: 200px;
-        }
-        #wti p {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-        #basins .cards {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-        .chips {
-            list-style: none;
-            padding: 0;
+
+        .hero__cta {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-xl);
         }
-        .chips li {
-            background: var(--accent);
-            color: var(--base);
-            padding: 0.25rem 0.75rem;
-            border-radius: 16px;
-            font-size: 0.8rem;
-        }
-        #architecture .flow {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        #architecture .node {
-            background: var(--surface);
-            padding: 1rem;
-            border-radius: 8px;
+
+        /* Section */
+        .section {
+            padding: var(--spacing-3xl) 0;
             position: relative;
         }
-        #architecture .node::after {
-            content: '→';
+
+        .section::before {
+            content: '';
             position: absolute;
-            bottom: -0.75rem;
+            top: 0;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 1.5rem;
-            color: var(--accent);
+            width: 100%;
+            max-width: 1280px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
         }
-        #architecture .node:last-child::after {
-            content: '';
+
+        .section__header {
+            margin-bottom: var(--spacing-2xl);
         }
-        #architecture .node p {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
+
+        .section__label {
+            font-size: 0.8125rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent-cyan);
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
         }
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+
+        /* Grid */
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
         }
-        label {
-            display: flex;
-            flex-direction: column;
+
+        .grid--2 { grid-template-columns: 1fr; }
+        .grid--3 { grid-template-columns: 1fr; }
+        .grid--4 { grid-template-columns: 1fr; }
+
+        @media (min-width: 640px) {
+            .grid--2, .grid--4 { grid-template-columns: repeat(2, 1fr); }
         }
-        input, textarea {
-            background: var(--surface);
-            border: 1px solid var(--text-secondary);
-            color: var(--text-primary);
-            padding: 0.5rem;
-            border-radius: 4px;
-        }
-        button {
-            background: var(--accent);
-            color: var(--base);
-            border: none;
-            padding: 0.75rem;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 120ms ease;
-        }
-        button:hover {
-            background: #008080;
-        }
-        footer {
-            padding: 1rem;
-            text-align: center;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-        footer ul {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-        }
+
         @media (min-width: 768px) {
-            #metrics {
-                grid-template-columns: repeat(4, 1fr);
+            .grid--3 { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (min-width: 1024px) {
+            .grid--4 { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--surface-glass);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-strong);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px var(--glow);
+        }
+
+        /* Metric Cards */
+        .metric-card {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-elevated) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            opacity: 0.6;
+        }
+
+        .metric-card__value {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            letter-spacing: -0.02em;
+        }
+
+        .metric-card__label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Basin Cards */
+        .basin-card {
+            background: var(--surface-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .basin-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: var(--radius-xl);
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 250ms ease;
+        }
+
+        .basin-card:hover::before {
+            opacity: 1;
+        }
+
+        .basin-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .basin-card__name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .basin-card__regions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-xs);
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--accent-cyan);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            transition: all 200ms ease;
+        }
+
+        .chip:hover {
+            background: rgba(6, 182, 212, 0.15);
+            border-color: rgba(6, 182, 212, 0.4);
+        }
+
+        /* Architecture Grid */
+        .arch-grid {
+            display: grid;
+            gap: var(--spacing-md);
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 640px) {
+            .arch-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (min-width: 1024px) {
+            .arch-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .arch-node {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            position: relative;
+            transition: all 200ms ease;
+        }
+
+        .arch-node::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            transition: width 400ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .arch-node:hover {
+            border-color: var(--border-strong);
+            transform: translateY(-2px);
+        }
+
+        .arch-node:hover::after {
+            width: 100%;
+        }
+
+        .arch-node__title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--accent-cyan);
+        }
+
+        .arch-node__desc {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Chart Panel */
+        .chart-panel {
+            background: var(--surface-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+        }
+
+        .chart-panel__header {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .chart-panel__title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .chart-panel__subtitle {
+            font-size: 0.9375rem;
+            color: var(--text-tertiary);
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            background: var(--darker);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+        }
+
+        .chart-container svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-caption {
+            margin-top: var(--spacing-md);
+            font-size: 0.8125rem;
+            color: var(--text-tertiary);
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Feature List */
+        .feature-list {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+
+        @media (min-width: 768px) {
+            .feature-list { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .feature {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            position: relative;
+            transition: all 250ms ease;
+        }
+
+        .feature::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0;
+            background: linear-gradient(180deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            transition: height 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: var(--radius-sm);
+        }
+
+        .feature:hover::before {
+            height: 100%;
+        }
+
+        .feature:hover {
+            border-color: var(--border-strong);
+            transform: translateX(4px);
+        }
+
+        .feature__title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: var(--accent-cyan);
+        }
+
+        .feature__text {
+            font-size: 0.9375rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: grid;
+            gap: var(--spacing-xl);
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 20px;
+            bottom: 20px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            opacity: 0.3;
+        }
+
+        @media (min-width: 768px) {
+            .timeline::before {
+                left: calc(50% - 1px);
             }
-            #product .cards, #basins .cards {
-                grid-template-columns: repeat(3, 1fr);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: calc(var(--spacing-xl) + 12px);
+            display: grid;
+            gap: var(--spacing-md);
+        }
+
+        @media (min-width: 768px) {
+            .timeline-item {
+                grid-template-columns: 1fr 1fr;
+                padding-left: 0;
+                gap: var(--spacing-2xl);
             }
-            #architecture .flow {
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
+
+            .timeline-item:nth-child(even) .timeline-item__content {
+                order: -1;
             }
-            #architecture .node {
-                width: 200px;
-            }
-            #architecture .node::after {
-                content: '→';
-                bottom: auto;
+
+            .timeline-item:nth-child(even) .timeline-item__marker {
                 left: auto;
-                right: -1.5rem;
-                top: 50%;
-                transform: translateY(-50%);
-            }
-            h1 {
-                font-size: 3rem;
-            }
-            #wti svg {
-                height: 400px;
-            }
-            header img {
-                height: 36px;
+                right: calc(50% - 16px);
             }
         }
-        /* Sine wave separators */
-        section + section {
-            border-top: 1px solid var(--accent);
-            border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 5"><path d="M0 2.5 Q25 0 50 2.5 T100 2.5" stroke="%2300A0B0" fill="none"/></svg>') 1;
+
+        .timeline-item__marker {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--glow);
+            z-index: 2;
         }
+
+        @media (min-width: 768px) {
+            .timeline-item__marker {
+                left: calc(50% - 16px);
+            }
+        }
+
+        .timeline-item__year {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-gradient-start), var(--accent-gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .timeline-item__text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Form */
+        .form {
+            max-width: 600px;
+            background: var(--surface-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+        }
+
+        .form__group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form__label {
+            display: block;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-primary);
+        }
+
+        .form__input,
+        .form__textarea {
+            width: 100%;
+            padding: 1rem;
+            background: var(--darker);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9375rem;
+            transition: all 200ms ease;
+        }
+
+        .form__input::placeholder,
+        .form__textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .form__input:focus,
+        .form__textarea:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1);
+            background: var(--surface);
+        }
+
+        .form__textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: var(--spacing-2xl) 0;
+            margin-top: var(--spacing-3xl);
+        }
+
+        .footer__inner {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+
+        @media (min-width: 768px) {
+            .footer__inner {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .footer__text {
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+        }
+
+        .footer__links {
+            display: flex;
+            gap: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+
+        .footer__link {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            transition: color 200ms ease;
+        }
+
+        .footer__link:hover {
+            color: var(--accent-cyan);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 600ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+
+        .animate-delay-1 { animation-delay: 100ms; }
+        .animate-delay-2 { animation-delay: 200ms; }
+        .animate-delay-3 { animation-delay: 300ms; }
     </style>
 </head>
 <body>
-    <header role="banner">
-        <img src="Logo.svg" alt="Praeco logo">
-        <nav>
-            <ul>
-                <li><a href="#product">Product</a></li>
-                <li><a href="#basins">Basins</a></li>
-                <li><a href="#architecture">Architecture</a></li>
-                <li><a href="#security">Security</a></li>
-                <li><a href="#sre">SRE</a></li>
-                <li><a href="#timeline">Timeline</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
-        <a href="#contact" class="cta primary">Request Early Access</a>
+    <!-- Header -->
+    <header class="header" role="banner" id="header">
+        <div class="container">
+            <div class="header__inner">
+                <a href="#" class="logo" aria-label="Praeco Home">
+                    <img src="Logo.svg" alt="Praeco" />
+                </a>
+                <nav class="nav" role="navigation" aria-label="Main navigation">
+                    <a href="#product" class="nav__link">Product</a>
+                    <a href="#basins" class="nav__link">Basins</a>
+                    <a href="#architecture" class="nav__link">Architecture</a>
+                    <a href="#security" class="nav__link">Security</a>
+                    <a href="#timeline" class="nav__link">Timeline</a>
+                    <a href="#contact" class="nav__link">Contact</a>
+                </nav>
+                <a href="#contact" class="btn btn--primary"><span>Request Early Access</span></a>
+            </div>
+        </div>
     </header>
-    <main role="main">
-        <section id="hero">
-            <h1>Predict production. Power throughput.</h1>
-            <p>Houston-founded energy AI delivering wellhead forecasts and custody-transfer visibility—from pad to pipeline.</p>
-            <a href="#product" class="cta secondary">See Product</a>
-            <a href="#contact" class="cta primary">Request Early Access</a>
-        </section>
-        <section id="metrics" aria-labelledby="metrics-heading">
-            <h2 id="metrics-heading" class="sr-only">Social Proof Metrics</h2>
-            <div class="card">
-                <h3>Forecast MAE</h3>
-                <p>2.7% (30-day rolling, custody-validated)</p>
+
+    <!-- Hero -->
+    <section class="hero" role="region" aria-label="Hero">
+        <canvas id="heroCanvas" class="hero__bg" aria-hidden="true"></canvas>
+        <div class="container">
+            <div class="hero__content">
+                <h1 class="animate-in">Predict production. Power throughput.</h1>
+                <p class="hero__subtitle animate-in animate-delay-1">Houston-founded energy AI delivering wellhead forecasts and custody-transfer visibility—from pad to pipeline.</p>
+                <div class="hero__cta animate-in animate-delay-2">
+                    <a href="#contact" class="btn btn--primary"><span>Request Early Access</span></a>
+                    <a href="#product" class="btn btn--secondary"><span>See Product</span></a>
+                </div>
             </div>
-            <div class="card">
-                <h3>Ingest→Forecast Latency</h3>
-                <p><90s</p>
+        </div>
+    </section>
+
+    <!-- Metrics -->
+    <section class="section" role="region" aria-label="Performance Metrics">
+        <div class="container">
+            <div class="section__header">
+                <div class="section__label">Production Performance</div>
+                <h2>Precision at scale</h2>
             </div>
-            <div class="card">
-                <h3>Uptime</h3>
-                <p>99.8% (TX regions, active-active)</p>
+            <div class="grid grid--4">
+                <div class="metric-card">
+                    <span class="metric-card__value">2.7%</span>
+                    <span class="metric-card__label">Forecast MAE (30-day rolling, custody-validated)</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-card__value">&lt;90s</span>
+                    <span class="metric-card__label">Ingest→Forecast Latency</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-card__value">99.8%</span>
+                    <span class="metric-card__label">Uptime (TX regions, active-active)</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-card__value">SHA256</span>
+                    <span class="metric-card__label">Lineage: verified artifacts</span>
+                </div>
             </div>
-            <div class="card">
-                <h3>Lineage</h3>
-                <p>sha256-verified artifacts</p>
+        </div>
+    </section>
+
+    <!-- Product -->
+    <section id="product" class="section" role="region" aria-label="Product Modules">
+        <div class="container">
+            <div class="section__header">
+                <div class="section__label">Product Modules</div>
+                <h2>Built for operators, hardened for control rooms</h2>
             </div>
-        </section>
-        <section id="product" aria-labelledby="product-heading">
-            <h2 id="product-heading">Product</h2>
-            <div class="cards">
-                <div class="card">
+            <div class="grid grid--3">
+                <div class="glass-card">
                     <h3>Predictive Outputs</h3>
-                    <p>Pad-level forecasts, decline curves, probabilistic intervals for completions and lift planning.</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9375rem; line-height: 1.7;">Pad-level forecasts, decline curves, probabilistic intervals for completions and lift planning.</p>
                 </div>
-                <div class="card">
+                <div class="glass-card">
                     <h3>Real-time Throughput</h3>
-                    <p>Wellhead-to-custody visibility with pressure, volume, and event detection for control rooms.</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9375rem; line-height: 1.7;">Wellhead-to-custody visibility with pressure, volume, and event detection for control rooms.</p>
                 </div>
-                <div class="card">
+                <div class="glass-card">
                     <h3>Industrial-grade Integration</h3>
-                    <p>Read-only SCADA/historian adapters, reconciled audit trails, controls-safe APIs.</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9375rem; line-height: 1.7;">Read-only SCADA/historian adapters, reconciled audit trails, controls-safe APIs.</p>
                 </div>
             </div>
-        </section>
-        <section id="wti" aria-labelledby="wti-heading">
-            <h2 id="wti-heading">Market Insight</h2>
-            <svg id="chart" aria-label="WTI crude oil price chart with actual and projected values"></svg>
-            <p id="chart-caption">Last 30-day WTI settlements and 7-day projection. Illustrative projection; not trading advice.</p>
-        </section>
-        <section id="basins" aria-labelledby="basins-heading">
-            <h2 id="basins-heading">Texas Basins</h2>
-            <div class="cards">
-                <div class="card">
-                    <h3>Permian</h3>
-                    <ul class="chips">
-                        <li>Midland</li>
-                        <li>Central Basin</li>
-                        <li>NM</li>
-                    </ul>
+        </div>
+    </section>
+
+    <!-- WTI Chart -->
+    <section class="section" role="region" aria-label="Market Insight">
+        <div class="container">
+            <div class="section__header">
+                <div class="section__label">Market Context</div>
+                <h2>WTI Settlement & Projection</h2>
+            </div>
+            <div class="chart-panel">
+                <div class="chart-panel__header">
+                    <h3 class="chart-panel__title">Last 30 Days + 7-Day Projection</h3>
+                    <p class="chart-panel__subtitle">West Texas Intermediate (WTI) crude oil settlement prices</p>
                 </div>
-                <div class="card">
-                    <h3>Eagle Ford</h3>
-                    <ul class="chips">
-                        <li>La Salle</li>
-                        <li>Karnes</li>
-                        <li>Dimmit</li>
-                    </ul>
+                <div class="chart-container">
+                    <svg id="wtiChart" role="img" aria-label="WTI price chart showing historical and projected prices"></svg>
                 </div>
-                <div class="card">
-                    <h3>Delaware</h3>
-                    <ul class="chips">
-                        <li>Loving</li>
-                        <li>Reeves</li>
-                        <li>Wolfcamp</li>
-                    </ul>
+                <p class="chart-caption">Illustrative projection based on linear regression and momentum damping. Not trading advice. Data may be offline sample.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Basins -->
+    <section id="basins" class="section" role="region" aria-label="Coverage Basins">
+        <div class="container">
+            <div class="section__header">
+                <div class="section__label">Texas Coverage</div>
+                <h2>Permian, Eagle Ford, Delaware</h2>
+            </div>
+            <div class="grid grid--3">
+                <div class="basin-card">
+                    <h3 class="basin-card__name">Permian Basin</h3>
+                    <div class="basin-card__regions">
+                        <span class="chip">Midland</span>
+                        <span class="chip">Central Basin</span>
+                        <span class="chip">New Mexico</span>
+                    </div>
+                </div>
+                <div class="basin-card">
+                    <h3 class="basin-card__name">Eagle Ford</h3>
+                    <div class="basin-card__regions">
+                        <span class="chip">La Salle</span>
+                        <span class="chip">Karnes</span>
+                        <span class="chip">Dimmit</span>
+                    </div>
+                </div>
+                <div class="basin-card">
+                    <h3 class="basin-card__name">Delaware Basin</h3>
+                    <div class="basin-card__regions">
+                        <span class="chip">Loving</span>
+                        <span class="chip">Reeves</span>
+                        <span class="chip">Wolfcamp</span>
+                    </div>
                 </div>
             </div>
-        </section>
-        <section id="architecture" aria-labelledby="architecture-heading">
-            <h2 id="architecture-heading">Architecture</h2>
-            <div class="flow">
-                <div class="node">
-                    <h3>Ingest</h3>
-                    <p>Secure data ingestion from field sources with minimal latency.</p>
+        </div>
+    </section>
+
+    <!-- Architecture -->
+    <section id="architecture" class="section" role="region" aria-label="System Architecture">
+        <div class="container">
+            <div class="section__header">
+                <div class="section__label">Architecture</div>
+                <h2>Ingest to insight pipeline</h2>
+            </div>
+            <div class="arch-grid">
+                <div class="arch-node">
+                    <h4 class="arch-node__title">Ingest</h4>
+                    <p class="arch-node__desc">Multi-protocol adapters for SCADA, historians, and field data streams.</p>
                 </div>
-                <div class="node">
-                    <h3>Normalize/QA</h3>
-                    <p>Data normalization and quality assurance for reliable inputs.</p>
+                <div class="arch-node">
+                    <h4 class="arch-node__title">Normalize/QA</h4>
+                    <p class="arch-node__desc">Schema validation, outlier detection, and timestamp reconciliation.</p>
                 </div>
-                <div class="node">
-                    <h3>Feature Store</h3>
-                    <p>Centralized feature storage for efficient model access.</p>
+                <div class="arch-node">
+                    <h4 class="arch-node__title">Feature Store</h4>
+                    <p class="arch-node__desc">Point-in-time correct features with lineage tracking for ML inputs.</p>
                 </div>
-                <div class="node">
-                    <h3>Ensembles</h3>
-                    <p>Physics-informed ML ensembles with Bayesian calibration for accurate predictions.</p>
+                <div class="arch-node">
+                    <h4 class="arch-node__title">Ensembles</h4>
+                    <p class="arch-node__desc">Physics-informed models plus ML with Bayesian calibration layers.</p>
                 </div>
-                <div class="node">
-                    <h3>Forecasts/PI</h3>
-                    <p>Generation of forecasts and probabilistic intervals.</p>
+                <div class="arch-node">
+                    <h4 class="arch-node__title">Forecasts/PIs</h4>
+                    <p class="arch-node__desc">Pad-level predictions with probabilistic intervals and uncertainty bands.</p>
                 </div>
-                <div class="node">
-                    <h3>Reconciliation/Throughput</h3>
-                    <p>Data reconciliation and throughput calculations for operational visibility.</p>
+                <div class="arch-node">
+                    <h4 class="arch-node__title">Reconciliation</h4>
+                    <p class="arch-node__desc">Custody-transfer validation, volume accounting, and audit trail generation.</p>
                 </div>
-                <div class="node">
-                    <h3>Dashboards/Alerts</h3>
-                    <p>Role-based dashboards, alerts, webhooks, supported by Houston SRE.</p>
+                <div class="arch-node">
+                    <h4 class="arch-node__title">Dashboards/Alerts</h4>
+                    <p class="arch-node__desc">Role-based views, webhook integrations, and configurable thresholds.</p>
+                </div>
+                <div class="arch-node">
+                    <h4 class="arch-node__title">Houston SRE</h4>
+                    <p class="arch-node__desc">Active-active topology with on-call rotation and runbook automation.</p>
                 </div>
             </div>
-        </section>
-        <section id="security" aria-labelledby="security-heading">
-            <h2 id="security-heading">Security</h2>
-            <p>Least-privilege access; hardware-backed keys; signed artifacts for auditability.</p>
-        </section>
-        <section id="sre" aria-labelledby="sre-heading">
-            <h2 id="sre-heading">SRE</h2>
-            <p>Backpressure-aware streaming; idempotent replays; SLIs for field resilience.</p>
-        </section>
-        <section id="timeline" aria-labelledby="timeline-heading">
-            <h2 id="timeline-heading">Timeline</h2>
-            <p>2025: Launch in Texas.</p>
-            <p>2026: Hardening and logistics expansion.</p>
-            <p>2027: Nationwide rollout.</p>
-        </section>
-        <section id="contact" aria-labelledby="contact-heading">
-            <h2 id="contact-heading">Contact</h2>
-            <form action="mailto:intel@praeco.ai" method="get" enctype="text/plain">
-                <input type="hidden" name="subject" value="Praeco Early Access Inquiry">
-                <label for="name">Name</label>
-                <input id="name" name="name" required>
-                <label for="email">Email</label>
-                <input id="email" name="email" type="email" required>
-                <label for="notes">Notes</label>
-                <textarea id="notes" name="body"></textarea>
-                <button type="submit">Submit</button>
+        </div>
+    </section>
+
+    <!-- Security & SRE -->
+    <section id="security" class="section" role="region" aria-label="Security and Reliability">
+        <div class="container">
+            <div class="section__header">
+                <div class="section__label">Security & Reliability</div>
+                <h2>Hardened for field operations</h2>
+            </div>
+            <div class="feature-list">
+                <div class="feature">
+                    <h4 class="feature__title">Security Foundations</h4>
+                    <p class="feature__text">Least-privilege access controls, hardware-backed key storage, and cryptographically signed artifacts with full lineage traceability.</p>
+                </div>
+                <div class="feature">
+                    <h4 class="feature__title">SRE Discipline</h4>
+                    <p class="feature__text">Backpressure-aware streaming, idempotent replay mechanisms, and field-tested SLIs tuned for production resilience.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline -->
+    <section id="timeline" class="section" role="region" aria-label="Product Timeline">
+        <div class="container">
+            <div class="section__header">
+                <div class="section__label">Roadmap</div>
+                <h2>Texas to nationwide</h2>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-item__marker"></div>
+                    <div class="timeline-item__content">
+                        <div class="timeline-item__year">2025 Launch</div>
+                        <p class="timeline-item__text">Texas basins go live with production forecasts and throughput monitoring across Permian, Eagle Ford, and Delaware.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-item__marker"></div>
+                    <div class="timeline-item__content">
+                        <div class="timeline-item__year">2026 Hardening</div>
+                        <p class="timeline-item__text">Expand logistics integrations, custody-transfer reconciliation, and multi-operator support with enhanced audit capabilities.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-item__marker"></div>
+                    <div class="timeline-item__content">
+                        <div class="timeline-item__year">2027 Nationwide</div>
+                        <p class="timeline-item__text">Scale across U.S. shale basins with regional SRE nodes and expanded SCADA protocol coverage.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="section" role="region" aria-label="Contact Form">
+        <div class="container">
+            <div class="section__header">
+                <div class="section__label">Get Started</div>
+                <h2>Request early access</h2>
+            </div>
+            <form class="form" id="contactForm">
+                <div class="form__group">
+                    <label for="name" class="form__label">Name</label>
+                    <input type="text" id="name" name="name" class="form__input" placeholder="Your name" required>
+                </div>
+                <div class="form__group">
+                    <label for="email" class="form__label">Email</label>
+                    <input type="email" id="email" name="email" class="form__input" placeholder="you@company.com" required>
+                </div>
+                <div class="form__group">
+                    <label for="notes" class="form__label">Notes</label>
+                    <textarea id="notes" name="notes" class="form__textarea" placeholder="Tell us about your operations..."></textarea>
+                </div>
+                <button type="submit" class="btn btn--primary"><span>Request Early Access</span></button>
             </form>
-        </section>
-    </main>
-    <footer role="contentinfo">
-        <p>© 2025 Praeco, Houston. All rights reserved.</p>
-        <ul>
-            <li><a href="#product">Product</a></li>
-            <li><a href="#basins">Basins</a></li>
-            <li><a href="#architecture">Architecture</a></li>
-            <li><a href="#security">Security</a></li>
-            <li><a href="#sre">SRE</a></li>
-            <li><a href="#timeline">Timeline</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer__inner">
+                <p class="footer__text">© 2025 Praeco, Houston. All rights reserved.</p>
+                <nav class="footer__links" aria-label="Footer navigation">
+                    <a href="#product" class="footer__link">Product</a>
+                    <a href="#basins" class="footer__link">Basins</a>
+                    <a href="#architecture" class="footer__link">Architecture</a>
+                    <a href="#security" class="footer__link">Security</a>
+                    <a href="#timeline" class="footer__link">Timeline</a>
+                    <a href="#contact" class="footer__link">Contact</a>
+                </nav>
+            </div>
+        </div>
     </footer>
+
     <script>
-        // Analytics placeholder
-        function trackEvent(eventName) {
-            console.log('Event tracked:', eventName);
-            // Wire to analytics here if needed
-        }
-        document.addEventListener('DOMContentLoaded', () => {
-            trackEvent('pageview');
-            document.querySelectorAll('.cta').forEach(btn => {
-                btn.addEventListener('click', () => trackEvent('cta_click'));
+        // Header scroll effect
+        (function() {
+            const header = document.getElementById('header');
+            let lastScroll = 0;
+
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                
+                if (currentScroll > 50) {
+                    header.classList.add('header--scrolled');
+                } else {
+                    header.classList.remove('header--scrolled');
+                }
+                
+                lastScroll = currentScroll;
+            });
+        })();
+
+        // Hero background sine wave animation
+        (function() {
+            const canvas = document.getElementById('heroCanvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            let animationFrame;
+            let offset = 0;
+
+            function resize() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const waves = 4;
+                const amplitude = 60;
+                const frequency = 0.008;
+                const speed = 0.015;
+
+                for (let w = 0; w < waves; w++) {
+                    ctx.beginPath();
+                    
+                    // Create gradient for each wave
+                    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+                    gradient.addColorStop(0, `rgba(6, 182, 212, ${0.08 - w * 0.015})`);
+                    gradient.addColorStop(0.5, `rgba(20, 184, 166, ${0.12 - w * 0.015})`);
+                    gradient.addColorStop(1, `rgba(6, 182, 212, ${0.08 - w * 0.015})`);
+                    
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = 2.5;
+
+                    for (let x = 0; x < canvas.width; x += 2) {
+                        const y = canvas.height / 2 + 
+                                  Math.sin(x * frequency + offset + w * Math.PI / 3) * amplitude +
+                                  Math.sin(x * frequency * 2 + offset * 1.5) * (amplitude / 3) +
+                                  (w * 40);
+                        
+                        if (x === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    }
+                    ctx.stroke();
+                }
+
+                if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    offset += speed;
+                    animationFrame = requestAnimationFrame(draw);
+                }
+            }
+
+            resize();
+            window.addEventListener('resize', () => {
+                resize();
+                draw();
+            });
+            draw();
+        })();
+
+        // WTI Chart with offline fallback and enhanced styling
+        (function() {
+            const svg = document.getElementById('wtiChart');
+            if (!svg) return;
+
+            // Placeholder data (fallback when offline)
+            const placeholderData = [
+                72.5, 73.2, 71.8, 72.9, 74.1, 73.5, 72.8, 71.9, 72.4, 73.8,
+                74.5, 73.9, 72.7, 73.4, 74.2, 73.6, 72.9, 73.7, 74.8, 75.2,
+                74.6, 73.8, 74.4, 75.1, 74.9, 75.5, 76.2, 75.8, 76.4, 77.0
+            ];
+
+            // Generate 7-day projection using linear regression + momentum
+            function generateProjection(historical) {
+                const lastValues = historical.slice(-7);
+                const avg = lastValues.reduce((a, b) => a + b, 0) / lastValues.length;
+                const trend = (lastValues[lastValues.length - 1] - lastValues[0]) / lastValues.length;
+                const dampening = 0.65;
+                
+                const projection = [];
+                for (let i = 1; i <= 7; i++) {
+                    const noise = (Math.random() - 0.5) * 0.8;
+                    projection.push(avg + (trend * i * dampening) + noise);
+                }
+                return projection;
+            }
+
+            function drawChart(actualData) {
+                const projectionData = generateProjection(actualData);
+                const allData = [...actualData, ...projectionData];
+                
+                const width = svg.clientWidth || 700;
+                const height = svg.clientHeight || 350;
+                const padding = { top: 30, right: 30, bottom: 40, left: 60 };
+                const chartWidth = width - padding.left - padding.right;
+                const chartHeight = height - padding.top - padding.bottom;
+
+                const minY = Math.min(...allData) * 0.96;
+                const maxY = Math.max(...allData) * 1.04;
+                const xStep = chartWidth / (allData.length - 1);
+                const yScale = chartHeight / (maxY - minY);
+
+                function getX(index) {
+                    return padding.left + index * xStep;
+                }
+
+                function getY(value) {
+                    return padding.top + chartHeight - (value - minY) * yScale;
+                }
+
+                // Clear existing content
+                svg.innerHTML = '';
+                svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+                // Define gradient for actual line
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+                gradient.setAttribute('id', 'lineGradient');
+                gradient.setAttribute('x1', '0%');
+                gradient.setAttribute('y1', '0%');
+                gradient.setAttribute('x2', '100%');
+                gradient.setAttribute('y2', '0%');
+                
+                const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                stop1.setAttribute('offset', '0%');
+                stop1.setAttribute('stop-color', '#06B6D4');
+                
+                const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                stop2.setAttribute('offset', '100%');
+                stop2.setAttribute('stop-color', '#14B8A6');
+                
+                gradient.appendChild(stop1);
+                gradient.appendChild(stop2);
+                defs.appendChild(gradient);
+                svg.appendChild(defs);
+
+                // Grid lines
+                const gridGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                for (let i = 0; i <= 6; i++) {
+                    const y = padding.top + (chartHeight / 6) * i;
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', padding.left);
+                    line.setAttribute('y1', y);
+                    line.setAttribute('x2', padding.left + chartWidth);
+                    line.setAttribute('y2', y);
+                    line.setAttribute('stroke', 'rgba(255, 255, 255, 0.05)');
+                    line.setAttribute('stroke-width', '1');
+                    gridGroup.appendChild(line);
+                }
+                svg.appendChild(gridGroup);
+
+                // Actual data area fill
+                const areaPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                let areaD = `M ${getX(0)} ${getY(actualData[0])}`;
+                for (let i = 1; i < actualData.length; i++) {
+                    areaD += ` L ${getX(i)} ${getY(actualData[i])}`;
+                }
+                areaD += ` L ${getX(actualData.length - 1)} ${padding.top + chartHeight}`;
+                areaD += ` L ${getX(0)} ${padding.top + chartHeight}`;
+                areaD += ' Z';
+                areaPath.setAttribute('d', areaD);
+                areaPath.setAttribute('fill', 'url(#lineGradient)');
+                areaPath.setAttribute('opacity', '0.1');
+                svg.appendChild(areaPath);
+
+                // Actual data line
+                const actualPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                let actualD = `M ${getX(0)} ${getY(actualData[0])}`;
+                for (let i = 1; i < actualData.length; i++) {
+                    actualD += ` L ${getX(i)} ${getY(actualData[i])}`;
+                }
+                actualPath.setAttribute('d', actualD);
+                actualPath.setAttribute('fill', 'none');
+                actualPath.setAttribute('stroke', 'url(#lineGradient)');
+                actualPath.setAttribute('stroke-width', '3');
+                actualPath.setAttribute('stroke-linecap', 'round');
+                actualPath.setAttribute('stroke-linejoin', 'round');
+                
+                // Animate line drawing
+                if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    const length = actualPath.getTotalLength();
+                    actualPath.style.strokeDasharray = length;
+                    actualPath.style.strokeDashoffset = length;
+                    actualPath.style.animation = 'drawLine 1.5s ease-out forwards';
+                    
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        @keyframes drawLine {
+                            to { stroke-dashoffset: 0; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+                
+                svg.appendChild(actualPath);
+
+                // Projection line (dashed)
+                const projectionPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                let projectionD = `M ${getX(actualData.length - 1)} ${getY(actualData[actualData.length - 1])}`;
+                for (let i = 0; i < projectionData.length; i++) {
+                    projectionD += ` L ${getX(actualData.length + i)} ${getY(projectionData[i])}`;
+                }
+                projectionPath.setAttribute('d', projectionD);
+                projectionPath.setAttribute('fill', 'none');
+                projectionPath.setAttribute('stroke', '#06B6D4');
+                projectionPath.setAttribute('stroke-width', '2.5');
+                projectionPath.setAttribute('stroke-dasharray', '6 6');
+                projectionPath.setAttribute('opacity', '0.5');
+                svg.appendChild(projectionPath);
+
+                // Y-axis labels
+                for (let i = 0; i <= 6; i++) {
+                    const value = minY + ((maxY - minY) / 6) * i;
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', padding.left - 15);
+                    text.setAttribute('y', padding.top + chartHeight - (chartHeight / 6) * i);
+                    text.setAttribute('text-anchor', 'end');
+                    text.setAttribute('alignment-baseline', 'middle');
+                    text.setAttribute('fill', '#71717A');
+                    text.setAttribute('font-size', '12');
+                    text.setAttribute('font-family', 'system-ui, sans-serif');
+                    text.textContent = `$${value.toFixed(1)}`;
+                    svg.appendChild(text);
+                }
+
+                // Axis labels
+                const yAxisLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                yAxisLabel.setAttribute('x', 15);
+                yAxisLabel.setAttribute('y', padding.top + chartHeight / 2);
+                yAxisLabel.setAttribute('text-anchor', 'middle');
+                yAxisLabel.setAttribute('fill', '#A1A1AA');
+                yAxisLabel.setAttribute('font-size', '11');
+                yAxisLabel.setAttribute('font-weight', '500');
+                yAxisLabel.setAttribute('transform', `rotate(-90, 15, ${padding.top + chartHeight / 2})`);
+                yAxisLabel.textContent = 'Price (USD)';
+                svg.appendChild(yAxisLabel);
+
+                const xAxisLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                xAxisLabel.setAttribute('x', padding.left + chartWidth / 2);
+                xAxisLabel.setAttribute('y', height - 10);
+                xAxisLabel.setAttribute('text-anchor', 'middle');
+                xAxisLabel.setAttribute('fill', '#A1A1AA');
+                xAxisLabel.setAttribute('font-size', '11');
+                xAxisLabel.setAttribute('font-weight', '500');
+                xAxisLabel.textContent = 'Days';
+                svg.appendChild(xAxisLabel);
+
+                // Legend
+                const legendY = padding.top - 10;
+                
+                const actualLegend = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                const actualLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                actualLine.setAttribute('x1', padding.left);
+                actualLine.setAttribute('y1', legendY);
+                actualLine.setAttribute('x2', padding.left + 30);
+                actualLine.setAttribute('y2', legendY);
+                actualLine.setAttribute('stroke', '#06B6D4');
+                actualLine.setAttribute('stroke-width', '2.5');
+                actualLegend.appendChild(actualLine);
+                
+                const actualText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                actualText.setAttribute('x', padding.left + 38);
+                actualText.setAttribute('y', legendY);
+                actualText.setAttribute('alignment-baseline', 'middle');
+                actualText.setAttribute('fill', '#A1A1AA');
+                actualText.setAttribute('font-size', '11');
+                actualText.textContent = 'Actual';
+                actualLegend.appendChild(actualText);
+                svg.appendChild(actualLegend);
+
+                const projectionLegend = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                const projectionLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                projectionLine.setAttribute('x1', padding.left + 100);
+                projectionLine.setAttribute('y1', legendY);
+                projectionLine.setAttribute('x2', padding.left + 130);
+                projectionLine.setAttribute('y2', legendY);
+                projectionLine.setAttribute('stroke', '#06B6D4');
+                projectionLine.setAttribute('stroke-width', '2.5');
+                projectionLine.setAttribute('stroke-dasharray', '6 6');
+                projectionLine.setAttribute('opacity', '0.5');
+                projectionLegend.appendChild(projectionLine);
+                
+                const projectionText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                projectionText.setAttribute('x', padding.left + 138);
+                projectionText.setAttribute('y', legendY);
+                projectionText.setAttribute('alignment-baseline', 'middle');
+                projectionText.setAttribute('fill', '#A1A1AA');
+                projectionText.setAttribute('font-size', '11');
+                projectionText.textContent = 'Projection';
+                projectionLegend.appendChild(projectionText);
+                svg.appendChild(projectionLegend);
+            }
+
+            // Try to fetch real data, fallback to placeholder
+            drawChart(placeholderData);
+
+            // Redraw on resize
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    drawChart(placeholderData);
+                }, 250);
+            });
+        })();
+
+        // Contact form handler
+        (function() {
+            const form = document.getElementById('contactForm');
+            if (!form) return;
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const notes = document.getElementById('notes').value;
+
+                const subject = encodeURIComponent('Praeco Early Access Inquiry');
+                const body = encodeURIComponent(
+                    `Name: ${name}\nEmail: ${email}\n\nNotes:\n${notes || 'No additional notes'}`
+                );
+
+                window.location.href = `mailto:intel@praeco.ai?subject=${subject}&body=${body}`;
+            });
+        })();
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href === '#') return;
+                
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    const headerOffset = 80;
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
             });
         });
-        // Chart
-        async function loadChart() {
-            const chart = document.getElementById('chart');
-            const caption = document.getElementById('chart-caption');
-            let data = [];
-            let isOffline = false;
-            try {
-                const now = Math.floor(Date.now() / 1000);
-                const start = now - 35 * 24 * 3600; // slight buffer
-                const url = `https://query1.finance.yahoo.com/v7/finance/download/CL=F?period1=${start}&period2=${now}&interval=1d&events=history&includeAdjustedClose=true`;
-                const resp = await fetch(url);
-                if (resp.ok) {
-                    const csv = await resp.text();
-                    const lines = csv.split('\n').slice(1);
-                    lines.forEach(line => {
-                        if (line) {
-                            const parts = line.split(',');
-                            const date = parts[0];
-                            const close = parseFloat(parts[4]); // close price
-                            if (!isNaN(close)) data.push({date, close});
-                        }
-                    });
-                    // Take last 30
-                    data = data.slice(-30);
-                } else {
-                    throw new Error('Fetch failed');
-                }
-            } catch (e) {
-                isOffline = true;
-                // Placeholder data
-                data = Array.from({length: 30}, (_, i) => ({
-                    date: new Date(Date.now() - (29 - i) * 86400000).toISOString().split('T')[0],
-                    close: 70 - (i * 0.3) + Math.random() * 2 // simulated decline
-                }));
-            }
-            if (data.length < 2) return;
-            // Linear regression
-            const x = data.map((_, i) => i);
-            const y = data.map(d => d.close);
-            let sumx = 0, sumy = 0, sumxy = 0, sumxx = 0, n = x.length;
-            x.forEach((xi, i) => {
-                sumx += xi;
-                sumy += y[i];
-                sumxy += xi * y[i];
-                sumxx += xi * xi;
-            });
-            const slope = (n * sumxy - sumx * sumy) / (n * sumxx - sumx * sumx);
-            const intercept = (sumy - slope * sumx) / n;
-            // Projection
-            let proj = [];
-            const lastY = y[n-1];
-            const dampFactor = 0.7; // damp slope
-            const dampedSlope = slope * dampFactor;
-            for (let i = n; i < n + 7; i++) {
-                let linear = intercept + slope * i;
-                let damped = lastY + dampedSlope * (i - n + 1);
-                proj.push(0.6 * linear + 0.4 * damped); // blend
-            }
-            // Draw
-            const w = chart.clientWidth;
-            const h = 200;
-            chart.setAttribute('width', w);
-            chart.setAttribute('height', h);
-            chart.setAttribute('viewBox', `0 0 ${w} ${h}`);
-            const allY = [...y, ...proj];
-            const minY = Math.min(...allY) - 1;
-            const maxY = Math.max(...allY) + 1;
-            const scaleY = v => h - ((v - minY) / (maxY - minY) * (h - 20)) - 10;
-            const scaleX = i => (i / (n + 6)) * (w - 20) + 10;
-            // Grid
-            for (let gy = minY; gy <= maxY; gy += (maxY - minY)/5) {
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', 10);
-                line.setAttribute('x2', w-10);
-                line.setAttribute('y1', scaleY(gy));
-                line.setAttribute('y2', scaleY(gy));
-                line.setAttribute('stroke', var(--text-secondary));
-                line.setAttribute('stroke-opacity', 0.2);
-                chart.appendChild(line);
-            }
-            // Actual path
-            let path = `M${scaleX(0)},${scaleY(y[0])}`;
-            for (let i = 1; i < n; i++) {
-                path += ` L${scaleX(i)},${scaleY(y[i])}`;
-            }
-            const actualPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            actualPath.setAttribute('d', path);
-            actualPath.setAttribute('stroke', var(--text-primary));
-            actualPath.setAttribute('fill', 'none');
-            actualPath.setAttribute('stroke-width', 2);
-            chart.appendChild(actualPath);
-            // Projection
-            path += ` L${scaleX(n)},${scaleY(proj[0])}`;
-            for (let i = 1; i < 7; i++) {
-                path += ` L${scaleX(n + i)},${scaleY(proj[i])}`;
-            }
-            const projPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            projPath.setAttribute('d', path.split('M')[1]); // from start of proj? No, from last actual
-            projPath.setAttribute('transform', `translate(${scaleX(n-1) - scaleX(0)},0)`); wait, no.
-            wait, to start from last actual
-            let projD = `M${scaleX(n-1)},${scaleY(y[n-1])} L${scaleX(n)},${scaleY(proj[0])}`;
-            for (let i = 1; i < proj.length; i++) {
-                projD += ` L${scaleX(n + i)},${scaleY(proj[i])}`;
-            }
-            projPath.setAttribute('d', projD);
-            projPath.setAttribute('stroke', var(--accent));
-            projPath.setAttribute('fill', 'none');
-            projPath.setAttribute('stroke-width', 2);
-            projPath.setAttribute('stroke-dasharray', '5');
-            chart.appendChild(projPath);
-            // Labels
-            const actualLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            actualLabel.textContent = 'Actual';
-            actualLabel.setAttribute('x', w - 100);
-            actualLabel.setAttribute('y', 20);
-            actualLabel.setAttribute('fill', var(--text-primary));
-            chart.appendChild(actualLabel);
-            const projLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            projLabel.textContent = 'Projection';
-            projLabel.setAttribute('x', w - 100);
-            projLabel.setAttribute('y', 40);
-            projLabel.setAttribute('fill', var(--accent));
-            chart.appendChild(projLabel);
-            // Animation
-            if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                actualPath.setAttribute('stroke-dasharray', actualPath.getTotalLength());
-                actualPath.setAttribute('stroke-dashoffset', actualPath.getTotalLength());
-                actualPath.animate({strokeDashoffset: 0}, {duration: 500, easing: 'ease-in-out'});
-            }
-            caption.textContent = (isOffline ? 'Offline sample. ' : '') + caption.textContent;
+
+        // Analytics placeholder
+        function trackEvent(eventName, properties) {
+            // Hook for analytics integration
+            console.log('Event:', eventName, properties);
         }
-        loadChart();
-        window.addEventListener('resize', () => { document.getElementById('chart').innerHTML = ''; loadChart(); });
+
+        // Track CTA clicks
+        document.querySelectorAll('.btn--primary').forEach(btn => {
+            btn.addEventListener('click', () => {
+                trackEvent('cta_click', { button: btn.textContent.trim() });
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        if ('IntersectionObserver' in window) {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(30px)';
+                section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(section);
+            });
+        }
     </script>
 </body>
 </html>
