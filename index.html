@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Raidline Analytics | College Football Predictions</title>
+    <title>CFB Predictions | AI/ML Models</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         
@@ -127,16 +127,6 @@
             letter-spacing: -0.01em;
         }
 
-        h1 {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--blue-500) 0%, var(--blue-600) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.02em;
-        }
-
         .tagline {
             font-size: 13px;
             color: var(--text-tertiary);
@@ -150,9 +140,12 @@
             .tagline {
                 display: none;
             }
+            .brand-text {
+                font-size: 12px;
+            }
         }
 
-        .config-panel {
+        .api-key-panel {
             background: var(--bg-primary);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -161,16 +154,10 @@
             padding: 16px;
             margin: 12px;
             box-shadow: var(--shadow-sm);
-            display: none; /* Hidden by default */
         }
 
-        .config-panel.collapsed {
-            max-height: 0;
-            padding: 0;
-            margin: 0;
-            overflow: hidden;
-            opacity: 0;
-            transition: all 0.3s ease;
+        .api-key-panel.hidden {
+            display: none;
         }
 
         .input-group {
@@ -186,6 +173,7 @@
             letter-spacing: -0.01em;
         }
 
+        input[type="text"],
         input[type="number"],
         select {
             width: 100%;
@@ -208,15 +196,6 @@
             outline: none;
             border-color: var(--blue-500);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        select {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23737373' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-            padding-right: 40px;
         }
 
         button {
@@ -507,7 +486,7 @@
         }
 
         .prediction-details {
-            padding: 20px;
+            padding: 16px;
             background: var(--bg-primary);
             border-top: 1px solid var(--border-light);
         }
@@ -515,13 +494,13 @@
         .detail-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .detail-item {
             text-align: center;
-            padding: 12px 8px;
+            padding: 10px 8px;
             background: var(--bg-secondary);
             border-radius: var(--radius-md);
             border: 1px solid var(--border-light);
@@ -543,7 +522,7 @@
         }
 
         .detail-value {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--text-primary);
             letter-spacing: -0.01em;
@@ -553,7 +532,7 @@
         .badges {
             display: flex;
             gap: 8px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             flex-wrap: wrap;
         }
 
@@ -1042,9 +1021,10 @@
                 grid-template-columns: repeat(4, 1fr);
                 max-width: min(800px, 100vw);
                 margin: 16px auto;
+                padding: 0 16px 12px;
             }
 
-            .config-panel {
+            .api-key-panel {
                 max-width: min(800px, 100vw);
                 margin: 16px auto;
             }
@@ -1073,16 +1053,15 @@
     </header>
 
     <div class="container">
-        <div class="config-panel" id="configPanel">
+        <div class="api-key-panel" id="apiKeyPanel">
             <div class="input-group">
-                <label>Season Year</label>
-                <input type="number" id="seasonYear" value="2025" min="2020" max="2030">
+                <label>CollegeFootballData API Key</label>
+                <input type="text" id="apiKey" placeholder="Enter your API key">
+                <small style="display: block; margin-top: 6px; color: var(--text-tertiary); font-size: 11px;">
+                    Get your free API key at <a href="https://collegefootballdata.com" target="_blank" style="color: var(--blue-500);">collegefootballdata.com</a>
+                </small>
             </div>
-            <div class="input-group">
-                <label>Week (Leave blank for current week)</label>
-                <input type="number" id="weekNumber" placeholder="Auto-detect" min="1" max="15">
-            </div>
-            <button id="runPrediction">Generate Predictions</button>
+            <button id="saveApiKey">Save & Load Predictions</button>
         </div>
 
         <div class="status-bar hidden" id="statusBar">
@@ -1095,7 +1074,6 @@
             <div class="filter-chip" data-filter="Big Ten">Big Ten</div>
             <div class="filter-chip" data-filter="Big 12">Big 12</div>
             <div class="filter-chip" data-filter="ACC">ACC</div>
-            <div class="filter-chip" data-filter="Pac-12">Pac-12</div>
             <div class="filter-chip" data-filter="upsets">Upsets</div>
             <div class="filter-chip" data-filter="tossups">Toss-Ups</div>
         </div>
@@ -1123,60 +1101,38 @@
     </div>
 
     <!-- Share Modal -->
-    <div class="modal" id="shareModal">
-        <!-- Dynamic content populated by JavaScript -->
-    </div>
+    <div class="modal" id="shareModal"></div>
 
-    <script type="module">
-        // ===== CONFIGURATION =====
-        const ESPN_BASE = 'https://site.api.espn.com/apis/site/v2/sports/football/college-football';
-        const ESPN_CORE = 'https://sports.core.api.espn.com/v2/sports/football/leagues/college-football';
-        const ESPN_LOGO_BASE = 'https://a.espncdn.com/i/teamlogos/ncaa/500';
-        const CACHE_TTL = 1000 * 60 * 15; // 15 minutes
+    <script>
+        // Configuration
+        const CFB_API_BASE = 'https://api.collegefootballdata.com';
+        const CURRENT_YEAR = 2025;
+        const CACHE_TTL = 1000 * 60 * 30;
         
-        // Conference mapping
-        const CONFERENCES = {
-            '1': 'ACC',
-            '4': 'Big 12',
-            '5': 'Big Ten',
-            '8': 'SEC',
-            '9': 'Pac-12',
-            '12': 'Conference USA',
-            '15': 'MAC',
-            '17': 'Mountain West',
-            '18': 'FBS Independents',
-            '37': 'Sun Belt',
-            '151': 'American Athletic'
-        };
-
-        // State
         let predictions = [];
         let allPredictions = [];
         let activeFilter = 'all';
-        let teamStats = {};
-        let eloRatings = {};
+        let apiKey = '';
 
-        // ===== UTILITIES =====
-        function debug(message, data = null) {
-            console.log(`[DEBUG] ${message}`, data || '');
+        function debug(msg, data) {
+            console.log(`[DEBUG] ${msg}`, data || '');
         }
 
-        function logStatus(message, type = 'loading') {
-            const statusBar = document.getElementById('statusBar');
-            const statusText = document.getElementById('statusText');
-            statusBar.className = `status-bar ${type}`;
-            statusText.textContent = message;
-            statusBar.classList.remove('hidden');
-            debug(message);
+        function logStatus(msg, type = 'loading') {
+            const bar = document.getElementById('statusBar');
+            const text = document.getElementById('statusText');
+            bar.className = `status-bar ${type}`;
+            text.textContent = msg;
+            bar.classList.remove('hidden');
+            debug(msg);
         }
 
         function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
+            return new Promise(r => setTimeout(r, ms));
         }
 
-        // ===== CACHING =====
         function getCacheKey(endpoint) {
-            return `espn_cache_${endpoint}`;
+            return `cfb_cache_${endpoint}`;
         }
 
         function getCache(endpoint) {
@@ -1194,581 +1150,240 @@
 
         function setCache(endpoint, data) {
             const key = getCacheKey(endpoint);
-            localStorage.setItem(key, JSON.stringify({
-                data,
-                timestamp: Date.now()
-            }));
+            localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
         }
 
-        // ===== ESPN API =====
-        async function fetchESPN(url) {
-            debug(`Fetching: ${url}`);
+        async function fetchCFB(endpoint, params = {}) {
+            const url = new URL(`${CFB_API_BASE}${endpoint}`);
+            Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
             
-            // Check cache first
-            const cached = getCache(url);
+            const cached = getCache(url.toString());
             if (cached) {
-                debug('Cache hit');
+                debug('Cache hit: ' + endpoint);
                 return cached;
             }
 
-            const response = await fetch(url);
+            debug(`Fetching: ${url.toString()}`);
+            
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Accept': 'application/json'
+                }
+            });
+
             if (!response.ok) {
-                throw new Error(`ESPN API error: ${response.status}`);
+                if (response.status === 401) throw new Error('Invalid API key');
+                if (response.status === 429) throw new Error('Rate limit exceeded');
+                throw new Error(`API error: ${response.status}`);
             }
             
             const data = await response.json();
-            setCache(url, data);
+            setCache(url.toString(), data);
             return data;
         }
 
-        // ===== DATA COLLECTION =====
-        async function getCurrentWeek(year) {
+        async function getCurrentWeek() {
             logStatus('Detecting current week...', 'loading');
-            
-            // Get scoreboard without week parameter to get current
-            const url = `${ESPN_BASE}/scoreboard?limit=1`;
-            const data = await fetchESPN(url);
-            
-            if (data.week && data.week.number) {
-                debug(`Current week: ${data.week.number}`);
-                return data.week.number;
-            }
-            
-            return 1;
+            const calendar = await fetchCFB('/calendar', { year: CURRENT_YEAR });
+            const now = new Date();
+            const currentWeek = calendar.find(week => {
+                const start = new Date(week.firstGameStart);
+                const end = new Date(week.lastGameStart);
+                end.setDate(end.getDate() + 2);
+                return now >= start && now <= end;
+            });
+            const week = currentWeek ? currentWeek.week : 1;
+            debug(`Current week: ${week}`);
+            return week;
         }
 
         async function fetchGames(year, week) {
-            logStatus(`Fetching games for Week ${week}...`, 'loading');
-            const url = `${ESPN_BASE}/scoreboard?week=${week}&seasontype=2&limit=300`;
-            const data = await fetchESPN(url);
-            return data.events || [];
+            logStatus(`Fetching Week ${week} games...`, 'loading');
+            return await fetchCFB('/games', { year, week, seasonType: 'regular' });
         }
 
-        async function fetchSeasonGames(year) {
-            logStatus('Fetching season history...', 'loading');
-            
-            // Instead of using the Core API, fetch weeks 1-5 from scoreboard
-            // This is more reliable
-            const allGames = [];
-            const currentWeekNum = await getCurrentWeek(year);
-            
-            // Fetch completed weeks (up to current week - 1)
-            const weeksToFetch = Math.max(1, currentWeekNum - 1);
-            
-            for (let week = 1; week <= Math.min(weeksToFetch, 10); week++) {
-                try {
-                    logStatus(`Loading Week ${week} history...`, 'loading');
-                    const url = `${ESPN_BASE}/scoreboard?week=${week}&seasontype=2&limit=300`;
-                    const data = await fetchESPN(url);
-                    
-                    if (data.events && data.events.length > 0) {
-                        // Only keep completed games
-                        const completedGames = data.events.filter(event => 
-                            event.status && event.status.type && event.status.type.completed
-                        );
-                        allGames.push(...completedGames);
-                        debug(`Week ${week}: ${completedGames.length} completed games`);
-                    }
-                    
-                    await delay(100); // Small delay to be nice to ESPN
-                } catch (err) {
-                    debug(`Failed to fetch week ${week}: ${err.message}`);
-                }
-            }
-            
-            debug(`Total games fetched: ${allGames.length}`);
-            return allGames;
+        async function fetchAdvancedStats(year) {
+            logStatus('Fetching advanced metrics...', 'loading');
+            const [spRatings, fpi] = await Promise.all([
+                fetchCFB('/ratings/sp', { year }),
+                fetchCFB('/ratings/fpi', { year })
+            ]);
+            return { spRatings, fpi };
         }
 
-        // ===== ELO RATING SYSTEM =====
-        function initializeElo(teams) {
-            const elo = {};
-            teams.forEach(team => {
-                elo[team] = 1500; // Starting Elo
-            });
-            return elo;
+        async function fetchTeamRecords(year) {
+            logStatus('Fetching team records...', 'loading');
+            return await fetchCFB('/records', { year });
         }
 
-        function updateElo(winnerElo, loserElo, margin, K = 32) {
-            const expectedWin = 1 / (1 + Math.pow(10, (loserElo - winnerElo) / 400));
-            const marginMultiplier = Math.log(Math.abs(margin) + 1) / Math.log(2);
-            const actualK = K * marginMultiplier;
-            
-            const winnerNew = winnerElo + actualK * (1 - expectedWin);
-            const loserNew = loserElo + actualK * (0 - (1 - expectedWin));
-            
-            return { winner: winnerNew, loser: loserNew };
-        }
-
-        function calculateEloFromHistory(games) {
-            logStatus('Calculating Elo ratings...', 'loading');
-            
-            const teams = new Set();
-            const completedGames = [];
-            
-            // Extract completed games from ESPN scoreboard events
-            games.forEach(event => {
-                if (event.status && event.status.type && event.status.type.completed) {
-                    if (event.competitions && event.competitions[0] && event.competitions[0].competitors) {
-                        const comp = event.competitions[0];
-                        
-                        if (comp.competitors.length === 2) {
-                            const home = comp.competitors.find(c => c.homeAway === 'home');
-                            const away = comp.competitors.find(c => c.homeAway === 'away');
-                            
-                            if (home && away && home.team && away.team) {
-                                const homeTeam = home.team.displayName;
-                                const awayTeam = away.team.displayName;
-                                const homeScore = parseInt(home.score || 0);
-                                const awayScore = parseInt(away.score || 0);
-                                
-                                teams.add(homeTeam);
-                                teams.add(awayTeam);
-                                
-                                completedGames.push({
-                                    home: homeTeam,
-                                    away: awayTeam,
-                                    homeScore,
-                                    awayScore,
-                                    date: new Date(event.date)
-                                });
-                            }
-                        }
-                    }
-                }
-            });
-            
-            debug(`Processing ${completedGames.length} games for Elo calculation`);
-            
-            // Sort by date
-            completedGames.sort((a, b) => a.date - b.date);
-            
-            // Initialize Elo
-            const elo = initializeElo(Array.from(teams));
-            
-            // Process games chronologically
-            completedGames.forEach(game => {
-                const homeElo = elo[game.home] || 1500;
-                const awayElo = elo[game.away] || 1500;
-                const margin = game.homeScore - game.awayScore;
-                
-                if (margin > 0) {
-                    const newElo = updateElo(homeElo, awayElo, margin);
-                    elo[game.home] = newElo.winner;
-                    elo[game.away] = newElo.loser;
-                } else if (margin < 0) {
-                    const newElo = updateElo(awayElo, homeElo, Math.abs(margin));
-                    elo[game.away] = newElo.winner;
-                    elo[game.home] = newElo.loser;
-                }
-            });
-            
-            debug('Elo ratings calculated', Object.keys(elo).length + ' teams');
-            return elo;
-        }
-
-        // ===== TEAM STATS =====
-        function calculateTeamStats(games) {
-            logStatus('Calculating team statistics...', 'loading');
-            
-            const stats = {};
-            
-            games.forEach(event => {
-                if (event.status && event.status.type && event.status.type.completed) {
-                    if (event.competitions && event.competitions[0] && event.competitions[0].competitors) {
-                        const comp = event.competitions[0];
-                        
-                        if (comp.competitors.length === 2) {
-                            const home = comp.competitors.find(c => c.homeAway === 'home');
-                            const away = comp.competitors.find(c => c.homeAway === 'away');
-                            
-                            if (home && away && home.team && away.team) {
-                                const homeTeam = home.team.displayName;
-                                const awayTeam = away.team.displayName;
-                                const homeScore = parseInt(home.score || 0);
-                                const awayScore = parseInt(away.score || 0);
-                                
-                                // Initialize stats
-                                if (!stats[homeTeam]) {
-                                    stats[homeTeam] = {
-                                        games: [],
-                                        wins: 0,
-                                        losses: 0,
-                                        pointsFor: 0,
-                                        pointsAgainst: 0,
-                                        homeGames: 0,
-                                        homeWins: 0,
-                                        conference: home.team.conferenceId || null
-                                    };
-                                }
-                                if (!stats[awayTeam]) {
-                                    stats[awayTeam] = {
-                                        games: [],
-                                        wins: 0,
-                                        losses: 0,
-                                        pointsFor: 0,
-                                        pointsAgainst: 0,
-                                        homeGames: 0,
-                                        homeWins: 0,
-                                        conference: away.team.conferenceId || null
-                                    };
-                                }
-                                
-                                // Update stats
-                                stats[homeTeam].games.push({ score: homeScore, allowed: awayScore, home: true });
-                                stats[awayTeam].games.push({ score: awayScore, allowed: homeScore, home: false });
-                                
-                                stats[homeTeam].pointsFor += homeScore;
-                                stats[homeTeam].pointsAgainst += awayScore;
-                                stats[awayTeam].pointsFor += awayScore;
-                                stats[awayTeam].pointsAgainst += homeScore;
-                                
-                                stats[homeTeam].homeGames++;
-                                
-                                if (homeScore > awayScore) {
-                                    stats[homeTeam].wins++;
-                                    stats[homeTeam].homeWins++;
-                                    stats[awayTeam].losses++;
-                                } else if (awayScore > homeScore) {
-                                    stats[awayTeam].wins++;
-                                    stats[homeTeam].losses++;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            
-            // Calculate derived stats
-            Object.keys(stats).forEach(team => {
-                const s = stats[team];
-                const totalGames = s.games.length;
-                
-                if (totalGames > 0) {
-                    s.avgPointsFor = s.pointsFor / totalGames;
-                    s.avgPointsAgainst = s.pointsAgainst / totalGames;
-                    s.offenseEfficiency = s.avgPointsFor;
-                    s.defenseEfficiency = s.avgPointsAgainst;
-                    
-                    // Recent form (last 3 games)
-                    const recent = s.games.slice(-3);
-                    s.recentForm = recent.reduce((sum, g) => {
-                        return sum + (g.score > g.allowed ? 1 : 0);
-                    }, 0) / recent.length;
-                    
-                    // Home advantage
-                    s.homeAdvantage = s.homeGames > 0 ? s.homeWins / s.homeGames : 0.5;
-                    
-                    // Debug logging
-                    if (totalGames > 0) {
-                        debug(`${team}: ${s.wins}-${s.losses} (${totalGames} games)`);
-                    }
-                }
-            });
-            
-            debug('Team stats calculated', Object.keys(stats).length + ' teams');
-            return stats;
-        }
-
-        // ===== PREDICTION MODEL =====
         function sigmoid(z) {
             return 1 / (1 + Math.exp(-z));
         }
 
-        function predictGame(event, elo, stats) {
-            if (!event.competitions || !event.competitions[0]) {
-                return null;
-            }
+        function predictGame(game, advanced, records) {
+            const homeTeam = game.home_team;
+            const awayTeam = game.away_team;
             
-            const comp = event.competitions[0];
-            if (!comp.competitors || comp.competitors.length !== 2) {
-                return null;
-            }
+            const homeSP = advanced.spRatings.find(r => r.team === homeTeam);
+            const awaySP = advanced.spRatings.find(r => r.team === awayTeam);
+            const homeFPI = advanced.fpi.find(f => f.team === homeTeam);
+            const awayFPI = advanced.fpi.find(f => f.team === awayTeam);
+            const homeRecord = records.find(r => r.team === homeTeam);
+            const awayRecord = records.find(r => r.team === awayTeam);
             
-            const home = comp.competitors.find(c => c.homeAway === 'home');
-            const away = comp.competitors.find(c => c.homeAway === 'away');
+            const spDiff = (homeSP?.rating || 0) - (awaySP?.rating || 0);
+            const fpiDiff = (homeFPI?.fpi || 0) - (awayFPI?.fpi || 0);
             
-            if (!home || !away) return null;
-            
-            const homeTeam = home.team.displayName;
-            const awayTeam = away.team.displayName;
-            const homeConf = CONFERENCES[home.team.conferenceId] || 'Other';
-            const awayConf = CONFERENCES[away.team.conferenceId] || 'Other';
-            
-            // Get Elo
-            const homeElo = elo[homeTeam] || 1500;
-            const awayElo = elo[awayTeam] || 1500;
-            const eloDiff = (homeElo - awayElo) / 100;
-            
-            // Get stats
-            const homeStats = stats[homeTeam] || {};
-            const awayStats = stats[awayTeam] || {};
-            
-            const offenseMargin = (homeStats.offenseEfficiency || 20) - (awayStats.defenseEfficiency || 20);
-            const defenseMargin = (awayStats.offenseEfficiency || 20) - (homeStats.defenseEfficiency || 20);
-            const netMargin = offenseMargin + defenseMargin;
-            
-            const recentFormDiff = (homeStats.recentForm || 0.5) - (awayStats.recentForm || 0.5);
-            
-            // Adjust home advantage based on actual home win rate
-            const homeAdvantage = (homeStats.homeAdvantage || 0.55) - 0.5;
-            
-            // Win percentage as a feature
-            const homeWinPct = (homeStats.wins || 0) / Math.max(1, (homeStats.wins || 0) + (homeStats.losses || 0));
-            const awayWinPct = (awayStats.wins || 0) / Math.max(1, (awayStats.wins || 0) + (awayStats.losses || 0));
+            const homeWinPct = homeRecord ? homeRecord.total.wins / (homeRecord.total.wins + homeRecord.total.losses) : 0.5;
+            const awayWinPct = awayRecord ? awayRecord.total.wins / (awayRecord.total.wins + awayRecord.total.losses) : 0.5;
             const winPctDiff = homeWinPct - awayWinPct;
             
-            // Logistic regression with improved weights
-            // Reduced Elo weight, increased performance-based features
-            let logit = 
-                0.25 * eloDiff +                    // Reduced Elo influence
-                0.30 * (netMargin / 10) +           // Offensive/defensive margin
-                0.20 * recentFormDiff +             // Recent momentum
-                0.15 * homeAdvantage +              // Home field advantage
-                0.10 * winPctDiff;                  // Season win percentage
-            
+            let logit = 0.35 * (spDiff / 10) + 0.30 * (fpiDiff / 5) + 0.20 * winPctDiff + 0.15;
             let homeWinProb = sigmoid(logit);
-            
-            // Apply regression towards 50% for uncertainty
-            // This prevents overconfident predictions
             homeWinProb = 0.5 + 0.85 * (homeWinProb - 0.5);
-            
-            // Clamp
             homeWinProb = Math.max(0.10, Math.min(0.90, homeWinProb));
             
             const winner = homeWinProb > 0.5 ? homeTeam : awayTeam;
             const winnerProb = homeWinProb > 0.5 ? homeWinProb : 1 - homeWinProb;
-            const predictedMargin = (homeWinProb - 0.5) * 24;  // Reduced from 28 to be less aggressive
+            const predictedMargin = Math.abs((homeWinProb - 0.5) * 24);
             
             const confidence = Math.abs(homeWinProb - 0.5) * 2;
             let confLabel = 'low';
             if (confidence > 0.7) confLabel = 'high';
             else if (confidence > 0.4) confLabel = 'medium';
             
-            // Check for upset (underdog winning)
-            const isUpset = (homeElo < awayElo && homeWinProb > 0.5) || 
-                            (awayElo < homeElo && homeWinProb < 0.5);
-            
-            // Build proper W-L records
-            const homeWins = homeStats.wins || 0;
-            const homeLosses = homeStats.losses || 0;
-            const awayWins = awayStats.wins || 0;
-            const awayLosses = awayStats.losses || 0;
-            
-            // Debug logging for records
-            debug(`Predicting ${awayTeam} (${awayWins}-${awayLosses}) @ ${homeTeam} (${homeWins}-${homeLosses})`);
+            const homeExpected = (homeFPI?.fpi || 0) > (awayFPI?.fpi || 0);
+            const isUpset = (homeExpected && homeWinProb < 0.5) || (!homeExpected && homeWinProb > 0.5);
             
             return {
-                event,
+                game,
                 homeTeam,
                 awayTeam,
-                homeConference: homeConf,
-                awayConference: awayConf,
+                homeConference: game.home_conference || 'FBS Independents',
+                awayConference: game.away_conference || 'FBS Independents',
                 homeWinProb,
                 awayWinProb: 1 - homeWinProb,
                 winner,
                 winnerProb,
-                predictedMargin: Math.abs(predictedMargin),
-                favoredTeam: predictedMargin > 0 ? homeTeam : awayTeam,
+                predictedMargin,
+                favoredTeam: homeWinProb > 0.5 ? homeTeam : awayTeam,
                 confidence: confLabel,
                 isUpset,
                 isTossUp: confidence < 0.2,
-                homeRecord: `${homeWins}-${homeLosses}`,
-                awayRecord: `${awayWins}-${awayLosses}`,
-                homeElo: Math.round(homeElo),
-                awayElo: Math.round(awayElo)
+                homeRecord: homeRecord ? `${homeRecord.total.wins}-${homeRecord.total.losses}` : '0-0',
+                awayRecord: awayRecord ? `${awayRecord.total.wins}-${awayRecord.total.losses}` : '0-0',
+                venue: game.venue || 'TBD',
+                startDate: game.start_date
             };
         }
 
-        // ===== RENDERING =====
-        function getTeamLogo(teamName, teamId) {
-            if (teamId) {
-                return `${ESPN_LOGO_BASE}/${teamId}.png`;
-            }
-            return null;
+        function getTeamLogo(team) {
+            const slug = team.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            return `https://a.espncdn.com/i/teamlogos/ncaa/500/${slug}.png`;
         }
 
         function renderPredictions(preds) {
             const container = document.getElementById('predictions');
             
             if (preds.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🏈</div>
-                        <div class="empty-text">No games match your filter</div>
-                    </div>
-                `;
+                container.innerHTML = `<div class="empty-state"><div class="empty-icon">🏈</div><div class="empty-text">No games match your filter</div></div>`;
                 return;
             }
 
             container.innerHTML = '';
-
-            preds.forEach((pred, index) => {
-                const home = pred.event.competitions[0].competitors.find(c => c.homeAway === 'home');
-                const away = pred.event.competitions[0].competitors.find(c => c.homeAway === 'away');
-                
-                const homeLogo = getTeamLogo(pred.homeTeam, home.team.id);
-                const awayLogo = getTeamLogo(pred.awayTeam, away.team.id);
-
-                const gameTime = new Date(pred.event.date).toLocaleString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit'
+            preds.forEach((pred, idx) => {
+                const homeLogo = getTeamLogo(pred.homeTeam);
+                const awayLogo = getTeamLogo(pred.awayTeam);
+                const gameTime = new Date(pred.startDate).toLocaleString('en-US', {
+                    weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
                 });
-
-                const venue = pred.event.competitions[0].venue ? 
-                    pred.event.competitions[0].venue.fullName : 'TBD';
-
                 const badges = [];
                 if (pred.isUpset) badges.push('<span class="badge badge-upset">🔥 Upset</span>');
                 if (pred.isTossUp) badges.push('<span class="badge badge-tossup">🎲 Toss-Up</span>');
 
                 const card = document.createElement('div');
                 card.className = 'game-card';
-                card.style.animationDelay = `${index * 0.05}s`;
-
                 card.innerHTML = `
                     <div class="game-header">
                         <div class="game-time">${gameTime}</div>
-                        <div class="game-venue">${venue}</div>
+                        <div class="game-venue">${pred.venue}</div>
                     </div>
-                    
                     <div class="matchup">
                         ${badges.length > 0 ? `<div class="badges">${badges.join('')}</div>` : ''}
-                        
                         <div class="team-row ${pred.winner === pred.awayTeam ? 'winner' : ''}">
-                            <div class="team-logo">
-                                ${awayLogo ? `<img src="${awayLogo}" alt="${pred.awayTeam}" onerror="this.style.display='none'">` : ''}
-                            </div>
+                            <div class="team-logo"><img src="${awayLogo}" alt="${pred.awayTeam}" onerror="this.style.display='none'"></div>
                             <div class="team-info">
                                 <div class="team-name">${pred.awayTeam}</div>
                                 <div class="team-record">${pred.awayRecord}</div>
                             </div>
                             <div class="prob-container">
-                                <div class="prob-bar">
-                                    <div class="prob-fill" style="width: ${pred.awayWinProb * 100}%"></div>
-                                </div>
+                                <div class="prob-bar"><div class="prob-fill" style="width: ${pred.awayWinProb * 100}%"></div></div>
                                 <div class="prob-value">${(pred.awayWinProb * 100).toFixed(0)}%</div>
                             </div>
                         </div>
-                        
                         <div class="team-row ${pred.winner === pred.homeTeam ? 'winner' : ''}">
                             <div class="home-indicator"></div>
-                            <div class="team-logo">
-                                ${homeLogo ? `<img src="${homeLogo}" alt="${pred.homeTeam}" onerror="this.style.display='none'">` : ''}
-                            </div>
+                            <div class="team-logo"><img src="${homeLogo}" alt="${pred.homeTeam}" onerror="this.style.display='none'"></div>
                             <div class="team-info">
                                 <div class="team-name">${pred.homeTeam}</div>
                                 <div class="team-record">${pred.homeRecord}</div>
                             </div>
                             <div class="prob-container">
-                                <div class="prob-bar">
-                                    <div class="prob-fill" style="width: ${pred.homeWinProb * 100}%"></div>
-                                </div>
+                                <div class="prob-bar"><div class="prob-fill" style="width: ${pred.homeWinProb * 100}%"></div></div>
                                 <div class="prob-value">${(pred.homeWinProb * 100).toFixed(0)}%</div>
                             </div>
                         </div>
                     </div>
-                    
                     <div class="prediction-details">
                         <div class="detail-grid">
-                            <div class="detail-item">
-                                <div class="detail-label">Winner</div>
-                                <div class="detail-value">${pred.winner}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Confidence</div>
-                                <div class="detail-value">${(pred.winnerProb * 100).toFixed(0)}%</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Margin</div>
-                                <div class="detail-value">${pred.predictedMargin.toFixed(1)} pts</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Model</div>
-                                <div class="detail-value">${pred.confidence.toUpperCase()}</div>
-                            </div>
+                            <div class="detail-item"><div class="detail-label">Winner</div><div class="detail-value">${pred.winner}</div></div>
+                            <div class="detail-item"><div class="detail-label">Confidence</div><div class="detail-value">${(pred.winnerProb * 100).toFixed(0)}%</div></div>
+                            <div class="detail-item"><div class="detail-label">Margin</div><div class="detail-value">${pred.predictedMargin.toFixed(1)} pts</div></div>
+                            <div class="detail-item"><div class="detail-label">Model</div><div class="detail-value">${pred.confidence.toUpperCase()}</div></div>
                         </div>
-                        <button class="share-btn" onclick="openShareModal(${index})">📸 Share Prediction</button>
+                        <button class="share-btn" onclick="window.openShareModal(${idx})">📸 Share Prediction</button>
                     </div>
                 `;
-
                 container.appendChild(card);
             });
         }
 
         function updateSummary(preds) {
             document.getElementById('totalGames').textContent = preds.length;
-            
-            const avgConf = preds.reduce((sum, p) => {
-                const conf = Math.abs(p.homeWinProb - 0.5) * 2;
-                return sum + conf;
-            }, 0) / preds.length;
+            const avgConf = preds.reduce((s, p) => s + Math.abs(p.homeWinProb - 0.5) * 2, 0) / preds.length;
             document.getElementById('avgConfidence').textContent = (avgConf * 100).toFixed(0) + '%';
-            
-            const upsets = preds.filter(p => p.isUpset).length;
-            document.getElementById('upsets').textContent = upsets;
-            
-            const tossUps = preds.filter(p => p.isTossUp).length;
-            document.getElementById('closeGames').textContent = tossUps;
-
+            document.getElementById('upsets').textContent = preds.filter(p => p.isUpset).length;
+            document.getElementById('closeGames').textContent = preds.filter(p => p.isTossUp).length;
             document.getElementById('summary').classList.remove('hidden');
             document.getElementById('filters').classList.remove('hidden');
         }
 
-        // ===== FILTERING =====
         function applyFilter(filterType) {
             activeFilter = filterType;
-            
             document.querySelectorAll('.filter-chip').forEach(chip => {
                 chip.classList.remove('active');
-                if (chip.dataset.filter === filterType) {
-                    chip.classList.add('active');
-                }
+                if (chip.dataset.filter === filterType) chip.classList.add('active');
             });
 
             let filtered = [...allPredictions];
-            
-            if (filterType === 'upsets') {
-                filtered = filtered.filter(p => p.isUpset);
-            } else if (filterType === 'tossups') {
-                filtered = filtered.filter(p => p.isTossUp);
-            } else if (filterType !== 'all') {
-                filtered = filtered.filter(p => 
-                    p.homeConference === filterType || 
-                    p.awayConference === filterType
-                );
-            }
+            if (filterType === 'upsets') filtered = filtered.filter(p => p.isUpset);
+            else if (filterType === 'tossups') filtered = filtered.filter(p => p.isTossUp);
+            else if (filterType !== 'all') filtered = filtered.filter(p => p.homeConference === filterType || p.awayConference === filterType);
 
             predictions = filtered;
             renderPredictions(predictions);
             updateSummary(predictions);
         }
 
-        // ===== SHARE MODAL =====
-        function openShareModal(index) {
-            const pred = predictions[index];
+        function openShareModal(idx) {
+            const pred = predictions[idx];
             const modal = document.getElementById('shareModal');
-            
-            const home = pred.event.competitions[0].competitors.find(c => c.homeAway === 'home');
-            const away = pred.event.competitions[0].competitors.find(c => c.homeAway === 'away');
-            
-            const homeLogo = getTeamLogo(pred.homeTeam, home.team.id);
-            const awayLogo = getTeamLogo(pred.awayTeam, away.team.id);
-
-            const gameTime = new Date(pred.event.date).toLocaleString('en-US', {
-                weekday: 'short',
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit'
+            const homeLogo = getTeamLogo(pred.homeTeam);
+            const awayLogo = getTeamLogo(pred.awayTeam);
+            const gameTime = new Date(pred.startDate).toLocaleString('en-US', {
+                weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
             });
-
-            const venue = pred.event.competitions[0].venue ? 
-                pred.event.competitions[0].venue.fullName : 'Venue TBD';
-
             const badges = [];
             if (pred.isUpset) badges.push('<span class="share-badge share-badge-upset">🔥 UPSET</span>');
             if (pred.isTossUp) badges.push('<span class="share-badge share-badge-tossup">🎲 TOSS-UP</span>');
@@ -1782,69 +1397,40 @@
                                     <img src="Logo.svg" alt="Logo" class="share-brand-logo">
                                     <span class="share-brand-text">Game Prediction</span>
                                 </div>
-                                <div class="share-week">Week ${pred.event.week ? pred.event.week.number : '?'}</div>
+                                <div class="share-week">Week ${pred.game.week || '?'}</div>
                             </div>
                             <div class="share-meta">${gameTime}</div>
                         </div>
-                        
                         <div class="share-matchup">
                             ${badges.length > 0 ? `<div class="share-badges">${badges.join('')}</div>` : ''}
-                            
                             <div class="share-teams">
                                 <div class="share-team ${pred.winner === pred.awayTeam ? 'winner' : ''}">
                                     <div class="share-team-label">Away</div>
-                                    <div class="share-team-logo-container">
-                                        <div class="share-team-logo">
-                                            ${awayLogo ? `<img src="${awayLogo}" alt="${pred.awayTeam}" onerror="this.style.display='none'">` : ''}
-                                        </div>
-                                    </div>
+                                    <div class="share-team-logo-container"><div class="share-team-logo"><img src="${awayLogo}" alt="${pred.awayTeam}" onerror="this.style.display='none'"></div></div>
                                     <div class="share-team-name">${pred.awayTeam}</div>
                                     <div class="share-team-prob">${(pred.awayWinProb * 100).toFixed(0)}%</div>
                                 </div>
-                                
-                                <div class="share-vs">
-                                    <div class="vs-badge">VS</div>
-                                </div>
-                                
+                                <div class="share-vs"><div class="vs-badge">VS</div></div>
                                 <div class="share-team ${pred.winner === pred.homeTeam ? 'winner' : ''}">
                                     <div class="share-team-label">Home</div>
-                                    <div class="share-team-logo-container">
-                                        <div class="share-team-logo">
-                                            ${homeLogo ? `<img src="${homeLogo}" alt="${pred.homeTeam}" onerror="this.style.display='none'">` : ''}
-                                        </div>
-                                    </div>
+                                    <div class="share-team-logo-container"><div class="share-team-logo"><img src="${homeLogo}" alt="${pred.homeTeam}" onerror="this.style.display='none'"></div></div>
                                     <div class="share-team-name">${pred.homeTeam}</div>
                                     <div class="share-team-prob">${(pred.homeWinProb * 100).toFixed(0)}%</div>
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="share-details">
                             <div class="share-prediction">
                                 <div class="share-prediction-label">Predicted Winner</div>
                                 <div class="share-prediction-value">${pred.winner}</div>
                             </div>
-                            
                             <div class="share-stats-grid">
-                                <div class="share-stat">
-                                    <div class="share-stat-label">Win Probability</div>
-                                    <div class="share-stat-value">${(pred.winnerProb * 100).toFixed(0)}%</div>
-                                </div>
-                                <div class="share-stat">
-                                    <div class="share-stat-label">Predicted Margin</div>
-                                    <div class="share-stat-value">${pred.predictedMargin.toFixed(1)}</div>
-                                </div>
-                                <div class="share-stat">
-                                    <div class="share-stat-label">Home Elo</div>
-                                    <div class="share-stat-value">${pred.homeElo}</div>
-                                </div>
-                                <div class="share-stat">
-                                    <div class="share-stat-label">Away Elo</div>
-                                    <div class="share-stat-value">${pred.awayElo}</div>
-                                </div>
+                                <div class="share-stat"><div class="share-stat-label">Win Probability</div><div class="share-stat-value">${(pred.winnerProb * 100).toFixed(0)}%</div></div>
+                                <div class="share-stat"><div class="share-stat-label">Predicted Margin</div><div class="share-stat-value">${pred.predictedMargin.toFixed(1)}</div></div>
+                                <div class="share-stat"><div class="share-stat-label">${pred.homeTeam} Record</div><div class="share-stat-value">${pred.homeRecord}</div></div>
+                                <div class="share-stat"><div class="share-stat-label">${pred.awayTeam} Record</div><div class="share-stat-value">${pred.awayRecord}</div></div>
                             </div>
-                            
-                            <div class="share-venue">📍 ${venue}</div>
+                            <div class="share-venue">📍 ${pred.venue}</div>
                             <div class="share-footer">
                                 <span>Powered by</span>
                                 <img src="Logo.svg" alt="Logo" class="share-footer-logo">
@@ -1852,13 +1438,9 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="modal-actions">
-                        <button class="btn-close" onclick="closeShareModal()">Close</button>
-                    </div>
+                    <div class="modal-actions"><button class="btn-close" onclick="window.closeShareModal()">Close</button></div>
                 </div>
             `;
-
             modal.classList.add('active');
         }
 
@@ -1866,90 +1448,62 @@
             document.getElementById('shareModal').classList.remove('active');
         }
 
-        // Make functions available globally for onclick handlers
         window.openShareModal = openShareModal;
         window.closeShareModal = closeShareModal;
 
-        // ===== MAIN WORKFLOW =====
         async function runPrediction() {
             try {
-                const year = parseInt(document.getElementById('seasonYear').value);
-                let week = parseInt(document.getElementById('weekNumber').value);
-
-                if (!week || isNaN(week)) {
-                    week = await getCurrentWeek(year);
-                }
-
-                // Fetch season history for model training
-                const seasonGames = await fetchSeasonGames(year);
+                const week = await getCurrentWeek();
+                const [games, advanced, records] = await Promise.all([
+                    fetchGames(CURRENT_YEAR, week),
+                    fetchAdvancedStats(CURRENT_YEAR),
+                    fetchTeamRecords(CURRENT_YEAR)
+                ]);
                 
-                if (seasonGames.length === 0) {
-                    logStatus('No season data found', 'error');
-                    return;
-                }
-
-                // Build model
-                eloRatings = calculateEloFromHistory(seasonGames);
-                teamStats = calculateTeamStats(seasonGames);
-
-                // Fetch current week games
-                const weekGames = await fetchGames(year, week);
-                
-                if (weekGames.length === 0) {
+                if (games.length === 0) {
                     logStatus('No games found for this week', 'error');
                     return;
                 }
 
                 logStatus('Generating predictions...', 'loading');
-                
-                allPredictions = weekGames
-                    .map(event => predictGame(event, eloRatings, teamStats))
-                    .filter(p => p !== null);
-
-                allPredictions.sort((a, b) => {
-                    const confA = Math.abs(a.homeWinProb - 0.5);
-                    const confB = Math.abs(b.homeWinProb - 0.5);
-                    return confB - confA;
-                });
-
+                allPredictions = games.filter(g => !g.completed).map(game => predictGame(game, advanced, records)).filter(p => p !== null);
+                allPredictions.sort((a, b) => Math.abs(b.homeWinProb - 0.5) - Math.abs(a.homeWinProb - 0.5));
                 predictions = [...allPredictions];
-
                 renderPredictions(predictions);
                 updateSummary(predictions);
-
-                document.getElementById('configPanel').classList.add('collapsed');
+                document.getElementById('apiKeyPanel').classList.add('hidden');
                 document.getElementById('statusBar').classList.add('hidden');
-
                 debug(`✅ ${predictions.length} predictions generated`);
-
             } catch (err) {
                 console.error(err);
                 logStatus(`Error: ${err.message}`, 'error');
             }
         }
 
-        // ===== EVENT LISTENERS =====
-        document.getElementById('runPrediction').addEventListener('click', runPrediction);
+        document.getElementById('saveApiKey').addEventListener('click', () => {
+            const key = document.getElementById('apiKey').value.trim();
+            if (!key) { alert('Please enter an API key'); return; }
+            apiKey = key;
+            localStorage.setItem('cfb_api_key', key);
+            runPrediction();
+        });
 
         document.querySelectorAll('.filter-chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                applyFilter(chip.dataset.filter);
-            });
+            chip.addEventListener('click', () => applyFilter(chip.dataset.filter));
         });
 
-        // Close modal on background click
         document.getElementById('shareModal').addEventListener('click', (e) => {
-            if (e.target.id === 'shareModal') {
-                closeShareModal();
-            }
+            if (e.target.id === 'shareModal') closeShareModal();
         });
 
-        logStatus('Ready. Click Generate Predictions to start.', 'success');
-        
-        // Auto-run predictions on page load
-        setTimeout(() => {
-            runPrediction();
-        }, 500);
+        const savedKey = localStorage.getItem('cfb_api_key');
+        if (savedKey) {
+            apiKey = savedKey;
+            document.getElementById('apiKey').value = savedKey;
+            setTimeout(() => runPrediction(), 500);
+        } else {
+            logStatus('Enter your API key to start', 'success');
+        }
     </script>
 </body>
 </html>
