@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#050a16" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Praeco | Predictive Intelligence for the Oilfield</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,11 +16,16 @@
       --accent-blue: #00aaff;
       --accent-teal: #00ffcc;
       --text-primary: #f0f5ff;
-      --text-secondary: #94a3c7;
+      --text-secondary: #c0cae7;
       --card-bg: rgba(10, 15, 26, 0.75);
       --glass-border: rgba(0, 170, 255, 0.2);
       --transition: 220ms ease;
       --max-width: 1200px;
+    }
+
+    html {
+      background: var(--bg);
+      color-scheme: dark;
     }
 
     * {
@@ -34,6 +41,7 @@
       color: var(--text-primary);
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
     }
 
     ::selection {
@@ -49,7 +57,7 @@
       display: flex;
       flex-direction: column;
       gap: 6rem;
-      padding: 4rem 1.25rem 6rem;
+      padding: calc(4rem + env(safe-area-inset-top, 0px)) 1.25rem 6rem;
     }
 
     section {
@@ -75,7 +83,7 @@
       display: grid;
       gap: 2.5rem;
       text-align: center;
-      padding-top: 2rem;
+      padding-top: calc(2rem + env(safe-area-inset-top, 0px));
     }
 
     .hero-logo {
@@ -103,6 +111,7 @@
       letter-spacing: 0.02em;
       max-width: 640px;
       margin: 0 auto 1.75rem;
+      color: #e2e9ff;
     }
 
     .cta-primary {
@@ -144,17 +153,43 @@
 
     .wave-divider {
       position: relative;
-      height: 80px;
+      height: 110px;
       overflow: hidden;
       margin: 0 auto;
       max-width: var(--max-width);
     }
 
     .wave-divider svg {
-      width: 180%;
-      height: 100%;
-      animation: wave-flow 16s linear infinite;
+      width: 160%;
+      height: 120%;
+      transform: translateX(-20%);
+    }
+
+    .wave-path {
+      fill: none;
+      stroke-linecap: round;
+      stroke-width: 4;
+      stroke-dasharray: 18 26;
+      stroke-dashoffset: 0;
+      animation: wave-flow 12s linear infinite;
+    }
+
+    .wave-path:nth-of-type(2) {
+      stroke-width: 3;
+      stroke-dasharray: 12 20;
       opacity: 0.55;
+      animation-duration: 18s;
+      animation-direction: reverse;
+      animation-delay: -2.5s;
+    }
+
+    .wave-path:nth-of-type(3) {
+      stroke-width: 6;
+      stroke-linecap: butt;
+      opacity: 0.25;
+      filter: blur(2px);
+      animation-duration: 28s;
+      animation-delay: -5s;
     }
 
     .section-header {
@@ -180,6 +215,7 @@
       border-radius: 28px;
       padding: clamp(1.75rem, 4vw, 3rem);
       backdrop-filter: blur(16px);
+      box-shadow: 0 24px 60px rgba(4, 18, 40, 0.45);
     }
 
     .story-grid p {
@@ -235,6 +271,7 @@
       background: linear-gradient(135deg, rgba(0, 170, 255, 0.1), rgba(0, 255, 204, 0.07));
       border: 1px solid var(--glass-border);
       backdrop-filter: blur(12px);
+      box-shadow: 0 26px 60px rgba(4, 18, 40, 0.45);
     }
 
     .texas-map {
@@ -251,7 +288,8 @@
     }
 
     .texas-map svg {
-      width: min(420px, 95vw);
+      width: clamp(260px, 82vw, 460px);
+      height: auto;
       filter: drop-shadow(0 28px 56px rgba(0, 170, 255, 0.38));
     }
 
@@ -269,13 +307,13 @@
 
     .map-point text {
       fill: #f5fbff;
-      font-size: 13px;
+      font-size: clamp(0.7rem, 1.9vw, 0.85rem);
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       paint-order: stroke fill;
-      stroke: rgba(5, 10, 22, 0.9);
-      stroke-width: 4px;
+      stroke: rgba(5, 10, 22, 0.85);
+      stroke-width: 3.5px;
       stroke-linejoin: round;
     }
 
@@ -288,7 +326,147 @@
       stroke-width: 1.75;
       stroke-linecap: round;
       stroke-dasharray: 4 6;
+      vector-effect: non-scaling-stroke;
       filter: drop-shadow(0 6px 18px rgba(0, 170, 255, 0.45));
+    }
+
+    .market-intel {
+      display: grid;
+      gap: clamp(1.75rem, 4vw, 3rem);
+      background: linear-gradient(160deg, rgba(0, 170, 255, 0.1), rgba(0, 255, 204, 0.08));
+      border-radius: 28px;
+      border: 1px solid rgba(0, 255, 204, 0.18);
+      padding: clamp(1.75rem, 4vw, 3rem);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 26px 60px rgba(4, 18, 40, 0.4);
+    }
+
+    .market-intel header {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .market-tagline {
+      color: var(--accent-teal);
+      font-size: 0.85rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .market-grid {
+      display: grid;
+      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .market-card {
+      position: relative;
+      display: grid;
+      gap: 0.65rem;
+      background: rgba(4, 14, 28, 0.78);
+      border-radius: 22px;
+      border: 1px solid rgba(0, 170, 255, 0.22);
+      padding: 1.5rem;
+      box-shadow: inset 0 0 0 1px rgba(0, 255, 204, 0.08);
+      overflow: hidden;
+    }
+
+    .market-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 10% 15%, rgba(0, 255, 204, 0.2), transparent 55%),
+        radial-gradient(circle at 90% 85%, rgba(0, 170, 255, 0.15), transparent 60%);
+      opacity: 0.6;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .market-card strong {
+      font-size: clamp(1.65rem, 7vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+    }
+
+    .market-card span {
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(198, 213, 245, 0.75);
+    }
+
+    .market-delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 600;
+      color: var(--accent-teal);
+      font-size: 0.95rem;
+    }
+
+    .market-delta.negative {
+      color: #ff7a8a;
+    }
+
+    .market-card strong.market-delta {
+      font-size: clamp(1.3rem, 6vw, 1.9rem);
+      font-weight: 700;
+      justify-content: flex-start;
+      display: inline-flex;
+      align-items: baseline;
+    }
+
+    .market-note {
+      font-size: 0.85rem;
+      color: rgba(200, 210, 240, 0.8);
+    }
+
+    .market-intel footer {
+      display: grid;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      color: rgba(180, 196, 232, 0.65);
+    }
+
+    .market-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 0.85rem;
+      border-radius: 999px;
+      background: rgba(0, 255, 204, 0.12);
+      border: 1px solid rgba(0, 170, 255, 0.25);
+      width: fit-content;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-teal);
+    }
+
+    .market-status svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .market-intel.is-error {
+      border-color: rgba(255, 122, 138, 0.35);
+      box-shadow: 0 26px 60px rgba(60, 10, 24, 0.4);
+    }
+
+    .market-intel.is-error .market-status {
+      background: rgba(255, 122, 138, 0.14);
+      border-color: rgba(255, 122, 138, 0.35);
+      color: #ff7a8a;
+    }
+
+    .market-intel.is-error .market-status circle:last-of-type {
+      fill: #ff7a8a;
+    }
+
+    .market-intel.is-error .market-note {
+      color: rgba(255, 185, 198, 0.82);
     }
 
     .architecture {
@@ -353,10 +531,11 @@
     .timeline-item {
       display: grid;
       gap: 0.35rem;
-      background: rgba(5, 10, 22, 0.8);
-      border: 1px solid rgba(0, 255, 204, 0.2);
+      background: rgba(5, 10, 22, 0.88);
+      border: 1px solid rgba(0, 255, 204, 0.28);
       border-radius: 18px;
       padding: 1.25rem 1.5rem;
+      box-shadow: 0 16px 40px rgba(4, 18, 40, 0.45);
     }
 
     .timeline-year {
@@ -382,11 +561,12 @@
     }
 
     .footer {
-      border-top: 1px solid rgba(0, 170, 255, 0.08);
-      padding: 2.5rem 1.25rem 3rem;
+      margin-top: 4rem;
+      padding: 2.75rem 1.25rem 3.5rem;
       text-align: center;
-      color: rgba(148, 163, 199, 0.65);
+      color: rgba(180, 198, 236, 0.68);
       font-size: 0.85rem;
+      background: linear-gradient(180deg, rgba(4, 16, 30, 0) 0%, rgba(4, 16, 30, 0.55) 100%);
     }
 
     .modal {
@@ -446,9 +626,10 @@
     .floating-wave {
       position: fixed;
       top: -160px;
-      left: -20%;
-      width: 140%;
+      left: 50%;
+      width: min(140vw, 1600px);
       height: 320px;
+      transform: translateX(-50%);
       background: radial-gradient(circle at 20% 40%, rgba(0, 170, 255, 0.16), transparent 55%),
         radial-gradient(circle at 80% 60%, rgba(0, 255, 204, 0.18), transparent 55%);
       filter: blur(120px);
@@ -486,10 +667,10 @@
 
     @keyframes wave-flow {
       0% {
-        transform: translateX(0);
+        stroke-dashoffset: 0;
       }
       100% {
-        transform: translateX(-30%);
+        stroke-dashoffset: -220;
       }
     }
 
@@ -537,6 +718,16 @@
       }
     }
 
+    @media (max-width: 480px) {
+      .market-card {
+        padding: 1.25rem;
+      }
+
+      .market-note {
+        font-size: 0.8rem;
+      }
+    }
+
     @media (min-width: 1024px) {
       .product-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -579,13 +770,84 @@
 
     <div class="wave-divider" aria-hidden="true">
       <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-        <path d="M0,60 C200,20 400,100 600,60 C800,20 1000,100 1200,60" fill="none" stroke="url(#waveGradient)" stroke-width="6" stroke-linecap="round" />
         <defs>
           <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.6)" />
-            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.6)" />
+            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.7)" />
+            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.7)" />
+          </linearGradient>
+          <linearGradient id="waveGradientSoft" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.45)" />
+            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.45)" />
+          </linearGradient>
+          <linearGradient id="waveGradientGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(0, 255, 204, 0.35)" />
+            <stop offset="100%" stop-color="rgba(0, 170, 255, 0.35)" />
           </linearGradient>
         </defs>
+        <path class="wave-path" d="M0,62 C200,26 400,96 600,62 C800,28 1000,98 1200,62" stroke="url(#waveGradient)" />
+        <path class="wave-path" d="M0,58 C220,18 380,94 600,58 C820,22 980,102 1200,58" stroke="url(#waveGradientSoft)" />
+        <path class="wave-path" d="M0,68 C210,32 420,104 600,68 C780,32 990,104 1200,68" stroke="url(#waveGradientGlow)" />
+      </svg>
+    </div>
+
+    <section class="market-intel" aria-labelledby="market-intel-title" data-wti-card>
+      <header>
+        <span class="market-tagline">Live Market Intelligence</span>
+        <h2 id="market-intel-title">WTI Outlook & Accuracy</h2>
+        <p class="market-note">Praeco's forecast engine keeps hedging and production plans aligned with benchmark crude pricing.</p>
+      </header>
+      <div class="market-status" data-wti-status>
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <circle cx="8" cy="8" r="7" fill="none" stroke="rgba(0, 255, 204, 0.35)" stroke-width="1.5" />
+          <circle cx="8" cy="8" r="4" fill="var(--accent-teal)" opacity="0.35">
+            <animate attributeName="opacity" values="0.35;0.7;0.35" dur="2.8s" repeatCount="indefinite" />
+          </circle>
+        </svg>
+        <span>Updating markets</span>
+      </div>
+      <div class="market-grid">
+        <article class="market-card" aria-live="polite">
+          <span>Last Close</span>
+          <strong data-wti-last-price>--</strong>
+          <div class="market-delta" data-wti-delta>Δ --</div>
+          <p class="market-note" data-wti-last-date>Awaiting market data.</p>
+        </article>
+        <article class="market-card">
+          <span>Tomorrow's Forecast</span>
+          <strong data-wti-forecast>--</strong>
+          <p class="market-note" data-wti-forecast-note>Generating projection...</p>
+        </article>
+        <article class="market-card">
+          <span>Yesterday's Prediction vs Actual</span>
+          <strong class="market-delta" data-wti-accuracy>Δ --</strong>
+          <p class="market-note" data-wti-accuracy-note>Measuring variance...</p>
+        </article>
+      </div>
+      <footer>
+        <p>The outlook uses a short-term momentum signal: tomorrow's forecast equals today's close plus the latest delta.</p>
+        <p>Yesterday's accuracy checks that same method against today's settlement so teams can calibrate confidence in the signal.</p>
+      </footer>
+    </section>
+
+    <div class="wave-divider" aria-hidden="true">
+      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="waveGradientB" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.7)" />
+            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.7)" />
+          </linearGradient>
+          <linearGradient id="waveGradientSoftB" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.45)" />
+            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.45)" />
+          </linearGradient>
+          <linearGradient id="waveGradientGlowB" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(0, 255, 204, 0.35)" />
+            <stop offset="100%" stop-color="rgba(0, 170, 255, 0.35)" />
+          </linearGradient>
+        </defs>
+        <path class="wave-path" d="M0,62 C200,26 400,96 600,62 C800,28 1000,98 1200,62" stroke="url(#waveGradientB)" />
+        <path class="wave-path" d="M0,58 C220,18 380,94 600,58 C820,22 980,102 1200,58" stroke="url(#waveGradientSoftB)" />
+        <path class="wave-path" d="M0,68 C210,32 420,104 600,68 C780,32 990,104 1200,68" stroke="url(#waveGradientGlowB)" />
       </svg>
     </div>
 
@@ -737,13 +999,23 @@
 
     <div class="wave-divider" aria-hidden="true">
       <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-        <path d="M0,60 C200,20 400,100 600,60 C800,20 1000,100 1200,60" fill="none" stroke="url(#waveGradient2)" stroke-width="6" stroke-linecap="round" />
         <defs>
-          <linearGradient id="waveGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="rgba(0, 255, 204, 0.5)" />
-            <stop offset="100%" stop-color="rgba(0, 170, 255, 0.5)" />
+          <linearGradient id="waveGradientC" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(0, 255, 204, 0.55)" />
+            <stop offset="100%" stop-color="rgba(0, 170, 255, 0.55)" />
+          </linearGradient>
+          <linearGradient id="waveGradientSoftC" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.4)" />
+            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.4)" />
+          </linearGradient>
+          <linearGradient id="waveGradientGlowC" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.3)" />
+            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.3)" />
           </linearGradient>
         </defs>
+        <path class="wave-path" d="M0,62 C200,26 400,96 600,62 C800,28 1000,98 1200,62" stroke="url(#waveGradientC)" />
+        <path class="wave-path" d="M0,58 C220,18 380,94 600,58 C820,22 980,102 1200,58" stroke="url(#waveGradientSoftC)" />
+        <path class="wave-path" d="M0,68 C210,32 420,104 600,68 C780,32 990,104 1200,68" stroke="url(#waveGradientGlowC)" />
       </svg>
     </div>
 
@@ -793,6 +1065,164 @@
         closeModal();
       }
     });
+
+    const wtiSection = document.querySelector('[data-wti-card]');
+    if (wtiSection) {
+      const WTI_DATA_URL = 'https://raw.githubusercontent.com/datasets/oil-prices/master/data/wti-daily.csv';
+      const statusEl = wtiSection.querySelector('[data-wti-status] span');
+      const statusWrapper = wtiSection.querySelector('[data-wti-status]');
+      const lastPriceEl = wtiSection.querySelector('[data-wti-last-price]');
+      const lastDateEl = wtiSection.querySelector('[data-wti-last-date]');
+      const deltaEl = wtiSection.querySelector('[data-wti-delta]');
+      const forecastEl = wtiSection.querySelector('[data-wti-forecast]');
+      const forecastNoteEl = wtiSection.querySelector('[data-wti-forecast-note]');
+      const accuracyEl = wtiSection.querySelector('[data-wti-accuracy]');
+      const accuracyNoteEl = wtiSection.querySelector('[data-wti-accuracy-note]');
+
+      if (statusWrapper) {
+        statusWrapper.setAttribute('role', 'status');
+        statusWrapper.setAttribute('aria-live', 'polite');
+      }
+
+      const dateFormatter = new Intl.DateTimeFormat('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+      const statusFormatter = new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+
+      const formatPrice = (value) => `$${value.toFixed(2)}`;
+      const formatDelta = (value) => `${value >= 0 ? '+' : '−'}$${Math.abs(value).toFixed(2)}`;
+      const formatPercent = (value) => `${value >= 0 ? '+' : '−'}${Math.abs(value).toFixed(2)}%`;
+
+      const setDeltaBlock = (element, value, percent) => {
+        if (!element) return;
+        const deltaText = `Δ ${formatDelta(value)} (${formatPercent(percent)})`;
+        element.textContent = deltaText;
+        element.classList.toggle('negative', value < 0);
+      };
+
+      const handleError = (error) => {
+        console.error('Unable to load WTI data', error);
+        wtiSection.classList.add('is-error');
+        if (statusEl) {
+          statusEl.textContent = 'Live feed unavailable';
+        }
+        if (deltaEl) {
+          deltaEl.textContent = 'Δ --';
+          deltaEl.classList.remove('negative');
+        }
+        if (accuracyEl) {
+          accuracyEl.textContent = 'Δ --';
+          accuracyEl.classList.remove('negative');
+        }
+        if (lastPriceEl) {
+          lastPriceEl.textContent = '--';
+        }
+        if (lastDateEl) {
+          lastDateEl.textContent = 'Unable to load WTI benchmark pricing right now.';
+        }
+        if (forecastEl) {
+          forecastEl.textContent = '--';
+        }
+        if (forecastNoteEl) {
+          forecastNoteEl.textContent = 'We will refresh the projection once pricing is back online.';
+        }
+        if (accuracyNoteEl) {
+          accuracyNoteEl.textContent = 'Forecast accuracy tracking is paused until we have the latest settlement.';
+        }
+      };
+
+      const addDays = (isoDate, amount) => {
+        const date = new Date(`${isoDate}T00:00:00Z`);
+        date.setUTCDate(date.getUTCDate() + amount);
+        return date;
+      };
+
+      const loadWTIData = async () => {
+        try {
+          const response = await fetch(WTI_DATA_URL, { cache: 'no-store' });
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          const text = await response.text();
+          const lines = text.trim().split('\n').filter((line) => line && !line.startsWith('Date'));
+          if (lines.length < 3) {
+            throw new Error('Not enough historical pricing data');
+          }
+
+          const entries = lines
+            .slice(-6)
+            .map((line) => {
+              const [date, price] = line.split(',');
+              const value = parseFloat(price);
+              if (!date || Number.isNaN(value)) {
+                return undefined;
+              }
+              return { date, price: value };
+            })
+            .filter(Boolean);
+
+          if (entries.length < 3) {
+            throw new Error('Unable to parse WTI pricing feed');
+          }
+
+          const latest = entries[entries.length - 1];
+          const previous = entries[entries.length - 2];
+          const prior = entries[entries.length - 3];
+
+          const dailyDelta = latest.price - previous.price;
+          const dailyPercent = (dailyDelta / previous.price) * 100;
+          const forecastTomorrow = latest.price + dailyDelta;
+          const forecastToday = previous.price + (previous.price - prior.price);
+          const accuracyDelta = latest.price - forecastToday;
+          const accuracyPercent = (accuracyDelta / latest.price) * 100;
+          const tomorrowDate = addDays(latest.date, 1);
+
+          if (lastPriceEl) {
+            lastPriceEl.textContent = formatPrice(latest.price);
+          }
+          if (lastDateEl) {
+            lastDateEl.textContent = `${dateFormatter.format(new Date(`${latest.date}T00:00:00Z`))}`;
+          }
+          setDeltaBlock(deltaEl, dailyDelta, dailyPercent);
+
+          if (forecastEl) {
+            forecastEl.textContent = formatPrice(forecastTomorrow);
+          }
+          if (forecastNoteEl) {
+            forecastNoteEl.textContent = `Momentum outlook for ${dateFormatter.format(tomorrowDate)} using ${formatDelta(dailyDelta)} delta.`;
+          }
+
+          if (accuracyEl) {
+            const accuracyLabel = `Δ ${formatDelta(accuracyDelta)} (${formatPercent(accuracyPercent)})`;
+            accuracyEl.textContent = accuracyLabel;
+            accuracyEl.classList.toggle('negative', accuracyDelta < 0);
+          }
+          if (accuracyNoteEl) {
+            const comparison = `${formatPrice(forecastToday)} forecast vs ${formatPrice(latest.price)} settlement.`;
+            const direction = accuracyDelta === 0 ? 'on target' : accuracyDelta > 0 ? 'finished higher than projected' : 'finished lower than projected';
+            accuracyNoteEl.textContent = `${comparison} Market ${direction}.`;
+          }
+
+          if (statusEl) {
+            statusEl.textContent = `Updated ${statusFormatter.format(new Date(`${latest.date}T00:00:00Z`))}`;
+          }
+          if (statusWrapper) {
+            statusWrapper.title = `Latest WTI close recorded on ${dateFormatter.format(new Date(`${latest.date}T00:00:00Z`))}`;
+          }
+        } catch (error) {
+          handleError(error);
+        }
+      };
+
+      loadWTIData();
+    }
   </script>
 </body>
 </html>
