@@ -677,6 +677,15 @@
             animation: pulse 2s infinite;
         }
 
+        .api-quota-container {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
         .loading::before {
             background: var(--warning);
         }
@@ -1141,7 +1150,12 @@
         </div>
 
         <!-- Status Bar -->
-        <div class="status-bar hidden" id="statusBar"></div>
+        <div class="status-bar hidden" id="statusBar">
+            <span id="statusText"></span>
+            <span id="apiQuotaContainer" class="api-quota-container" style="margin-left: auto; display: none;">
+                API Quota: <span id="apiQuota" style="font-weight: 700;">--</span>
+            </span>
+        </div>
 
         <!-- Filters -->
         <div class="filters hidden" id="filters">
@@ -1265,6 +1279,12 @@
         let allPredictions = []; // Store unfiltered predictions
         let activeFilter = 'all';
         let debugMode = true;
+        let apiRequestCount = 0;
+        let rateLimitInfo = {
+            remaining: null,
+            reset: null,
+            limit: null
+        };
 
         // ===== UTILITIES =====
         function debug(message, data = null) {
@@ -1275,8 +1295,17 @@
 
         function logStatus(message, type = 'loading') {
             const statusBar = document.getElementById('statusBar');
+            const statusText = document.getElementById('statusText');
+            const quotaContainer = document.getElementById('apiQuotaContainer');
+            
             statusBar.className = `status-bar ${type}`;
-            statusBar.textContent = message;
+            statusText.textContent = message;
+            
+            // Show quota if we have it
+            if (rateLimitInfo.remaining !== null && quotaContainer) {
+                quotaContainer.style.display = 'flex';
+            }
+            
             debug(message);
         }
 
@@ -1304,11 +1333,62 @@
             for (let i = 0; i < retries; i++) {
                 try {
                     const response = await fetch(url, options);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    // Capture rate limit info from headers
+                    if (response.headers.get('x-ratelimit-remaining')) {
+                        rateLimitInfo.remaining = parseInt(response.headers.get('x-ratelimit-remaining'));
+                        rateLimitInfo.limit = parseInt(response.headers.get('x-ratelimit-limit')) || null;
+                        rateLimitInfo.reset = response.headers.get('x-ratelimit-reset') || null;
+                        updateRateLimitDisplay();
+                    }
+                    
+                    apiRequestCount++;
+                    
+                    if (!response.ok) {
+                        if (response.status === 429) {
+                            const resetTime = response.headers.get('x-ratelimit-reset');
+                            const retryAfter = response.headers.get('retry-after');
+                            
+                            let waitMessage = 'Rate limit exceeded. ';
+                            if (resetTime) {
+                                const resetDate = new Date(parseInt(resetTime) * 1000);
+                                waitMessage += `Resets at ${resetDate.toLocaleString()}`;
+                            } else if (retryAfter) {
+                                waitMessage += `Retry after ${retryAfter} seconds`;
+                            }
+                            
+                            throw new Error(waitMessage);
+                        }
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
                     return await response.json();
                 } catch (err) {
                     if (i === retries - 1) throw err;
                     await new Promise(r => setTimeout(r, RETRY_DELAY * (i + 1)));
+                }
+            }
+        }
+
+        function updateRateLimitDisplay() {
+            const statusBar = document.getElementById('statusBar');
+            if (rateLimitInfo.remaining !== null) {
+                const limitText = rateLimitInfo.limit ? `/${rateLimitInfo.limit}` : '';
+                const quotaEl = document.getElementById('apiQuota');
+                if (quotaEl) {
+                    quotaEl.textContent = `${rateLimitInfo.remaining}${limitText}`;
+                    
+                    // Color code based on remaining requests
+                    if (rateLimitInfo.limit) {
+                        const percentRemaining = (rateLimitInfo.remaining / rateLimitInfo.limit) * 100;
+                        if (percentRemaining < 10) {
+                            quotaEl.style.color = 'var(--danger)';
+                        } else if (percentRemaining < 25) {
+                            quotaEl.style.color = 'var(--warning)';
+                        } else {
+                            quotaEl.style.color = 'var(--success)';
+                        }
+                    }
                 }
             }
         }
@@ -1910,6 +1990,10 @@
         // ===== MAIN WORKFLOW =====
         async function runPrediction() {
             try {
+                // Reset counters
+                apiRequestCount = 0;
+                rateLimitInfo = { remaining: null, reset: null, limit: null };
+                
                 // Get inputs
                 apiKey = document.getElementById('apiKey').value.trim();
                 if (!apiKey) {
