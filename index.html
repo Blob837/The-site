@@ -1,1 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Praeco | Predicting Production. Powering Throughput.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-primary: #050510;
+            --bg-secondary: #0b1120;
+            --bg-elevated: #10182c;
+            --text-primary: #f7faff;
+            --text-muted: #8ba0c9;
+            --accent-blue: #3c7bff;
+            --accent-teal: #20f6d8;
+            --accent-gradient: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            --max-width: 1120px;
+            --radius-large: 28px;
+            --radius-medium: 20px;
+            --radius-small: 14px;
+            --shadow-soft: 0 20px 60px rgba(10, 40, 90, 0.35);
+            color-scheme: dark;
+        }
 
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at 20% -10%, rgba(44, 78, 160, 0.35), transparent 55%),
+                radial-gradient(circle at 80% 0%, rgba(32, 246, 216, 0.25), transparent 60%),
+                var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        main {
+            overflow: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            margin: 0 0 0.6em;
+            line-height: 1.15;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        p {
+            margin: 0 0 1.1em;
+            color: var(--text-muted);
+        }
+
+        .page {
+            position: relative;
+        }
+
+        .wave-overlay::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                    90deg,
+                    rgba(32, 246, 216, 0.12) 0,
+                    rgba(32, 246, 216, 0.12) 2px,
+                    transparent 2px,
+                    transparent 32px
+                );
+            mask-image: radial-gradient(circle at top, rgba(0, 0, 0, 0.45), transparent 70%);
+            opacity: 0.5;
+            animation: drift 24s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(-32px);
+            }
+        }
+
+        .container {
+            width: min(92%, var(--max-width));
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero {
+            position: relative;
+            padding: 120px 0 90px;
+        }
+
+        .hero::before,
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .hero::before {
+            background: radial-gradient(circle at 10% 20%, rgba(60, 123, 255, 0.28), transparent 65%),
+                radial-gradient(circle at 75% 15%, rgba(32, 246, 216, 0.22), transparent 60%);
+            filter: blur(0.5px);
+            animation: pulse 18s ease-in-out infinite;
+        }
+
+        .hero::after {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="320" viewBox="0 0 1440 320"><path fill="none" stroke="rgba(44,160,202,0.26)" stroke-width="2" d="M0 160c70-40 140-40 210 0s140 40 210 0 140-40 210 0 140 40 210 0 140-40 210 0 140 40 210 0 140-40 210 0"/></svg>') center/cover repeat-x;
+            opacity: 0.4;
+            transform: translateY(30px);
+            animation: waveShift 28s linear infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.45;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.85;
+                transform: scale(1.06);
+            }
+        }
+
+        @keyframes waveShift {
+            from {
+                background-position: 0 80%;
+            }
+            to {
+                background-position: 1440px 60%;
+            }
+        }
+
+        .hero-content {
+            display: grid;
+            gap: 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-tagline {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .hero-tagline {
+            font-size: clamp(2.4rem, 6vw, 3.8rem);
+            max-width: 12ch;
+        }
+
+        .hero-subcopy {
+            font-size: 1.05rem;
+            max-width: 52ch;
+        }
+
+        .cta-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .cta-button {
+            padding: 16px 28px;
+            border-radius: 999px;
+            border: none;
+            background-image: var(--accent-gradient);
+            color: var(--bg-primary);
+            font-weight: 600;
+            font-size: 1.05rem;
+            letter-spacing: 0.02em;
+            box-shadow: 0 12px 40px rgba(32, 246, 216, 0.35);
+            transition: transform 0.35s ease, box-shadow 0.35s ease, filter 0.35s ease;
+            cursor: pointer;
+        }
+
+        .cta-button:hover,
+        .cta-button:focus-visible {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 22px 60px rgba(32, 246, 216, 0.4);
+            filter: brightness(1.05);
+        }
+
+        .signal-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .signal-bar span {
+            display: inline-flex;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-teal);
+            box-shadow: 0 0 14px rgba(32, 246, 216, 0.6);
+            animation: pulseSignal 2.6s ease-in-out infinite;
+        }
+
+        @keyframes pulseSignal {
+            0%,
+            100% {
+                transform: scale(0.85);
+                opacity: 0.55;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        section {
+            position: relative;
+            padding: 80px 0;
+        }
+
+        .section-header {
+            margin-bottom: 36px;
+        }
+
+        .section-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background: rgba(60, 123, 255, 0.08);
+            border: 1px solid rgba(60, 123, 255, 0.15);
+        }
+
+        .cards {
+            display: grid;
+            gap: 20px;
+        }
+
+        .card {
+            background: linear-gradient(160deg, rgba(16, 24, 44, 0.85), rgba(10, 18, 32, 0.92));
+            border: 1px solid rgba(60, 123, 255, 0.12);
+            border-radius: var(--radius-medium);
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        .card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(32, 246, 216, 0.22), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            pointer-events: none;
+        }
+
+        .card:hover,
+        .card:focus-within {
+            transform: translateY(-6px);
+            border-color: rgba(32, 246, 216, 0.4);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .card:hover::after,
+        .card:focus-within::after {
+            opacity: 1;
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+        }
+
+        .grid-two {
+            display: grid;
+            gap: 32px;
+        }
+
+        .map-panel {
+            background: linear-gradient(160deg, rgba(10, 16, 32, 0.92), rgba(12, 20, 36, 0.94));
+            border-radius: var(--radius-large);
+            padding: 32px;
+            border: 1px solid rgba(60, 123, 255, 0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 35% 30%, rgba(60, 123, 255, 0.26), transparent 60%);
+            mix-blend-mode: screen;
+            opacity: 0.8;
+            animation: pulse 20s ease-in-out infinite;
+        }
+
+        .map-grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .map-visual {
+            position: relative;
+        }
+
+        .map-visual svg {
+            width: 100%;
+            max-width: 420px;
+            display: block;
+            margin: 0 auto;
+            filter: drop-shadow(0 12px 30px rgba(32, 246, 216, 0.25));
+        }
+
+        .map-legends {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .legend-item span {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            background: var(--accent-gradient);
+            box-shadow: 0 0 18px rgba(32, 246, 216, 0.55);
+        }
+
+        .architecture-flow {
+            background: linear-gradient(170deg, rgba(9, 16, 32, 0.92), rgba(8, 18, 36, 0.85));
+            border-radius: var(--radius-large);
+            padding: 32px;
+            border: 1px solid rgba(60, 123, 255, 0.1);
+            display: grid;
+            gap: 24px;
+        }
+
+        .flow-steps {
+            display: grid;
+            gap: 24px;
+        }
+
+        .flow-step {
+            display: grid;
+            gap: 8px;
+            align-items: start;
+            grid-template-columns: auto 1fr;
+        }
+
+        .flow-step .marker {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgba(60, 123, 255, 0.2);
+            display: grid;
+            place-items: center;
+            font-weight: 600;
+            color: var(--accent-teal);
+            border: 1px solid rgba(32, 246, 216, 0.4);
+            box-shadow: 0 0 18px rgba(32, 246, 216, 0.4);
+        }
+
+        .timeline {
+            display: grid;
+            gap: 18px;
+            margin-top: 16px;
+        }
+
+        .timeline-item {
+            display: grid;
+            gap: 12px;
+            padding: 24px;
+            border-radius: var(--radius-medium);
+            background: rgba(11, 18, 36, 0.75);
+            border: 1px solid rgba(60, 123, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-item::before {
+            content: attr(data-year);
+            position: absolute;
+            top: 18px;
+            right: 24px;
+            font-weight: 600;
+            font-size: 1.15rem;
+            color: rgba(32, 246, 216, 0.85);
+            letter-spacing: 0.06em;
+        }
+
+        .future-vision {
+            background: linear-gradient(200deg, rgba(10, 18, 36, 0.92), rgba(16, 32, 54, 0.88));
+            border-radius: var(--radius-large);
+            padding: 36px;
+            border: 1px solid rgba(60, 123, 255, 0.12);
+            box-shadow: 0 24px 70px rgba(11, 38, 80, 0.35);
+        }
+
+        .closing {
+            text-align: center;
+            padding: 100px 0 140px;
+        }
+
+        .closing p {
+            margin: 0 auto 24px;
+            max-width: 64ch;
+        }
+
+        .closing .cta-button {
+            margin: 0 auto;
+        }
+
+        .closing .wave-divider {
+            margin: 60px auto 40px;
+            width: 100%;
+            max-width: 400px;
+            height: 20px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="40" viewBox="0 0 400 40"><path fill="none" stroke="rgba(32,246,216,0.5)" stroke-width="1.5" d="M0 20c20-12 40-12 60 0s40 12 60 0 40-12 60 0 40 12 60 0 40-12 60 0 40 12 60 0 40-12 60 0"/></svg>') center/contain repeat-x;
+            opacity: 0.65;
+            animation: waveShift 18s linear infinite;
+        }
+
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid rgba(60, 123, 255, 0.12);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        footer .container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: center;
+        }
+
+        @media (min-width: 640px) {
+            .cta-group {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .signal-bar {
+                font-size: 1rem;
+            }
+
+            .cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .grid-two {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .flow-steps {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                align-items: stretch;
+            }
+
+            .flow-step {
+                grid-template-columns: 1fr;
+                background: rgba(11, 18, 36, 0.7);
+                border: 1px solid rgba(60, 123, 255, 0.12);
+                border-radius: var(--radius-small);
+                padding: 18px;
+                gap: 14px;
+                text-align: left;
+            }
+
+            .flow-step .marker {
+                justify-self: start;
+            }
+
+            .timeline {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 960px) {
+            .hero {
+                padding: 140px 0 120px;
+            }
+
+            .hero-content {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+                align-items: center;
+            }
+
+            .logo-tagline {
+                gap: 32px;
+            }
+
+            .hero-tagline {
+                font-size: clamp(3rem, 4vw, 4.4rem);
+            }
+
+            .hero-visual {
+                justify-self: end;
+                position: relative;
+            }
+
+            .hero-visual::before {
+                content: "";
+                position: absolute;
+                inset: -16%;
+                background: radial-gradient(circle at 50% 50%, rgba(60, 123, 255, 0.28), transparent 70%);
+                filter: blur(12px);
+                z-index: -1;
+            }
+
+            .hero-visual svg {
+                width: min(420px, 90%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page wave-overlay">
+        <section class="hero">
+            <div class="container hero-content">
+                <div class="logo-tagline">
+                    <img src="Logo.svg" alt="Praeco logo" width="280" height="80" />
+                    <h1 class="hero-tagline">Predicting Production. Powering Throughput.</h1>
+                    <p class="hero-subcopy">
+                        Praeco delivers AI-driven production forecasts and real-time throughput visibility for the oilfield. Founded
+                        in Houston in 2025, starting in Texas, expanding across the U.S. in 2027.
+                    </p>
+                    <div class="cta-group">
+                        <button class="cta-button" type="button">Request Early Access</button>
+                        <div class="signal-bar">
+                            <span></span>
+                            Always-on predictive clarity for Texas basins.
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-visual" aria-hidden="true">
+                    <svg width="360" height="360" viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="heroGradient" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#3C7BFF" />
+                                <stop offset="100%" stop-color="#20F6D8" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="180" cy="180" r="168" stroke="url(#heroGradient)" stroke-opacity="0.25" stroke-width="2" />
+                        <circle cx="180" cy="180" r="132" stroke="url(#heroGradient)" stroke-opacity="0.35" stroke-width="2" />
+                        <path d="M32 220C62 172 108 148 160 160C208 172 248 148 288 128C320 112 344 112 360 128" stroke="url(#heroGradient)" stroke-width="2" stroke-linecap="round" />
+                        <path d="M0 176C40 150 86 152 132 184C178 216 224 214 270 178C316 142 352 138 384 164" stroke="url(#heroGradient)" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round" />
+                        <g filter="url(#glow)">
+                            <circle cx="112" cy="188" r="8" fill="#20F6D8" />
+                            <circle cx="232" cy="164" r="6" fill="#3C7BFF" />
+                            <circle cx="276" cy="206" r="7" fill="#20F6D8" />
+                        </g>
+                        <defs>
+                            <filter id="glow" x="0" y="0" width="360" height="360" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                <feGaussianBlur stdDeviation="8" result="blur" />
+                                <feMerge>
+                                    <feMergeNode in="blur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-eyebrow">About Praeco</span>
+                    <h2>Founded in Houston to deliver predictive clarity to the oilfield</h2>
+                    <p>
+                        Originating in Houston in 2025, Praeco exists to give operators a confident view of production before it happens.
+                        We build machine intelligence that fuses subsurface data, completions, artificial lift behavior, and
+                        environmental signals into actionable foresight for every well.
+                    </p>
+                </div>
+                <div class="cards">
+                    <article class="card">
+                        <h3>Origin</h3>
+                        <p>Built by Houston engineers and data scientists who have led energy operations across the Permian and Eagle Ford.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Mission</h3>
+                        <p>Deliver predictive clarity and operational foresight to high-stakes energy operations where throughput matters most.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Roadmap</h3>
+                        <p>Texas-first deployments across the Permian, Eagle Ford, and Delaware basins with U.S. expansion targeted for 2027.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Funding-ready Execution</h3>
+                        <p>Enterprise-grade security, observability, and deployment practices designed for operators and investors at scale.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-eyebrow">Product Highlights</span>
+                    <h2>Predictive intelligence built for production leaders</h2>
+                </div>
+                <div class="cards">
+                    <article class="card">
+                        <h3>Predictive Outputs</h3>
+                        <p>Accurate machine learning forecasts of well production trained on completions, decline curves, artificial lift profiles, and environmental data streams.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Real-time Throughput</h3>
+                        <p>Continuous visibility into pad, battery, and LACT station performance with anomaly detection and alerting tuned for operations teams.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Scalable Deployment</h3>
+                        <p>Architected to meet Texas operator needs first with secure ingestion and configurable integrations, ready to expand nationally.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Enterprise Delivery</h3>
+                        <p>Role-based access controls, auditable pipelines, and fully instrumented observability for boardroom-grade confidence.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="container grid-two">
+                <div class="map-panel">
+                    <div class="section-header">
+                        <span class="section-eyebrow">Texas Basins</span>
+                        <h2>Texas-first, U.S.-next expansion strategy</h2>
+                        <p>Praeco is rooted in the Permian, Eagle Ford, and Delaware basins with localized models tailored to the geology and operational cadence of each district.</p>
+                    </div>
+                    <div class="map-grid">
+                        <div class="map-visual" aria-hidden="true">
+                            <svg viewBox="0 0 360 320" xmlns="http://www.w3.org/2000/svg" role="presentation">
+                                <defs>
+                                    <linearGradient id="mapGlow" x1="0" y1="0" x2="1" y2="1">
+                                        <stop offset="0%" stop-color="#3C7BFF" stop-opacity="0.7" />
+                                        <stop offset="100%" stop-color="#20F6D8" stop-opacity="0.9" />
+                                    </linearGradient>
+                                    <radialGradient id="pinGlow" cx="50%" cy="50%" r="50%">
+                                        <stop offset="0%" stop-color="#20F6D8" stop-opacity="0.9" />
+                                        <stop offset="100%" stop-color="#20F6D8" stop-opacity="0" />
+                                    </radialGradient>
+                                </defs>
+                                <path d="M140 18l54 10 52 38-8 54 26 34-6 42-66 68-92-4-40-70 20-82 52-68z" fill="rgba(14,26,48,0.85)" stroke="url(#mapGlow)" stroke-width="2" stroke-linejoin="round" />
+                                <g>
+                                    <circle cx="222" cy="110" r="8" fill="#20F6D8" />
+                                    <circle cx="222" cy="110" r="26" fill="url(#pinGlow)" />
+                                    <text x="236" y="108" fill="#f7faff" font-size="12" font-weight="600">Permian</text>
+                                </g>
+                                <g>
+                                    <circle cx="186" cy="176" r="7" fill="#3C7BFF" />
+                                    <circle cx="186" cy="176" r="22" fill="url(#pinGlow)" />
+                                    <text x="198" y="190" fill="#f7faff" font-size="12" font-weight="600">Eagle Ford</text>
+                                </g>
+                                <g>
+                                    <circle cx="248" cy="154" r="7" fill="#20F6D8" />
+                                    <circle cx="248" cy="154" r="24" fill="url(#pinGlow)" />
+                                    <text x="262" y="150" fill="#f7faff" font-size="12" font-weight="600">Delaware</text>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="map-legends">
+                            <div class="legend-item">
+                                <span></span>
+                                Permian Basin: Midland + Delaware, optimized decline curve ensembles.
+                            </div>
+                            <div class="legend-item">
+                                <span></span>
+                                Eagle Ford: Liquids-heavy pads with rapid recompletion feedback loops.
+                            </div>
+                            <div class="legend-item">
+                                <span></span>
+                                Delaware Basin: High-resolution SCADA integration and throughput telemetry.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="architecture-flow">
+                    <div class="section-header">
+                        <span class="section-eyebrow">Architecture</span>
+                        <h2>Fail-safe by design. Secure by default.</h2>
+                        <p>Praeco&apos;s platform connects raw historian feeds to predictive intelligence and operational dashboards with security, compliance, and scalability embedded at every step.</p>
+                    </div>
+                    <div class="flow-steps">
+                        <div class="flow-step">
+                            <div class="marker">1</div>
+                            <div>
+                                <h3>SCADA / Historian Ingest</h3>
+                                <p>Encrypted pipelines pull sensor, allocation, and downtime events with automated validation.</p>
+                            </div>
+                        </div>
+                        <div class="flow-step">
+                            <div class="marker">2</div>
+                            <div>
+                                <h3>Feature Store</h3>
+                                <p>Contextualized features blending completions, artificial lift, weather, and infrastructure states.</p>
+                            </div>
+                        </div>
+                        <div class="flow-step">
+                            <div class="marker">3</div>
+                            <div>
+                                <h3>Predictive Ensembles</h3>
+                                <p>Hybrid physics + ML ensembles tuned for high-confidence production forecasts.</p>
+                            </div>
+                        </div>
+                        <div class="flow-step">
+                            <div class="marker">4</div>
+                            <div>
+                                <h3>Throughput Dashboards</h3>
+                                <p>Real-time visualization with alerting, audit trails, and executive-ready reporting.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-item" data-year="2025">
+                            <h3>Texas Launch</h3>
+                            <p>Production models calibrated for the Permian, Eagle Ford, and Delaware basins with operator pilots in Houston.</p>
+                        </div>
+                        <div class="timeline-item" data-year="2026">
+                            <h3>Feature Expansion</h3>
+                            <p>Integrated logistics coordination, refined ensemble management, and adaptive alerting across assets.</p>
+                        </div>
+                        <div class="timeline-item" data-year="2027">
+                            <h3>Nationwide Rollout</h3>
+                            <p>Scaling predictive intelligence across U.S. energy basins with investor-grade transparency.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="container future-vision">
+                <div class="section-header">
+                    <span class="section-eyebrow">Future Vision</span>
+                    <h2>Praeco becomes the predictive layer for U.S. energy infrastructure</h2>
+                    <p>
+                        We are building the AI control tower that orchestrates production, capital, and throughput decisions for operators,
+                        investors, and infrastructure partners. Praeco unifies signal and action so every barrel is anticipated before it
+                        hits the line.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="closing">
+            <div class="container">
+                <div class="wave-divider" aria-hidden="true"></div>
+                <h2>Predicting Production. Powering Throughput.</h2>
+                <p>Secure your spot in the Praeco early access program and bring predictive clarity to your operations.</p>
+                <button class="cta-button" type="button">Request Early Access</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <span>© 2025 Praeco. Built in Houston.</span>
+            <span>Texas-first. U.S.-next.</span>
+        </div>
+    </footer>
+</body>
+</html>
