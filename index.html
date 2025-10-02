@@ -510,6 +510,29 @@
         display: block;
       }
 
+      @media (max-width: 600px) {
+        :root {
+          --mobile-shell-padding: clamp(0.75rem, 4vw, 1.25rem);
+        }
+
+        .layout-container {
+          width: 100%;
+          padding: var(--space-lg) var(--mobile-shell-padding) var(--space-xl);
+        }
+
+        .market-intel {
+          padding: var(--space-md) var(--mobile-shell-padding);
+        }
+
+        .chart-frame {
+          padding: clamp(0.9rem, 4vw, 1.15rem);
+        }
+
+        .chart-frame svg {
+          min-height: 320px;
+        }
+      }
+
       .chart-grid path {
         stroke: rgba(48, 98, 140, 0.28);
         stroke-dasharray: 4 10;
@@ -1390,7 +1413,9 @@
 
         const wtiSection = document.querySelector('[data-wti-card]');
         if (wtiSection) {
-          const WTI_DATA_URL = 'https://raw.githubusercontent.com/datasets/oil-prices/master/data/wti-daily.csv';
+          const EIA_SERIES_URL = 'https://api.eia.gov/series/?series_id=PET.RWTC.D';
+          const DEFAULT_EIA_API_KEY = 'DEMO_KEY';
+          const EIA_REQUEST_TIMEOUT = 10000;
           const statusWrapper = wtiSection.querySelector('[data-wti-status]');
           const statusLabelEl = wtiSection.querySelector('[data-wti-status-label]');
           const lastPriceEl = wtiSection.querySelector('[data-wti-last-price]');
@@ -1436,6 +1461,51 @@
           const formatDelta = (value) => `${value >= 0 ? '+' : '−'}$${Math.abs(value).toFixed(2)}`;
           const formatPercent = (value) => `${value >= 0 ? '+' : '−'}${Math.abs(value).toFixed(2)}%`;
 
+          const resolveEiaApiKey = () => {
+            const inlineKey = wtiSection.getAttribute('data-eia-api-key');
+            if (inlineKey && inlineKey.trim()) {
+              return inlineKey.trim();
+            }
+            const metaKey = document.querySelector('meta[name="eia-api-key"]')?.content?.trim();
+            if (metaKey) return metaKey;
+            const globalKey =
+              window.EIA_API_KEY ||
+              window.WTI_EIA_API_KEY ||
+              window.__EIA_API_KEY__ ||
+              window.__ENV__?.EIA_API_KEY ||
+              window.__CONFIG__?.EIA_API_KEY;
+            if (typeof globalKey === 'string' && globalKey.trim()) {
+              return globalKey.trim();
+            }
+            try {
+              const storedKey = window.localStorage.getItem('praeco:eia-api-key');
+              if (storedKey && storedKey.trim()) {
+                return storedKey.trim();
+              }
+            } catch (storageError) {
+              // Ignore storage access issues (e.g., Safari private mode).
+            }
+            return DEFAULT_EIA_API_KEY;
+          };
+
+          const fetchWithTimeout = async (resource, options = {}, timeout = EIA_REQUEST_TIMEOUT) => {
+            const controller = new AbortController();
+            const timer = window.setTimeout(() => controller.abort(), timeout);
+            try {
+              const response = await fetch(resource, { ...options, signal: controller.signal });
+              return response;
+            } finally {
+              window.clearTimeout(timer);
+            }
+          };
+
+          const toIsoDate = (value) => {
+            if (typeof value === 'string' && /^\d{8}$/.test(value)) {
+              return `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`;
+            }
+            return value;
+          };
+
           const setDeltaBlock = (element, value, percent) => {
             if (!element) return;
             const deltaText = `Δ ${formatDelta(value)} (${formatPercent(percent)})`;
@@ -1451,18 +1521,20 @@
 
           const handleError = (error) => {
             console.error('Unable to load WTI data', error);
+            const errorName = error?.name === 'AbortError' ? 'Request timed out' : error?.message || 'Unknown error';
             wtiSection.classList.add('is-error');
             if (statusWrapper) {
               statusWrapper.setAttribute('aria-busy', 'false');
+              statusWrapper.title = `Unable to reach EIA feed (${errorName}).`;
             }
             if (statusLabelEl) {
-              statusLabelEl.textContent = 'Live feed unavailable';
+              statusLabelEl.textContent = error?.name === 'AbortError' ? 'EIA feed timeout' : 'EIA feed unavailable';
             }
             if (lastPriceEl) {
               lastPriceEl.textContent = '--';
             }
             if (lastDateEl) {
-              lastDateEl.textContent = 'Unable to load WTI benchmark pricing right now.';
+              lastDateEl.textContent = 'Unable to load EIA WTI settlements right now.';
             }
             if (deltaEl) {
               deltaEl.textContent = 'Δ --';
@@ -1472,7 +1544,7 @@
               forecastEl.textContent = '--';
             }
             if (forecastNoteEl) {
-              forecastNoteEl.textContent = 'Forecast paused until pricing resumes.';
+              forecastNoteEl.textContent = 'Verify your EIA API key and connectivity, then refresh.';
             }
             if (accuracyEl) {
               accuracyEl.textContent = 'Δ --';
@@ -1482,10 +1554,10 @@
               accuracyNoteEl.textContent = 'Accuracy pending next settlement.';
             }
             if (chartNoteEl) {
-              chartNoteEl.textContent = 'Unable to retrieve historical WTI settlements at the moment.';
+              chartNoteEl.textContent = 'Unable to retrieve historical EIA settlements at the moment.';
             }
             if (chartCaptionEl) {
-              chartCaptionEl.textContent = 'The visualization will refresh once the feed returns.';
+              chartCaptionEl.textContent = 'The visualization will refresh once the EIA feed responds.';
             }
             clearChart();
           };
@@ -1585,24 +1657,38 @@
 
           const loadWTIData = async () => {
             try {
+              wtiSection.classList.remove('is-error');
               if (statusWrapper) {
                 statusWrapper.setAttribute('aria-busy', 'true');
               }
               if (statusLabelEl) {
                 statusLabelEl.textContent = 'Loading WTI settlements…';
               }
-              const response = await fetch(WTI_DATA_URL, { cache: 'no-store' });
+              const apiKey = resolveEiaApiKey();
+              const requestUrl = `${EIA_SERIES_URL}&api_key=${encodeURIComponent(apiKey)}`;
+              const response = await fetchWithTimeout(requestUrl, { cache: 'no-store' }, EIA_REQUEST_TIMEOUT);
               if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
               }
-              const csvText = await response.text();
-              const rows = csvText.trim().split('\n');
-              const entries = rows
-                .slice(1)
-                .map((row) => {
-                  const [date, price] = row.split(',');
-                  return { date, price: Number.parseFloat(price) };
-                })
+              const payload = await response.json();
+              const responseError = payload?.response?.error || payload?.error;
+              if (responseError) {
+                const message =
+                  typeof responseError === 'string'
+                    ? responseError
+                    : responseError?.message || 'EIA feed returned an error response';
+                throw new Error(message);
+              }
+              const series = payload?.series?.[0];
+              const seriesData = Array.isArray(series?.data) ? series.data : [];
+              if (!seriesData.length) {
+                throw new Error('EIA series returned no data');
+              }
+              const entries = seriesData
+                .map(([rawDate, rawPrice]) => ({
+                  date: toIsoDate(String(rawDate)),
+                  price: Number.parseFloat(typeof rawPrice === 'string' ? rawPrice.replace(/,/g, '') : rawPrice)
+                }))
                 .filter((entry) => Number.isFinite(entry.price));
 
               if (entries.length < Math.max(CHART_ACTUAL_DAYS + 2, 3)) {
@@ -1619,12 +1705,20 @@
               const forecastToday = previous.price + (previous.price - prior.price);
               const accuracyDelta = latest.price - forecastToday;
               const accuracyPercent = (accuracyDelta / latest.price) * 100;
+              const latestDateObj = parseDate(latest.date);
+              const nowIsoDate = new Date().toISOString().slice(0, 10);
+              const comparisonAnchor = parseDate(nowIsoDate);
+              const daysSinceSettlement = Math.max(
+                0,
+                Math.round((comparisonAnchor.getTime() - latestDateObj.getTime()) / (1000 * 60 * 60 * 24))
+              );
+              const staleSuffix = daysSinceSettlement > 1 ? ' · last published settlement' : '';
 
               if (lastPriceEl) {
                 lastPriceEl.textContent = formatPrice(latest.price);
               }
               if (lastDateEl) {
-                lastDateEl.textContent = `${dateFormatter.format(parseDate(latest.date))}`;
+                lastDateEl.textContent = `${dateFormatter.format(latestDateObj)}`;
               }
               setDeltaBlock(deltaEl, dailyDelta, dailyPercent);
 
@@ -1632,8 +1726,8 @@
                 forecastEl.textContent = formatPrice(forecastTomorrow);
               }
               if (forecastNoteEl) {
-                forecastNoteEl.textContent = `Seven-day hybrid using last 30 settlements as of ${statusFormatter.format(
-                  parseDate(latest.date)
+                forecastNoteEl.textContent = `Seven-day hybrid using last 30 EIA settlements as of ${statusFormatter.format(
+                  latestDateObj
                 )}.`;
               }
 
@@ -1655,10 +1749,10 @@
 
               if (statusWrapper) {
                 statusWrapper.setAttribute('aria-busy', 'false');
-                statusWrapper.title = `Latest WTI close recorded on ${dateFormatter.format(parseDate(latest.date))}`;
+                statusWrapper.title = `Latest WTI close recorded on ${dateFormatter.format(latestDateObj)} via EIA`;
               }
               if (statusLabelEl) {
-                statusLabelEl.textContent = `Updated ${statusFormatter.format(parseDate(latest.date))}`;
+                statusLabelEl.textContent = `Settled ${statusFormatter.format(latestDateObj)}${staleSuffix}`;
               }
 
               const chartActual = entries
@@ -1718,7 +1812,7 @@
                   const horizonEnd = chartForecast[chartForecast.length - 1];
                   chartNoteEl.textContent = `Last 30 settlements through ${statusFormatter.format(
                     parseDate(chartActual[chartActual.length - 1].isoDate)
-                  )}; projection extends to ${statusFormatter.format(horizonEnd.date)}.`;
+                  )} via EIA; projection extends to ${statusFormatter.format(horizonEnd.date)}.`;
                 } else {
                   chartNoteEl.textContent = 'Awaiting sufficient market history to render the trajectory.';
                 }
@@ -1736,7 +1830,18 @@
 
               renderChart(chartActual, chartForecast);
             } catch (error) {
-              handleError(error);
+              const normalizedError = (() => {
+                if (error?.name === 'AbortError') {
+                  const timeoutError = new Error('EIA request timed out');
+                  timeoutError.name = 'AbortError';
+                  return timeoutError;
+                }
+                if (error instanceof Error) {
+                  return error;
+                }
+                return new Error(typeof error === 'string' ? error : 'Unknown error');
+              })();
+              handleError(normalizedError);
             }
           };
 
