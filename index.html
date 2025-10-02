@@ -17,10 +17,8 @@
       --accent-teal: #00ffcc;
       --text-primary: #f0f5ff;
       --text-secondary: #c0cae7;
-      --card-bg: rgba(10, 15, 26, 0.75);
-      --glass-border: rgba(0, 170, 255, 0.2);
       --transition: 220ms ease;
-      --max-width: 1200px;
+      --max-width: 1080px;
     }
 
     html {
@@ -35,14 +33,17 @@
     body {
       margin: 0;
       font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: radial-gradient(circle at 20% 20%, rgba(0, 170, 255, 0.12), transparent 55%),
-        radial-gradient(circle at 80% 10%, rgba(0, 255, 204, 0.15), transparent 45%),
-        var(--bg);
+      background: radial-gradient(circle at 20% 20%, rgba(0, 170, 255, 0.18), transparent 58%),
+        radial-gradient(circle at 72% 18%, rgba(0, 255, 204, 0.18), transparent 48%),
+        linear-gradient(180deg, #040810 0%, #050a16 40%, #02040b 100%);
       color: var(--text-primary);
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       min-height: 100vh;
-      padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+      display: flex;
+      flex-direction: column;
+      padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px)
+        env(safe-area-inset-left, 0px);
     }
 
     ::selection {
@@ -55,11 +56,12 @@
     }
 
     main {
+      flex: 1 1 auto;
       display: flex;
       flex-direction: column;
-      gap: 6rem;
-      padding: calc(4rem + env(safe-area-inset-top, 0px)) calc(1.75rem + env(safe-area-inset-right, 0px)) 6rem
-        calc(1.75rem + env(safe-area-inset-left, 0px));
+      gap: 5rem;
+      padding: calc(3.5rem + env(safe-area-inset-top, 0px)) calc(1.5rem + env(safe-area-inset-right, 0px))
+        calc(5rem + env(safe-area-inset-bottom, 0px)) calc(1.5rem + env(safe-area-inset-left, 0px));
     }
 
     section {
@@ -153,47 +155,6 @@
       opacity: 1;
     }
 
-    .wave-divider {
-      position: relative;
-      height: 110px;
-      overflow: hidden;
-      margin: 0 auto;
-      max-width: var(--max-width);
-    }
-
-    .wave-divider svg {
-      width: 160%;
-      height: 120%;
-      transform: translateX(-20%);
-    }
-
-    .wave-path {
-      fill: none;
-      stroke-linecap: round;
-      stroke-width: 4;
-      stroke-dasharray: 18 26;
-      stroke-dashoffset: 0;
-      animation: wave-flow 12s linear infinite;
-    }
-
-    .wave-path:nth-of-type(2) {
-      stroke-width: 3;
-      stroke-dasharray: 12 20;
-      opacity: 0.55;
-      animation-duration: 18s;
-      animation-direction: reverse;
-      animation-delay: -2.5s;
-    }
-
-    .wave-path:nth-of-type(3) {
-      stroke-width: 6;
-      stroke-linecap: butt;
-      opacity: 0.25;
-      filter: blur(2px);
-      animation-duration: 28s;
-      animation-delay: -5s;
-    }
-
     .section-header {
       display: flex;
       flex-direction: column;
@@ -212,12 +173,10 @@
     .story-grid {
       display: grid;
       gap: 2rem;
-      background: linear-gradient(160deg, rgba(0, 170, 255, 0.08), rgba(0, 255, 204, 0.05));
-      border: 1px solid var(--glass-border);
+      background: linear-gradient(145deg, rgba(6, 18, 36, 0.92), rgba(12, 30, 56, 0.75));
       border-radius: 28px;
       padding: clamp(1.75rem, 4vw, 3rem);
-      backdrop-filter: blur(16px);
-      box-shadow: 0 24px 60px rgba(4, 18, 40, 0.45);
+      box-shadow: 0 32px 90px rgba(2, 10, 22, 0.6);
     }
 
     .story-grid p {
@@ -237,10 +196,10 @@
       position: relative;
       padding: 1.75rem;
       border-radius: 24px;
-      background: var(--card-bg);
-      border: 1px solid rgba(0, 170, 255, 0.1);
+      background: linear-gradient(160deg, rgba(8, 20, 38, 0.92), rgba(4, 14, 32, 0.88));
       overflow: hidden;
-      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+      transition: transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 30px 70px rgba(3, 12, 28, 0.55);
     }
 
     .product-card::before {
@@ -255,8 +214,7 @@
 
     .product-card:hover {
       transform: translateY(-6px);
-      border-color: rgba(0, 255, 204, 0.45);
-      box-shadow: 0 22px 44px rgba(0, 170, 255, 0.18);
+      box-shadow: 0 36px 80px rgba(0, 170, 255, 0.32);
     }
 
     .product-card:hover::before {
@@ -270,10 +228,8 @@
       align-items: center;
       border-radius: 28px;
       padding: clamp(1.75rem, 4vw, 3rem);
-      background: linear-gradient(135deg, rgba(0, 170, 255, 0.1), rgba(0, 255, 204, 0.07));
-      border: 1px solid var(--glass-border);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 26px 60px rgba(4, 18, 40, 0.45);
+      background: linear-gradient(160deg, rgba(8, 24, 46, 0.92), rgba(12, 34, 60, 0.85));
+      box-shadow: 0 34px 90px rgba(3, 15, 30, 0.58);
     }
 
     .texas-map {
@@ -281,12 +237,10 @@
       justify-content: center;
       padding: clamp(1.25rem, 3vw, 1.75rem);
       border-radius: 24px;
-      background:
-        radial-gradient(circle at 28% 32%, rgba(0, 170, 255, 0.12), transparent 70%),
-        radial-gradient(circle at 72% 68%, rgba(0, 255, 204, 0.16), transparent 75%),
-        rgba(5, 10, 22, 0.65);
-      border: 1px solid rgba(0, 170, 255, 0.22);
-      box-shadow: 0 26px 60px rgba(0, 170, 255, 0.22);
+      background: radial-gradient(circle at 28% 32%, rgba(0, 170, 255, 0.18), transparent 70%),
+        radial-gradient(circle at 72% 68%, rgba(0, 255, 204, 0.22), transparent 75%),
+        rgba(4, 12, 26, 0.88);
+      box-shadow: inset 0 0 30px rgba(0, 170, 255, 0.25), 0 28px 70px rgba(0, 170, 255, 0.32);
     }
 
     .texas-map svg {
@@ -335,12 +289,39 @@
     .market-intel {
       display: grid;
       gap: clamp(1.75rem, 4vw, 3rem);
-      background: linear-gradient(160deg, rgba(0, 170, 255, 0.1), rgba(0, 255, 204, 0.08));
-      border-radius: 28px;
-      border: 1px solid rgba(0, 255, 204, 0.18);
-      padding: clamp(1.75rem, 4vw, 3rem);
-      backdrop-filter: blur(14px);
-      box-shadow: 0 26px 60px rgba(4, 18, 40, 0.4);
+      background: linear-gradient(155deg, rgba(8, 24, 46, 0.94), rgba(3, 10, 24, 0.92));
+      border-radius: 32px;
+      padding: clamp(1.75rem, 4vw, 3.25rem);
+      box-shadow: 0 36px 100px rgba(2, 12, 28, 0.65);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .market-intel::before {
+      content: '';
+      position: absolute;
+      inset: -30% -10% auto -20%;
+      height: 60%;
+      background: radial-gradient(circle, rgba(0, 170, 255, 0.35), transparent 65%);
+      opacity: 0.6;
+      pointer-events: none;
+      filter: blur(30px);
+    }
+
+    .market-intel::after {
+      content: '';
+      position: absolute;
+      inset: auto -30% -30% 40%;
+      height: 70%;
+      background: radial-gradient(circle, rgba(0, 255, 204, 0.32), transparent 70%);
+      opacity: 0.5;
+      pointer-events: none;
+      filter: blur(40px);
+    }
+
+    .market-intel > * {
+      position: relative;
+      z-index: 1;
     }
 
     .market-intel header {
@@ -358,19 +339,18 @@
 
     .market-grid {
       display: grid;
-      gap: 1.25rem;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
     }
 
     .market-chart {
       margin-top: 1rem;
       display: grid;
-      gap: 1rem;
-      background: rgba(4, 14, 28, 0.82);
-      border-radius: 24px;
-      border: 1px solid rgba(0, 170, 255, 0.2);
-      padding: clamp(1.5rem, 4vw, 2.25rem);
-      box-shadow: inset 0 0 0 1px rgba(0, 255, 204, 0.08);
+      gap: 1.25rem;
+      background: linear-gradient(165deg, rgba(5, 18, 38, 0.9), rgba(2, 8, 20, 0.92));
+      border-radius: 28px;
+      padding: clamp(1.5rem, 4vw, 2.5rem);
+      box-shadow: inset 0 0 50px rgba(0, 170, 255, 0.08), 0 26px 70px rgba(0, 0, 0, 0.35);
     }
 
     .market-chart-heading {
@@ -482,12 +462,11 @@
     .market-card {
       position: relative;
       display: grid;
-      gap: 0.65rem;
-      background: rgba(4, 14, 28, 0.78);
-      border-radius: 22px;
-      border: 1px solid rgba(0, 170, 255, 0.22);
-      padding: 1.5rem;
-      box-shadow: inset 0 0 0 1px rgba(0, 255, 204, 0.08);
+      gap: 0.75rem;
+      background: linear-gradient(150deg, rgba(4, 16, 34, 0.92), rgba(2, 8, 20, 0.9));
+      border-radius: 24px;
+      padding: 1.6rem;
+      box-shadow: 0 22px 50px rgba(0, 0, 0, 0.35);
       overflow: hidden;
     }
 
@@ -495,15 +474,24 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 10% 15%, rgba(0, 255, 204, 0.2), transparent 55%),
-        radial-gradient(circle at 90% 85%, rgba(0, 170, 255, 0.15), transparent 60%);
-      opacity: 0.6;
+      background: radial-gradient(circle at 12% 20%, rgba(0, 255, 204, 0.35), transparent 60%),
+        radial-gradient(circle at 88% 80%, rgba(0, 170, 255, 0.28), transparent 65%);
+      opacity: 0.45;
       pointer-events: none;
       mix-blend-mode: screen;
     }
 
+    .market-card.highlight {
+      background: linear-gradient(140deg, rgba(0, 255, 204, 0.32), rgba(0, 170, 255, 0.24));
+      box-shadow: 0 30px 80px rgba(0, 255, 204, 0.38);
+    }
+
+    .market-card.highlight::after {
+      opacity: 0.6;
+    }
+
     .market-card strong {
-      font-size: clamp(1.65rem, 7vw, 2.2rem);
+      font-size: clamp(1.75rem, 7.5vw, 2.4rem);
       font-weight: 700;
       letter-spacing: -0.01em;
       color: var(--text-primary);
@@ -514,6 +502,11 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: rgba(198, 213, 245, 0.75);
+    }
+
+    .market-card.highlight span,
+    .market-card.highlight .market-note {
+      color: rgba(11, 39, 54, 0.7);
     }
 
     .market-delta {
@@ -530,16 +523,21 @@
     }
 
     .market-card strong.market-delta {
-      font-size: clamp(1.3rem, 6vw, 1.9rem);
+      font-size: clamp(1.4rem, 6.5vw, 2rem);
       font-weight: 700;
       justify-content: flex-start;
       display: inline-flex;
       align-items: baseline;
     }
 
+    .market-card.highlight strong {
+      font-size: clamp(2.1rem, 9vw, 2.85rem);
+      color: #04121e;
+    }
+
     .market-note {
       font-size: 0.85rem;
-      color: rgba(200, 210, 240, 0.8);
+      color: rgba(205, 218, 246, 0.85);
     }
 
     .market-intel footer {
@@ -553,15 +551,16 @@
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      padding: 0.5rem 0.85rem;
+      padding: 0.5rem 0.95rem;
       border-radius: 999px;
-      background: rgba(0, 255, 204, 0.12);
-      border: 1px solid rgba(0, 170, 255, 0.25);
+      background: linear-gradient(120deg, rgba(0, 255, 204, 0.18), rgba(0, 170, 255, 0.2));
+      box-shadow: 0 12px 30px rgba(0, 255, 204, 0.25);
       width: fit-content;
       font-size: 0.75rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--accent-teal);
+      color: #031521;
+      font-weight: 700;
     }
 
     .market-status svg {
@@ -570,14 +569,12 @@
     }
 
     .market-intel.is-error {
-      border-color: rgba(255, 122, 138, 0.35);
-      box-shadow: 0 26px 60px rgba(60, 10, 24, 0.4);
+      box-shadow: 0 28px 80px rgba(60, 10, 24, 0.45);
     }
 
     .market-intel.is-error .market-status {
-      background: rgba(255, 122, 138, 0.14);
-      border-color: rgba(255, 122, 138, 0.35);
-      color: #ff7a8a;
+      background: linear-gradient(120deg, rgba(255, 122, 138, 0.22), rgba(255, 196, 204, 0.22));
+      color: #3c0a18;
     }
 
     .market-intel.is-error .market-status circle:last-of-type {
@@ -585,7 +582,7 @@
     }
 
     .market-intel.is-error .market-note {
-      color: rgba(255, 185, 198, 0.82);
+      color: rgba(255, 205, 214, 0.85);
     }
 
     .architecture {
@@ -609,16 +606,16 @@
       position: relative;
       flex: 1 1 220px;
       min-height: 120px;
-      background: var(--card-bg);
-      border-radius: 18px;
-      border: 1px solid rgba(0, 170, 255, 0.15);
-      padding: 1.25rem;
+      background: linear-gradient(150deg, rgba(4, 16, 34, 0.92), rgba(2, 8, 20, 0.88));
+      border-radius: 20px;
+      padding: 1.35rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: flex-start;
       text-align: left;
       overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
     }
 
     .diagram-node::after {
@@ -650,11 +647,10 @@
     .timeline-item {
       display: grid;
       gap: 0.35rem;
-      background: rgba(5, 10, 22, 0.88);
-      border: 1px solid rgba(0, 255, 204, 0.28);
-      border-radius: 18px;
-      padding: 1.25rem 1.5rem;
-      box-shadow: 0 16px 40px rgba(4, 18, 40, 0.45);
+      background: linear-gradient(150deg, rgba(4, 16, 34, 0.9), rgba(2, 10, 26, 0.88));
+      border-radius: 20px;
+      padding: 1.35rem 1.6rem;
+      box-shadow: 0 22px 55px rgba(2, 12, 28, 0.5);
     }
 
     .timeline-year {
@@ -666,11 +662,11 @@
     }
 
     .vision {
-      background: linear-gradient(180deg, rgba(0, 170, 255, 0.1), rgba(0, 170, 255, 0));
+      background: linear-gradient(170deg, rgba(6, 18, 36, 0.92), rgba(0, 170, 255, 0.12));
       border-radius: 28px;
-      border: 1px solid rgba(0, 255, 204, 0.18);
       padding: clamp(1.75rem, 4vw, 3rem);
       text-align: center;
+      box-shadow: 0 30px 80px rgba(2, 10, 28, 0.55);
     }
 
     .closing {
@@ -708,14 +704,13 @@
     }
 
     .modal-card {
-      background: rgba(7, 13, 24, 0.95);
-      border: 1px solid rgba(0, 255, 204, 0.25);
+      background: linear-gradient(160deg, rgba(6, 16, 34, 0.96), rgba(2, 8, 20, 0.94));
       border-radius: 24px;
       padding: 2.5rem;
       max-width: 420px;
       width: 90%;
       text-align: center;
-      box-shadow: 0 30px 60px rgba(0, 170, 255, 0.28);
+      box-shadow: 0 40px 80px rgba(0, 170, 255, 0.3);
       animation: fade-up 380ms ease;
     }
 
@@ -749,19 +744,21 @@
       width: min(140vw, 1600px);
       height: 320px;
       transform: translateX(-50%);
-      background: radial-gradient(circle at 20% 40%, rgba(0, 170, 255, 0.16), transparent 55%),
-        radial-gradient(circle at 80% 60%, rgba(0, 255, 204, 0.18), transparent 55%);
-      filter: blur(120px);
-      opacity: 0.45;
+      background: radial-gradient(circle at 20% 40%, rgba(0, 170, 255, 0.18), transparent 55%),
+        radial-gradient(circle at 80% 60%, rgba(0, 255, 204, 0.22), transparent 55%);
+      filter: blur(140px);
+      opacity: 0.35;
       animation: float-slow 30s ease-in-out infinite;
-      z-index: -1;
+      z-index: -2;
+      pointer-events: none;
+      mix-blend-mode: screen;
     }
 
     .floating-wave.bottom {
       top: auto;
-      bottom: -200px;
+      bottom: -220px;
       animation-direction: reverse;
-      opacity: 0.35;
+      opacity: 0.28;
     }
 
     @keyframes float {
@@ -784,15 +781,6 @@
       }
     }
 
-    @keyframes wave-flow {
-      0% {
-        stroke-dashoffset: 0;
-      }
-      100% {
-        stroke-dashoffset: -220;
-      }
-    }
-
     @keyframes float-slow {
       0% {
         transform: translate3d(0, 0, 0) scale(1);
@@ -807,8 +795,10 @@
 
     @media (min-width: 768px) {
       main {
-        padding: 5rem calc(2.25rem + env(safe-area-inset-right, 0px)) 6rem
-          calc(2.25rem + env(safe-area-inset-left, 0px));
+        padding: calc(5rem + env(safe-area-inset-top, 0px))
+          calc(2.5rem + env(safe-area-inset-right, 0px))
+          calc(6.25rem + env(safe-area-inset-bottom, 0px))
+          calc(2.5rem + env(safe-area-inset-left, 0px));
       }
 
       .hero {
@@ -848,7 +838,7 @@
 
     @media (max-width: 480px) {
       .market-card {
-        padding: 1.25rem;
+        padding: 1.35rem;
       }
 
       .market-note {
@@ -896,28 +886,6 @@
       </div>
     </section>
 
-    <div class="wave-divider" aria-hidden="true">
-      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.7)" />
-            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.7)" />
-          </linearGradient>
-          <linearGradient id="waveGradientSoft" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.45)" />
-            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.45)" />
-          </linearGradient>
-          <linearGradient id="waveGradientGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="rgba(0, 255, 204, 0.35)" />
-            <stop offset="100%" stop-color="rgba(0, 170, 255, 0.35)" />
-          </linearGradient>
-        </defs>
-        <path class="wave-path" d="M0,62 C200,26 400,96 600,62 C800,28 1000,98 1200,62" stroke="url(#waveGradient)" />
-        <path class="wave-path" d="M0,58 C220,18 380,94 600,58 C820,22 980,102 1200,58" stroke="url(#waveGradientSoft)" />
-        <path class="wave-path" d="M0,68 C210,32 420,104 600,68 C780,32 990,104 1200,68" stroke="url(#waveGradientGlow)" />
-      </svg>
-    </div>
-
     <section class="market-intel" aria-labelledby="market-intel-title" data-wti-card>
       <header>
         <span class="market-tagline">Live Market Intelligence</span>
@@ -940,7 +908,7 @@
           <div class="market-delta" data-wti-delta>Δ --</div>
           <p class="market-note" data-wti-last-date>Awaiting market data.</p>
         </article>
-        <article class="market-card">
+        <article class="market-card highlight">
           <span>Tomorrow's Forecast</span>
           <strong data-wti-forecast>--</strong>
           <p class="market-note" data-wti-forecast-note>Generating projection...</p>
@@ -972,28 +940,6 @@
         <p>The trajectory chart damps that momentum and blends it with a fresh regression to illuminate the next seven sessions.</p>
       </footer>
     </section>
-
-    <div class="wave-divider" aria-hidden="true">
-      <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="waveGradientB" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.7)" />
-            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.7)" />
-          </linearGradient>
-          <linearGradient id="waveGradientSoftB" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="rgba(0, 170, 255, 0.45)" />
-            <stop offset="100%" stop-color="rgba(0, 255, 204, 0.45)" />
-          </linearGradient>
-          <linearGradient id="waveGradientGlowB" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="rgba(0, 255, 204, 0.35)" />
-            <stop offset="100%" stop-color="rgba(0, 170, 255, 0.35)" />
-          </linearGradient>
-        </defs>
-        <path class="wave-path" d="M0,62 C200,26 400,96 600,62 C800,28 1000,98 1200,62" stroke="url(#waveGradientB)" />
-        <path class="wave-path" d="M0,58 C220,18 380,94 600,58 C820,22 980,102 1200,58" stroke="url(#waveGradientSoftB)" />
-        <path class="wave-path" d="M0,68 C210,32 420,104 600,68 C780,32 990,104 1200,68" stroke="url(#waveGradientGlowB)" />
-      </svg>
-    </div>
 
     <section class="story" aria-labelledby="story-title">
       <div class="section-header">
@@ -1368,7 +1314,9 @@
 
         const yTicks = 4;
         for (let i = 0; i <= yTicks; i += 1) {
-          const y = padding.top + (innerHeight * i) / yTicks;
+          const valueRatio = i / yTicks;
+          const value = domainMin + domainRange * valueRatio;
+          const y = yScale(value);
           const line = document.createElementNS(SVG_NS, 'line');
           line.setAttribute('x1', padding.left);
           line.setAttribute('x2', width - padding.right);
@@ -1381,7 +1329,6 @@
           label.setAttribute('y', y + 4);
           label.setAttribute('text-anchor', 'end');
           label.setAttribute('class', 'chart-axis-label');
-          const value = domainMin + (domainRange * i) / yTicks;
           label.textContent = formatPrice(value);
           axisGroup.appendChild(label);
         }
@@ -1493,8 +1440,8 @@
             throw new Error('Not enough historical pricing data');
           }
 
-          const entries = lines
-            .slice(-40)
+          const entriesSorted = lines
+            .slice(-80)
             .map((line) => {
               const [date, price] = line.split(',');
               const value = parseFloat(price);
@@ -1503,7 +1450,17 @@
               }
               return { date, price: value };
             })
-            .filter(Boolean);
+            .filter(Boolean)
+            .sort((a, b) => new Date(`${a.date}T00:00:00Z`) - new Date(`${b.date}T00:00:00Z`));
+
+          const entries = [];
+          const seenDates = new Set();
+          entriesSorted.forEach((entry) => {
+            if (!seenDates.has(entry.date)) {
+              seenDates.add(entry.date);
+              entries.push(entry);
+            }
+          });
 
           if (entries.length < Math.max(CHART_ACTUAL_DAYS + 2, 3)) {
             throw new Error('Unable to parse sufficient WTI pricing data');
