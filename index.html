@@ -1284,6 +1284,10 @@
             return Math.max(min, Math.min(max, val));
         }
 
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
         function distance(lat1, lon1, lat2, lon2) {
             const R = 3959; // Earth radius in miles
             const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -1417,8 +1421,15 @@
             debug('Team names to fetch stats for:', teamNames);
 
             const stats = {};
-            for (let team of teamNames) {
+            for (let i = 0; i < teamNames.length; i++) {
+                const team = teamNames[i];
                 try {
+                    // Add delay between requests to avoid rate limiting (429 errors)
+                    if (i > 0) {
+                        await delay(500); // 500ms delay between each request
+                    }
+                    
+                    logStatus(`📈 Fetching stats ${i + 1}/${teamNames.length}: ${team}...`, 'loading');
                     const teamStats = await apiCall('/stats/season', { year, team });
                     stats[team] = teamStats;
                     debug(`Fetched stats for ${team}:`, teamStats?.length || 0);
