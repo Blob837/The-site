@@ -71,12 +71,14 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 100%;
             padding: 0;
             margin: 0 auto;
+            overflow-x: hidden;
         }
 
         header {
@@ -109,6 +111,13 @@
             height: 48px;
             width: auto;
             display: block;
+        }
+
+        .brand-text {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-secondary);
+            letter-spacing: -0.01em;
         }
 
         h1 {
@@ -145,6 +154,7 @@
             padding: 16px;
             margin: 12px;
             box-shadow: var(--shadow-sm);
+            display: none; /* Hidden by default */
         }
 
         .config-panel.collapsed {
@@ -701,6 +711,13 @@
             display: block;
         }
 
+        .share-brand-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
         .share-week {
             font-size: 10px;
             color: var(--text-tertiary);
@@ -1027,6 +1044,7 @@
         <div class="header-content">
             <div class="brand">
                 <img src="Logo.svg" alt="Logo" class="brand-logo">
+                <span class="brand-text">CFB AI/ML Models</span>
             </div>
             <div class="tagline">College Football Predictions</div>
         </div>
@@ -1464,23 +1482,36 @@
             const netMargin = offenseMargin + defenseMargin;
             
             const recentFormDiff = (homeStats.recentForm || 0.5) - (awayStats.recentForm || 0.5);
-            const homeAdvantage = 0.15;
             
-            // Logistic regression
+            // Adjust home advantage based on actual home win rate
+            const homeAdvantage = (homeStats.homeAdvantage || 0.55) - 0.5;
+            
+            // Win percentage as a feature
+            const homeWinPct = (homeStats.wins || 0) / Math.max(1, (homeStats.wins || 0) + (homeStats.losses || 0));
+            const awayWinPct = (awayStats.wins || 0) / Math.max(1, (awayStats.wins || 0) + (awayStats.losses || 0));
+            const winPctDiff = homeWinPct - awayWinPct;
+            
+            // Logistic regression with improved weights
+            // Reduced Elo weight, increased performance-based features
             let logit = 
-                0.40 * eloDiff +
-                0.35 * (netMargin / 10) +
-                0.15 * recentFormDiff +
-                0.10 * homeAdvantage;
+                0.25 * eloDiff +                    // Reduced Elo influence
+                0.30 * (netMargin / 10) +           // Offensive/defensive margin
+                0.20 * recentFormDiff +             // Recent momentum
+                0.15 * homeAdvantage +              // Home field advantage
+                0.10 * winPctDiff;                  // Season win percentage
             
             let homeWinProb = sigmoid(logit);
             
+            // Apply regression towards 50% for uncertainty
+            // This prevents overconfident predictions
+            homeWinProb = 0.5 + 0.85 * (homeWinProb - 0.5);
+            
             // Clamp
-            homeWinProb = Math.max(0.05, Math.min(0.95, homeWinProb));
+            homeWinProb = Math.max(0.10, Math.min(0.90, homeWinProb));
             
             const winner = homeWinProb > 0.5 ? homeTeam : awayTeam;
             const winnerProb = homeWinProb > 0.5 ? homeWinProb : 1 - homeWinProb;
-            const predictedMargin = (homeWinProb - 0.5) * 28;
+            const predictedMargin = (homeWinProb - 0.5) * 24;  // Reduced from 28 to be less aggressive
             
             const confidence = Math.abs(homeWinProb - 0.5) * 2;
             let confLabel = 'low';
@@ -1490,6 +1521,12 @@
             // Check for upset (underdog winning)
             const isUpset = (homeElo < awayElo && homeWinProb > 0.5) || 
                             (awayElo < homeElo && homeWinProb < 0.5);
+            
+            // Build proper W-L records
+            const homeWins = homeStats.wins || 0;
+            const homeLosses = homeStats.losses || 0;
+            const awayWins = awayStats.wins || 0;
+            const awayLosses = awayStats.losses || 0;
             
             return {
                 event,
@@ -1506,8 +1543,8 @@
                 confidence: confLabel,
                 isUpset,
                 isTossUp: confidence < 0.2,
-                homeRecord: `${homeStats.wins || 0}-${homeStats.losses || 0}`,
-                awayRecord: `${awayStats.wins || 0}-${awayStats.losses || 0}`,
+                homeRecord: `${homeWins}-${homeLosses}`,
+                awayRecord: `${awayWins}-${awayLosses}`,
                 homeElo: Math.round(homeElo),
                 awayElo: Math.round(awayElo)
             };
@@ -1713,6 +1750,7 @@
                             <div class="share-header-top">
                                 <div class="share-brand">
                                     <img src="Logo.svg" alt="Logo" class="share-brand-logo">
+                                    <span class="share-brand-text">Game Prediction</span>
                                 </div>
                                 <div class="share-week">Week ${pred.event.week ? pred.event.week.number : '?'}</div>
                             </div>
@@ -1780,6 +1818,7 @@
                             <div class="share-footer">
                                 <span>Powered by</span>
                                 <img src="Logo.svg" alt="Logo" class="share-footer-logo">
+                                <span>CFB AI/ML Models</span>
                             </div>
                         </div>
                     </div>
@@ -1876,6 +1915,11 @@
         });
 
         logStatus('Ready. Click Generate Predictions to start.', 'success');
+        
+        // Auto-run predictions on page load
+        setTimeout(() => {
+            runPrediction();
+        }, 500);
     </script>
 </body>
 </html>
