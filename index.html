@@ -1403,20 +1403,41 @@
         <div class="ticker-shell">
           <div class="ticker-viewport">
             <div class="ticker-track" id="ticker-track" role="list" aria-live="polite">
-              <div class="ticker-item" role="listitem" data-symbol="WTI" data-yahoo="CL=F">
+              <div
+                class="ticker-item"
+                role="listitem"
+                data-symbol="WTI"
+                data-yahoo="CL=F"
+                data-fallback-price="79.42"
+                data-fallback-change="0.84"
+              >
                 <span class="ticker-label">WTI</span>
-                <span class="ticker-price" aria-live="off">—</span>
-                <span class="ticker-change neutral" aria-live="off">—</span>
+                <span class="ticker-price" aria-live="off">$79.42</span>
+                <span class="ticker-change positive" aria-live="off">+0.84%</span>
               </div>
-              <div class="ticker-item" role="listitem" data-symbol="BRENT" data-yahoo="BZ=F">
+              <div
+                class="ticker-item"
+                role="listitem"
+                data-symbol="BRENT"
+                data-yahoo="BZ=F"
+                data-fallback-price="83.77"
+                data-fallback-change="0.68"
+              >
                 <span class="ticker-label">Brent</span>
-                <span class="ticker-price" aria-live="off">—</span>
-                <span class="ticker-change neutral" aria-live="off">—</span>
+                <span class="ticker-price" aria-live="off">$83.77</span>
+                <span class="ticker-change positive" aria-live="off">+0.68%</span>
               </div>
-              <div class="ticker-item" role="listitem" data-symbol="NATGAS" data-yahoo="NG=F">
+              <div
+                class="ticker-item"
+                role="listitem"
+                data-symbol="NATGAS"
+                data-yahoo="NG=F"
+                data-fallback-price="2.74"
+                data-fallback-change="-1.12"
+              >
                 <span class="ticker-label">Nat Gas</span>
-                <span class="ticker-price" aria-live="off">—</span>
-                <span class="ticker-change neutral" aria-live="off">—</span>
+                <span class="ticker-price" aria-live="off">$2.74</span>
+                <span class="ticker-change negative" aria-live="off">-1.12%</span>
               </div>
             </div>
           </div>
@@ -1865,17 +1886,25 @@
 
       const statusEl = document.getElementById('ticker-status');
       const baseItems = Array.from(tickerTrack.querySelectorAll('.ticker-item'));
+      const STATIC_FALLBACKS = {
+        WTI: { price: 79.42, change: 0.84 },
+        BRENT: { price: 83.77, change: 0.68 },
+        NATGAS: { price: 2.74, change: -1.12 }
+      };
+
       const fallbackData = baseItems.map(item => {
+        const symbol = item.dataset.symbol;
         const priceSource = item.dataset.fallbackPrice || item.querySelector('.ticker-price')?.textContent || '';
         const changeSource = item.dataset.fallbackChange || item.querySelector('.ticker-change')?.textContent || '';
         const parsedPrice = parseFloat(priceSource.replace(/[^0-9.\-]/g, ''));
         const parsedChange = parseFloat(changeSource.replace(/[^0-9.\-]/g, ''));
+        const staticFallback = STATIC_FALLBACKS[symbol] || {};
 
         return {
-          symbol: item.dataset.symbol,
+          symbol,
           yahoo: item.dataset.yahoo,
-          price: Number.isFinite(parsedPrice) ? parsedPrice : null,
-          change: Number.isFinite(parsedChange) ? parsedChange : null
+          price: Number.isFinite(parsedPrice) ? parsedPrice : staticFallback.price ?? null,
+          change: Number.isFinite(parsedChange) ? parsedChange : staticFallback.change ?? null
         };
       });
       const timestampFormatter = typeof Intl !== 'undefined' && Intl.DateTimeFormat
