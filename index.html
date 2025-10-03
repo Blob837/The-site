@@ -182,17 +182,23 @@
     .logo {
       display: flex;
       align-items: center;
-      height: 32px;
+      height: 40px;
     }
-    
+
     .logo img {
       height: 100%;
       width: auto;
       filter: brightness(0) invert(1);
     }
-    
+
     @media (min-width: 768px) {
-      .logo { height: 40px; }
+      .logo { height: 56px; }
+    }
+
+    .header .btn {
+      padding: 10px 24px;
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
     }
     
     .nav {
