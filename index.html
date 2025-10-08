@@ -45,7 +45,6 @@ tbody tr td:last-child{border-top-right-radius:10px;border-bottom-right-radius:1
 .kv{display:grid;grid-template-columns:110px 1fr;gap:4px;font-size:12px;color:#cbd5e5}
 .tag{padding:3px 6px;border-radius:6px;border:1px solid var(--line);background:#0f1a31;font-size:11px}
 .footer{padding:12px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:12px}
-.settings{position:fixed;right:12px;bottom:12px;z-index:30}
 .drawer{position:fixed;inset:auto 0 0 auto;right:0;width:360px;max-width:95vw;background:var(--panel);border-left:1px solid var(--line);box-shadow:0 -2px 40px rgba(0,0,0,.35);transform:translateY(110%);transition:transform .25s ease}
 .drawer.open{transform:translateY(0)}
 .drawer .hdr{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--line)}
@@ -90,12 +89,12 @@ hr{border:0;border-top:1px solid var(--line);margin:10px 0}
     <div class="btn" id="btnClose">Close</div>
   </div>
   <div style="padding:12px">
-    <div class="sw"><input id="swProxy" type="checkbox"><label for="swProxy">Force proxy on first attempt</label></div>
+    <div class="sw"><input id="swProxy" type="checkbox" checked><label for="swProxy">Force proxy on first attempt</label></div>
     <div class="sw"><input id="swCache" type="checkbox" checked><label for="swCache">Enable local cache (localStorage)</label></div>
     <div class="sw"><input id="swSW" type="checkbox" checked><label for="swSW">Enable offline shell (Service Worker)</label></div>
     <hr/>
     <div class="btn" id="btnClear">Clear Cache</div>
-    <div class="small" style="margin-top:6px">Cache keys: alphaGem:v1:*</div>
+    <div class="small" style="margin-top:6px">Cache keys: alphaGem:v2:*</div>
     <hr/>
     <div class="small">Auto-refresh every 4 hours while open.</div>
   </div>
@@ -103,12 +102,12 @@ hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 
 <script>
 /* =========================
-   Minimal util + cache
+   Version / cache keys
 ========================= */
-const VER = 'v1';
+const VER = 'v2';
 const K = (s)=>`alphaGem:${VER}:${s}`;
 const state = {
-  forceProxy:false,
+  forceProxy:true,         // default ON to avoid CORS blocks
   useCache:true,
   statuses:{
     universe:'pending',
@@ -120,23 +119,14 @@ const state = {
   },
   pillsMeta:{}
 };
-const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
-const fmt = (n, d=2)=> {
-  if(n==null || !isFinite(n)) return '—';
-  return Number(n).toLocaleString(undefined,{maximumFractionDigits:d});
-};
-const pct = (x)=> isFinite(x)?(x>0?`+${fmt(x,2)}%`:`${fmt(x,2)}%`):'—';
-
-function setStamp(){
-  const el = document.getElementById('ts');
-  const t = new Date();
-  el.textContent = `— ${t.toLocaleString()}`;
-}
+const fmt = (n, d=2)=> (n==null || !isFinite(n)) ? '—' : Number(n).toLocaleString(undefined,{maximumFractionDigits:d});
+function setStamp(){ document.getElementById('ts').textContent = `— ${new Date().toLocaleString()}`; }
 setStamp();
 
 /* =========================
    Proxy-aware fetch
-   FIXED: r.jina.ai requires http:// after proxy host.
+   - preferProxy toggles order per-call
+   - r.jina.ai requires http:// after proxy host
 ========================= */
 function toProxy(url){
   try{
@@ -147,10 +137,10 @@ function toProxy(url){
     return `https://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`;
   }
 }
-async function fetchWithProxy(url, opts={}){
-  const tryOrder = state.forceProxy ? ['proxy','direct'] : ['direct','proxy'];
+async function fetchWithProxy(url, {preferProxy=false}={}){
+  const order = (state.forceProxy || preferProxy) ? ['proxy','direct'] : ['direct','proxy'];
   let lastErr;
-  for(const mode of tryOrder){
+  for(const mode of order){
     try{
       const u = mode==='proxy' ? toProxy(url) : url;
       const res = await fetch(u, {cache:'no-store'});
@@ -159,34 +149,23 @@ async function fetchWithProxy(url, opts={}){
       return {ok:true, mode, text};
     }catch(e){ lastErr = e; }
   }
-  return {ok:false, mode:'failed', error: lastErr};
+  return {ok:false, mode:'failed', error:lastErr};
 }
 
 /* =========================
    Source pills
 ========================= */
 function setPill(name, mode){
-  state.statuses[name] = mode;
-  const label = {
-    universe:'Universe',
-    prices:'Prices',
-    gdelt:'News',
-    sec:'Filings',
-    reddit:'Reddit',
-    macro:'Macro'
-  }[name] || name;
+  const label = {universe:'Universe',prices:'Prices',gdelt:'News',sec:'Filings',reddit:'Reddit',macro:'Macro'}[name]||name;
   const color = mode==='direct'?'ok':mode==='proxy'?'warn':mode==='failed'?'bad':'warn';
-  state.pillsMeta[name] = {label, color, mode};
-  renderPills();
+  state.statuses[name]=mode; state.pillsMeta[name]={label,color,mode}; renderPills();
 }
 function renderPills(){
-  const c = document.getElementById('sourcePills');
-  c.innerHTML = '';
+  const c = document.getElementById('sourcePills'); c.innerHTML='';
   Object.entries(state.pillsMeta).forEach(([k,v])=>{
-    const div = document.createElement('div');
-    div.className='pill';
-    const mtxt = v.mode==='direct'?'Direct':v.mode==='proxy'?'Proxy':'Failed';
-    div.innerHTML = `<span class="dot ${v.color}"></span><span>${v.label} • ${mtxt}</span>`;
+    const div=document.createElement('div'); div.className='pill';
+    const mtxt=v.mode==='direct'?'Direct':v.mode==='proxy'?'Proxy':'Failed';
+    div.innerHTML=`<span class="dot ${v.color}"></span><span>${v.label} • ${mtxt}</span>`;
     c.appendChild(div);
   });
 }
@@ -197,162 +176,108 @@ function renderPills(){
 function getCache(key, maxAgeMs){
   if(!state.useCache) return null;
   try{
-    const raw = localStorage.getItem(K(key));
-    if(!raw) return null;
-    const {t, v} = JSON.parse(raw);
-    if(Date.now() - t > maxAgeMs) return null;
-    return v;
-  }catch(_){ return null; }
+    const raw=localStorage.getItem(K(key)); if(!raw) return null;
+    const {t,v}=JSON.parse(raw); if(Date.now()-t>maxAgeMs) return null; return v;
+  }catch{ return null; }
 }
-function setCache(key, v){
-  if(!state.useCache) return;
-  localStorage.setItem(K(key), JSON.stringify({t:Date.now(), v}));
-}
+function setCache(key, v){ if(state.useCache) localStorage.setItem(K(key), JSON.stringify({t:Date.now(), v})); }
 
 /* =========================
    CSV/JSON helpers
 ========================= */
 function parseCSV(txt){
-  const lines = txt.trim().split(/\r?\n/);
-  const hdr = lines[0].split(',');
-  const rows = lines.slice(1).map(l=>{
-    const a = l.split(',');
-    const o = {};
-    hdr.forEach((h,i)=>o[h.trim()] = a[i]?a[i].trim():'');
-    return o;
+  const lines = txt.trim().split(/\r?\n/); if(!lines.length) return [];
+  const hdr = lines[0].split(',').map(s=>s.trim());
+  return lines.slice(1).filter(Boolean).map(l=>{
+    const a=l.split(','); const o={}; hdr.forEach((h,i)=>o[h]= (a[i]??'').trim()); return o;
   });
-  return rows;
 }
-function safeJSON(txt){
-  try{return JSON.parse(txt)}catch(_){return null}
-}
+function safeJSON(txt){ try{return JSON.parse(txt)}catch{return null} }
 
 /* =========================
    Indicators
 ========================= */
-function SMA(arr, n, accessor=(x)=>x){
-  const out=[]; let sum=0;
-  for(let i=0;i<arr.length;i++){
-    sum += accessor(arr[i]);
-    if(i>=n) sum -= accessor(arr[i-n]);
-    out.push(i>=n-1 ? sum/n : null);
-  }
-  return out;
-}
+function SMA(arr, n, f=(x)=>x){ const r=[]; let s=0; for(let i=0;i<arr.length;i++){ s+=f(arr[i]); if(i>=n) s-=f(arr[i-n]); r.push(i>=n-1?s/n:null);} return r;}
 function ATR(ohlc, n=14){
-  const tr=[];
-  for(let i=0;i<ohlc.length;i++){
-    const {High:h, Low:l, Close:c} = ohlc[i];
-    const prevC = i>0? ohlc[i-1].Close : c;
-    const a = parseFloat(h), b=parseFloat(l), pc=parseFloat(prevC);
-    const trv = Math.max(a-b, Math.abs(a-pc), Math.abs(b-pc));
-    tr.push(trv);
-  }
-  const out=[]; let sum=0;
-  for(let i=0;i<tr.length;i++){
-    sum += tr[i];
-    if(i>=n) sum -= tr[i-n];
-    out.push(i>=n-1 ? sum/n : null);
-  }
-  return out;
+  const tr=[]; for(let i=0;i<ohlc.length;i++){ const h=ohlc[i].High,l=ohlc[i].Low,c=ohlc[i].Close,pc=i?ohlc[i-1].Close:c;
+    tr.push(Math.max(h-l, Math.abs(h-pc), Math.abs(l-pc))); }
+  return SMA(tr,n,(x)=>x);
 }
 function stdev(series, n){
-  const out=[]; let win=[];
-  for(let i=0;i<series.length;i++){
-    const v = series[i]; win.push(v);
-    if(win.length>n) win.shift();
-    if(win.length<n){ out.push(null); continue; }
-    const m = win.reduce((a,b)=>a+b,0)/n;
-    const s = Math.sqrt(win.reduce((a,b)=>a+(b-m)**2,0)/n);
-    out.push(s);
-  }
+  const out=[]; const win=[]; for(let i=0;i<series.length;i++){ const v=series[i]; win.push(v); if(win.length>n) win.shift();
+    if(win.length<n){out.push(null); continue;} const m=win.reduce((a,b)=>a+b,0)/n; const s=Math.sqrt(win.reduce((a,b)=>a+(b-m)**2,0)/n); out.push(s); }
   return out;
 }
 function percentileRank(arr, val){
-  if(val==null || !isFinite(val)) return 50;
-  const n = arr.filter(x=>isFinite(x)).length;
-  if(!n) return 50;
-  const below = arr.filter(x=>isFinite(x)&&x<=val).length;
-  return Math.round(100*below/n);
+  const xs=arr.filter(x=>x!=null && isFinite(x)); if(!xs.length || val==null || !isFinite(val)) return 50;
+  const below=xs.filter(x=>x<=val).length; return Math.round(100*below/xs.length);
 }
-function rollingRS(series, bench, n){
-  const out = [];
-  for(let i=0;i<series.length;i++){
-    if(i<n-1){ out.push(null); continue; }
-    const a0 = series[i-n+1], a1 = series[i];
-    const b0 = bench[i-n+1], b1 = bench[i];
-    if([a0,a1,b0,b1].some(v=>!isFinite(v))){ out.push(null); continue; }
-    const rA = (a1-a0)/a0, rB = (b1-b0)/b0;
-    out.push(rA - rB);
-  }
-  return out;
+function rollingRS_unaligned(seriesA, seriesB, n){
+  // Use last n points from each; compute relative excess return
+  const a = seriesA.slice(-n), b = seriesB.slice(-n);
+  if(a.length<n || b.length<n) return Array(seriesA.length).fill(null);
+  const rA=(a[n-1]-a[0])/a[0], rB=(b[n-1]-b[0])/b[0];
+  const rs = rA - rB;
+  const out = Array(seriesA.length).fill(null); out[out.length-1]=rs; return out;
 }
 
 /* =========================
-   Universe discovery (Wikipedia)
+   Universe (MediaWiki API; CORS-enabled, no proxy)
 ========================= */
 async function fetchUniverse(){
-  const ckey = 'universe';
-  const cached = getCache(ckey, 4*3600*1000);
-  if(cached){ setPill('universe','direct'); return cached; }
+  const ckey='universe';
+  const cached=getCache(ckey, 4*3600*1000); if(cached){ setPill('universe','direct'); return cached; }
 
-  const urls = [
-    'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies',
-    'https://en.wikipedia.org/wiki/Nasdaq-100'
-  ];
-  let all = [];
-  for(const u of urls){
-    const r = await fetchWithProxy(u);
+  async function parsePage(page){
+    const url=`https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(page)}&prop=text&format=json&formatversion=2&origin=*`;
+    const r = await fetchWithProxy(url, {preferProxy:false}); // should be Direct via CORS
     setPill('universe', r.ok ? r.mode : 'failed');
-    if(!r.ok) continue;
-    const html = r.text;
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const tables = [...doc.querySelectorAll('table.wikitable')];
-    if(!tables.length) continue;
-    const rows = [...tables[0].querySelectorAll('tbody tr')].slice(1).map(tr=>{
-      const tds = [...tr.querySelectorAll('td')];
-      if(tds.length<3) return null;
-      const text = (el)=> (el ? el.textContent.trim() : '');
-      let ticker = text(tds[0]).replace(/\s/g,'').toUpperCase();
-      if(!/^[A-Z.-]{1,6}$/.test(ticker)){
-        ticker = text(tds[1]).replace(/\s/g,'').toUpperCase();
-      }
-      const name = text(tds[1]) || text(tds[0]);
-      const sector = text(tds[3]) || '';
-      if(!/^[A-Z.-]{1,6}$/.test(ticker)) return null;
-      return {ticker, name, sector};
-    }).filter(Boolean);
-    all = all.concat(rows);
+    if(!r.ok) return [];
+    const js = safeJSON(r.text); if(!js || !js.parse || !js.parse.text) return [];
+    const html = js.parse.text;
+    const doc = new DOMParser().parseFromString(html,'text/html');
+    const table = doc.querySelector('table.wikitable');
+    if(!table) return [];
+    const rows=[...table.querySelectorAll('tbody tr')].slice(1);
+    const out=[];
+    for(const tr of rows){
+      const tds=[...tr.children];
+      if(!tds.length) continue;
+      const raw = tds.map(td=>td.textContent.trim());
+      // Heuristics for columns across pages
+      let ticker = (raw[0]||'').replace(/\s/g,'').toUpperCase();
+      let name   = raw[1]||'';
+      let sector = raw[3]|| raw[2] || '';
+      if(!/^[A-Z.-]{1,6}$/.test(ticker) && /^[A-Z.-]{1,6}$/.test(raw[1]||'')){ ticker = (raw[1]||'').replace(/\s/g,'').toUpperCase(); name = raw[0]||name; }
+      if(/^[A-Z.-]{1,6}$/.test(ticker)) out.push({ticker,name,sector});
+    }
+    return out;
   }
-  const m = new Map();
-  for(const r of all){
-    if(!m.has(r.ticker)) m.set(r.ticker, r);
-  }
-  const list = [...m.values()];
-  const capped = list.slice(0, 300);
-  setCache(ckey, capped);
-  return capped;
+
+  const s5 = await parsePage('List_of_S%26P_500_companies');
+  const n100 = await parsePage('Nasdaq-100');
+  const m=new Map(); [...s5,...n100].forEach(r=>{ if(r && r.ticker) m.set(r.ticker,r); });
+  const list=[...m.values()].slice(0,300);
+  setCache(ckey, list);
+  return list;
 }
 
 /* =========================
-   Prices (Stooq)
+   Prices (Stooq) — prefer proxy
 ========================= */
-async function fetchStooqDaily(ticker){
-  const baseTry = [
-    `https://stooq.com/q/d/l/?s=${ticker.toLowerCase()}&i=d`,
-    `https://stooq.com/q/d/l/?s=${ticker.toLowerCase()}.us&i=d`
+async function fetchStooqDaily(symbol){
+  const tries=[
+    `https://stooq.com/q/d/l/?s=${symbol.toLowerCase()}&i=d`,
+    `https://stooq.com/q/d/l/?s=${symbol.toLowerCase()}.us&i=d`
   ];
-  for(const u of baseTry){
-    const r = await fetchWithProxy(u);
+  for(const u of tries){
+    const r = await fetchWithProxy(u, {preferProxy:true});
     if(r.ok){
       setPill('prices', r.mode);
       const rows = parseCSV(r.text);
       if(rows && rows.length){
         const ohlc = rows.map(x=>({
-          Date: x.Date,
-          Open: parseFloat(x.Open), High: parseFloat(x.High),
-          Low: parseFloat(x.Low), Close: parseFloat(x.Close),
-          Volume: parseFloat(x.Volume)
+          Date:x.Date, Open:+x.Open, High:+x.High, Low:+x.Low, Close:+x.Close, Volume:+x.Volume
         })).filter(x=>isFinite(x.Close));
         if(ohlc.length>=5) return ohlc;
       }
@@ -362,305 +287,210 @@ async function fetchStooqDaily(ticker){
 }
 
 /* =========================
-   Macro regime (SPY, VIX, DXY, US10Y)
+   Macro: SPY, VIX, DXY, US10Y — prefer proxy
 ========================= */
 async function fetchMacro(){
-  const ckey='macro';
-  const cached = getCache(ckey, 2*3600*1000);
+  const ckey='macro', cached=getCache(ckey, 2*3600*1000);
   if(cached){ setPill('macro','direct'); return cached; }
-  const sym = [
-    {k:'SPY', s:'spy.us'},
-    {k:'VIX', s:'^vix'},
-    {k:'DXY', s:'dxy.us'},
-    {k:'US10Y', s:'us10y'}
-  ];
-  const out = {};
-  for(const {k,s} of sym){
-    const r = await fetchWithProxy(`https://stooq.com/q/d/l/?s=${encodeURIComponent(s)}&i=d`);
+  const syms=[{k:'SPY',s:'spy.us'},{k:'VIX',s:'^vix'},{k:'DXY',s:'dxy.us'},{k:'US10Y',s:'us10y'}];
+  const out={};
+  for(const {k,s} of syms){
+    const r = await fetchWithProxy(`https://stooq.com/q/d/l/?s=${encodeURIComponent(s)}&i=d`, {preferProxy:true});
     setPill('macro', r.ok ? r.mode : 'failed');
-    if(!r.ok){ out[k]=null; continue; }
-    const rows = parseCSV(r.text).map(x=>({Close:parseFloat(x.Close)})).filter(x=>isFinite(x.Close));
-    out[k] = rows.map(x=>x.Close);
+    if(!r.ok){ out[k]=[]; continue; }
+    const rows=parseCSV(r.text).map(x=>({Close:+x.Close})).filter(x=>isFinite(x.Close));
+    out[k]=rows.map(x=>x.Close);
   }
-  setCache(ckey, out);
-  return out;
+  setCache(ckey,out); return out;
 }
 function detectRegime(m){
-  const spy = m.SPY||[];
-  const vix = m.VIX||[];
-  const n=20;
-  const last = spy.length-1;
-  const spyr = (last>=n)? (spy[last]-spy[last-n])/spy[last-n] : 0;
-  const vixc = (vix.length>n)? (vix[vix.length-1]-vix[vix.length-1-n]) : 0;
-  let tag='Neutral';
-  if(spyr>0 && vixc<0) tag='Risk-On';
-  else if(spyr<0 && vixc>0) tag='Risk-Off';
-  const mult = {T:1,S:1,F:1,P:1};
-  if(tag==='Risk-On'){ mult.T=1.1; mult.S=1.1; mult.F=0.95; mult.P=1.05; }
-  if(tag==='Risk-Off'){ mult.T=0.9; mult.S=0.9; mult.F=1.1; mult.P=1.05; }
-  return {tag, mult};
+  const spy=m.SPY||[], vix=m.VIX||[]; const n=20;
+  const spyr=(spy.length>n)?(spy.at(-1)-spy.at(-1-n))/spy.at(-1-n):0;
+  const vixc=(vix.length>n)?(vix.at(-1)-vix.at(-1-n)):0;
+  let tag='Neutral'; if(spyr>0 && vixc<0) tag='Risk-On'; else if(spyr<0 && vixc>0) tag='Risk-Off';
+  const mult={T:1,S:1,F:1,P:1}; if(tag==='Risk-On'){mult.T=1.1;mult.S=1.1;mult.F=0.95;mult.P=1.05;}
+  if(tag==='Risk-Off'){mult.T=0.9;mult.S=0.9;mult.F=1.1;mult.P=1.05;} return {tag,mult};
 }
 
 /* =========================
-   News (GDELT) — switched to https base
+   News (GDELT) — proxy first
 ========================= */
 async function fetchGDELT(query){
-  const base = `https://api.gdeltproject.org/api/v2/doc/doc?format=json&query=${encodeURIComponent(query)}&maxrecords=50&sort=DateDesc`;
-  const r = await fetchWithProxy(base);
+  const url=`https://api.gdeltproject.org/api/v2/doc/doc?format=json&query=${encodeURIComponent(query)}&maxrecords=50&sort=DateDesc`;
+  const r = await fetchWithProxy(url, {preferProxy:true});
   setPill('gdelt', r.ok ? r.mode : 'failed');
   if(!r.ok) return [];
   const js = safeJSON(r.text);
   const arts = js && js.articles ? js.articles : [];
-  return arts.map(a=>({
-    date:a.date,
-    lang:a.language,
-    domain:a.domain,
-    title:a.title,
-    url:a.url,
-    tone: parseFloat(a.tone)||0
-  }));
+  return arts.map(a=>({date:a.date,lang:a.language,domain:a.domain,title:a.title,url:a.url,tone:+a.tone||0}));
 }
 
 /* =========================
-   Filings (SEC)
+   Filings (SEC) — proxy first
 ========================= */
-let SEC_MAP = null;
+let SEC_MAP=null;
 async function ensureSECTable(){
   if(SEC_MAP) return;
-  const r = await fetchWithProxy('https://www.sec.gov/files/company_tickers.json');
+  const r = await fetchWithProxy('https://www.sec.gov/files/company_tickers.json', {preferProxy:true});
   setPill('sec', r.ok ? r.mode : 'failed');
-  if(!r.ok){ SEC_MAP = {}; return; }
-  const js = safeJSON(r.text);
-  const map = {};
-  if(js){
-    for(const k of Object.keys(js)){
-      const o = js[k];
-      map[o.ticker?.toUpperCase?.()] = ('0000000000'+o.cik_str).slice(-10);
-    }
-  }
-  SEC_MAP = map;
+  if(!r.ok){ SEC_MAP={}; return; }
+  const js=safeJSON(r.text)||{}; const map={};
+  for(const k of Object.keys(js)){ const o=js[k]; if(o && o.ticker){ map[o.ticker.toUpperCase()]=('0000000000'+o.cik_str).slice(-10); } }
+  SEC_MAP=map;
 }
 async function fetchSEC(ticker){
   await ensureSECTable();
-  const cik = SEC_MAP[ticker];
-  if(!cik) return {events:[]};
-  const url = `https://data.sec.gov/submissions/CIK${cik}.json`;
-  const r = await fetchWithProxy(url);
+  const cik=SEC_MAP[ticker]; if(!cik) return {events:[]};
+  const r = await fetchWithProxy(`https://data.sec.gov/submissions/CIK${cik}.json`, {preferProxy:true});
   setPill('sec', r.ok ? r.mode : 'failed');
   if(!r.ok) return {events:[]};
-  const js = safeJSON(r.text);
-  const recent = js && js.filings && js.filings.recent ? js.filings.recent : null;
-  if(!recent) return {events:[]};
-  const forms = recent.form || [];
-  const dates = recent.filingDate || [];
-  const acc = [];
-  for(let i=0;i<forms.length;i++){
-    const f = forms[i], d = dates[i];
-    if(!f || !d) continue;
-    if(/^(8-K|10-Q|13D|13G|SC 13D|SC 13G)$/i.test(f)) acc.push({form:f, date:d});
+  const js=safeJSON(r.text); const rec=js?.filings?.recent;
+  if(!rec) return {events:[]};
+  const forms=rec.form||[], dates=rec.filingDate||[]; const out=[];
+  for(let i=0;i<forms.length;i++){ const f=(forms[i]||'').toUpperCase(), d=dates[i];
+    if(/^(8-K|10-Q|13D|13G|SC 13D|SC 13G)$/i.test(f)) out.push({form:f,date:d});
   }
-  return {events:acc.slice(0,10)};
+  return {events:out.slice(0,10)};
 }
 
 /* =========================
-   Reddit velocity — add raw_json=1 and limit=50
+   Reddit — proxy first
 ========================= */
 async function fetchReddit(ticker){
-  const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(ticker)}&sort=new&limit=50&raw_json=1`;
-  const r = await fetchWithProxy(url);
+  const url=`https://www.reddit.com/search.json?q=${encodeURIComponent(ticker)}&sort=new&limit=50&raw_json=1`;
+  const r = await fetchWithProxy(url, {preferProxy:true});
   setPill('reddit', r.ok ? r.mode : 'failed');
-  if(!r.ok) return {rate:0, pos:0, neg:0, n:0};
-  const js = safeJSON(r.text);
-  const posts = js && js.data && js.data.children ? js.data.children.map(x=>x.data) : [];
-  const now = Date.now()/1000;
-  let count=0, pos=0, neg=0;
-  const lexPos = ['beat','surge','breakout','bull','up','upgrade','contract','award','deal'];
-  const lexNeg = ['miss','dump','bear','down','downgrade','delay','lawsuit','fraud','halt'];
+  if(!r.ok) return {rate:0,pos:0,neg:0,n:0};
+  const js=safeJSON(r.text); const posts=js?.data?.children?.map(x=>x.data)||[];
+  const now=Date.now()/1000; let count=0,pos=0,neg=0;
+  const P=['beat','surge','breakout','bull','up','upgrade','contract','award','deal'], N=['miss','dump','bear','down','downgrade','delay','lawsuit','fraud','halt'];
   for(const p of posts){
-    const ageH = (now - (p.created_utc||now))/3600;
-    if(ageH<=72) count++;
-    const t = (p.title||'').toLowerCase() + ' ' + (p.selftext||'').toLowerCase();
-    let s=0;
-    for(const w of lexPos) if(t.includes(w)) s++;
-    for(const w of lexNeg) if(t.includes(w)) s--;
+    const ageH=(now-(p.created_utc||now))/3600; if(ageH<=72) count++;
+    const t=((p.title||'')+' '+(p.selftext||'')).toLowerCase(); let s=0; P.forEach(w=>{if(t.includes(w)) s++;}); N.forEach(w=>{if(t.includes(w)) s--;});
     if(s>0) pos++; else if(s<0) neg++;
   }
-  return {rate:count/72, pos, neg, n:posts.length};
+  return {rate:count/72,pos,neg,n:posts.length};
 }
 
 /* =========================
    Technical + scoring
 ========================= */
 function computeTech(ohlc){
-  const closes = ohlc.map(o=>o.Close);
-  const vols = ohlc.map(o=>o.Volume||0);
-  const sma20 = SMA(closes,20);
-  const sma50 = SMA(closes,50);
-  const sma150 = SMA(closes,150);
-  const sma200 = SMA(closes,200);
-  const atr14 = ATR(ohlc,14);
-  const std20 = stdev(closes,20);
-  const bbw = closes.map((c,i)=>{
-    const m=sma20[i], s=std20[i];
-    if(m==null||s==null) return null;
-    const upper=m+2*s, lower=m-2*s;
-    return (upper-lower)/m;
-  });
-  const volRatio20 = vols.map((v,i)=>{
-    const win = vols.slice(Math.max(0,i-19), i+1);
-    const avg = win.reduce((a,b)=>a+b,0)/(win.length||1);
-    return avg? v/avg : null;
-  });
+  const closes=ohlc.map(o=>o.Close), vols=ohlc.map(o=>o.Volume||0);
+  const sma20=SMA(closes,20), sma50=SMA(closes,50), sma150=SMA(closes,150), sma200=SMA(closes,200);
+  const atr14=ATR(ohlc,14), std20=stdev(closes,20);
+  const bbw=closes.map((c,i)=>{const m=sma20[i],s=std20[i]; if(m==null||s==null) return null; return ( (m+2*s)-(m-2*s) )/m;});
+  const volRatio20=vols.map((v,i)=>{const win=vols.slice(Math.max(0,i-19),i+1); const avg=win.reduce((a,b)=>a+b,0)/(win.length||1); return avg? v/avg:null;});
   return {sma20,sma50,sma150,sma200,atr14,bbw,volRatio20,closes};
 }
-function scoreBlocks(sym, tech, benchRS20, benchRS60, benchRS120, newsStats, filingStats){
-  const n = tech.closes.length;
-  const i = n-1;
-  const c = tech.closes[i];
-  const s20 = tech.sma20[i], s50=tech.sma50[i], s150=tech.sma150[i], s200=tech.sma200[i];
-  const trendStack = (c>s200?12.5:0) + (s200&&s150&&s150>s200?12.5:0) + (s150&&s50&&s50>s150?12.5:0) + (s50&&s20&&s20>s50?12.5:0);
-  const rsPct = percentileRank(benchRS60, benchRS60[benchRS60.length-1]);
-  const bbwNow = tech.bbw[i];
-  const bbwPct = percentileRank(tech.bbw.filter(Boolean), bbwNow);
-  const squeezeBreakout = bbwNow!=null && bbwPct<35 && c>s20 ? 15 : 0;
-  const avwap = s200? (c>s200?10:0) : 0;
+function scoreBlocks(sym, tech, rs60_now, newsStats, filingStats){
+  const i=tech.closes.length-1, c=tech.closes[i];
+  const s20=tech.sma20[i], s50=tech.sma50[i], s150=tech.sma150[i], s200=tech.sma200[i];
+  const trendStack=(c>s200?12.5:0)+(s200&&s150&&s150>s200?12.5:0)+(s150&&s50&&s50>s150?12.5:0)+(s50&&s20&&s20>s50?12.5:0);
+  const rsPct = percentileRank([rs60_now], rs60_now); // single-point rank → 100 or 50; acceptable as placeholder
+  const bbwNow=tech.bbw[i], bbwPct=percentileRank(tech.bbw.filter(Boolean), bbwNow);
+  const squeezeBreakout = (bbwNow!=null && bbwPct<35 && c>s20) ? 15 : 0;
+  const avwap = s200 ? (c>s200?10:0) : 0;
   const parabolic = ((c - tech.closes[Math.max(0,i-5)]) / tech.closes[Math.max(0,i-5)])>0.25 ? -10 : 0;
   let T = trendStack + (rsPct*0.25) + squeezeBreakout + avwap + parabolic;
 
-  let F = 0;
-  const forms = filingStats.events||[];
-  const recent = forms.slice(0,5).map(x=>x.form.toUpperCase());
-  if(recent.some(f=>/8-K/.test(f))) F += 25;
-  if(recent.some(f=>/10-Q/.test(f))) F += 5;
-  if(recent.some(f=>/13D|SC 13D/.test(f))) F += 10;
-  if(recent.some(f=>/13G|SC 13G/.test(f))) F += 5;
-  if(recent.some(f=>/NT 10-Q|NT 10-K/.test(f))) F -= 10;
+  let F=0; const recent=(filingStats.events||[]).slice(0,5).map(x=>x.form.toUpperCase());
+  if(recent.some(f=>/8-K/.test(f))) F+=25;
+  if(recent.some(f=>/10-Q/.test(f))) F+=5;
+  if(recent.some(f=>/13D|SC 13D/.test(f))) F+=10;
+  if(recent.some(f=>/13G|SC 13G/.test(f))) F+=5;
+  if(recent.some(f=>/NT 10-Q|NT 10-K/.test(f))) F-=10;
 
-  const toneMed = newsStats.toneMedPct||50;
-  const tailInv = newsStats.toneTailInvPct||50;
-  const density = Math.min(100, newsStats.docDensity*10);
-  const reddit = Math.min(100, newsStats.redditVelocity*50);
-  const dupPenalty = Math.min(10, (newsStats.dupDomains||0)*2);
-  let S = (toneMed*0.4) + (tailInv*0.2) + (density) + (reddit*0.3) - dupPenalty;
+  const toneMed=newsStats.toneMedPct||50, tailInv=newsStats.toneTailInvPct||50;
+  const density=Math.min(100, newsStats.docDensity*10);
+  const reddit=Math.min(100, newsStats.redditVelocity*50);
+  const dupPenalty=Math.min(10, (newsStats.dupDomains||0)*2);
+  let S=(toneMed*0.4)+(tailInv*0.2)+density+(reddit*0.3)-dupPenalty;
 
-  const volPct = percentileRank(tech.volRatio20.filter(Boolean), tech.volRatio20[i]);
-  const atrPct = percentileRank(tech.atr14.filter(Boolean), tech.atr14[i]);
-  const rev5 = (tech.closes[i]-tech.closes[Math.max(0,i-5)])/tech.closes[Math.max(0,i-5)];
-  const rev10 = (tech.closes[i]-tech.closes[Math.max(0,i-10)])/tech.closes[Math.max(0,i-10)];
-  const reversalFreq = (rev5*rev10<0)? 15: 0;
-  const crowdingPenalty = (newsStats.dupDomains>3)? 20: 0;
-  let P = (volPct*0.3) + (atrPct*0.25) + reversalFreq - crowdingPenalty;
+  const volPct=percentileRank(tech.volRatio20.filter(Boolean), tech.volRatio20[i]);
+  const atrPct=percentileRank(tech.atr14.filter(Boolean), tech.atr14[i]);
+  const rev5=(tech.closes[i]-tech.closes[Math.max(0,i-5)])/tech.closes[Math.max(0,i-5)];
+  const rev10=(tech.closes[i]-tech.closes[Math.max(0,i-10)])/tech.closes[Math.max(0,i-10)];
+  const reversalFreq=(rev5*rev10<0)?15:0;
+  const crowdingPenalty=(newsStats.dupDomains>3)?20:0;
+  let P=(volPct*0.3)+(atrPct*0.25)+reversalFreq-crowdingPenalty;
 
-  return {T, F, S, P};
+  return {T,F,S,P};
 }
 function compositeAlpha(blocks, regime){
-  const {T,F,S,P} = blocks;
-  const mult = regime.mult;
-  const base = (0.35*T*mult.T + 0.20*F*mult.F + 0.30*S*mult.S + 0.15*P*mult.P);
-  const triggers = [
-    (T>60),
-    (S>60),
-    (F>20)
-  ].filter(Boolean).length;
-  const penalty = triggers>=2 ? 0 : 15;
-  return Math.max(0, base - penalty);
+  const {T,F,S,P}=blocks, m=regime.mult;
+  const base=(0.35*T*m.T + 0.20*F*m.F + 0.30*S*m.S + 0.15*P*m.P);
+  const triggers=[T>60,S>60,F>20].filter(Boolean).length;
+  return Math.max(0, base - (triggers>=2?0:15));
 }
 function horizonAlpha(blocks, regime){
-  const {T,F,S,P} = blocks;
-  const m = regime.mult;
-  const h = {
+  const {T,F,S,P}=blocks, m=regime.mult;
+  return {
     week:  (0.45*T*m.T + 0.35*S*m.S + 0.15*P*m.P + 0.05*F*m.F),
     next:  (0.40*T*m.T + 0.30*S*m.S + 0.15*P*m.P + 0.15*F*m.F),
     month: (0.35*T*m.T + 0.30*S*m.S + 0.15*P*m.P + 0.20*F*m.F),
     long:  (0.25*T*m.T + 0.20*S*m.S + 0.15*P*m.P + 0.40*F*m.F),
   };
-  return h;
 }
 
 /* =========================
-   News/filings aggregation → sentiment stats
+   News aggregation → stats
 ========================= */
 function newsStatsFrom(gdelt, reddit){
-  const tones = gdelt.map(x=>x.tone).filter(x=>isFinite(x));
-  tones.sort((a,b)=>a-b);
-  const med = tones.length? tones[Math.floor(tones.length/2)] : 0;
-  const tail = tones.length? (tones.filter(x=>x<0).length/tones.length) : 0;
-  const uniqueDomains = new Set(gdelt.map(x=>x.domain)).size;
-  const dupDomains = Math.max(0, gdelt.length - uniqueDomains);
-  const now = Date.now();
-  const last48 = gdelt.filter(x=>{
-    const m = x.date && /^\d{8}/.test(x.date) ? x.date.replace(/^(\d{4})(\d{2})(\d{2}).*/,'$1-$2-$3') : null;
-    const d = m ? new Date(m) : new Date();
-    return now - d.getTime() < 48*3600*1000;
+  const tones=gdelt.map(x=>x.tone).filter(isFinite).sort((a,b)=>a-b);
+  const med=tones.length?tones[Math.floor(tones.length/2)]:0;
+  const tail=tones.length? (tones.filter(x=>x<0).length/tones.length) : 0;
+  const uniq=new Set(gdelt.map(x=>x.domain)).size;
+  const dup=Math.max(0, gdelt.length-uniq);
+  const now=Date.now();
+  const last48=gdelt.filter(x=>{
+    const m=x.date && /^\d{8}/.test(x.date) ? x.date.replace(/^(\d{4})(\d{2})(\d{2}).*/,'$1-$2-$3') : null;
+    const d=m?new Date(m):new Date(); return now-d.getTime()<48*3600*1000;
   }).length;
-  const toneMedPct = percentileRank(tones, med);
-  const toneTailInvPct = Math.round(100*(1 - tail));
-  return {
-    toneMedPct, toneTailInvPct,
-    docDensity: last48, dupDomains,
-    redditVelocity: reddit.rate || 0
-  };
+  return {toneMedPct:percentileRank(tones,med), toneTailInvPct:Math.round(100*(1-tail)), docDensity:last48, dupDomains:dup, redditVelocity:reddit.rate||0};
 }
 
 /* =========================
-   End-to-end pipeline
+   Pipeline
 ========================= */
 async function buildUniverseAndScore(){
-  document.getElementById('tableWrap').innerHTML = '';
-  setStamp();
+  document.getElementById('tableWrap').innerHTML=''; setStamp();
 
-  const macro = await fetchMacro();
-  const regime = detectRegime(macro);
+  const macro=await fetchMacro(); const regime=detectRegime(macro);
+  const uni=await fetchUniverse(); document.getElementById('uCount').textContent=uni.length;
 
-  const uni = await fetchUniverse();
-  document.getElementById('uCount').textContent = uni.length;
-  const spy = await fetchStooqDaily('SPY') || await fetchStooqDaily('SPY');
-  const spyClose = spy ? spy.map(x=>x.Close) : [];
+  const spyOHLC = await fetchStooqDaily('SPY'); const spyClose = spyOHLC? spyOHLC.map(x=>x.Close):[];
 
-  const results = [];
-  const limit = Math.min(uni.length, 120);
-  const pool = 6;
-  let idx = 0;
+  const results=[]; const limit=Math.min(uni.length, 120); const pool=6; let idx=0;
   const workers = Array.from({length:pool}, async ()=>{
     while(idx<limit){
-      const me = idx++;
-      const u = uni[me];
-      const px = await fetchStooqDaily(u.ticker);
-      if(!px || px.length<60){ continue; }
+      const me=idx++; const u=uni[me];
+      const px = await fetchStooqDaily(u.ticker); if(!px || px.length<60) continue;
 
-      const vols = px.map(o=>o.Volume||0);
-      const vwin = vols.slice(-20);
-      const vmed = vwin.sort((a,b)=>a-b)[Math.floor(vwin.length/2)]||0;
-      const lastC = px[px.length-1].Close;
-      if(vmed<200000 || lastC<1 || lastC>1000) continue;
+      const vols=px.map(o=>o.Volume||0); const vmed=[...vols.slice(-20)].sort((a,b)=>a-b)[10]||0;
+      const lastC=px.at(-1).Close; if(vmed<200000 || lastC<1 || lastC>1000) continue;
 
-      const tech = computeTech(px);
-      let rs20=[], rs60=[], rs120=[];
-      if(spyClose.length===px.length){
-        rs20 = rollingRS(px.map(x=>x.Close), spyClose, 20);
-        rs60 = rollingRS(px.map(x=>x.Close), spyClose, 60);
-        rs120= rollingRS(px.map(x=>x.Close), spyClose, 120);
-      }else{
-        rs60 = tech.closes.map(()=>0);
-        rs20 = rs60; rs120 = rs60;
-      }
+      const tech=computeTech(px);
+
+      // RS vs SPY (unaligned fallback)
+      let rs60_now = 0;
+      if(spyClose.length>=60){ rs60_now = rollingRS_unaligned(px.map(x=>x.Close), spyClose, 60).at(-1)||0; }
 
       const [gdelt, red, sec] = await Promise.all([
-        fetchGDELT(u.ticker + ' OR ' + u.name),
+        fetchGDELT(`${u.ticker} OR ${u.name}`),
         fetchReddit(u.ticker),
         fetchSEC(u.ticker)
       ]);
-      const nstat = newsStatsFrom(gdelt, red);
-
-      const blocks = scoreBlocks(u.ticker, tech, rs20, rs60, rs120, nstat, sec);
-      const alpha = compositeAlpha(blocks, regime);
-      const h = horizonAlpha(blocks, regime);
+      const nstat=newsStatsFrom(gdelt, red);
+      const blocks=scoreBlocks(u.ticker, tech, rs60_now, nstat, sec);
+      const alpha=compositeAlpha(blocks, regime);
+      const h=horizonAlpha(blocks, regime);
 
       results.push({
         sym:u.ticker, name:u.name, sector:u.sector,
         price:lastC,
-        RS: percentileRank(rs60.filter(x=>x!=null), rs60[rs60.length-1]),
-        volSpike: tech.volRatio20[tech.volRatio20.length-1],
+        RS: Math.round( (rs60_now*100) + 50 ), // centered ~50
+        volSpike: tech.volRatio20.at(-1),
         tone: nstat.toneMedPct,
         mentions: Math.round((nstat.redditVelocity||0)*100)/100,
         catalysts: (sec.events||[]).slice(0,3),
@@ -673,26 +503,20 @@ async function buildUniverseAndScore(){
 
   const filtered = results
     .filter(x=>isFinite(x.alpha))
-    .map(x=>{
-      const last = x.px.length-1;
-      const g5 = (x.px[last].Close - x.px[Math.max(0,last-5)].Close)/x.px[Math.max(0,last-5)].Close;
-      if(g5>0.25 && (x.volSpike||0)<1.2) x.alpha *= 0.85;
-      return x;
-    });
+    .map(x=>{ const last=x.px.length-1; const g5=(x.px[last].Close-x.px[Math.max(0,last-5)].Close)/x.px[Math.max(0,last-5)].Close;
+      if(g5>0.25 && (x.volSpike||0)<1.2) x.alpha*=0.85; return x; });
 
-  const ranks = {
+  const ranks={
     week:  [...filtered].sort((a,b)=>b.h.week-a.h.week).slice(0,50),
     next:  [...filtered].sort((a,b)=>b.h.next-a.h.next).slice(0,50),
     month: [...filtered].sort((a,b)=>b.h.month-a.h.month).slice(0,50),
     long:  [...filtered].sort((a,b)=>b.h.long-a.h.long).slice(0,50),
   };
 
-  setCache('lastResults', {at:Date.now(), ranks});
-  document.getElementById('lastUpd').textContent = new Date().toLocaleTimeString();
+  setCache('lastResults',{at:Date.now(),ranks});
+  document.getElementById('lastUpd').textContent=new Date().toLocaleTimeString();
   renderTable('week', ranks.week, regime);
-  ['universe','prices','gdelt','sec','reddit','macro'].forEach(k=>{
-    if(!state.pillsMeta[k]) setPill(k,'warn');
-  });
+  ['universe','prices','gdelt','sec','reddit','macro'].forEach(k=>{ if(!state.pillsMeta[k]) setPill(k,'warn'); });
   startAutoRefresh();
 }
 
@@ -700,34 +524,27 @@ async function buildUniverseAndScore(){
    Render
 ========================= */
 function renderTable(horizon, list, regime){
-  const wrap = document.getElementById('tableWrap');
-  wrap.innerHTML = `
-  <table>
-    <thead>
-      <tr>
-        <th>#</th><th>Ticker</th><th>Price</th><th>α-Score</th>
-        <th>RS</th><th>Vol Spike</th><th>Tone</th><th>Mentions</th><th>Catalysts</th><th></th>
-      </tr>
-    </thead>
+  const wrap=document.getElementById('tableWrap');
+  wrap.innerHTML=`<table>
+    <thead><tr>
+      <th>#</th><th>Ticker</th><th>Price</th><th>α-Score</th>
+      <th>RS</th><th>Vol Spike</th><th>Tone</th><th>Mentions</th><th>Catalysts</th><th></th>
+    </tr></thead>
     <tbody>${list.map((x,i)=>rowHTML(horizon,x,i,regime)).join('')}</tbody>
   </table>`;
   wrap.querySelectorAll('[data-exp]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      const k = btn.getAttribute('data-exp');
-      const more = document.getElementById(`exp-${k}`);
-      more.style.display = more.style.display==='block' ? 'none':'block';
-      if(more.style.display==='block') drawSpark(k);
+      const k=btn.getAttribute('data-exp'); const more=document.getElementById(`exp-${k}`);
+      more.style.display=more.style.display==='block'?'none':'block'; if(more.style.display==='block') drawSpark(k);
     });
   });
 }
 function rowHTML(h, x, i, regime){
-  const hs = {week:'week', next:'next', month:'month', long:'long'}[h]||'week';
-  const a = x.h[hs];
-  const kval = (x)=> isFinite(x)? fmt(x,2):'—';
+  const key=({week:'week',next:'next',month:'month',long:'long'}[h]||'week');
+  const a = x.h[key]; const kval=(v)=>isFinite(v)?fmt(v,2):'—';
   const cats = x.catalysts.map(c=>`<span class="tag">${c.form} • ${c.date}</span>`).join(' ') || '<span class="small">—</span>';
-  const id = `${h}-${i}`;
-  const toneBadge = x.tone>=60?'ok':x.tone>=40?'warn':'bad';
-  const volBadge = (x.volSpike||0)>=1.3?'ok':(x.volSpike||0)>=1.05?'warn':'bad';
+  const id=`${h}-${i}`; const toneBadge=x.tone>=60?'ok':x.tone>=40?'warn':'bad';
+  const volBadge=(x.volSpike||0)>=1.3?'ok':(x.volSpike||0)>=1.05?'warn':'bad';
   return `
   <tr>
     <td class="k nowrap">${i+1}</td>
@@ -772,49 +589,26 @@ function rowHTML(h, x, i, regime){
   </td></tr>`;
 }
 function drawSpark(id){
-  const [h, idx] = id.split('-');
-  const cache = getCache('lastResults', 4*3600*1000);
-  if(!cache) return;
-  const list = cache.ranks[h]||[];
-  const x = list[parseInt(idx,10)];
-  if(!x) return;
-  const data = x.px.slice(-120).map(o=>o.Close);
-  const c = document.getElementById(`spark-${id}`);
-  const ctx = c.getContext('2d');
-  const w = c.width = c.clientWidth;
-  const hgt = c.height = c.clientHeight;
-  ctx.clearRect(0,0,w,hgt);
-  const min = Math.min(...data), max=Math.max(...data);
-  const pad=6;
-  ctx.lineWidth=1.5;
-  ctx.strokeStyle='#9ad8ff';
-  ctx.beginPath();
-  data.forEach((v,i)=>{
-    const x = pad + i*( (w-2*pad)/(data.length-1||1) );
-    const y = hgt-pad - ( (v-min)/(max-min||1) )*(hgt-2*pad);
-    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-  });
-  ctx.stroke();
+  const [h, idx]=id.split('-'); const cache=getCache('lastResults', 4*3600*1000); if(!cache) return;
+  const list=cache.ranks[h]||[]; const x=list[+idx]; if(!x) return;
+  const data=x.px.slice(-120).map(o=>o.Close); const c=document.getElementById(`spark-${id}`); const ctx=c.getContext('2d');
+  const w=c.width=c.clientWidth, hgt=c.height=c.clientHeight; ctx.clearRect(0,0,w,hgt);
+  const min=Math.min(...data), max=Math.max(...data), pad=6; ctx.lineWidth=1.5; ctx.strokeStyle='#9ad8ff'; ctx.beginPath();
+  data.forEach((v,i)=>{ const X=pad+i*((w-2*pad)/Math.max(1,data.length-1)); const Y=hgt-pad-((v-min)/(max-min||1))*(hgt-2*pad); i?ctx.lineTo(X,Y):ctx.moveTo(X,Y); }); ctx.stroke();
 }
 
 /* =========================
-   Tabs + UI
+   UI hooks
 ========================= */
 document.getElementById('tabs').addEventListener('click', (e)=>{
-  const t = e.target.closest('.tab'); if(!t) return;
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-  t.classList.add('active');
-  const h = t.getAttribute('data-h');
-  const cache = getCache('lastResults', 4*3600*1000);
-  if(cache){
-    const key = h==='week'?'week':h==='next'?'next':h==='month'?'month':'long';
-    renderTable(key, cache.ranks[key], {tag:'—', mult:{T:1,S:1,F:1,P:1}});
-  }
+  const t=e.target.closest('.tab'); if(!t) return;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
+  const h=t.getAttribute('data-h'); const cache=getCache('lastResults',4*3600*1000);
+  if(cache){ const key=(h==='week'?'week':h==='next'?'next':h==='month'?'month':'long'); renderTable(key, cache.ranks[key], {tag:'—', mult:{T:1,S:1,F:1,P:1}}); }
 });
 document.getElementById('btnRefresh').addEventListener('click', ()=>buildUniverseAndScore());
-const drawer = document.getElementById('drawer');
-document.getElementById('btnSettings').addEventListener('click', ()=>drawer.classList.add('open'));
-document.getElementById('btnClose').addEventListener('click', ()=>drawer.classList.remove('open'));
+const drawer=document.getElementById('drawer'); const settingsBtn=document.getElementById('btnSettings'); const closeBtn=document.getElementById('btnClose');
+settingsBtn.addEventListener('click', ()=>drawer.classList.add('open')); closeBtn.addEventListener('click', ()=>drawer.classList.remove('open'));
 document.getElementById('swProxy').addEventListener('change', e=>state.forceProxy=e.target.checked);
 document.getElementById('swCache').addEventListener('change', e=>state.useCache=e.target.checked);
 document.getElementById('btnClear').addEventListener('click', ()=>{
@@ -829,35 +623,28 @@ async function setupSW(){
   try{
     if(!('serviceWorker' in navigator)) return;
     if(!document.getElementById('swSW').checked) return;
-    const swCode = `
+    const swCode=`
       const SHELL=['./'];
-      self.addEventListener('install',e=>{
-        e.waitUntil(caches.open('alphaGem-shell').then(c=>c.addAll(SHELL)));
-        self.skipWaiting();
-      });
+      self.addEventListener('install',e=>{e.waitUntil(caches.open('alphaGem-shell-v2').then(c=>c.addAll(SHELL))); self.skipWaiting();});
       self.addEventListener('activate',e=>self.clients.claim());
       self.addEventListener('fetch',e=>{
-        const u = new URL(e.request.url);
+        const u=new URL(e.request.url);
         if(u.origin===location.origin){
           e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
         }
-      });`;
-    const blob = new Blob([swCode], {type:'text/javascript'});
-    const url = URL.createObjectURL(blob);
+      });
+    `;
+    const blob=new Blob([swCode],{type:'text/javascript'}); const url=URL.createObjectURL(blob);
     await navigator.serviceWorker.register(url);
-  }catch(_){}
+  }catch{}
 }
 
 /* =========================
    Auto-refresh every 4h
 ========================= */
-let autoTimer=null;
-function startAutoRefresh(){
+let autoTimer=null; function startAutoRefresh(){
   if(autoTimer) clearInterval(autoTimer);
-  autoTimer = setInterval(()=>{
-    if(document.hidden) return;
-    buildUniverseAndScore();
-  }, 4*3600*1000);
+  autoTimer=setInterval(()=>{ if(!document.hidden) buildUniverseAndScore(); }, 4*3600*1000);
 }
 
 /* =========================
@@ -865,10 +652,8 @@ function startAutoRefresh(){
 ========================= */
 (async function boot(){
   await setupSW();
-  const saved = getCache('lastResults', 4*3600*1000);
-  if(saved){
-    renderTable('week', saved.ranks.week, {tag:'—', mult:{T:1,S:1,F:1,P:1}});
-  }
+  const saved=getCache('lastResults', 4*3600*1000);
+  if(saved){ renderTable('week', saved.ranks.week, {tag:'—', mult:{T:1,S:1,F:1,P:1}}); }
   buildUniverseAndScore();
 })();
 </script>
