@@ -136,16 +136,16 @@ setStamp();
 
 /* =========================
    Proxy-aware fetch
-   - direct, then proxy fallback unless forced
+   FIXED: r.jina.ai requires http:// after proxy host.
 ========================= */
 function toProxy(url){
-  // Transparent reader proxy
-  // Use http:// for target to avoid double https inside proxy spec
-  try {
+  try{
     const u = new URL(url);
-    const raw = `${u.protocol}//${u.host}${u.pathname}${u.search}`;
+    const raw = `http://${u.host}${u.pathname}${u.search}`;
     return `https://r.jina.ai/${raw}`;
-  } catch(e){ return `https://r.jina.ai/http://` + url.replace(/^https?:\/\//,''); }
+  } catch {
+    return `https://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`;
+  }
 }
 async function fetchWithProxy(url, opts={}){
   const tryOrder = state.forceProxy ? ['proxy','direct'] : ['direct','proxy'];
@@ -276,7 +276,6 @@ function percentileRank(arr, val){
   return Math.round(100*below/n);
 }
 function rollingRS(series, bench, n){
-  // RS = ratio of cumulative return over window vs bench
   const out = [];
   for(let i=0;i<series.length;i++){
     if(i<n-1){ out.push(null); continue; }
@@ -297,7 +296,6 @@ async function fetchUniverse(){
   const cached = getCache(ckey, 4*3600*1000);
   if(cached){ setPill('universe','direct'); return cached; }
 
-  // S&P 500 first, then attempt Nasdaq-100 as supplement
   const urls = [
     'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies',
     'https://en.wikipedia.org/wiki/Nasdaq-100'
@@ -311,15 +309,12 @@ async function fetchUniverse(){
     const doc = new DOMParser().parseFromString(html, 'text/html');
     const tables = [...doc.querySelectorAll('table.wikitable')];
     if(!tables.length) continue;
-    // Attempt to parse rows containing Ticker/Company/Sector
     const rows = [...tables[0].querySelectorAll('tbody tr')].slice(1).map(tr=>{
       const tds = [...tr.querySelectorAll('td')];
       if(tds.length<3) return null;
       const text = (el)=> (el ? el.textContent.trim() : '');
       let ticker = text(tds[0]).replace(/\s/g,'').toUpperCase();
-      // handle when first column isn't ticker
       if(!/^[A-Z.-]{1,6}$/.test(ticker)){
-        // try second cell
         ticker = text(tds[1]).replace(/\s/g,'').toUpperCase();
       }
       const name = text(tds[1]) || text(tds[0]);
@@ -329,13 +324,11 @@ async function fetchUniverse(){
     }).filter(Boolean);
     all = all.concat(rows);
   }
-  // Dedup, limit size for performance
   const m = new Map();
   for(const r of all){
     if(!m.has(r.ticker)) m.set(r.ticker, r);
   }
   const list = [...m.values()];
-  // Cap to ~300 tickers for client perf
   const capped = list.slice(0, 300);
   setCache(ckey, capped);
   return capped;
@@ -345,7 +338,6 @@ async function fetchUniverse(){
    Prices (Stooq)
 ========================= */
 async function fetchStooqDaily(ticker){
-  // Stooq uses symbol formats; try <ticker>.us as fallback for many US stocks
   const baseTry = [
     `https://stooq.com/q/d/l/?s=${ticker.toLowerCase()}&i=d`,
     `https://stooq.com/q/d/l/?s=${ticker.toLowerCase()}.us&i=d`
@@ -394,7 +386,6 @@ async function fetchMacro(){
   return out;
 }
 function detectRegime(m){
-  // Simple: if SPY 20d return > 0 and VIX 20d change < 0 => Risk-On, else Risk-Off; neutral otherwise
   const spy = m.SPY||[];
   const vix = m.VIX||[];
   const n=20;
@@ -411,10 +402,10 @@ function detectRegime(m){
 }
 
 /* =========================
-   News (GDELT)
+   News (GDELT) — switched to https base
 ========================= */
 async function fetchGDELT(query){
-  const base = `http://api.gdeltproject.org/api/v2/doc/doc?format=json&query=${encodeURIComponent(query)}&maxrecords=50&sort=DateDesc`;
+  const base = `https://api.gdeltproject.org/api/v2/doc/doc?format=json&query=${encodeURIComponent(query)}&maxrecords=50&sort=DateDesc`;
   const r = await fetchWithProxy(base);
   setPill('gdelt', r.ok ? r.mode : 'failed');
   if(!r.ok) return [];
@@ -472,10 +463,10 @@ async function fetchSEC(ticker){
 }
 
 /* =========================
-   Reddit velocity
+   Reddit velocity — add raw_json=1 and limit=50
 ========================= */
 async function fetchReddit(ticker){
-  const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(ticker)}&sort=new`;
+  const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(ticker)}&sort=new&limit=50&raw_json=1`;
   const r = await fetchWithProxy(url);
   setPill('reddit', r.ok ? r.mode : 'failed');
   if(!r.ok) return {rate:0, pos:0, neg:0, n:0};
@@ -523,21 +514,19 @@ function computeTech(ohlc){
   return {sma20,sma50,sma150,sma200,atr14,bbw,volRatio20,closes};
 }
 function scoreBlocks(sym, tech, benchRS20, benchRS60, benchRS120, newsStats, filingStats){
-  // Technical (T)
   const n = tech.closes.length;
   const i = n-1;
   const c = tech.closes[i];
   const s20 = tech.sma20[i], s50=tech.sma50[i], s150=tech.sma150[i], s200=tech.sma200[i];
   const trendStack = (c>s200?12.5:0) + (s200&&s150&&s150>s200?12.5:0) + (s150&&s50&&s50>s150?12.5:0) + (s50&&s20&&s20>s50?12.5:0);
-  const rsPct = percentileRank(benchRS60, benchRS60[benchRS60.length-1]);// use 60d RS
+  const rsPct = percentileRank(benchRS60, benchRS60[benchRS60.length-1]);
   const bbwNow = tech.bbw[i];
   const bbwPct = percentileRank(tech.bbw.filter(Boolean), bbwNow);
   const squeezeBreakout = bbwNow!=null && bbwPct<35 && c>s20 ? 15 : 0;
-  const avwap = s200? (c>s200?10:0) : 0; // proxy for anchored VWAP reclaim
+  const avwap = s200? (c>s200?10:0) : 0;
   const parabolic = ((c - tech.closes[Math.max(0,i-5)]) / tech.closes[Math.max(0,i-5)])>0.25 ? -10 : 0;
   let T = trendStack + (rsPct*0.25) + squeezeBreakout + avwap + parabolic;
 
-  // Filings (F)
   let F = 0;
   const forms = filingStats.events||[];
   const recent = forms.slice(0,5).map(x=>x.form.toUpperCase());
@@ -547,7 +536,6 @@ function scoreBlocks(sym, tech, benchRS20, benchRS60, benchRS120, newsStats, fil
   if(recent.some(f=>/13G|SC 13G/.test(f))) F += 5;
   if(recent.some(f=>/NT 10-Q|NT 10-K/.test(f))) F -= 10;
 
-  // Sentiment (S)
   const toneMed = newsStats.toneMedPct||50;
   const tailInv = newsStats.toneTailInvPct||50;
   const density = Math.min(100, newsStats.docDensity*10);
@@ -555,7 +543,6 @@ function scoreBlocks(sym, tech, benchRS20, benchRS60, benchRS120, newsStats, fil
   const dupPenalty = Math.min(10, (newsStats.dupDomains||0)*2);
   let S = (toneMed*0.4) + (tailInv*0.2) + (density) + (reddit*0.3) - dupPenalty;
 
-  // Positioning (P)
   const volPct = percentileRank(tech.volRatio20.filter(Boolean), tech.volRatio20[i]);
   const atrPct = percentileRank(tech.atr14.filter(Boolean), tech.atr14[i]);
   const rev5 = (tech.closes[i]-tech.closes[Math.max(0,i-5)])/tech.closes[Math.max(0,i-5)];
@@ -571,9 +558,9 @@ function compositeAlpha(blocks, regime){
   const mult = regime.mult;
   const base = (0.35*T*mult.T + 0.20*F*mult.F + 0.30*S*mult.S + 0.15*P*mult.P);
   const triggers = [
-    (T>60), // breakout-ish
-    (S>60), // tone spike-ish
-    (F>20)  // filings positive
+    (T>60),
+    (S>60),
+    (F>20)
   ].filter(Boolean).length;
   const penalty = triggers>=2 ? 0 : 15;
   return Math.max(0, base - penalty);
@@ -600,14 +587,14 @@ function newsStatsFrom(gdelt, reddit){
   const tail = tones.length? (tones.filter(x=>x<0).length/tones.length) : 0;
   const uniqueDomains = new Set(gdelt.map(x=>x.domain)).size;
   const dupDomains = Math.max(0, gdelt.length - uniqueDomains);
-  // document density: per 48h
   const now = Date.now();
   const last48 = gdelt.filter(x=>{
-    const d = new Date(x.date.replace(/^(\d{4})(\d{2})(\d{2}).*/,'$1-$2-$3'));
+    const m = x.date && /^\d{8}/.test(x.date) ? x.date.replace(/^(\d{4})(\d{2})(\d{2}).*/,'$1-$2-$3') : null;
+    const d = m ? new Date(m) : new Date();
     return now - d.getTime() < 48*3600*1000;
   }).length;
   const toneMedPct = percentileRank(tones, med);
-  const toneTailInvPct = Math.round(100*(1 - tail)); // fewer negative → higher
+  const toneTailInvPct = Math.round(100*(1 - tail));
   return {
     toneMedPct, toneTailInvPct,
     docDensity: last48, dupDomains,
@@ -631,26 +618,22 @@ async function buildUniverseAndScore(){
   const spyClose = spy ? spy.map(x=>x.Close) : [];
 
   const results = [];
-  const limit = Math.min(uni.length, 120); // throttle initial run for perf
-  // Simple concurrency control
+  const limit = Math.min(uni.length, 120);
   const pool = 6;
   let idx = 0;
   const workers = Array.from({length:pool}, async ()=>{
     while(idx<limit){
       const me = idx++;
       const u = uni[me];
-      // Price series
       const px = await fetchStooqDaily(u.ticker);
       if(!px || px.length<60){ continue; }
 
-      // Liquidity and price filters
       const vols = px.map(o=>o.Volume||0);
       const vwin = vols.slice(-20);
       const vmed = vwin.sort((a,b)=>a-b)[Math.floor(vwin.length/2)]||0;
       const lastC = px[px.length-1].Close;
-      if(vmed<200000 || lastC<1 || lastC>1000) continue; // drop penny/illiquid
+      if(vmed<200000 || lastC<1 || lastC>1000) continue;
 
-      // Indicators + RS
       const tech = computeTech(px);
       let rs20=[], rs60=[], rs120=[];
       if(spyClose.length===px.length){
@@ -658,12 +641,10 @@ async function buildUniverseAndScore(){
         rs60 = rollingRS(px.map(x=>x.Close), spyClose, 60);
         rs120= rollingRS(px.map(x=>x.Close), spyClose, 120);
       }else{
-        // length mismatch: approximate by self
         rs60 = tech.closes.map(()=>0);
         rs20 = rs60; rs120 = rs60;
       }
 
-      // News / Reddit / SEC
       const [gdelt, red, sec] = await Promise.all([
         fetchGDELT(u.ticker + ' OR ' + u.name),
         fetchReddit(u.ticker),
@@ -692,7 +673,6 @@ async function buildUniverseAndScore(){
 
   const filtered = results
     .filter(x=>isFinite(x.alpha))
-    // Down-rank parabolic low-volume spikes
     .map(x=>{
       const last = x.px.length-1;
       const g5 = (x.px[last].Close - x.px[Math.max(0,last-5)].Close)/x.px[Math.max(0,last-5)].Close;
@@ -710,7 +690,6 @@ async function buildUniverseAndScore(){
   setCache('lastResults', {at:Date.now(), ranks});
   document.getElementById('lastUpd').textContent = new Date().toLocaleTimeString();
   renderTable('week', ranks.week, regime);
-  // prime pills if missing
   ['universe','prices','gdelt','sec','reddit','macro'].forEach(k=>{
     if(!state.pillsMeta[k]) setPill(k,'warn');
   });
@@ -732,7 +711,6 @@ function renderTable(horizon, list, regime){
     </thead>
     <tbody>${list.map((x,i)=>rowHTML(horizon,x,i,regime)).join('')}</tbody>
   </table>`;
-  // attach expand handlers
   wrap.querySelectorAll('[data-exp]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const k = btn.getAttribute('data-exp');
@@ -862,7 +840,7 @@ async function setupSW(){
         const u = new URL(e.request.url);
         if(u.origin===location.origin){
           e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
-        } // passthrough for network sources
+        }
       });`;
     const blob = new Blob([swCode], {type:'text/javascript'});
     const url = URL.createObjectURL(blob);
