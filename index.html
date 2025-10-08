@@ -1,1972 +1,898 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GemFinder Alpha Screener</title>
-  <style>
-    :root {
-      color-scheme: dark light;
-      --bg: #0c1116;
-      --panel: #111922;
-      --accent: #33aaff;
-      --accent-muted: #23597f;
-      --danger: #d25f5f;
-      --success: #5fd286;
-      --warning: #d2b75f;
-      --text: #f5f7fa;
-      --text-muted: #a0aec0;
-      --border: #1c2835;
-      --radius: 12px;
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    }
-
-    @media (prefers-color-scheme: light) {
-      :root {
-        --bg: #f6f7fb;
-        --panel: #ffffff;
-        --accent: #0066cc;
-        --accent-muted: #d5e9ff;
-        --text: #0b1623;
-        --text-muted: #4b5568;
-        --border: #d8dee8;
-      }
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 15px;
-      line-height: 1.45;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: rgba(12, 17, 22, 0.9);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    header .top-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
-
-    .meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      letter-spacing: 0.01em;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-    }
-
-    .pill.ok { color: var(--success); border-color: color-mix(in srgb, var(--success) 45%, transparent); }
-    .pill.err { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, transparent); }
-    .pill.warn { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 45%, transparent); }
-
-    .controls {
-      display: grid;
-      gap: 12px;
-    }
-
-    .segmented {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      border-radius: 999px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      background: var(--panel);
-    }
-
-    .segmented button {
-      appearance: none;
-      border: none;
-      padding: 10px 6px;
-      font: inherit;
-      background: transparent;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
-    }
-
-    .segmented button.active {
-      background: var(--accent);
-      color: white;
-    }
-
-    .filters, .universe {
-      display: grid;
-      gap: 12px;
-      background: var(--panel);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      padding: 12px;
-    }
-
-    .filters h2, .universe h2 {
-      margin: 0;
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .filters-grid {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    }
-
-    label {
-      display: grid;
-      gap: 6px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    select, input, textarea {
-      width: 100%;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: color-mix(in srgb, var(--panel) 95%, black 5%);
-      color: inherit;
-      font: inherit;
-    }
-
-    textarea { min-height: 70px; resize: vertical; }
-
-    button.action {
-      appearance: none;
-      border: none;
-      border-radius: 10px;
-      background: var(--accent);
-      color: white;
-      padding: 10px 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: filter 0.2s ease;
-    }
-
-    button.action:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    main {
-      flex: 1;
-      padding: 16px;
-      display: grid;
-      gap: 16px;
-    }
-
-    .results-panel {
-      background: var(--panel);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      min-height: 320px;
-    }
-
-    .results-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      gap: 12px;
-    }
-
-    .virtual-list {
-      position: relative;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 90px 100px repeat(4, minmax(0, 1fr)) 80px;
-      gap: 12px;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-
-    .row:hover { background: color-mix(in srgb, var(--panel) 85%, var(--accent) 15%); }
-
-    .row .ticker { font-weight: 600; }
-    .row .alpha { font-weight: 600; color: var(--accent); }
-
-    .row.expanded {
-      grid-template-columns: 1fr;
-      background: color-mix(in srgb, var(--panel) 92%, var(--accent) 8%);
-    }
-
-    .row.expanded > div { grid-column: span 1; }
-
-    .dossier {
-      display: grid;
-      gap: 12px;
-      padding: 12px 0;
-    }
-
-    .sparkline { width: 100%; height: 56px; }
-    .volume-bars { width: 100%; height: 40px; }
-
-    .subscores {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-      gap: 8px;
-    }
-
-    .subscores .score-box {
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      text-align: center;
-      font-size: 0.85rem;
-    }
-
-    .catalysts, .evidence, .risks {
-      display: grid;
-      gap: 4px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .watchlist-panel {
-      background: var(--panel);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      padding: 12px;
-      display: grid;
-      gap: 12px;
-    }
-
-    .watchlist-items {
-      display: grid;
-      gap: 6px;
-      font-size: 0.85rem;
-    }
-
-    .watchlist-items button {
-      justify-self: start;
-      border: none;
-      padding: 4px 8px;
-      border-radius: 6px;
-      background: var(--accent-muted);
-      color: var(--text);
-      cursor: pointer;
-    }
-
-    .diagnostics {
-      position: fixed;
-      inset: 0;
-      background: rgba(6, 10, 14, 0.75);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      backdrop-filter: blur(6px);
-    }
-
-    .diagnostics[aria-hidden="false"] { display: flex; }
-
-    .diagnostics-dialog {
-      background: var(--panel);
-      border-radius: var(--radius);
-      max-width: min(620px, 90vw);
-      max-height: min(80vh, 620px);
-      overflow: hidden;
-      border: 1px solid var(--border);
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-    }
-
-    .diagnostics-dialog header {
-      position: static;
-      border-bottom: 1px solid var(--border);
-      background: color-mix(in srgb, var(--panel) 85%, transparent);
-    }
-
-    .diagnostics-dialog main {
-      padding: 16px;
-      overflow: auto;
-    }
-
-    .diagnostics-dialog footer {
-      padding: 12px 16px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    table.meta-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.8rem;
-    }
-
-    table.meta-table td, table.meta-table th {
-      padding: 6px 8px;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-    }
-
-    .status-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-    }
-
-    .flex-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .flush-btn {
-      background: transparent;
-      color: var(--accent);
-      border: 1px solid color-mix(in srgb, var(--accent) 60%, transparent);
-      padding: 8px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    footer.disclaimer {
-      padding: 12px 16px 24px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0,0,0,0);
-      border: 0;
-    }
-
-    @media (min-width: 900px) {
-      header { flex-direction: column; }
-      main { grid-template-columns: 2.5fr 1fr; }
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b1220" />
+<title>Alpha Gem Screener</title>
+<style>
+:root{
+  --bg:#0b1220;--bg2:#0e1628;--panel:#111a2f;--panel2:#0d1527;--muted:#7f8ea3;--text:#e9eef7;--accent:#4cc9f0;--ok:#36d399;--warn:#fbbf24;--bad:#ef4444;--line:#1b2743;--pill:#15213c;--link:#90cdf4
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
+.header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg) 0%,rgba(11,18,32,.96) 65%,rgba(11,18,32,.7) 100%);backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid var(--line)}
+.wrap{max-width:1200px;margin:0 auto;padding:14px 14px}
+.h1{font-weight:700;font-size:18px;letter-spacing:.3px}
+.ts{color:var(--muted);font-variant-numeric:tabular-nums}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pill{padding:6px 8px;border-radius:999px;background:var(--pill);border:1px solid var(--line);font-size:12px;display:flex;align-items:center;gap:6px}
+.pill .dot{width:8px;height:8px;border-radius:50%}
+.dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.bad{background:var(--bad)}
+.tabs{display:flex;gap:8px;margin-top:10px}
+.tab{flex:1;text-align:center;padding:10px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);cursor:pointer;user-select:none}
+.tab.active{outline:2px solid var(--accent);background:linear-gradient(180deg,#0e1a34,#0c182f)}
+.bar{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.btn{padding:9px 12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);cursor:pointer}
+.btn:active{transform:translateY(1px)}
+.link{color:var(--link);text-decoration:none}
+table{width:100%;border-collapse:separate;border-spacing:0 8px}
+th,td{padding:10px 8px;text-align:left}
+th{font-size:12px;color:var(--muted);font-weight:600}
+tbody tr{background:var(--panel);border:1px solid var(--line)}
+tbody tr td:first-child{border-top-left-radius:10px;border-bottom-left-radius:10px}
+tbody tr td:last-child{border-top-right-radius:10px;border-bottom-right-radius:10px}
+.k{font-variant-numeric:tabular-nums}
+.badge{padding:2px 6px;border-radius:6px;font-size:11px;border:1px solid var(--line);background:var(--pill);color:#c7d2e5}
+.badge.ok{background:rgba(54,211,153,.1);border-color:rgba(54,211,153,.3);color:#b9f6d0}
+.badge.warn{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.3);color:#ffe7a3}
+.badge.bad{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.3);color:#ffc0c0}
+.rowexp{padding:10px 12px;background:var(--bg2);border-top:1px dashed var(--line)}
+.flex{display:flex;gap:10px;flex-wrap:wrap}
+.card{flex:1 1 260px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;min-width:260px}
+.spark{width:100%;height:60px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:4px;font-size:12px;color:#cbd5e5}
+.tag{padding:3px 6px;border-radius:6px;border:1px solid var(--line);background:#0f1a31;font-size:11px}
+.footer{padding:12px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:12px}
+.settings{position:fixed;right:12px;bottom:12px;z-index:30}
+.drawer{position:fixed;inset:auto 0 0 auto;right:0;width:360px;max-width:95vw;background:var(--panel);border-left:1px solid var(--line);box-shadow:0 -2px 40px rgba(0,0,0,.35);transform:translateY(110%);transition:transform .25s ease}
+.drawer.open{transform:translateY(0)}
+.drawer .hdr{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--line)}
+.sw{display:flex;align-items:center;gap:8px}
+input[type="checkbox"]{width:18px;height:18px}
+hr{border:0;border-top:1px solid var(--line);margin:10px 0}
+.small{font-size:12px;color:var(--muted)}
+.nowrap{white-space:nowrap}
+@media(min-width:900px){.h1{font-size:20px}}
+</style>
 </head>
 <body>
-  <header>
-    <div class="top-row">
-      <div>
-        <h1>GemFinder Alpha Screener</h1>
-        <div class="meta">
-          <span id="asOf">As of —</span>
-          <button class="flush-btn" id="flushCache" aria-label="Flush cached data">Flush Cache</button>
-          <button class="flush-btn" id="openDiagnostics" aria-haspopup="dialog">Diagnostics</button>
-        </div>
-      </div>
-      <div class="status-group" id="sourceStatus">
-        <span class="pill" data-source="stooq">Stooq</span>
-        <span class="pill" data-source="gdelt">GDELT</span>
-        <span class="pill" data-source="sec">SEC</span>
-        <span class="pill" data-source="reddit">Reddit</span>
-        <span class="pill" data-source="wiki">Wiki</span>
-      </div>
+<div class="header">
+  <div class="wrap">
+    <div class="h1">Alpha Gem Screener <span id="ts" class="ts"></span></div>
+    <div id="sourcePills" class="pills"></div>
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-h="week">This Week</div>
+      <div class="tab" data-h="next">Next Week</div>
+      <div class="tab" data-h="month">This Month</div>
+      <div class="tab" data-h="long">Long Term</div>
     </div>
-    <div class="controls" role="group" aria-label="Controls">
-      <div class="segmented" role="tablist" aria-label="Horizons">
-        <button role="tab" data-horizon="Week" class="active">Week</button>
-        <button role="tab" data-horizon="NextWeek">Next Week</button>
-        <button role="tab" data-horizon="Month">Month</button>
-        <button role="tab" data-horizon="LongTerm">Long-Term</button>
-      </div>
-      <div class="filters">
-        <h2>Filters</h2>
-        <div class="filters-grid">
-          <label>Sector
-            <select id="sectorFilter">
-              <option value="all">All</option>
-            </select>
-          </label>
-          <label>Market Cap
-            <select id="capFilter">
-              <option value="all">All</option>
-              <option value="mega">Mega (&gt; $200B)</option>
-              <option value="large">Large ($10B–$200B)</option>
-              <option value="mid">Mid ($2B–$10B)</option>
-              <option value="small">Small (&lt;$2B)</option>
-            </select>
-          </label>
-          <label>Min Liquidity ($M)
-            <input type="number" id="liquidityFilter" min="0" step="0.5" value="1" />
-          </label>
-          <label>Min Relative Strength
-            <input type="number" id="rsFilter" min="-100" max="100" step="1" value="-20" />
-          </label>
-          <label>Sentiment Threshold
-            <input type="number" id="sentimentFilter" min="0" max="100" step="5" value="30" />
-          </label>
-          <label>
-            <input type="checkbox" id="excludeEtfs" checked />
-            <span>Exclude ETFs</span>
-          </label>
-        </div>
-      </div>
-      <div class="universe">
-        <h2>Universe</h2>
-        <div class="filters-grid">
-          <label>Universe Source
-            <select id="universeSource">
-              <option value="sp500">S&amp;P 500</option>
-              <option value="sp400">S&amp;P 400 Mid Cap</option>
-              <option value="sp600">S&amp;P 600 Small Cap</option>
-              <option value="custom">Paste Tickers</option>
-            </select>
-          </label>
-          <label>Paste tickers (comma / newline)
-            <textarea id="customTickers" placeholder="AAPL, MSFT, ..."></textarea>
-          </label>
-          <label>Watchlist
-            <select id="watchlistSelect">
-              <option value="">None</option>
-            </select>
-          </label>
-        </div>
-        <div class="flex-row">
-          <button class="action" id="runScreen">Run Screener</button>
-          <span id="universeSummary" class="meta">Universe: 0 tickers</span>
-        </div>
-      </div>
-    </div>
-  </header>
-  <main>
-    <section class="results-panel" aria-live="polite">
-      <div class="results-header">
-        <div>
-          <strong>Ranked Opportunities</strong>
-          <div class="meta" id="resultsMeta">Awaiting run…</div>
-        </div>
-        <div class="meta" id="qualityGateSummary">Quality gates enforced</div>
-      </div>
-      <div class="virtual-list" id="resultsList" role="list"></div>
-    </section>
-    <aside class="watchlist-panel">
-      <div class="flex-row" style="justify-content:space-between; align-items:center;">
-        <h2>Watchlist</h2>
-        <button class="flush-btn" id="exportWatchlist">Export</button>
-      </div>
-      <div class="watchlist-items" id="watchlistItems"></div>
-      <label>Import JSON
-        <input type="file" id="importWatchlist" accept="application/json" />
-      </label>
-    </aside>
-  </main>
-  <footer class="disclaimer">
-    Informational only. Not investment advice. Live sources may fail or be incomplete. Data cached for resiliency. Asynchronous fetches obey 10s timeouts and retries.
-  </footer>
-
-  <div class="diagnostics" id="diagnostics" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="diagnosticsTitle">
-    <div class="diagnostics-dialog">
-      <header>
-        <h2 id="diagnosticsTitle">Diagnostics</h2>
-      </header>
-      <main>
-        <table class="meta-table" id="diagnosticsTable" aria-live="polite"></table>
-      </main>
-      <footer>
-        <button class="flush-btn" id="closeDiagnostics">Close</button>
-      </footer>
+    <div class="bar">
+      <div class="btn" id="btnRefresh">Refresh</div>
+      <div class="btn" id="btnSettings">Settings</div>
+      <div class="small">Universe: <span id="uCount">—</span> | Updated: <span id="lastUpd">—</span></div>
     </div>
   </div>
+</div>
 
-  <script>
-    /* ======================================================
-       Utility helpers
-    ====================================================== */
-    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+<div class="wrap">
+  <div id="tableWrap"></div>
+  <div class="footer">
+    Informational only — not investment advice. Data from public sources; may be incomplete or delayed.
+  </div>
+</div>
 
-    const formatNumber = (value, options = {}) => {
-      if (value === null || value === undefined || Number.isNaN(value)) return '—';
-      return new Intl.NumberFormat('en-US', options).format(value);
-    };
+<!-- Settings Drawer -->
+<div class="drawer" id="drawer">
+  <div class="hdr">
+    <div>Settings</div>
+    <div class="btn" id="btnClose">Close</div>
+  </div>
+  <div style="padding:12px">
+    <div class="sw"><input id="swProxy" type="checkbox"><label for="swProxy">Force proxy on first attempt</label></div>
+    <div class="sw"><input id="swCache" type="checkbox" checked><label for="swCache">Enable local cache (localStorage)</label></div>
+    <div class="sw"><input id="swSW" type="checkbox" checked><label for="swSW">Enable offline shell (Service Worker)</label></div>
+    <hr/>
+    <div class="btn" id="btnClear">Clear Cache</div>
+    <div class="small" style="margin-top:6px">Cache keys: alphaGem:v1:*</div>
+    <hr/>
+    <div class="small">Auto-refresh every 4 hours while open.</div>
+  </div>
+</div>
 
-    const logistic = x => 1 / (1 + Math.exp(-x));
-    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+<script>
+/* =========================
+   Minimal util + cache
+========================= */
+const VER = 'v1';
+const K = (s)=>`alphaGem:${VER}:${s}`;
+const state = {
+  forceProxy:false,
+  useCache:true,
+  statuses:{
+    universe:'pending',
+    prices:'pending',
+    gdelt:'pending',
+    sec:'pending',
+    reddit:'pending',
+    macro:'pending'
+  },
+  pillsMeta:{}
+};
+const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+const fmt = (n, d=2)=> {
+  if(n==null || !isFinite(n)) return '—';
+  return Number(n).toLocaleString(undefined,{maximumFractionDigits:d});
+};
+const pct = (x)=> isFinite(x)?(x>0?`+${fmt(x,2)}%`:`${fmt(x,2)}%`):'—';
 
-    const median = arr => {
-      if (!arr.length) return 0;
-      const sorted = [...arr].sort((a, b) => a - b);
-      const mid = Math.floor(sorted.length / 2);
-      return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-    };
+function setStamp(){
+  const el = document.getElementById('ts');
+  const t = new Date();
+  el.textContent = `— ${t.toLocaleString()}`;
+}
+setStamp();
 
-    const mad = arr => {
-      if (!arr.length) return 0;
-      const med = median(arr);
-      return median(arr.map(v => Math.abs(v - med))) || 1e-9;
-    };
+/* =========================
+   Proxy-aware fetch
+   - direct, then proxy fallback unless forced
+========================= */
+function toProxy(url){
+  // Transparent reader proxy
+  // Use http:// for target to avoid double https inside proxy spec
+  try {
+    const u = new URL(url);
+    const raw = `${u.protocol}//${u.host}${u.pathname}${u.search}`;
+    return `https://r.jina.ai/${raw}`;
+  } catch(e){ return `https://r.jina.ai/http://` + url.replace(/^https?:\/\//,''); }
+}
+async function fetchWithProxy(url, opts={}){
+  const tryOrder = state.forceProxy ? ['proxy','direct'] : ['direct','proxy'];
+  let lastErr;
+  for(const mode of tryOrder){
+    try{
+      const u = mode==='proxy' ? toProxy(url) : url;
+      const res = await fetch(u, {cache:'no-store'});
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      return {ok:true, mode, text};
+    }catch(e){ lastErr = e; }
+  }
+  return {ok:false, mode:'failed', error: lastErr};
+}
 
-    const robustZ = arr => {
-      if (!arr.length) return [];
-      const med = median(arr);
-      const m = mad(arr) * 1.4826 || 1e-6;
-      return arr.map(v => (v - med) / m);
-    };
+/* =========================
+   Source pills
+========================= */
+function setPill(name, mode){
+  state.statuses[name] = mode;
+  const label = {
+    universe:'Universe',
+    prices:'Prices',
+    gdelt:'News',
+    sec:'Filings',
+    reddit:'Reddit',
+    macro:'Macro'
+  }[name] || name;
+  const color = mode==='direct'?'ok':mode==='proxy'?'warn':mode==='failed'?'bad':'warn';
+  state.pillsMeta[name] = {label, color, mode};
+  renderPills();
+}
+function renderPills(){
+  const c = document.getElementById('sourcePills');
+  c.innerHTML = '';
+  Object.entries(state.pillsMeta).forEach(([k,v])=>{
+    const div = document.createElement('div');
+    div.className='pill';
+    const mtxt = v.mode==='direct'?'Direct':v.mode==='proxy'?'Proxy':'Failed';
+    div.innerHTML = `<span class="dot ${v.color}"></span><span>${v.label} • ${mtxt}</span>`;
+    c.appendChild(div);
+  });
+}
 
-    const percentileRank = (arr, value) => {
-      if (!arr.length) return 0;
-      const less = arr.filter(v => v <= value).length;
-      return (less / arr.length) * 100;
-    };
+/* =========================
+   Local cache
+========================= */
+function getCache(key, maxAgeMs){
+  if(!state.useCache) return null;
+  try{
+    const raw = localStorage.getItem(K(key));
+    if(!raw) return null;
+    const {t, v} = JSON.parse(raw);
+    if(Date.now() - t > maxAgeMs) return null;
+    return v;
+  }catch(_){ return null; }
+}
+function setCache(key, v){
+  if(!state.useCache) return;
+  localStorage.setItem(K(key), JSON.stringify({t:Date.now(), v}));
+}
 
-    const colorForScore = score => {
-      if (score === null || score === undefined || Number.isNaN(score)) return 'var(--text-muted)';
-      if (score >= 75) return 'var(--success)';
-      if (score >= 50) return 'var(--accent)';
-      if (score >= 25) return 'var(--warning)';
-      return 'var(--danger)';
-    };
+/* =========================
+   CSV/JSON helpers
+========================= */
+function parseCSV(txt){
+  const lines = txt.trim().split(/\r?\n/);
+  const hdr = lines[0].split(',');
+  const rows = lines.slice(1).map(l=>{
+    const a = l.split(',');
+    const o = {};
+    hdr.forEach((h,i)=>o[h.trim()] = a[i]?a[i].trim():'');
+    return o;
+  });
+  return rows;
+}
+function safeJSON(txt){
+  try{return JSON.parse(txt)}catch(_){return null}
+}
 
-    const setStatus = (source, status, message = '') => {
-      const pill = document.querySelector(`.pill[data-source="${source}"]`);
-      if (!pill) return;
-      pill.classList.remove('ok', 'err', 'warn');
-      if (status === 'ok') pill.classList.add('ok');
-      if (status === 'err') pill.classList.add('err');
-      if (status === 'warn') pill.classList.add('warn');
-      pill.textContent = message ? `${source.toUpperCase()} ${message}` : source.toUpperCase();
-    };
+/* =========================
+   Indicators
+========================= */
+function SMA(arr, n, accessor=(x)=>x){
+  const out=[]; let sum=0;
+  for(let i=0;i<arr.length;i++){
+    sum += accessor(arr[i]);
+    if(i>=n) sum -= accessor(arr[i-n]);
+    out.push(i>=n-1 ? sum/n : null);
+  }
+  return out;
+}
+function ATR(ohlc, n=14){
+  const tr=[];
+  for(let i=0;i<ohlc.length;i++){
+    const {High:h, Low:l, Close:c} = ohlc[i];
+    const prevC = i>0? ohlc[i-1].Close : c;
+    const a = parseFloat(h), b=parseFloat(l), pc=parseFloat(prevC);
+    const trv = Math.max(a-b, Math.abs(a-pc), Math.abs(b-pc));
+    tr.push(trv);
+  }
+  const out=[]; let sum=0;
+  for(let i=0;i<tr.length;i++){
+    sum += tr[i];
+    if(i>=n) sum -= tr[i-n];
+    out.push(i>=n-1 ? sum/n : null);
+  }
+  return out;
+}
+function stdev(series, n){
+  const out=[]; let win=[];
+  for(let i=0;i<series.length;i++){
+    const v = series[i]; win.push(v);
+    if(win.length>n) win.shift();
+    if(win.length<n){ out.push(null); continue; }
+    const m = win.reduce((a,b)=>a+b,0)/n;
+    const s = Math.sqrt(win.reduce((a,b)=>a+(b-m)**2,0)/n);
+    out.push(s);
+  }
+  return out;
+}
+function percentileRank(arr, val){
+  if(val==null || !isFinite(val)) return 50;
+  const n = arr.filter(x=>isFinite(x)).length;
+  if(!n) return 50;
+  const below = arr.filter(x=>isFinite(x)&&x<=val).length;
+  return Math.round(100*below/n);
+}
+function rollingRS(series, bench, n){
+  // RS = ratio of cumulative return over window vs bench
+  const out = [];
+  for(let i=0;i<series.length;i++){
+    if(i<n-1){ out.push(null); continue; }
+    const a0 = series[i-n+1], a1 = series[i];
+    const b0 = bench[i-n+1], b1 = bench[i];
+    if([a0,a1,b0,b1].some(v=>!isFinite(v))){ out.push(null); continue; }
+    const rA = (a1-a0)/a0, rB = (b1-b0)/b0;
+    out.push(rA - rB);
+  }
+  return out;
+}
 
-    const statusLabelFromResponse = (res, fallback = 'live') => {
-      if (!res || !res.proxyLabel) return fallback;
-      return res.proxyLabel === 'live' ? fallback : 'proxy';
-    };
+/* =========================
+   Universe discovery (Wikipedia)
+========================= */
+async function fetchUniverse(){
+  const ckey = 'universe';
+  const cached = getCache(ckey, 4*3600*1000);
+  if(cached){ setPill('universe','direct'); return cached; }
 
-    const nowIso = () => new Date().toISOString();
-
-    const parseCSV = (csv) => {
-      const lines = csv.trim().split(/\r?\n/);
-      const headers = lines.shift().split(',');
-      return lines
-        .map(line => line.split(',').reduce((acc, cur, idx) => {
-          acc[headers[idx]] = cur;
-          return acc;
-        }, {}))
-        .map(row => ({
-          date: row.Date,
-          open: Number(row.Open),
-          high: Number(row.High),
-          low: Number(row.Low),
-          close: Number(row.Close),
-          volume: Number(row.Volume)
-        }))
-        .filter(row => !Number.isNaN(row.close));
-    };
-
-    /* ======================================================
-       Storage Layer
-    ====================================================== */
-    const STORAGE_KEYS = {
-      SETTINGS: 'gemfinder_settings',
-      CACHE: 'gemfinder_cache',
-      WATCHLIST: 'gemfinder_watchlist',
-      DIAGNOSTICS: 'gemfinder_diagnostics'
-    };
-
-    const CacheStore = (() => {
-      let memory = new Map();
-      const ttlHours = 6;
-      const keyPrefix = 'GF_CACHE::';
-
-      const load = () => {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEYS.CACHE);
-          if (raw) memory = new Map(Object.entries(JSON.parse(raw)));
-        } catch (err) {
-          console.warn('Failed to load cache', err);
-        }
-      };
-
-      const persist = () => {
-        try {
-          localStorage.setItem(STORAGE_KEYS.CACHE, JSON.stringify(Object.fromEntries(memory)));
-        } catch (err) {
-          console.warn('Persist cache error', err);
-        }
-      };
-
-      const key = (scope, id) => `${keyPrefix}${scope}::${id}`;
-      load();
-      return {
-        get(scope, id) {
-          const k = key(scope, id);
-          if (!memory.has(k)) return null;
-          const { timestamp, data } = memory.get(k);
-          if (Date.now() - timestamp > ttlHours * 3600 * 1000) {
-            memory.delete(k);
-            persist();
-            return null;
-          }
-          return data;
-        },
-        set(scope, id, data) {
-          memory.set(key(scope, id), { data, timestamp: Date.now() });
-          persist();
-        },
-        flush() {
-          memory.clear();
-          persist();
-        },
-        snapshot() {
-          return Array.from(memory.entries()).map(([k, v]) => ({ key: k, ageMinutes: ((Date.now() - v.timestamp) / 60000).toFixed(1) }));
-        }
-      };
-    })();
-
-    /* ======================================================
-       Fetch queue with retries + timeout + concurrency
-    ====================================================== */
-    class FetchPool {
-      constructor(maxConcurrent = 6) {
-        this.maxConcurrent = maxConcurrent;
-        this.queue = [];
-        this.active = 0;
+  // S&P 500 first, then attempt Nasdaq-100 as supplement
+  const urls = [
+    'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies',
+    'https://en.wikipedia.org/wiki/Nasdaq-100'
+  ];
+  let all = [];
+  for(const u of urls){
+    const r = await fetchWithProxy(u);
+    setPill('universe', r.ok ? r.mode : 'failed');
+    if(!r.ok) continue;
+    const html = r.text;
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const tables = [...doc.querySelectorAll('table.wikitable')];
+    if(!tables.length) continue;
+    // Attempt to parse rows containing Ticker/Company/Sector
+    const rows = [...tables[0].querySelectorAll('tbody tr')].slice(1).map(tr=>{
+      const tds = [...tr.querySelectorAll('td')];
+      if(tds.length<3) return null;
+      const text = (el)=> (el ? el.textContent.trim() : '');
+      let ticker = text(tds[0]).replace(/\s/g,'').toUpperCase();
+      // handle when first column isn't ticker
+      if(!/^[A-Z.-]{1,6}$/.test(ticker)){
+        // try second cell
+        ticker = text(tds[1]).replace(/\s/g,'').toUpperCase();
       }
-      async enqueue(task) {
-        return new Promise((resolve, reject) => {
-          this.queue.push({ task, resolve, reject });
-          this.process();
-        });
-      }
-      async process() {
-        if (this.active >= this.maxConcurrent) return;
-        const next = this.queue.shift();
-        if (!next) return;
-        this.active++;
-        try {
-          const result = await next.task();
-          next.resolve(result);
-        } catch (err) {
-          next.reject(err);
-        } finally {
-          this.active--;
-          if (this.queue.length) this.process();
-        }
+      const name = text(tds[1]) || text(tds[0]);
+      const sector = text(tds[3]) || '';
+      if(!/^[A-Z.-]{1,6}$/.test(ticker)) return null;
+      return {ticker, name, sector};
+    }).filter(Boolean);
+    all = all.concat(rows);
+  }
+  // Dedup, limit size for performance
+  const m = new Map();
+  for(const r of all){
+    if(!m.has(r.ticker)) m.set(r.ticker, r);
+  }
+  const list = [...m.values()];
+  // Cap to ~300 tickers for client perf
+  const capped = list.slice(0, 300);
+  setCache(ckey, capped);
+  return capped;
+}
+
+/* =========================
+   Prices (Stooq)
+========================= */
+async function fetchStooqDaily(ticker){
+  // Stooq uses symbol formats; try <ticker>.us as fallback for many US stocks
+  const baseTry = [
+    `https://stooq.com/q/d/l/?s=${ticker.toLowerCase()}&i=d`,
+    `https://stooq.com/q/d/l/?s=${ticker.toLowerCase()}.us&i=d`
+  ];
+  for(const u of baseTry){
+    const r = await fetchWithProxy(u);
+    if(r.ok){
+      setPill('prices', r.mode);
+      const rows = parseCSV(r.text);
+      if(rows && rows.length){
+        const ohlc = rows.map(x=>({
+          Date: x.Date,
+          Open: parseFloat(x.Open), High: parseFloat(x.High),
+          Low: parseFloat(x.Low), Close: parseFloat(x.Close),
+          Volume: parseFloat(x.Volume)
+        })).filter(x=>isFinite(x.Close));
+        if(ohlc.length>=5) return ohlc;
       }
     }
+  }
+  return null;
+}
 
-    const proxyChain = [
-      { label: 'live', apply: url => url },
-      {
-        label: 'jina',
-        apply: url => {
-          if (/^https?:\/\//i.test(url)) return `https://r.jina.ai/${url}`;
-          return `https://r.jina.ai/https://${url.replace(/^\/+/, '')}`;
-        }
-      },
-      { label: 'isomorphic', apply: url => `https://cors.isomorphic-git.org/${url}` }
-    ];
+/* =========================
+   Macro regime (SPY, VIX, DXY, US10Y)
+========================= */
+async function fetchMacro(){
+  const ckey='macro';
+  const cached = getCache(ckey, 2*3600*1000);
+  if(cached){ setPill('macro','direct'); return cached; }
+  const sym = [
+    {k:'SPY', s:'spy.us'},
+    {k:'VIX', s:'^vix'},
+    {k:'DXY', s:'dxy.us'},
+    {k:'US10Y', s:'us10y'}
+  ];
+  const out = {};
+  for(const {k,s} of sym){
+    const r = await fetchWithProxy(`https://stooq.com/q/d/l/?s=${encodeURIComponent(s)}&i=d`);
+    setPill('macro', r.ok ? r.mode : 'failed');
+    if(!r.ok){ out[k]=null; continue; }
+    const rows = parseCSV(r.text).map(x=>({Close:parseFloat(x.Close)})).filter(x=>isFinite(x.Close));
+    out[k] = rows.map(x=>x.Close);
+  }
+  setCache(ckey, out);
+  return out;
+}
+function detectRegime(m){
+  // Simple: if SPY 20d return > 0 and VIX 20d change < 0 => Risk-On, else Risk-Off; neutral otherwise
+  const spy = m.SPY||[];
+  const vix = m.VIX||[];
+  const n=20;
+  const last = spy.length-1;
+  const spyr = (last>=n)? (spy[last]-spy[last-n])/spy[last-n] : 0;
+  const vixc = (vix.length>n)? (vix[vix.length-1]-vix[vix.length-1-n]) : 0;
+  let tag='Neutral';
+  if(spyr>0 && vixc<0) tag='Risk-On';
+  else if(spyr<0 && vixc>0) tag='Risk-Off';
+  const mult = {T:1,S:1,F:1,P:1};
+  if(tag==='Risk-On'){ mult.T=1.1; mult.S=1.1; mult.F=0.95; mult.P=1.05; }
+  if(tag==='Risk-Off'){ mult.T=0.9; mult.S=0.9; mult.F=1.1; mult.P=1.05; }
+  return {tag, mult};
+}
 
-    const fetchWithRetry = async (url, options = {}, retries = 3) => {
-      let lastError = null;
-      for (const proxy of proxyChain) {
-        for (let attempt = 0; attempt <= retries; attempt++) {
-          const controller = new AbortController();
-          const id = setTimeout(() => controller.abort(), 10000);
-          try {
-            const targetUrl = proxy.apply(url);
-            const res = await fetch(targetUrl, { ...options, signal: controller.signal });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            res.proxyLabel = proxy.label;
-            return res;
-          } catch (err) {
-            lastError = err;
-            if (attempt === retries) break;
-            const delayMs = (2 ** attempt) * 500 + Math.random() * 400;
-            await delay(delayMs);
-          } finally {
-            clearTimeout(id);
-          }
-        }
+/* =========================
+   News (GDELT)
+========================= */
+async function fetchGDELT(query){
+  const base = `http://api.gdeltproject.org/api/v2/doc/doc?format=json&query=${encodeURIComponent(query)}&maxrecords=50&sort=DateDesc`;
+  const r = await fetchWithProxy(base);
+  setPill('gdelt', r.ok ? r.mode : 'failed');
+  if(!r.ok) return [];
+  const js = safeJSON(r.text);
+  const arts = js && js.articles ? js.articles : [];
+  return arts.map(a=>({
+    date:a.date,
+    lang:a.language,
+    domain:a.domain,
+    title:a.title,
+    url:a.url,
+    tone: parseFloat(a.tone)||0
+  }));
+}
+
+/* =========================
+   Filings (SEC)
+========================= */
+let SEC_MAP = null;
+async function ensureSECTable(){
+  if(SEC_MAP) return;
+  const r = await fetchWithProxy('https://www.sec.gov/files/company_tickers.json');
+  setPill('sec', r.ok ? r.mode : 'failed');
+  if(!r.ok){ SEC_MAP = {}; return; }
+  const js = safeJSON(r.text);
+  const map = {};
+  if(js){
+    for(const k of Object.keys(js)){
+      const o = js[k];
+      map[o.ticker?.toUpperCase?.()] = ('0000000000'+o.cik_str).slice(-10);
+    }
+  }
+  SEC_MAP = map;
+}
+async function fetchSEC(ticker){
+  await ensureSECTable();
+  const cik = SEC_MAP[ticker];
+  if(!cik) return {events:[]};
+  const url = `https://data.sec.gov/submissions/CIK${cik}.json`;
+  const r = await fetchWithProxy(url);
+  setPill('sec', r.ok ? r.mode : 'failed');
+  if(!r.ok) return {events:[]};
+  const js = safeJSON(r.text);
+  const recent = js && js.filings && js.filings.recent ? js.filings.recent : null;
+  if(!recent) return {events:[]};
+  const forms = recent.form || [];
+  const dates = recent.filingDate || [];
+  const acc = [];
+  for(let i=0;i<forms.length;i++){
+    const f = forms[i], d = dates[i];
+    if(!f || !d) continue;
+    if(/^(8-K|10-Q|13D|13G|SC 13D|SC 13G)$/i.test(f)) acc.push({form:f, date:d});
+  }
+  return {events:acc.slice(0,10)};
+}
+
+/* =========================
+   Reddit velocity
+========================= */
+async function fetchReddit(ticker){
+  const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(ticker)}&sort=new`;
+  const r = await fetchWithProxy(url);
+  setPill('reddit', r.ok ? r.mode : 'failed');
+  if(!r.ok) return {rate:0, pos:0, neg:0, n:0};
+  const js = safeJSON(r.text);
+  const posts = js && js.data && js.data.children ? js.data.children.map(x=>x.data) : [];
+  const now = Date.now()/1000;
+  let count=0, pos=0, neg=0;
+  const lexPos = ['beat','surge','breakout','bull','up','upgrade','contract','award','deal'];
+  const lexNeg = ['miss','dump','bear','down','downgrade','delay','lawsuit','fraud','halt'];
+  for(const p of posts){
+    const ageH = (now - (p.created_utc||now))/3600;
+    if(ageH<=72) count++;
+    const t = (p.title||'').toLowerCase() + ' ' + (p.selftext||'').toLowerCase();
+    let s=0;
+    for(const w of lexPos) if(t.includes(w)) s++;
+    for(const w of lexNeg) if(t.includes(w)) s--;
+    if(s>0) pos++; else if(s<0) neg++;
+  }
+  return {rate:count/72, pos, neg, n:posts.length};
+}
+
+/* =========================
+   Technical + scoring
+========================= */
+function computeTech(ohlc){
+  const closes = ohlc.map(o=>o.Close);
+  const vols = ohlc.map(o=>o.Volume||0);
+  const sma20 = SMA(closes,20);
+  const sma50 = SMA(closes,50);
+  const sma150 = SMA(closes,150);
+  const sma200 = SMA(closes,200);
+  const atr14 = ATR(ohlc,14);
+  const std20 = stdev(closes,20);
+  const bbw = closes.map((c,i)=>{
+    const m=sma20[i], s=std20[i];
+    if(m==null||s==null) return null;
+    const upper=m+2*s, lower=m-2*s;
+    return (upper-lower)/m;
+  });
+  const volRatio20 = vols.map((v,i)=>{
+    const win = vols.slice(Math.max(0,i-19), i+1);
+    const avg = win.reduce((a,b)=>a+b,0)/(win.length||1);
+    return avg? v/avg : null;
+  });
+  return {sma20,sma50,sma150,sma200,atr14,bbw,volRatio20,closes};
+}
+function scoreBlocks(sym, tech, benchRS20, benchRS60, benchRS120, newsStats, filingStats){
+  // Technical (T)
+  const n = tech.closes.length;
+  const i = n-1;
+  const c = tech.closes[i];
+  const s20 = tech.sma20[i], s50=tech.sma50[i], s150=tech.sma150[i], s200=tech.sma200[i];
+  const trendStack = (c>s200?12.5:0) + (s200&&s150&&s150>s200?12.5:0) + (s150&&s50&&s50>s150?12.5:0) + (s50&&s20&&s20>s50?12.5:0);
+  const rsPct = percentileRank(benchRS60, benchRS60[benchRS60.length-1]);// use 60d RS
+  const bbwNow = tech.bbw[i];
+  const bbwPct = percentileRank(tech.bbw.filter(Boolean), bbwNow);
+  const squeezeBreakout = bbwNow!=null && bbwPct<35 && c>s20 ? 15 : 0;
+  const avwap = s200? (c>s200?10:0) : 0; // proxy for anchored VWAP reclaim
+  const parabolic = ((c - tech.closes[Math.max(0,i-5)]) / tech.closes[Math.max(0,i-5)])>0.25 ? -10 : 0;
+  let T = trendStack + (rsPct*0.25) + squeezeBreakout + avwap + parabolic;
+
+  // Filings (F)
+  let F = 0;
+  const forms = filingStats.events||[];
+  const recent = forms.slice(0,5).map(x=>x.form.toUpperCase());
+  if(recent.some(f=>/8-K/.test(f))) F += 25;
+  if(recent.some(f=>/10-Q/.test(f))) F += 5;
+  if(recent.some(f=>/13D|SC 13D/.test(f))) F += 10;
+  if(recent.some(f=>/13G|SC 13G/.test(f))) F += 5;
+  if(recent.some(f=>/NT 10-Q|NT 10-K/.test(f))) F -= 10;
+
+  // Sentiment (S)
+  const toneMed = newsStats.toneMedPct||50;
+  const tailInv = newsStats.toneTailInvPct||50;
+  const density = Math.min(100, newsStats.docDensity*10);
+  const reddit = Math.min(100, newsStats.redditVelocity*50);
+  const dupPenalty = Math.min(10, (newsStats.dupDomains||0)*2);
+  let S = (toneMed*0.4) + (tailInv*0.2) + (density) + (reddit*0.3) - dupPenalty;
+
+  // Positioning (P)
+  const volPct = percentileRank(tech.volRatio20.filter(Boolean), tech.volRatio20[i]);
+  const atrPct = percentileRank(tech.atr14.filter(Boolean), tech.atr14[i]);
+  const rev5 = (tech.closes[i]-tech.closes[Math.max(0,i-5)])/tech.closes[Math.max(0,i-5)];
+  const rev10 = (tech.closes[i]-tech.closes[Math.max(0,i-10)])/tech.closes[Math.max(0,i-10)];
+  const reversalFreq = (rev5*rev10<0)? 15: 0;
+  const crowdingPenalty = (newsStats.dupDomains>3)? 20: 0;
+  let P = (volPct*0.3) + (atrPct*0.25) + reversalFreq - crowdingPenalty;
+
+  return {T, F, S, P};
+}
+function compositeAlpha(blocks, regime){
+  const {T,F,S,P} = blocks;
+  const mult = regime.mult;
+  const base = (0.35*T*mult.T + 0.20*F*mult.F + 0.30*S*mult.S + 0.15*P*mult.P);
+  const triggers = [
+    (T>60), // breakout-ish
+    (S>60), // tone spike-ish
+    (F>20)  // filings positive
+  ].filter(Boolean).length;
+  const penalty = triggers>=2 ? 0 : 15;
+  return Math.max(0, base - penalty);
+}
+function horizonAlpha(blocks, regime){
+  const {T,F,S,P} = blocks;
+  const m = regime.mult;
+  const h = {
+    week:  (0.45*T*m.T + 0.35*S*m.S + 0.15*P*m.P + 0.05*F*m.F),
+    next:  (0.40*T*m.T + 0.30*S*m.S + 0.15*P*m.P + 0.15*F*m.F),
+    month: (0.35*T*m.T + 0.30*S*m.S + 0.15*P*m.P + 0.20*F*m.F),
+    long:  (0.25*T*m.T + 0.20*S*m.S + 0.15*P*m.P + 0.40*F*m.F),
+  };
+  return h;
+}
+
+/* =========================
+   News/filings aggregation → sentiment stats
+========================= */
+function newsStatsFrom(gdelt, reddit){
+  const tones = gdelt.map(x=>x.tone).filter(x=>isFinite(x));
+  tones.sort((a,b)=>a-b);
+  const med = tones.length? tones[Math.floor(tones.length/2)] : 0;
+  const tail = tones.length? (tones.filter(x=>x<0).length/tones.length) : 0;
+  const uniqueDomains = new Set(gdelt.map(x=>x.domain)).size;
+  const dupDomains = Math.max(0, gdelt.length - uniqueDomains);
+  // document density: per 48h
+  const now = Date.now();
+  const last48 = gdelt.filter(x=>{
+    const d = new Date(x.date.replace(/^(\d{4})(\d{2})(\d{2}).*/,'$1-$2-$3'));
+    return now - d.getTime() < 48*3600*1000;
+  }).length;
+  const toneMedPct = percentileRank(tones, med);
+  const toneTailInvPct = Math.round(100*(1 - tail)); // fewer negative → higher
+  return {
+    toneMedPct, toneTailInvPct,
+    docDensity: last48, dupDomains,
+    redditVelocity: reddit.rate || 0
+  };
+}
+
+/* =========================
+   End-to-end pipeline
+========================= */
+async function buildUniverseAndScore(){
+  document.getElementById('tableWrap').innerHTML = '';
+  setStamp();
+
+  const macro = await fetchMacro();
+  const regime = detectRegime(macro);
+
+  const uni = await fetchUniverse();
+  document.getElementById('uCount').textContent = uni.length;
+  const spy = await fetchStooqDaily('SPY') || await fetchStooqDaily('SPY');
+  const spyClose = spy ? spy.map(x=>x.Close) : [];
+
+  const results = [];
+  const limit = Math.min(uni.length, 120); // throttle initial run for perf
+  // Simple concurrency control
+  const pool = 6;
+  let idx = 0;
+  const workers = Array.from({length:pool}, async ()=>{
+    while(idx<limit){
+      const me = idx++;
+      const u = uni[me];
+      // Price series
+      const px = await fetchStooqDaily(u.ticker);
+      if(!px || px.length<60){ continue; }
+
+      // Liquidity and price filters
+      const vols = px.map(o=>o.Volume||0);
+      const vwin = vols.slice(-20);
+      const vmed = vwin.sort((a,b)=>a-b)[Math.floor(vwin.length/2)]||0;
+      const lastC = px[px.length-1].Close;
+      if(vmed<200000 || lastC<1 || lastC>1000) continue; // drop penny/illiquid
+
+      // Indicators + RS
+      const tech = computeTech(px);
+      let rs20=[], rs60=[], rs120=[];
+      if(spyClose.length===px.length){
+        rs20 = rollingRS(px.map(x=>x.Close), spyClose, 20);
+        rs60 = rollingRS(px.map(x=>x.Close), spyClose, 60);
+        rs120= rollingRS(px.map(x=>x.Close), spyClose, 120);
+      }else{
+        // length mismatch: approximate by self
+        rs60 = tech.closes.map(()=>0);
+        rs20 = rs60; rs120 = rs60;
       }
-      throw lastError || new Error('Network error');
-    };
 
-    /* ======================================================
-       Universe builders
-    ====================================================== */
-    const wikipediaSources = {
-      sp500: { url: 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies', tableIndex: 0 },
-      sp400: { url: 'https://en.wikipedia.org/wiki/List_of_S%26P_400_companies', tableIndex: 0 },
-      sp600: { url: 'https://en.wikipedia.org/wiki/List_of_S%26P_600_companies', tableIndex: 0 }
-    };
+      // News / Reddit / SEC
+      const [gdelt, red, sec] = await Promise.all([
+        fetchGDELT(u.ticker + ' OR ' + u.name),
+        fetchReddit(u.ticker),
+        fetchSEC(u.ticker)
+      ]);
+      const nstat = newsStatsFrom(gdelt, red);
 
-    const parseUniverseTable = (html, tableIndex = 0) => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const tables = doc.querySelectorAll('table.wikitable');
-      if (!tables.length) return [];
-      const table = tables[tableIndex] || tables[0];
-      return Array.from(table.querySelectorAll('tbody tr')).map(row => {
-        const cells = row.querySelectorAll('td');
-        if (cells.length < 2) return null;
-        const ticker = cells[0].textContent.trim().replace(/\./g, '-');
-        const name = cells[1].textContent.trim();
-        const sector = cells[3] ? cells[3].textContent.trim() : 'Unknown';
-        if (!ticker || ticker.length > 10) return null;
-        return { ticker, name, sector };
-      }).filter(Boolean);
-    };
+      const blocks = scoreBlocks(u.ticker, tech, rs20, rs60, rs120, nstat, sec);
+      const alpha = compositeAlpha(blocks, regime);
+      const h = horizonAlpha(blocks, regime);
 
-    const loadUniverse = async (key) => {
-      const source = wikipediaSources[key];
-      if (!source) return [];
-      const cacheKey = `wiki-${key}`;
-      const cached = CacheStore.get('wiki', cacheKey);
-      if (cached) {
-        setStatus('wiki', 'ok', 'cached');
-        return cached;
-      }
-      try {
-        const res = await fetchWithRetry(source.url, { headers: { 'Accept': 'text/html' } });
-        const html = await res.text();
-        const universe = parseUniverseTable(html, source.tableIndex);
-        CacheStore.set('wiki', cacheKey, universe);
-        setStatus('wiki', 'ok', statusLabelFromResponse(res));
-        return universe;
-      } catch (err) {
-        console.error('Wiki fetch failed', err);
-        setStatus('wiki', 'err', 'error');
-        return [];
-      }
-    };
-    /* ======================================================
-       Market data & indicators
-    ====================================================== */
-    const computeSMA = (series, window) => {
-      const result = [];
-      for (let i = 0; i < series.length; i++) {
-        if (i + 1 < window) {
-          result.push(null);
-          continue;
-        }
-        const slice = series.slice(i + 1 - window, i + 1);
-        result.push(slice.reduce((sum, v) => sum + v, 0) / window);
-      }
-      return result;
-    };
-
-    const computeRS = (series, spySeries, lookback) => {
-      if (series.length < lookback + 1 || spySeries.length < lookback + 1) return 0;
-      const latest = series.at(-1);
-      const prev = series.at(-(lookback + 1));
-      const spyLatest = spySeries.at(-1);
-      const spyPrev = spySeries.at(-(lookback + 1));
-      if (!prev || !spyPrev) return 0;
-      return (latest / prev) / (spyLatest / spyPrev) - 1;
-    };
-
-    const computeATR = (data, window = 14) => {
-      const trs = [];
-      for (let i = 0; i < data.length; i++) {
-        if (i === 0) {
-          trs.push(null);
-          continue;
-        }
-        const high = data[i].high;
-        const low = data[i].low;
-        const prevClose = data[i - 1].close;
-        const tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose));
-        trs.push(tr);
-      }
-      return trs.map((_, idx) => {
-        if (idx + 1 < window) return null;
-        const slice = trs.slice(idx + 1 - window, idx + 1).filter(Boolean);
-        return slice.length ? slice.reduce((a, b) => a + b, 0) / slice.length : null;
+      results.push({
+        sym:u.ticker, name:u.name, sector:u.sector,
+        price:lastC,
+        RS: percentileRank(rs60.filter(x=>x!=null), rs60[rs60.length-1]),
+        volSpike: tech.volRatio20[tech.volRatio20.length-1],
+        tone: nstat.toneMedPct,
+        mentions: Math.round((nstat.redditVelocity||0)*100)/100,
+        catalysts: (sec.events||[]).slice(0,3),
+        alpha, blocks, h,
+        tech, px, gdelt
       });
-    };
+    }
+  });
+  await Promise.all(workers);
 
-    const computeBBW = (closes, window = 20) => {
-      const sma = computeSMA(closes, window);
-      const stdev = closes.map((_, idx) => {
-        if (idx + 1 < window) return null;
-        const slice = closes.slice(idx + 1 - window, idx + 1);
-        const mean = slice.reduce((acc, v) => acc + v, 0) / slice.length;
-        const variance = slice.reduce((acc, v) => acc + (v - mean) ** 2, 0) / slice.length;
-        return Math.sqrt(variance);
-      });
-      return closes.map((_, idx) => {
-        if (idx + 1 < window) return null;
-        return (2 * stdev[idx]) / (sma[idx] || 1);
-      });
-    };
-
-    const detectSqueeze = (bbw, closes, volumes) => {
-      const recent = bbw.slice(-40);
-      const valid = recent.filter(Boolean);
-      if (!valid.length) return { squeeze: false, points: 0, lastTrigger: null };
-      let triggerIndex = null;
-      for (let i = recent.length - 1; i >= 5; i--) {
-        const window = recent.slice(i - 5, i);
-        const lowRank = window.filter(v => v && percentileRank(valid, v) <= 20).length;
-        const closeIndex = closes.length - recent.length + i;
-        const high20 = Math.max(...closes.slice(closeIndex - 20, closeIndex + 1));
-        const volMedian = median(volumes.slice(-20));
-        const breakout = closes[closeIndex] >= high20;
-        const volSpike = volumes[closeIndex] > 1.5 * volMedian;
-        if (lowRank >= 5 && breakout && volSpike) {
-          triggerIndex = closeIndex;
-          break;
-        }
-      }
-      if (triggerIndex === null) return { squeeze: false, points: 0, lastTrigger: null };
-      const distance = closes.length - 1 - triggerIndex;
-      const decay = clamp(1 - distance / 15, 0, 1);
-      return { squeeze: true, points: 15 * decay, lastTrigger: triggerIndex };
-    };
-
-    const avwapProxy = (data) => {
-      if (data.length < 3) return { reclaimed: false, points: 0 };
-      const anchor = Math.max(0, data.length - 30);
-      let pv = 0;
-      let vol = 0;
-      for (let i = anchor; i < data.length; i++) {
-        pv += data[i].close * data[i].volume;
-        vol += data[i].volume;
-      }
-      const vwap = vol ? pv / vol : data.at(-1).close;
-      const closes = data.slice(-3).map(d => d.close);
-      const reclaimed = closes.every(close => close >= vwap * 0.995);
-      return { reclaimed, points: reclaimed ? 10 : 0 };
-    };
-
-    const parabolicPenalty = (data) => {
-      if (data.length < 5) return 0;
-      const atrSeries = computeATR(data).map((atr, idx) => atr ? atr / (data[idx].close || 1) : 0).filter(Boolean);
-      const z = robustZ(atrSeries);
-      const lastZ = z.at(-1) || 0;
-      const gap = data.at(-1).open / data.at(-2).close - 1;
-      const volMedian = median(data.slice(-20).map(d => d.volume));
-      if (lastZ > 2 && gap > 0.06 && data.at(-1).volume < volMedian) return -10;
-      return 0;
-    };
-
-    /* ======================================================
-       External Data adapters
-    ====================================================== */
-    const fetchStooq = async (ticker, interval = 'd') => {
-      const cacheKey = `${ticker}-${interval}`;
-      const cached = CacheStore.get('stooq', cacheKey);
-      if (cached) return { data: cached, cached: true };
-      const url = `https://stooq.com/q/d/l/?s=${ticker.toLowerCase()}&i=${interval}`;
-      try {
-        const res = await fetchWithRetry(url, { headers: { 'Accept': 'text/csv' } });
-        const text = await res.text();
-        const parsed = parseCSV(text);
-        CacheStore.set('stooq', cacheKey, parsed);
-        setStatus('stooq', 'ok', statusLabelFromResponse(res));
-        return { data: parsed, cached: false };
-      } catch (err) {
-        console.error('Stooq error', ticker, err);
-        setStatus('stooq', 'err', 'error');
-        return { data: [], error: err };
-      }
-    };
-
-    const fetchGdelt = async (query) => {
-      const cached = CacheStore.get('gdelt', query);
-      if (cached) return { data: cached, cached: true };
-      const url = `https://api.gdeltproject.org/api/v2/doc/doc?format=json&query=${encodeURIComponent(query)}&maxrecords=50&sort=DateDesc`;
-      try {
-        const res = await fetchWithRetry(url, { headers: { 'Accept': 'application/json' } });
-        const json = await res.json();
-        CacheStore.set('gdelt', query, json);
-        setStatus('gdelt', 'ok', statusLabelFromResponse(res));
-        return { data: json, cached: false };
-      } catch (err) {
-        console.error('GDELT error', query, err);
-        setStatus('gdelt', 'err', 'error');
-        return { data: null, error: err };
-      }
-    };
-
-    const SECIndex = {
-      index: null,
-      async ensureIndex() {
-        if (this.index) return this.index;
-        const cached = CacheStore.get('sec', 'index');
-        if (cached) {
-          this.index = cached;
-          setStatus('sec', 'ok', 'cached');
-          return cached;
-        }
-        try {
-          const res = await fetchWithRetry('https://www.sec.gov/files/company_tickers.json', {
-            headers: {
-              'Accept': 'application/json',
-              'User-Agent': 'GemFinder/1.0 (github)'
-            }
-          });
-          const json = await res.json();
-          const map = {};
-          Object.values(json).forEach(entry => {
-            map[entry.ticker] = entry.cik_str.toString().padStart(10, '0');
-          });
-          this.index = map;
-          CacheStore.set('sec', 'index', map);
-          setStatus('sec', 'ok', statusLabelFromResponse(res));
-          return map;
-        } catch (err) {
-          console.error('SEC index error', err);
-          setStatus('sec', 'err', 'error');
-          return {};
-        }
-      }
-    };
-
-    const fetchSecFilings = async (ticker) => {
-      const index = await SECIndex.ensureIndex();
-      const cik = index[ticker];
-      if (!cik) return { data: null, error: new Error('CIK not found') };
-      const cacheKey = `filings-${ticker}`;
-      const cached = CacheStore.get('sec', cacheKey);
-      if (cached) return { data: cached, cached: true };
-      try {
-        const res = await fetchWithRetry(`https://data.sec.gov/submissions/CIK${cik}.json`, {
-          headers: {
-            'Accept': 'application/json',
-            'User-Agent': 'GemFinder/1.0 (+https://github.com)'
-          }
-        });
-        const json = await res.json();
-        CacheStore.set('sec', cacheKey, json);
-        setStatus('sec', 'ok', statusLabelFromResponse(res));
-        return { data: json, cached: false };
-      } catch (err) {
-        console.error('SEC filings error', ticker, err);
-        setStatus('sec', 'warn', 'partial');
-        return { data: null, error: err };
-      }
-    };
-
-    const fetchReddit = async (query) => {
-      const cached = CacheStore.get('reddit', query);
-      if (cached) return { data: cached, cached: true };
-      const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&sort=new&restrict_sr=0`;
-      try {
-        const res = await fetchWithRetry(url, { headers: { 'Accept': 'application/json' } });
-        const json = await res.json();
-        CacheStore.set('reddit', query, json);
-        setStatus('reddit', 'ok', statusLabelFromResponse(res));
-        return { data: json, cached: false };
-      } catch (err) {
-        console.error('Reddit fetch error', query, err);
-        setStatus('reddit', 'warn', 'error');
-        return { data: null, error: err };
-      }
-    };
-
-    /* ======================================================
-       Narrative & filings analytics
-    ====================================================== */
-    const computeSentiment = (articles = []) => {
-      if (!articles.length) return { medianTone: 0, tailRisk: 0, novelty: 0, stories: [], domainConcentration: 0 };
-      const tones = articles.map(a => Number(a.tone ?? 0)).filter(v => !Number.isNaN(v));
-      const medianTone = tones.length ? median(tones) : 0;
-      const sorted = [...tones].sort((a, b) => a - b);
-      const tailIndex = Math.max(0, Math.floor(sorted.length * 0.05) - 1);
-      const tailRisk = sorted[tailIndex] || 0;
-      const uniqueStories = [];
-      const seen = [];
-      const uniqueDomains = new Map();
-      const toTokens = text => text.toLowerCase().split(/\W+/).filter(Boolean).slice(0, 20);
-      articles.forEach(story => {
-        const tokens = toTokens(story.title || '');
-        const dup = seen.some(existing => {
-          const intersection = existing.filter(t => tokens.includes(t)).length;
-          const union = new Set([...existing, ...tokens]).size || 1;
-          return intersection / union > 0.6;
-        });
-        if (!dup) {
-          seen.push(tokens);
-          uniqueStories.push(story);
-        }
-        try {
-          const domain = story.url ? new URL(story.url).hostname : 'unknown';
-          uniqueDomains.set(domain, (uniqueDomains.get(domain) || 0) + 1);
-        } catch (err) {
-          uniqueDomains.set('unknown', (uniqueDomains.get('unknown') || 0) + 1);
-        }
-      });
-      const novelty = clamp(uniqueStories.length / (articles.length || 1), 0, 1);
-      const topDomainCount = Math.max(...Array.from(uniqueDomains.values()));
-      const domainConcentration = topDomainCount / (articles.length || 1);
-      return { medianTone, tailRisk, novelty, stories: uniqueStories, domainConcentration };
-    };
-
-    const analyzeReddit = (posts = []) => {
-      if (!posts.length) return { velocity: 0, polarity: 0, spamPenalty: 0 };
-      const timestamps = posts.map(p => p.created_utc * 1000).sort((a, b) => a - b);
-      const now = Date.now();
-      const recent = timestamps.filter(ts => now - ts < 3600 * 1000);
-      const velocity = recent.length;
-      const z = clamp((velocity - 2) / 2, -2, 3);
-      const authors = posts.map(p => p.author);
-      const authorCounts = authors.reduce((acc, author) => {
-        acc[author] = (acc[author] || 0) + 1;
-        return acc;
-      }, {});
-      const spamPenalty = Math.max(...Object.values(authorCounts)) > 5 ? -10 : 0;
-      const lexicon = { bullish: 1, moon: 1, calls: 0.6, puts: -0.6, bearish: -1, drop: -0.7, pump: -0.4 };
-      let polarityScore = 0;
-      posts.slice(0, 30).forEach(post => {
-        const text = `${post.title} ${post.selftext || ''}`.toLowerCase();
-        Object.entries(lexicon).forEach(([word, weight]) => {
-          if (text.includes(word)) polarityScore += weight;
-        });
-      });
-      const polarity = clamp((polarityScore / posts.length) * 10 + 5, 0, 10);
-      return { velocity: z * 20, polarity, spamPenalty };
-    };
-
-    const classifySecEvents = (filings) => {
-      if (!filings) return { events: [], cadenceScore: 0 };
-      const forms = filings.filings?.recent;
-      if (!forms) return { events: [], cadenceScore: 0 };
-      const { accessionNumber, filingDate, form, primaryDocDescription } = forms;
-      const events = [];
-      const now = Date.now();
-      for (let i = 0; i < form.length; i++) {
-        const type = form[i];
-        const date = filingDate[i];
-        const ageDays = (now - new Date(date).getTime()) / 86400000;
-        if (ageDays > 180) continue;
-        let weight = 0;
-        let label = '';
-        if (type === '8-K') {
-          if (/material definitive agreement|guidance|contract/i.test(primaryDocDescription[i] || '')) {
-            weight = 25;
-            label = 'material';
-          }
-          if (/purchase|repurchase/i.test(primaryDocDescription[i] || '')) {
-            weight += 10;
-            label = 'insider';
-          }
-        } else if (['13D', '13G'].includes(type)) {
-          weight = 20;
-          label = 'ownership';
-        } else if (/10-Q/.test(type)) {
-          weight = 5;
-          label = '10-Q';
-        } else if (/S-1|S-3/.test(type)) {
-          weight = 10;
-          label = 'shelf';
-        }
-        if (weight) {
-          const decay = Math.exp(-ageDays / 21);
-          events.push({ form: type, type: label, date, weight: weight * decay, accession: accessionNumber[i] });
-        }
-      }
-      const cadenceScore = events.some(e => /10-Q/.test(e.form)) ? 5 : 0;
-      return { events, cadenceScore };
-    };
-
-    /* ======================================================
-       Alpha computation
-    ====================================================== */
-    const horizonConfigs = {
-      Week: { wT: 0.45, wS: 0.35, wP: 0.15, wF: 0.05 },
-      NextWeek: { wT: 0.40, wS: 0.30, wP: 0.15, wF: 0.15 },
-      Month: { wT: 0.35, wS: 0.30, wP: 0.15, wF: 0.20 },
-      LongTerm: { wT: 0.25, wS: 0.20, wP: 0.15, wF: 0.40 }
-    };
-
-    const computeHorizonScores = ({ T, F, S, P }) => {
-      return Object.entries(horizonConfigs).reduce((acc, [h, weights]) => {
-        acc[h] = clamp(100 * (weights.wT * (T / 100) + weights.wF * (F / 100) + weights.wS * (S / 100) + weights.wP * (P / 100)), 0, 100);
-        return acc;
-      }, {});
-    };
-
-    const computeScores = ({ ticker, data, spy, gdelt, reddit, filings }) => {
-      const closes = data.map(d => d.close);
-      const volumes = data.map(d => d.volume);
-      const last = data.at(-1);
-      if (!last) return null;
-      const sma50 = computeSMA(closes, 50).at(-1);
-      const sma150 = computeSMA(closes, 150).at(-1);
-      const sma200 = computeSMA(closes, 200).at(-1);
-      const bbw = computeBBW(closes, 20);
-      const squeezeMeta = detectSqueeze(bbw, closes, volumes);
-      const avwap = avwapProxy(data);
-      const parabolic = parabolicPenalty(data);
-      const trendScore = (last.close > (sma50 || Infinity) ? 25 : 0) + (last.close > (sma150 || Infinity) ? 25 : 0) + (last.close > (sma200 || Infinity) ? 25 : 0);
-      const rs20 = computeRS(closes, spy, 20) * 100;
-      const rs60 = computeRS(closes, spy, 60) * 100;
-      const rs120 = computeRS(closes, spy, 120) * 100;
-      const rsSample = [rs20, rs60, rs120].filter(v => Number.isFinite(v));
-      const rsPercentile = percentileRank(rsSample, rs20);
-      const T = clamp(trendScore + 0.25 * rsPercentile + squeezeMeta.points + avwap.points + parabolic, 0, 100);
-
-      const { events, cadenceScore } = classifySecEvents(filings);
-      const F = clamp(events.reduce((acc, e) => acc + e.weight, 0) + cadenceScore, 0, 100);
-
-      const articles = gdelt?.data?.articles || gdelt?.data?.documents || gdelt?.articles || gdelt?.data?.results || [];
-      const { medianTone, tailRisk, novelty, stories, domainConcentration } = computeSentiment(articles);
-      const tonePercentile = clamp((medianTone + 10) * 5, 0, 100);
-      const tailPercentile = clamp((20 + tailRisk) * 3, 0, 100);
-      const noveltyScore = clamp(novelty * 10, 0, 10);
-      const S_news = 40 * (tonePercentile / 100) + 20 * (1 - tailPercentile / 100) + 10 * noveltyScore;
-      const redditPosts = reddit?.data?.data?.children?.map(c => c.data) || [];
-      const redditMetrics = analyzeReddit(redditPosts);
-      let crowdPenalty = redditMetrics.spamPenalty;
-      if (domainConcentration > 0.6) crowdPenalty -= 10;
-      const S = clamp(S_news + redditMetrics.velocity + redditMetrics.polarity, 0, 100);
-
-      const turnoverPercentile = clamp(percentileRank(volumes.slice(-60), last.volume), 0, 100);
-      const atr = computeATR(data).at(-1) || 0;
-      const atrPercentile = clamp(percentileRank(computeATR(data).filter(Boolean), atr), 0, 100);
-      const P = clamp(turnoverPercentile * 0.35 + atrPercentile * 0.25 + Math.max(0, redditMetrics.velocity / 2) - crowdPenalty, 0, 100);
-
-      const alphaRaw = 0.35 * T + 0.20 * F + 0.30 * S + 0.15 * P;
-      const m = regimeMultipliers.current;
-      const alpha = alphaRaw * ((0.25 * m.T + 0.20 * m.F + 0.30 * m.S + 0.15 * m.P) / (0.25 + 0.20 + 0.30 + 0.15));
-
-      const liquidity = (median(volumes.slice(-20)) || 0) * last.close / 1e6;
-      const dataSufficient = data.length >= 60;
-      const catalystSufficient = (articles.length >= 5) || events.length >= 1;
-      const passesGates = liquidity >= filters.minLiquidity && dataSufficient && catalystSufficient && (!filters.excludeEtfs || !ticker.endsWith('-US')) && (last.close >= 2 || alpha > 85);
-
-      const horizonScores = computeHorizonScores({ T, F, S, P });
-      const penalties = [];
-      if (crowdPenalty) penalties.push(`crowding ${crowdPenalty}`);
-      if (parabolic < 0) penalties.push(`parabolic ${parabolic}`);
-
-      const corroborations = [T > 55, S > filters.sentimentThreshold, events.length > 0].filter(Boolean).length;
-      const confidence = clamp(Math.min(1, corroborations / 3), 0, 1);
-
-      const probabilities = {
-        p_1w_ge_10: logistic(-1.2 + 0.02 * rs20 + (squeezeMeta.squeeze ? 0.8 : 0) + 0.01 * redditMetrics.velocity + 0.005 * turnoverPercentile),
-        p_1m_ge_20: logistic(-1 + 0.015 * rs60 + 0.02 * medianTone + 0.01 * events.length + 0.005 * atrPercentile),
-        p_6_12m_ge_50: logistic(-1.5 + 0.012 * rs120 + 0.015 * events.length + 0.5 * novelty + 0.01 * trendScore)
-      };
-
-      const catalystMap = events.map(event => ({
-        date: event.date,
-        type: event.type.includes('ownership') ? 'M&A' : /10-Q/.test(event.form) ? 'earnings' : 'regulatory',
-        source: 'SEC'
-      }));
-      (stories || []).slice(0, 3).forEach(story => {
-        if (!story.url) return;
-        catalystMap.push({ date: story.seendate || story.published || '', type: 'press', source: 'GDELT' });
-      });
-
-      return {
-        as_of: nowIso(),
-        regime: regimeMultipliers.regime,
-        ticker,
-        name: metadata[ticker]?.name || ticker,
-        sector: metadata[ticker]?.sector || 'Unknown',
-        scores: { T, F, S, P, alpha, alpha_h: horizonScores[currentHorizon], confidence },
-        signals: {
-          rs20,
-          rs60,
-          bbw_rank: percentileRank(bbw.filter(Boolean), bbw.at(-1) || 0),
-          squeeze: squeezeMeta.squeeze,
-          turnover_prc: turnoverPercentile,
-          atr_prc: atrPercentile,
-          gdelt_median_tone_7d: medianTone,
-          gdelt_tail_risk: tailRisk,
-          reddit_velocity_z: redditMetrics.velocity,
-          reddit_polarity: redditMetrics.polarity,
-          sec_events: events.map(e => ({ form: e.form, type: e.type, date: e.date })),
-          novelty
-        },
-        probabilities,
-        catalysts: catalystMap,
-        penalties,
-        evidence: {
-          headlines: (stories || []).slice(0, 3).map(story => ({
-            domain: (() => { try { return new URL(story.url).hostname; } catch (err) { return 'unknown'; } })(),
-            title: story.title || '',
-            time: story.seendate || story.published || ''
-          })),
-          sec_refs: events.map(e => e.accession),
-          reddit_refs: redditPosts.slice(0, 3).map(p => `https://www.reddit.com${p.permalink}`)
-        },
-        horizonScores,
-        passesGates,
-        liquidity,
-        last,
-        novelty,
-        squeezeMeta,
-        redditMetrics,
-        events,
-        stories,
-        data,
-        gdelt,
-        reddit,
-        filings
-      };
-    };
-
-    /* ======================================================
-       Macro regime detection
-    ====================================================== */
-    const regimeMultipliers = {
-      current: { T: 1, F: 1, S: 1, P: 1 },
-      regime: 'Neutral'
-    };
-
-    const detectRegime = async () => {
-      try {
-        const spyData = (await fetchStooq('spy.us')).data;
-        const vixData = (await fetchStooq('^vix')).data;
-        const closes = spyData.map(d => d.close);
-        const sma200 = computeSMA(closes, 200).at(-1);
-        const priceAbove200 = closes.at(-1) > (sma200 || Infinity);
-        const vixLevel = vixData.at(-1)?.close || 20;
-        let regime = 'Neutral';
-        if (priceAbove200 && vixLevel < 15) regime = 'RiskOn';
-        if (!priceAbove200 || vixLevel > 22) regime = 'RiskOff';
-        regimeMultipliers.regime = regime;
-        regimeMultipliers.current = {
-          T: regime === 'RiskOff' ? 0.9 : regime === 'RiskOn' ? 1.1 : 1,
-          F: regime === 'RiskOff' ? 1.1 : 0.95,
-          S: regime === 'RiskOff' ? 0.9 : 1.05,
-          P: regime === 'RiskOff' ? 0.95 : 1.05
-        };
-        document.getElementById('asOf').textContent = `As of ${new Date().toLocaleString()} • Regime: ${regime}`;
-        return spyData;
-      } catch (err) {
-        console.error('Regime detection failed', err);
-        regimeMultipliers.current = { T: 1, F: 1, S: 1, P: 1 };
-        regimeMultipliers.regime = 'Neutral';
-        return [];
-      }
-    };
-
-    /* ======================================================
-       Rendering logic
-    ====================================================== */
-    const renderResults = (results, horizon) => {
-      const list = document.getElementById('resultsList');
-      list.innerHTML = '';
-      if (!results.length) {
-        list.innerHTML = '<p style="padding:16px;color:var(--text-muted);">No candidates passed quality gates.</p>';
-        return;
-      }
-      const rowHeight = 96;
-      const container = list;
-      const totalHeight = rowHeight * results.length;
-      const spacer = document.createElement('div');
-      spacer.style.height = `${totalHeight}px`;
-      spacer.style.position = 'relative';
-      container.appendChild(spacer);
-
-      const renderSlice = () => {
-        const scrollTop = container.scrollTop;
-        const height = container.clientHeight;
-        const start = Math.floor(scrollTop / rowHeight);
-        const end = Math.min(results.length, Math.ceil((scrollTop + height) / rowHeight) + 3);
-        spacer.innerHTML = '';
-        for (let i = start; i < end; i++) {
-          const item = results[i];
-          const row = document.createElement('div');
-          row.className = 'row';
-          row.setAttribute('role', 'listitem');
-          row.style.position = 'absolute';
-          row.style.top = `${i * rowHeight}px`;
-          row.innerHTML = `
-            <span class="ticker">${item.ticker}</span>
-            <span>${item.name}</span>
-            <span class="alpha" style="color:${colorForScore(item.horizonScores[horizon])}">${item.horizonScores[horizon].toFixed(1)}</span>
-            <span>T ${item.scores.T.toFixed(0)}</span>
-            <span>F ${item.scores.F.toFixed(0)}</span>
-            <span>S ${item.scores.S.toFixed(0)}</span>
-            <span>P ${item.scores.P.toFixed(0)}</span>
-            <span>${formatNumber(item.last.close, { style: 'currency', currency: 'USD' })}</span>
-          `;
-          row.addEventListener('click', () => toggleDossier(row, item));
-          spacer.appendChild(row);
-        }
-      };
-
-      container.addEventListener('scroll', renderSlice);
-      renderSlice();
-    };
-
-    const drawSparkline = (canvas, data) => {
-      const ctx = canvas.getContext('2d');
-      const width = canvas.width = canvas.clientWidth;
-      const height = canvas.height = canvas.clientHeight;
-      if (!data.length) return;
-      const max = Math.max(...data);
-      const min = Math.min(...data);
-      ctx.clearRect(0, 0, width, height);
-      ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      data.forEach((value, idx) => {
-        const x = (idx / (data.length - 1 || 1)) * width;
-        const y = height - ((value - min) / ((max - min) || 1)) * height;
-        if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      });
-      ctx.stroke();
-    };
-
-    const drawVolume = (canvas, data) => {
-      const ctx = canvas.getContext('2d');
-      const width = canvas.width = canvas.clientWidth;
-      const height = canvas.height = canvas.clientHeight;
-      if (!data.length) return;
-      const max = Math.max(...data);
-      const barWidth = width / data.length;
-      ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-muted');
-      data.forEach((value, idx) => {
-        const x = idx * barWidth;
-        const barHeight = (value / (max || 1)) * height;
-        ctx.fillRect(x, height - barHeight, Math.max(barWidth - 1, 1), barHeight);
-      });
-    };
-
-    const toggleDossier = (row, item) => {
-      const expanded = row.classList.toggle('expanded');
-      row.querySelector('.dossier')?.remove();
-      if (!expanded) return;
-      const dossier = document.createElement('div');
-      dossier.className = 'dossier';
-      const priceCanvas = document.createElement('canvas');
-      priceCanvas.className = 'sparkline';
-      drawSparkline(priceCanvas, item.data.map(d => d.close));
-      const volumeCanvas = document.createElement('canvas');
-      volumeCanvas.className = 'volume-bars';
-      drawVolume(volumeCanvas, item.data.map(d => d.volume));
-      const subscores = document.createElement('div');
-      subscores.className = 'subscores';
-      ['T', 'F', 'S', 'P'].forEach(key => {
-        const box = document.createElement('div');
-        box.className = 'score-box';
-        box.style.borderColor = colorForScore(item.scores[key]);
-        box.innerHTML = `<strong>${key}</strong><div>${item.scores[key].toFixed(1)}</div>`;
-        subscores.appendChild(box);
-      });
-      const catalysts = document.createElement('div');
-      catalysts.className = 'catalysts';
-      catalysts.innerHTML = `<strong>Catalysts</strong>` + (item.catalysts.slice(0, 6).map(c => `<div>${c.date || '—'} • ${c.type} (${c.source})</div>`).join('') || '<div>—</div>');
-      const risks = document.createElement('div');
-      risks.className = 'risks';
-      risks.innerHTML = `<strong>Risks</strong>` + (item.penalties.length ? item.penalties.map(p => `<div>${p}</div>`).join('') : '<div>—</div>');
-      const evidence = document.createElement('div');
-      evidence.className = 'evidence';
-      evidence.innerHTML = `<strong>Evidence</strong>` + (item.evidence.headlines.length ? item.evidence.headlines.map(story => `<div>${story.title} (${story.domain})</div>`).join('') : '<div>No headlines</div>');
-      const actions = document.createElement('div');
-      actions.className = 'flex-row';
-      const watchBtn = document.createElement('button');
-      watchBtn.className = 'flush-btn';
-      watchBtn.textContent = 'Add to Watchlist';
-      watchBtn.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        addToWatchlist(item);
-      });
-      actions.appendChild(watchBtn);
-      dossier.append(priceCanvas, volumeCanvas, subscores, catalysts, risks, evidence, actions);
-      row.appendChild(dossier);
-    };
-
-    /* ======================================================
-       Watchlist management
-    ====================================================== */
-    const Watchlist = (() => {
-      let items = [];
-      try {
-        const raw = localStorage.getItem(STORAGE_KEYS.WATCHLIST);
-        items = raw ? JSON.parse(raw) : [];
-      } catch (err) {
-        items = [];
-      }
-      const persist = () => localStorage.setItem(STORAGE_KEYS.WATCHLIST, JSON.stringify(items));
-      return {
-        all: () => items,
-        add(entry) {
-          if (!items.some(i => i.ticker === entry.ticker)) {
-            items.push({ ticker: entry.ticker, name: entry.name, added: nowIso() });
-            persist();
-            renderWatchlist();
-          }
-        },
-        remove(ticker) {
-          items = items.filter(i => i.ticker !== ticker);
-          persist();
-          renderWatchlist();
-        },
-        clear() {
-          items = [];
-          persist();
-          renderWatchlist();
-        }
-      };
-    })();
-
-    const renderWatchlist = () => {
-      const list = document.getElementById('watchlistItems');
-      list.innerHTML = '';
-      Watchlist.all().forEach(item => {
-        const row = document.createElement('div');
-        row.textContent = `${item.ticker} • added ${new Date(item.added).toLocaleString()}`;
-        const remove = document.createElement('button');
-        remove.textContent = 'Remove';
-        remove.addEventListener('click', () => Watchlist.remove(item.ticker));
-        row.appendChild(remove);
-        list.appendChild(row);
-      });
-      const select = document.getElementById('watchlistSelect');
-      const current = select.value;
-      select.innerHTML = '<option value="">None</option>' + Watchlist.all().map(item => `<option value="${item.ticker}">${item.ticker}</option>`).join('');
-      select.value = current;
-    };
-
-    const addToWatchlist = (item) => Watchlist.add({ ticker: item.ticker, name: item.name });
-
-    /* ======================================================
-       Diagnostics & logging
-    ====================================================== */
-    const diagnostics = [];
-    const logDiagnostic = (entry) => {
-      diagnostics.push({ ...entry, timestamp: nowIso() });
-      localStorage.setItem(STORAGE_KEYS.DIAGNOSTICS, JSON.stringify(diagnostics.slice(-200)));
-      renderDiagnostics();
-    };
-
-    const renderDiagnostics = () => {
-      const table = document.getElementById('diagnosticsTable');
-      table.innerHTML = '<tr><th>Time</th><th>Origin</th><th>Status</th><th>Duration</th></tr>' + diagnostics.slice(-50).reverse().map(entry => `
-        <tr>
-          <td>${new Date(entry.timestamp).toLocaleTimeString()}</td>
-          <td>${entry.origin}</td>
-          <td>${entry.status}</td>
-          <td>${entry.duration?.toFixed?.(1) || '—'} ms</td>
-        </tr>
-      `).join('');
-    };
-
-    /* ======================================================
-       Universe filters and runner
-    ====================================================== */
-    const filters = {
-      sector: 'all',
-      cap: 'all',
-      minLiquidity: 1,
-      sentimentThreshold: 30,
-      rsThreshold: -20,
-      excludeEtfs: true
-    };
-
-    let currentHorizon = 'Week';
-    let metadata = {};
-    let spyCache = [];
-    const pool = new FetchPool(6);
-
-    const createSyntheticSeries = (basePrice, baseVolume) => {
-      const start = Date.now() - 120 * 24 * 60 * 60 * 1000;
-      let price = basePrice * 0.82;
-      return Array.from({ length: 120 }, (_, idx) => {
-        const drift = 1 + 0.0025 * Math.sin(idx / 5) + 0.0012 * Math.cos(idx / 9);
-        price = Math.max(2, price * drift);
-        const close = Number(price.toFixed(2));
-        const open = Number((close * (1 - 0.004 * Math.sin(idx / 3))).toFixed(2));
-        const high = Number(Math.max(open, close * 1.01).toFixed(2));
-        const low = Number(Math.min(open, close * 0.985).toFixed(2));
-        const volume = Math.round(baseVolume * (1 + 0.18 * Math.sin(idx / 4)));
-        return {
-          date: new Date(start + idx * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
-          open,
-          high,
-          low,
-          close,
-          volume
-        };
-      });
-    };
-
-    const fallbackGemConfigs = [
-      {
-        ticker: 'NVDA',
-        name: 'NVIDIA Corporation',
-        sector: 'Information Technology',
-        basePrice: 880,
-        baseVolume: 22000000,
-        horizonScores: { Week: 84, NextWeek: 86, Month: 90, LongTerm: 93 },
-        scores: { T: 90, F: 64, S: 78, P: 60 },
-        confidence: 0.82,
-        rs20: 48,
-        rs60: 55,
-        rs120: 63,
-        novelty: 0.6,
-        catalysts: [
-          { date: '2024-03-18', type: 'earnings', source: 'SEC' },
-          { date: '2024-03-25', type: 'press', source: 'GDELT' }
-        ],
-        headlines: [
-          {
-            title: 'NVIDIA extends AI leadership with new platform wins',
-            domain: 'marketwatch.com',
-            time: '2024-03-25T14:00:00Z'
-          },
-          {
-            title: 'Analysts lift price targets after datacenter momentum',
-            domain: 'seekingalpha.com',
-            time: '2024-03-24T11:00:00Z'
-          }
-        ],
-        probabilities: { p_1w_ge_10: 0.34, p_1m_ge_20: 0.29, p_6_12m_ge_50: 0.27 },
-        liquidity: 380,
-        squeeze: true,
-        squeezePoints: 14,
-        redditVelocity: 1.8,
-        redditPolarity: 0.6,
-        sharesOutstanding: 2460000000
-      },
-      {
-        ticker: 'PLTR',
-        name: 'Palantir Technologies Inc.',
-        sector: 'Information Technology',
-        basePrice: 27,
-        baseVolume: 56000000,
-        horizonScores: { Week: 72, NextWeek: 75, Month: 78, LongTerm: 83 },
-        scores: { T: 70, F: 58, S: 66, P: 54 },
-        confidence: 0.68,
-        rs20: 32,
-        rs60: 40,
-        rs120: 48,
-        novelty: 0.55,
-        catalysts: [
-          { date: '2024-03-10', type: 'press', source: 'GDELT' },
-          { date: '2024-03-01', type: 'regulatory', source: 'SEC' }
-        ],
-        headlines: [
-          {
-            title: 'Palantir wins multiyear defense contract expansion',
-            domain: 'defensenews.com',
-            time: '2024-03-10T08:30:00Z'
-          }
-        ],
-        probabilities: { p_1w_ge_10: 0.22, p_1m_ge_20: 0.19, p_6_12m_ge_50: 0.24 },
-        liquidity: 120,
-        squeeze: true,
-        squeezePoints: 11,
-        redditVelocity: 1.1,
-        redditPolarity: 0.35,
-        sharesOutstanding: 2050000000
-      },
-      {
-        ticker: 'SMCI',
-        name: 'Super Micro Computer, Inc.',
-        sector: 'Information Technology',
-        basePrice: 1050,
-        baseVolume: 6200000,
-        horizonScores: { Week: 88, NextWeek: 90, Month: 92, LongTerm: 94 },
-        scores: { T: 94, F: 60, S: 80, P: 66 },
-        confidence: 0.86,
-        rs20: 52,
-        rs60: 60,
-        rs120: 68,
-        novelty: 0.62,
-        catalysts: [
-          { date: '2024-03-05', type: 'earnings', source: 'SEC' },
-          { date: '2024-03-14', type: 'press', source: 'GDELT' }
-        ],
-        headlines: [
-          {
-            title: 'Supermicro expands AI server footprint with hyperscaler order',
-            domain: 'bloomberg.com',
-            time: '2024-03-14T09:15:00Z'
-          },
-          {
-            title: 'Channel partners report backlog easing for Supermicro',
-            domain: 'techcrunch.com',
-            time: '2024-03-12T13:45:00Z'
-          }
-        ],
-        probabilities: { p_1w_ge_10: 0.41, p_1m_ge_20: 0.34, p_6_12m_ge_50: 0.31 },
-        liquidity: 210,
-        squeeze: true,
-        squeezePoints: 15,
-        redditVelocity: 1.6,
-        redditPolarity: 0.52,
-        sharesOutstanding: 55600000
-      }
-    ];
-
-    const buildFallbackGem = (config) => {
-      const data = createSyntheticSeries(config.basePrice, config.baseVolume);
-      const last = data.at(-1);
-      const alpha = clamp(0.35 * config.scores.T + 0.2 * config.scores.F + 0.3 * config.scores.S + 0.15 * config.scores.P, 0, 100);
-      const horizonScores = { ...config.horizonScores };
-      return {
-        as_of: nowIso(),
-        regime: regimeMultipliers.regime,
-        ticker: config.ticker,
-        name: config.name,
-        sector: config.sector,
-        scores: {
-          T: config.scores.T,
-          F: config.scores.F,
-          S: config.scores.S,
-          P: config.scores.P,
-          alpha,
-          alpha_h: horizonScores[currentHorizon],
-          confidence: config.confidence
-        },
-        signals: {
-          rs20: config.rs20,
-          rs60: config.rs60,
-          bbw_rank: 82,
-          squeeze: config.squeeze,
-          turnover_prc: 68,
-          atr_prc: 54,
-          gdelt_median_tone_7d: 12,
-          gdelt_tail_risk: -3,
-          reddit_velocity_z: config.redditVelocity,
-          reddit_polarity: config.redditPolarity,
-          sec_events: config.catalysts.filter(c => c.source === 'SEC'),
-          novelty: config.novelty * 10
-        },
-        probabilities: config.probabilities,
-        catalysts: config.catalysts,
-        penalties: [],
-        evidence: {
-          headlines: config.headlines,
-          sec_refs: [],
-          reddit_refs: []
-        },
-        horizonScores,
-        passesGates: true,
-        liquidity: config.liquidity,
-        last,
-        novelty: config.novelty,
-        squeezeMeta: { squeeze: config.squeeze, points: config.squeezePoints, lastTrigger: data.length - 5 },
-        redditMetrics: { velocity: config.redditVelocity, polarity: config.redditPolarity, spamPenalty: 0 },
-        events: [],
-        stories: [],
-        data,
-        gdelt: {},
-        reddit: {},
-        filings: { company: { sharesOutstanding: config.sharesOutstanding } }
-      };
-    };
-
-    const getFallbackGems = () => fallbackGemConfigs.map(buildFallbackGem);
-
-    const buildUniverse = async () => {
-      const source = document.getElementById('universeSource').value;
-      if (source === 'custom') {
-        const raw = document.getElementById('customTickers').value;
-        const tickers = raw.split(/[^A-Z0-9\-]+/i).map(t => t.trim().toUpperCase()).filter(Boolean);
-        metadata = tickers.reduce((acc, ticker) => {
-          acc[ticker] = { name: ticker, sector: 'Custom' };
-          return acc;
-        }, {});
-        document.getElementById('universeSummary').textContent = `Universe: ${tickers.length} tickers`;
-        return tickers;
-      }
-      const watchlistTicker = document.getElementById('watchlistSelect').value;
-      const universe = await loadUniverse(source);
-      metadata = universe.reduce((acc, entry) => {
-        acc[entry.ticker.toUpperCase()] = { name: entry.name, sector: entry.sector };
-        return acc;
-      }, {});
-      if (watchlistTicker) {
-        document.getElementById('universeSummary').textContent = `Universe: watchlist ${watchlistTicker}`;
-        return [watchlistTicker];
-      }
-      document.getElementById('universeSummary').textContent = `Universe: ${universe.length} tickers`;
-      const sectors = Array.from(new Set(universe.map(u => u.sector))).sort();
-      const sectorFilter = document.getElementById('sectorFilter');
-      sectorFilter.innerHTML = '<option value="all">All</option>' + sectors.map(sector => `<option value="${sector}">${sector}</option>`).join('');
-      return universe.map(u => u.ticker.toUpperCase());
-    };
-
-    const inferCapBucket = (item) => {
-      const base = item.last.close * (item.filings?.company?.sharesOutstanding || 0);
-      const cap = base || (item.liquidity * 1e6 * 20);
-      if (cap > 200e9) return 'mega';
-      if (cap > 10e9) return 'large';
-      if (cap > 2e9) return 'mid';
-      return 'small';
-    };
-
-    const applyFilters = (items) => {
-      return items.filter(item => {
-        if (!item.passesGates) return false;
-        if (filters.sector !== 'all' && item.sector !== filters.sector) return false;
-        if (filters.cap !== 'all' && inferCapBucket(item) !== filters.cap) return false;
-        if (item.rs20 < filters.rsThreshold) return false;
-        if (item.scores.S < filters.sentimentThreshold) return false;
-        if (filters.excludeEtfs && item.ticker.includes('-US')) return false;
-        return true;
-      });
-    };
-
-    const runScreener = async () => {
-      document.getElementById('resultsMeta').textContent = 'Running…';
-      const tickers = await buildUniverse();
-      const limitedTickers = tickers.slice(0, 60);
-      if (!spyCache.length) spyCache = (await detectRegime()) || [];
-      const spyCloses = spyCache.map(d => d.close);
-      const results = [];
-      let usedFallback = false;
-      for (const ticker of limitedTickers) {
-        try {
-          const startTime = performance.now();
-          const [stooq, gdelt, reddit, filings] = await Promise.all([
-            pool.enqueue(() => fetchStooq(`${ticker.toLowerCase()}.us`)),
-            pool.enqueue(() => fetchGdelt(`${ticker} OR "${metadata[ticker]?.name || ticker}"`)),
-            pool.enqueue(() => fetchReddit(`${ticker} OR ${metadata[ticker]?.name || ticker}`)),
-            pool.enqueue(() => fetchSecFilings(ticker))
-          ]);
-          const duration = performance.now() - startTime;
-          logDiagnostic({ origin: ticker, status: 'ok', duration });
-          const scored = computeScores({ ticker, data: stooq.data, spy: spyCloses, gdelt, reddit, filings: filings.data });
-          if (scored) results.push(scored);
-        } catch (err) {
-          console.error('Processing error', ticker, err);
-          logDiagnostic({ origin: ticker, status: 'error' });
-        }
-      }
-      let filtered = applyFilters(results);
-      const horizon = currentHorizon;
-      if (!filtered.length) {
-        const fallback = getFallbackGems();
-        filtered = applyFilters(fallback);
-        if (filtered.length) {
-          usedFallback = true;
-          metadata = fallback.reduce((acc, item) => {
-            acc[item.ticker] = { name: item.name, sector: item.sector };
-            return acc;
-          }, {});
-        }
-      }
-      const ranked = filtered
-        .filter(item => {
-          const sWeight = item.scores.S / (item.scores.T + item.scores.F + item.scores.S + item.scores.P || 1);
-          if (sWeight > 0.7 && !item.squeezeMeta.squeeze) return false;
-          return true;
-        })
-        .sort((a, b) => b.horizonScores[horizon] - a.horizonScores[horizon] || b.scores.confidence - a.scores.confidence || b.novelty - a.novelty);
-      renderResults(ranked, horizon);
-      if (usedFallback) {
-        document.getElementById('resultsMeta').textContent = `${ranked.length} curated exemplars • Offline mode`;
-        document.getElementById('qualityGateSummary').textContent = 'Showing cached exemplars while live data loads';
-      } else {
-        document.getElementById('resultsMeta').textContent = `${ranked.length} opportunities • Horizon ${horizon}`;
-        document.getElementById('qualityGateSummary').textContent = 'Quality gates enforced';
-      }
-    };
-
-    /* ======================================================
-       Settings persistence
-    ====================================================== */
-    const saveSettings = () => {
-      const settings = {
-        filters,
-        currentHorizon,
-        universeSource: document.getElementById('universeSource').value
-      };
-      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
-    };
-
-    const loadSettings = () => {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-        if (!raw) return;
-        const settings = JSON.parse(raw);
-        Object.assign(filters, settings.filters || {});
-        currentHorizon = settings.currentHorizon || 'Week';
-        document.getElementById('universeSource').value = settings.universeSource || 'sp500';
-        document.querySelectorAll('.segmented button').forEach(btn => btn.classList.toggle('active', btn.dataset.horizon === currentHorizon));
-        document.getElementById('sectorFilter').value = filters.sector;
-        document.getElementById('capFilter').value = filters.cap;
-        document.getElementById('liquidityFilter').value = filters.minLiquidity;
-        document.getElementById('sentimentFilter').value = filters.sentimentThreshold;
-        document.getElementById('rsFilter').value = filters.rsThreshold;
-        document.getElementById('excludeEtfs').checked = filters.excludeEtfs;
-      } catch (err) {
-        console.warn('Failed to load settings', err);
-      }
-    };
-
-    /* ======================================================
-       Event bindings
-    ====================================================== */
-    document.getElementById('runScreen').addEventListener('click', runScreener);
-    document.getElementById('flushCache').addEventListener('click', () => {
-      CacheStore.flush();
-      alert('Cache cleared.');
-    });
-    document.getElementById('sectorFilter').addEventListener('change', (ev) => { filters.sector = ev.target.value; saveSettings(); });
-    document.getElementById('capFilter').addEventListener('change', (ev) => { filters.cap = ev.target.value; saveSettings(); });
-    document.getElementById('liquidityFilter').addEventListener('input', (ev) => { filters.minLiquidity = Number(ev.target.value); saveSettings(); });
-    document.getElementById('sentimentFilter').addEventListener('input', (ev) => { filters.sentimentThreshold = Number(ev.target.value); saveSettings(); });
-    document.getElementById('rsFilter').addEventListener('input', (ev) => { filters.rsThreshold = Number(ev.target.value); saveSettings(); });
-    document.getElementById('excludeEtfs').addEventListener('change', (ev) => { filters.excludeEtfs = ev.target.checked; saveSettings(); });
-    document.querySelectorAll('.segmented button').forEach(btn => btn.addEventListener('click', () => {
-      document.querySelectorAll('.segmented button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentHorizon = btn.dataset.horizon;
-      saveSettings();
-    }));
-    document.getElementById('openDiagnostics').addEventListener('click', () => {
-      document.getElementById('diagnostics').setAttribute('aria-hidden', 'false');
-    });
-    document.getElementById('closeDiagnostics').addEventListener('click', () => {
-      document.getElementById('diagnostics').setAttribute('aria-hidden', 'true');
-    });
-    document.getElementById('exportWatchlist').addEventListener('click', () => {
-      const blob = new Blob([JSON.stringify(Watchlist.all(), null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `gemfinder-watchlist-${Date.now()}.json`;
-      link.click();
-      URL.revokeObjectURL(url);
-    });
-    document.getElementById('importWatchlist').addEventListener('change', async (ev) => {
-      const file = ev.target.files[0];
-      if (!file) return;
-      try {
-        const text = await file.text();
-        JSON.parse(text).forEach(entry => Watchlist.add(entry));
-      } catch (err) {
-        alert('Invalid watchlist file');
-      }
+  const filtered = results
+    .filter(x=>isFinite(x.alpha))
+    // Down-rank parabolic low-volume spikes
+    .map(x=>{
+      const last = x.px.length-1;
+      const g5 = (x.px[last].Close - x.px[Math.max(0,last-5)].Close)/x.px[Math.max(0,last-5)].Close;
+      if(g5>0.25 && (x.volSpike||0)<1.2) x.alpha *= 0.85;
+      return x;
     });
 
-    /* ======================================================
-       Service worker registration
-    ====================================================== */
-    const registerServiceWorker = async () => {
-      if (!('serviceWorker' in navigator)) return;
-      const script = `
-        const CACHE_NAME = 'gemfinder-shell-v1';
-        const RUNTIME_CACHE = 'gemfinder-runtime-v1';
-        const OFFLINE_URLS = ['.'];
-        self.addEventListener('install', event => {
-          event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(OFFLINE_URLS)));
-        });
-        self.addEventListener('activate', event => {
-          event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => ![CACHE_NAME, RUNTIME_CACHE].includes(key)).map(key => caches.delete(key)))));
-        });
-        const fetchWithTimeout = async (request) => {
-          const controller = new AbortController();
-          const id = setTimeout(() => controller.abort(), 10000);
-          try {
-            const response = await fetch(request, { signal: controller.signal });
-            if (!response.ok) throw new Error('Network error');
-            return response;
-          } finally {
-            clearTimeout(id);
-          }
-        };
-        self.addEventListener('fetch', event => {
-          const { request } = event;
-          if (request.method !== 'GET') return;
-          if (request.mode === 'navigate') {
-            event.respondWith(fetchWithTimeout(request).catch(() => caches.match('.')));
-            return;
-          }
-          event.respondWith(
-            caches.open(RUNTIME_CACHE).then(async cache => {
-              try {
-                const response = await fetchWithTimeout(request.clone());
-                cache.put(request, response.clone());
-                return response;
-              } catch (err) {
-                const cached = await cache.match(request);
-                if (cached) return cached;
-                throw err;
-              }
-            })
-          );
-        });
-      `;
-      const blob = new Blob([script], { type: 'text/javascript' });
-      const url = URL.createObjectURL(blob);
-      try {
-        await navigator.serviceWorker.register(url);
-      } catch (err) {
-        console.warn('SW registration failed', err);
-      }
-    };
+  const ranks = {
+    week:  [...filtered].sort((a,b)=>b.h.week-a.h.week).slice(0,50),
+    next:  [...filtered].sort((a,b)=>b.h.next-a.h.next).slice(0,50),
+    month: [...filtered].sort((a,b)=>b.h.month-a.h.month).slice(0,50),
+    long:  [...filtered].sort((a,b)=>b.h.long-a.h.long).slice(0,50),
+  };
 
-    /* ======================================================
-       Initialization
-    ====================================================== */
-    const init = async () => {
-      renderWatchlist();
-      loadSettings();
-      renderDiagnostics();
-      await registerServiceWorker();
-      try {
-        spyCache = (await detectRegime()) || [];
-      } catch (err) {
-        console.warn('Bootstrap regime detection failed', err);
-      }
-      try {
-        await runScreener();
-      } catch (err) {
-        console.error('Initial screener run failed', err);
-        document.getElementById('resultsMeta').textContent = 'Initial run failed';
-      }
-    };
+  setCache('lastResults', {at:Date.now(), ranks});
+  document.getElementById('lastUpd').textContent = new Date().toLocaleTimeString();
+  renderTable('week', ranks.week, regime);
+  // prime pills if missing
+  ['universe','prices','gdelt','sec','reddit','macro'].forEach(k=>{
+    if(!state.pillsMeta[k]) setPill(k,'warn');
+  });
+  startAutoRefresh();
+}
 
-    window.addEventListener('load', () => {
-      init().catch(err => console.error('Init failure', err));
+/* =========================
+   Render
+========================= */
+function renderTable(horizon, list, regime){
+  const wrap = document.getElementById('tableWrap');
+  wrap.innerHTML = `
+  <table>
+    <thead>
+      <tr>
+        <th>#</th><th>Ticker</th><th>Price</th><th>α-Score</th>
+        <th>RS</th><th>Vol Spike</th><th>Tone</th><th>Mentions</th><th>Catalysts</th><th></th>
+      </tr>
+    </thead>
+    <tbody>${list.map((x,i)=>rowHTML(horizon,x,i,regime)).join('')}</tbody>
+  </table>`;
+  // attach expand handlers
+  wrap.querySelectorAll('[data-exp]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const k = btn.getAttribute('data-exp');
+      const more = document.getElementById(`exp-${k}`);
+      more.style.display = more.style.display==='block' ? 'none':'block';
+      if(more.style.display==='block') drawSpark(k);
     });
-  </script>
+  });
+}
+function rowHTML(h, x, i, regime){
+  const hs = {week:'week', next:'next', month:'month', long:'long'}[h]||'week';
+  const a = x.h[hs];
+  const kval = (x)=> isFinite(x)? fmt(x,2):'—';
+  const cats = x.catalysts.map(c=>`<span class="tag">${c.form} • ${c.date}</span>`).join(' ') || '<span class="small">—</span>';
+  const id = `${h}-${i}`;
+  const toneBadge = x.tone>=60?'ok':x.tone>=40?'warn':'bad';
+  const volBadge = (x.volSpike||0)>=1.3?'ok':(x.volSpike||0)>=1.05?'warn':'bad';
+  return `
+  <tr>
+    <td class="k nowrap">${i+1}</td>
+    <td class="nowrap"><strong>${x.sym}</strong> <span class="small">• ${x.name}</span></td>
+    <td class="k">$${kval(x.price)}</td>
+    <td class="k"><span class="badge ${a>=70?'ok':a>=50?'warn':'bad'}">${kval(a)}</span></td>
+    <td class="k">${kval(x.RS)}</td>
+    <td class="k"><span class="badge ${volBadge}">${kval(x.volSpike)}</span></td>
+    <td class="k"><span class="badge ${toneBadge}">${kval(x.tone)}</span></td>
+    <td class="k">${kval(x.mentions)}</td>
+    <td>${cats}</td>
+    <td class="nowrap"><a class="link" href="javascript:void(0)" data-exp="${id}">Details</a></td>
+  </tr>
+  <tr id="exp-${id}" style="display:none"><td colspan="10">
+    <div class="rowexp">
+      <div class="flex">
+        <div class="card" style="min-width:320px">
+          <canvas id="spark-${id}" class="spark"></canvas>
+          <div class="small">Price 120d</div>
+        </div>
+        <div class="card">
+          <div class="kv">
+            <div>Regime</div><div>${regime.tag}</div>
+            <div>T</div><div>${fmt(x.blocks.T,1)}</div>
+            <div>F</div><div>${fmt(x.blocks.F,1)}</div>
+            <div>S</div><div>${fmt(x.blocks.S,1)}</div>
+            <div>P</div><div>${fmt(x.blocks.P,1)}</div>
+            <div>α</div><div>${fmt(x.alpha,1)}</div>
+          </div>
+        </div>
+        <div class="card" style="flex:2">
+          <div class="small" style="margin-bottom:6px">Catalyst Timeline</div>
+          <div>${x.catalysts.map(c=>`<span class="tag">${c.date} · ${c.form}</span>`).join(' ') || '<span class="small">No recent 8-K/10-Q/13D/13G detected</span>'}</div>
+          <hr/>
+          <div class="small" style="margin-bottom:6px">News (GDELT) — latest 6</div>
+          <div>${x.gdelt.slice(0,6).map(g=>`<div class="small">• ${g.date} — ${g.domain} — tone ${fmt(g.tone,1)}</div>`).join('')}</div>
+        </div>
+      </div>
+      <hr/>
+      <div class="small">Provenance: Prices — Stooq (${state.pillsMeta.prices?.mode||'—'}), News — GDELT (${state.pillsMeta.gdelt?.mode||'—'}), Filings — SEC (${state.pillsMeta.sec?.mode||'—'}), Reddit (${state.pillsMeta.reddit?.mode||'—'}), Universe — Wikipedia (${state.pillsMeta.universe?.mode||'—'})</div>
+    </div>
+  </td></tr>`;
+}
+function drawSpark(id){
+  const [h, idx] = id.split('-');
+  const cache = getCache('lastResults', 4*3600*1000);
+  if(!cache) return;
+  const list = cache.ranks[h]||[];
+  const x = list[parseInt(idx,10)];
+  if(!x) return;
+  const data = x.px.slice(-120).map(o=>o.Close);
+  const c = document.getElementById(`spark-${id}`);
+  const ctx = c.getContext('2d');
+  const w = c.width = c.clientWidth;
+  const hgt = c.height = c.clientHeight;
+  ctx.clearRect(0,0,w,hgt);
+  const min = Math.min(...data), max=Math.max(...data);
+  const pad=6;
+  ctx.lineWidth=1.5;
+  ctx.strokeStyle='#9ad8ff';
+  ctx.beginPath();
+  data.forEach((v,i)=>{
+    const x = pad + i*( (w-2*pad)/(data.length-1||1) );
+    const y = hgt-pad - ( (v-min)/(max-min||1) )*(hgt-2*pad);
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+}
+
+/* =========================
+   Tabs + UI
+========================= */
+document.getElementById('tabs').addEventListener('click', (e)=>{
+  const t = e.target.closest('.tab'); if(!t) return;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  const h = t.getAttribute('data-h');
+  const cache = getCache('lastResults', 4*3600*1000);
+  if(cache){
+    const key = h==='week'?'week':h==='next'?'next':h==='month'?'month':'long';
+    renderTable(key, cache.ranks[key], {tag:'—', mult:{T:1,S:1,F:1,P:1}});
+  }
+});
+document.getElementById('btnRefresh').addEventListener('click', ()=>buildUniverseAndScore());
+const drawer = document.getElementById('drawer');
+document.getElementById('btnSettings').addEventListener('click', ()=>drawer.classList.add('open'));
+document.getElementById('btnClose').addEventListener('click', ()=>drawer.classList.remove('open'));
+document.getElementById('swProxy').addEventListener('change', e=>state.forceProxy=e.target.checked);
+document.getElementById('swCache').addEventListener('change', e=>state.useCache=e.target.checked);
+document.getElementById('btnClear').addEventListener('click', ()=>{
+  Object.keys(localStorage).forEach(k=>{ if(k.startsWith(`alphaGem:${VER}:`)) localStorage.removeItem(k); });
+  document.getElementById('lastUpd').textContent='—';
+});
+
+/* =========================
+   Service Worker (optional)
+========================= */
+async function setupSW(){
+  try{
+    if(!('serviceWorker' in navigator)) return;
+    if(!document.getElementById('swSW').checked) return;
+    const swCode = `
+      const SHELL=['./'];
+      self.addEventListener('install',e=>{
+        e.waitUntil(caches.open('alphaGem-shell').then(c=>c.addAll(SHELL)));
+        self.skipWaiting();
+      });
+      self.addEventListener('activate',e=>self.clients.claim());
+      self.addEventListener('fetch',e=>{
+        const u = new URL(e.request.url);
+        if(u.origin===location.origin){
+          e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
+        } // passthrough for network sources
+      });`;
+    const blob = new Blob([swCode], {type:'text/javascript'});
+    const url = URL.createObjectURL(blob);
+    await navigator.serviceWorker.register(url);
+  }catch(_){}
+}
+
+/* =========================
+   Auto-refresh every 4h
+========================= */
+let autoTimer=null;
+function startAutoRefresh(){
+  if(autoTimer) clearInterval(autoTimer);
+  autoTimer = setInterval(()=>{
+    if(document.hidden) return;
+    buildUniverseAndScore();
+  }, 4*3600*1000);
+}
+
+/* =========================
+   Boot
+========================= */
+(async function boot(){
+  await setupSW();
+  const saved = getCache('lastResults', 4*3600*1000);
+  if(saved){
+    renderTable('week', saved.ranks.week, {tag:'—', mult:{T:1,S:1,F:1,P:1}});
+  }
+  buildUniverseAndScore();
+})();
+</script>
 </body>
 </html>
