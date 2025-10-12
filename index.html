@@ -1,661 +1,379 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#0b1220" />
-<title>Alpha Gem Screener</title>
-<style>
-:root{
-  --bg:#0b1220;--bg2:#0e1628;--panel:#111a2f;--panel2:#0d1527;--muted:#7f8ea3;--text:#e9eef7;--accent:#4cc9f0;--ok:#36d399;--warn:#fbbf24;--bad:#ef4444;--line:#1b2743;--pill:#15213c;--link:#90cdf4
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
-.header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg) 0%,rgba(11,18,32,.96) 65%,rgba(11,18,32,.7) 100%);backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid var(--line)}
-.wrap{max-width:1200px;margin:0 auto;padding:14px 14px}
-.h1{font-weight:700;font-size:18px;letter-spacing:.3px}
-.ts{color:var(--muted);font-variant-numeric:tabular-nums}
-.pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.pill{padding:6px 8px;border-radius:999px;background:var(--pill);border:1px solid var(--line);font-size:12px;display:flex;align-items:center;gap:6px}
-.pill .dot{width:8px;height:8px;border-radius:50%}
-.dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.bad{background:var(--bad)}
-.tabs{display:flex;gap:8px;margin-top:10px}
-.tab{flex:1;text-align:center;padding:10px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);cursor:pointer;user-select:none}
-.tab.active{outline:2px solid var(--accent);background:linear-gradient(180deg,#0e1a34,#0c182f)}
-.bar{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
-.btn{padding:9px 12px;border-radius:10px;background:var(--panel);border:1px solid var(--line);cursor:pointer}
-.btn:active{transform:translateY(1px)}
-.link{color:var(--link);text-decoration:none}
-table{width:100%;border-collapse:separate;border-spacing:0 8px}
-th,td{padding:10px 8px;text-align:left}
-th{font-size:12px;color:var(--muted);font-weight:600}
-tbody tr{background:var(--panel);border:1px solid var(--line)}
-tbody tr td:first-child{border-top-left-radius:10px;border-bottom-left-radius:10px}
-tbody tr td:last-child{border-top-right-radius:10px;border-bottom-right-radius:10px}
-.k{font-variant-numeric:tabular-nums}
-.badge{padding:2px 6px;border-radius:6px;font-size:11px;border:1px solid var(--line);background:var(--pill);color:#c7d2e5}
-.badge.ok{background:rgba(54,211,153,.1);border-color:rgba(54,211,153,.3);color:#b9f6d0}
-.badge.warn{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.3);color:#ffe7a3}
-.badge.bad{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.3);color:#ffc0c0}
-.rowexp{padding:10px 12px;background:var(--bg2);border-top:1px dashed var(--line)}
-.flex{display:flex;gap:10px;flex-wrap:wrap}
-.card{flex:1 1 260px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;min-width:260px}
-.spark{width:100%;height:60px}
-.kv{display:grid;grid-template-columns:110px 1fr;gap:4px;font-size:12px;color:#cbd5e5}
-.tag{padding:3px 6px;border-radius:6px;border:1px solid var(--line);background:#0f1a31;font-size:11px}
-.footer{padding:12px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:12px}
-.drawer{position:fixed;inset:auto 0 0 auto;right:0;width:360px;max-width:95vw;background:var(--panel);border-left:1px solid var(--line);box-shadow:0 -2px 40px rgba(0,0,0,.35);transform:translateY(110%);transition:transform .25s ease}
-.drawer.open{transform:translateY(0)}
-.drawer .hdr{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--line)}
-.sw{display:flex;align-items:center;gap:8px}
-input[type="checkbox"]{width:18px;height:18px}
-hr{border:0;border-top:1px solid var(--line);margin:10px 0}
-.small{font-size:12px;color:var(--muted)}
-.nowrap{white-space:nowrap}
-@media(min-width:900px){.h1{font-size:20px}}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Praeco - Advanced midstream oil and gas transportation solutions. Enterprise-grade crude oil trucking and logistics.">
+    <title>Praeco | Coming Soon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+```
+    :root {
+        --bg-primary: #0a0a0a;
+        --bg-secondary: #141414;
+        --accent-orange: #ff6b1a;
+        --accent-blue: #0ea5e9;
+        --text-primary: #ffffff;
+        --text-secondary: #a3a3a3;
+        --border-color: #262626;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        line-height: 1.6;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Animated background grid */
+    .bg-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(var(--border-color) 1px, transparent 1px),
+            linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+        background-size: 50px 50px;
+        opacity: 0.3;
+        z-index: 0;
+    }
+
+    .container {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* Hero Section */
+    .hero {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .logo-container {
+        margin-bottom: 40px;
+        animation: fadeInDown 0.8s ease-out;
+    }
+
+    .logo-container img {
+        max-width: 280px;
+        width: 100%;
+        height: auto;
+        filter: drop-shadow(0 0 30px rgba(255, 107, 26, 0.3));
+    }
+
+    .hero-content {
+        max-width: 700px;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 8px 20px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 30px;
+        animation: fadeInUp 0.8s ease-out 0.2s backwards;
+    }
+
+    .status-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: var(--accent-orange);
+        border-radius: 50%;
+        margin-right: 8px;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    h1 {
+        font-size: clamp(2rem, 8vw, 3.5rem);
+        font-weight: 700;
+        margin-bottom: 20px;
+        line-height: 1.1;
+        background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: fadeInUp 0.8s ease-out 0.3s backwards;
+    }
+
+    .tagline {
+        font-size: clamp(1.1rem, 3vw, 1.4rem);
+        color: var(--text-secondary);
+        margin-bottom: 40px;
+        font-weight: 400;
+        animation: fadeInUp 0.8s ease-out 0.4s backwards;
+    }
+
+    .accent-text {
+        color: var(--accent-orange);
+    }
+
+    /* Services Grid */
+    .services {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin-top: 50px;
+        animation: fadeInUp 0.8s ease-out 0.5s backwards;
+    }
+
+    .service-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 30px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .service-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent-orange), var(--accent-blue));
+        transform: translateX(-100%);
+        transition: transform 0.5s ease;
+    }
+
+    .service-card:hover::before {
+        transform: translateX(0);
+    }
+
+    .service-card:hover {
+        border-color: var(--accent-orange);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(255, 107, 26, 0.15);
+    }
+
+    .service-icon {
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+
+    .service-card h3 {
+        font-size: 1.25rem;
+        margin-bottom: 10px;
+        color: var(--text-primary);
+    }
+
+    .service-card p {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    /* Contact Section */
+    .contact-section {
+        margin-top: 60px;
+        padding: 40px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        text-align: center;
+        animation: fadeInUp 0.8s ease-out 0.6s backwards;
+    }
+
+    .contact-section h2 {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+    }
+
+    .contact-section p {
+        color: var(--text-secondary);
+        margin-bottom: 25px;
+    }
+
+    .cta-button {
+        display: inline-block;
+        padding: 14px 40px;
+        background: var(--accent-orange);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .cta-button:hover {
+        background: #ff8040;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 107, 26, 0.3);
+    }
+
+    /* Footer */
+    footer {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.6;
+            transform: scale(1.2);
+        }
+    }
+
+    /* Tablet */
+    @media (min-width: 640px) {
+        .services {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .logo-container img {
+            max-width: 350px;
+        }
+    }
+
+    /* Desktop */
+    @media (min-width: 1024px) {
+        .services {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .hero {
+            padding: 60px 20px;
+        }
+
+        .contact-section {
+            padding: 50px;
+        }
+    }
 </style>
+```
+
 </head>
 <body>
-<div class="header">
-  <div class="wrap">
-    <div class="h1">Alpha Gem Screener <span id="ts" class="ts"></span></div>
-    <div id="sourcePills" class="pills"></div>
-    <div class="tabs" id="tabs">
-      <div class="tab active" data-h="week">This Week</div>
-      <div class="tab" data-h="next">Next Week</div>
-      <div class="tab" data-h="month">This Month</div>
-      <div class="tab" data-h="long">Long Term</div>
-    </div>
-    <div class="bar">
-      <div class="btn" id="btnRefresh">Refresh</div>
-      <div class="btn" id="btnSettings">Settings</div>
-      <div class="small">Universe: <span id="uCount">—</span> | Updated: <span id="lastUpd">—</span></div>
-    </div>
-  </div>
-</div>
+    <div class="bg-grid"></div>
 
-<div class="wrap">
-  <div id="tableWrap"></div>
-  <div class="footer">
-    Informational only — not investment advice. Data from public sources; may be incomplete or delayed.
-  </div>
-</div>
-
-<!-- Settings Drawer -->
-<div class="drawer" id="drawer">
-  <div class="hdr">
-    <div>Settings</div>
-    <div class="btn" id="btnClose">Close</div>
-  </div>
-  <div style="padding:12px">
-    <div class="sw"><input id="swProxy" type="checkbox" checked><label for="swProxy">Force proxy on first attempt</label></div>
-    <div class="sw"><input id="swCache" type="checkbox" checked><label for="swCache">Enable local cache (localStorage)</label></div>
-    <div class="sw"><input id="swSW" type="checkbox" checked><label for="swSW">Enable offline shell (Service Worker)</label></div>
-    <hr/>
-    <div class="btn" id="btnClear">Clear Cache</div>
-    <div class="small" style="margin-top:6px">Cache keys: alphaGem:v2:*</div>
-    <hr/>
-    <div class="small">Auto-refresh every 4 hours while open.</div>
-  </div>
-</div>
-
-<script>
-/* =========================
-   Version / cache keys
-========================= */
-const VER = 'v2';
-const K = (s)=>`alphaGem:${VER}:${s}`;
-const state = {
-  forceProxy:true,         // default ON to avoid CORS blocks
-  useCache:true,
-  statuses:{
-    universe:'pending',
-    prices:'pending',
-    gdelt:'pending',
-    sec:'pending',
-    reddit:'pending',
-    macro:'pending'
-  },
-  pillsMeta:{}
-};
-const fmt = (n, d=2)=> (n==null || !isFinite(n)) ? '—' : Number(n).toLocaleString(undefined,{maximumFractionDigits:d});
-function setStamp(){ document.getElementById('ts').textContent = `— ${new Date().toLocaleString()}`; }
-setStamp();
-
-/* =========================
-   Proxy-aware fetch
-   - preferProxy toggles order per-call
-   - r.jina.ai requires http:// after proxy host
-========================= */
-function toProxy(url){
-  try{
-    const u = new URL(url);
-    const raw = `http://${u.host}${u.pathname}${u.search}`;
-    return `https://r.jina.ai/${raw}`;
-  } catch {
-    return `https://r.jina.ai/http://${url.replace(/^https?:\/\//,'')}`;
-  }
-}
-async function fetchWithProxy(url, {preferProxy=false}={}){
-  const order = (state.forceProxy || preferProxy) ? ['proxy','direct'] : ['direct','proxy'];
-  let lastErr;
-  for(const mode of order){
-    try{
-      const u = mode==='proxy' ? toProxy(url) : url;
-      const res = await fetch(u, {cache:'no-store'});
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const text = await res.text();
-      return {ok:true, mode, text};
-    }catch(e){ lastErr = e; }
-  }
-  return {ok:false, mode:'failed', error:lastErr};
-}
-
-/* =========================
-   Source pills
-========================= */
-function setPill(name, mode){
-  const label = {universe:'Universe',prices:'Prices',gdelt:'News',sec:'Filings',reddit:'Reddit',macro:'Macro'}[name]||name;
-  const color = mode==='direct'?'ok':mode==='proxy'?'warn':mode==='failed'?'bad':'warn';
-  state.statuses[name]=mode; state.pillsMeta[name]={label,color,mode}; renderPills();
-}
-function renderPills(){
-  const c = document.getElementById('sourcePills'); c.innerHTML='';
-  Object.entries(state.pillsMeta).forEach(([k,v])=>{
-    const div=document.createElement('div'); div.className='pill';
-    const mtxt=v.mode==='direct'?'Direct':v.mode==='proxy'?'Proxy':'Failed';
-    div.innerHTML=`<span class="dot ${v.color}"></span><span>${v.label} • ${mtxt}</span>`;
-    c.appendChild(div);
-  });
-}
-
-/* =========================
-   Local cache
-========================= */
-function getCache(key, maxAgeMs){
-  if(!state.useCache) return null;
-  try{
-    const raw=localStorage.getItem(K(key)); if(!raw) return null;
-    const {t,v}=JSON.parse(raw); if(Date.now()-t>maxAgeMs) return null; return v;
-  }catch{ return null; }
-}
-function setCache(key, v){ if(state.useCache) localStorage.setItem(K(key), JSON.stringify({t:Date.now(), v})); }
-
-/* =========================
-   CSV/JSON helpers
-========================= */
-function parseCSV(txt){
-  const lines = txt.trim().split(/\r?\n/); if(!lines.length) return [];
-  const hdr = lines[0].split(',').map(s=>s.trim());
-  return lines.slice(1).filter(Boolean).map(l=>{
-    const a=l.split(','); const o={}; hdr.forEach((h,i)=>o[h]= (a[i]??'').trim()); return o;
-  });
-}
-function safeJSON(txt){ try{return JSON.parse(txt)}catch{return null} }
-
-/* =========================
-   Indicators
-========================= */
-function SMA(arr, n, f=(x)=>x){ const r=[]; let s=0; for(let i=0;i<arr.length;i++){ s+=f(arr[i]); if(i>=n) s-=f(arr[i-n]); r.push(i>=n-1?s/n:null);} return r;}
-function ATR(ohlc, n=14){
-  const tr=[]; for(let i=0;i<ohlc.length;i++){ const h=ohlc[i].High,l=ohlc[i].Low,c=ohlc[i].Close,pc=i?ohlc[i-1].Close:c;
-    tr.push(Math.max(h-l, Math.abs(h-pc), Math.abs(l-pc))); }
-  return SMA(tr,n,(x)=>x);
-}
-function stdev(series, n){
-  const out=[]; const win=[]; for(let i=0;i<series.length;i++){ const v=series[i]; win.push(v); if(win.length>n) win.shift();
-    if(win.length<n){out.push(null); continue;} const m=win.reduce((a,b)=>a+b,0)/n; const s=Math.sqrt(win.reduce((a,b)=>a+(b-m)**2,0)/n); out.push(s); }
-  return out;
-}
-function percentileRank(arr, val){
-  const xs=arr.filter(x=>x!=null && isFinite(x)); if(!xs.length || val==null || !isFinite(val)) return 50;
-  const below=xs.filter(x=>x<=val).length; return Math.round(100*below/xs.length);
-}
-function rollingRS_unaligned(seriesA, seriesB, n){
-  // Use last n points from each; compute relative excess return
-  const a = seriesA.slice(-n), b = seriesB.slice(-n);
-  if(a.length<n || b.length<n) return Array(seriesA.length).fill(null);
-  const rA=(a[n-1]-a[0])/a[0], rB=(b[n-1]-b[0])/b[0];
-  const rs = rA - rB;
-  const out = Array(seriesA.length).fill(null); out[out.length-1]=rs; return out;
-}
-
-/* =========================
-   Universe (MediaWiki API; CORS-enabled, no proxy)
-========================= */
-async function fetchUniverse(){
-  const ckey='universe';
-  const cached=getCache(ckey, 4*3600*1000); if(cached){ setPill('universe','direct'); return cached; }
-
-  async function parsePage(page){
-    const url=`https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(page)}&prop=text&format=json&formatversion=2&origin=*`;
-    const r = await fetchWithProxy(url, {preferProxy:false}); // should be Direct via CORS
-    setPill('universe', r.ok ? r.mode : 'failed');
-    if(!r.ok) return [];
-    const js = safeJSON(r.text); if(!js || !js.parse || !js.parse.text) return [];
-    const html = js.parse.text;
-    const doc = new DOMParser().parseFromString(html,'text/html');
-    const table = doc.querySelector('table.wikitable');
-    if(!table) return [];
-    const rows=[...table.querySelectorAll('tbody tr')].slice(1);
-    const out=[];
-    for(const tr of rows){
-      const tds=[...tr.children];
-      if(!tds.length) continue;
-      const raw = tds.map(td=>td.textContent.trim());
-      // Heuristics for columns across pages
-      let ticker = (raw[0]||'').replace(/\s/g,'').toUpperCase();
-      let name   = raw[1]||'';
-      let sector = raw[3]|| raw[2] || '';
-      if(!/^[A-Z.-]{1,6}$/.test(ticker) && /^[A-Z.-]{1,6}$/.test(raw[1]||'')){ ticker = (raw[1]||'').replace(/\s/g,'').toUpperCase(); name = raw[0]||name; }
-      if(/^[A-Z.-]{1,6}$/.test(ticker)) out.push({ticker,name,sector});
-    }
-    return out;
-  }
-
-  const s5 = await parsePage('List_of_S%26P_500_companies');
-  const n100 = await parsePage('Nasdaq-100');
-  const m=new Map(); [...s5,...n100].forEach(r=>{ if(r && r.ticker) m.set(r.ticker,r); });
-  const list=[...m.values()].slice(0,300);
-  setCache(ckey, list);
-  return list;
-}
-
-/* =========================
-   Prices (Stooq) — prefer proxy
-========================= */
-async function fetchStooqDaily(symbol){
-  const tries=[
-    `https://stooq.com/q/d/l/?s=${symbol.toLowerCase()}&i=d`,
-    `https://stooq.com/q/d/l/?s=${symbol.toLowerCase()}.us&i=d`
-  ];
-  for(const u of tries){
-    const r = await fetchWithProxy(u, {preferProxy:true});
-    if(r.ok){
-      setPill('prices', r.mode);
-      const rows = parseCSV(r.text);
-      if(rows && rows.length){
-        const ohlc = rows.map(x=>({
-          Date:x.Date, Open:+x.Open, High:+x.High, Low:+x.Low, Close:+x.Close, Volume:+x.Volume
-        })).filter(x=>isFinite(x.Close));
-        if(ohlc.length>=5) return ohlc;
-      }
-    }
-  }
-  return null;
-}
-
-/* =========================
-   Macro: SPY, VIX, DXY, US10Y — prefer proxy
-========================= */
-async function fetchMacro(){
-  const ckey='macro', cached=getCache(ckey, 2*3600*1000);
-  if(cached){ setPill('macro','direct'); return cached; }
-  const syms=[{k:'SPY',s:'spy.us'},{k:'VIX',s:'^vix'},{k:'DXY',s:'dxy.us'},{k:'US10Y',s:'us10y'}];
-  const out={};
-  for(const {k,s} of syms){
-    const r = await fetchWithProxy(`https://stooq.com/q/d/l/?s=${encodeURIComponent(s)}&i=d`, {preferProxy:true});
-    setPill('macro', r.ok ? r.mode : 'failed');
-    if(!r.ok){ out[k]=[]; continue; }
-    const rows=parseCSV(r.text).map(x=>({Close:+x.Close})).filter(x=>isFinite(x.Close));
-    out[k]=rows.map(x=>x.Close);
-  }
-  setCache(ckey,out); return out;
-}
-function detectRegime(m){
-  const spy=m.SPY||[], vix=m.VIX||[]; const n=20;
-  const spyr=(spy.length>n)?(spy.at(-1)-spy.at(-1-n))/spy.at(-1-n):0;
-  const vixc=(vix.length>n)?(vix.at(-1)-vix.at(-1-n)):0;
-  let tag='Neutral'; if(spyr>0 && vixc<0) tag='Risk-On'; else if(spyr<0 && vixc>0) tag='Risk-Off';
-  const mult={T:1,S:1,F:1,P:1}; if(tag==='Risk-On'){mult.T=1.1;mult.S=1.1;mult.F=0.95;mult.P=1.05;}
-  if(tag==='Risk-Off'){mult.T=0.9;mult.S=0.9;mult.F=1.1;mult.P=1.05;} return {tag,mult};
-}
-
-/* =========================
-   News (GDELT) — proxy first
-========================= */
-async function fetchGDELT(query){
-  const url=`https://api.gdeltproject.org/api/v2/doc/doc?format=json&query=${encodeURIComponent(query)}&maxrecords=50&sort=DateDesc`;
-  const r = await fetchWithProxy(url, {preferProxy:true});
-  setPill('gdelt', r.ok ? r.mode : 'failed');
-  if(!r.ok) return [];
-  const js = safeJSON(r.text);
-  const arts = js && js.articles ? js.articles : [];
-  return arts.map(a=>({date:a.date,lang:a.language,domain:a.domain,title:a.title,url:a.url,tone:+a.tone||0}));
-}
-
-/* =========================
-   Filings (SEC) — proxy first
-========================= */
-let SEC_MAP=null;
-async function ensureSECTable(){
-  if(SEC_MAP) return;
-  const r = await fetchWithProxy('https://www.sec.gov/files/company_tickers.json', {preferProxy:true});
-  setPill('sec', r.ok ? r.mode : 'failed');
-  if(!r.ok){ SEC_MAP={}; return; }
-  const js=safeJSON(r.text)||{}; const map={};
-  for(const k of Object.keys(js)){ const o=js[k]; if(o && o.ticker){ map[o.ticker.toUpperCase()]=('0000000000'+o.cik_str).slice(-10); } }
-  SEC_MAP=map;
-}
-async function fetchSEC(ticker){
-  await ensureSECTable();
-  const cik=SEC_MAP[ticker]; if(!cik) return {events:[]};
-  const r = await fetchWithProxy(`https://data.sec.gov/submissions/CIK${cik}.json`, {preferProxy:true});
-  setPill('sec', r.ok ? r.mode : 'failed');
-  if(!r.ok) return {events:[]};
-  const js=safeJSON(r.text); const rec=js?.filings?.recent;
-  if(!rec) return {events:[]};
-  const forms=rec.form||[], dates=rec.filingDate||[]; const out=[];
-  for(let i=0;i<forms.length;i++){ const f=(forms[i]||'').toUpperCase(), d=dates[i];
-    if(/^(8-K|10-Q|13D|13G|SC 13D|SC 13G)$/i.test(f)) out.push({form:f,date:d});
-  }
-  return {events:out.slice(0,10)};
-}
-
-/* =========================
-   Reddit — proxy first
-========================= */
-async function fetchReddit(ticker){
-  const url=`https://www.reddit.com/search.json?q=${encodeURIComponent(ticker)}&sort=new&limit=50&raw_json=1`;
-  const r = await fetchWithProxy(url, {preferProxy:true});
-  setPill('reddit', r.ok ? r.mode : 'failed');
-  if(!r.ok) return {rate:0,pos:0,neg:0,n:0};
-  const js=safeJSON(r.text); const posts=js?.data?.children?.map(x=>x.data)||[];
-  const now=Date.now()/1000; let count=0,pos=0,neg=0;
-  const P=['beat','surge','breakout','bull','up','upgrade','contract','award','deal'], N=['miss','dump','bear','down','downgrade','delay','lawsuit','fraud','halt'];
-  for(const p of posts){
-    const ageH=(now-(p.created_utc||now))/3600; if(ageH<=72) count++;
-    const t=((p.title||'')+' '+(p.selftext||'')).toLowerCase(); let s=0; P.forEach(w=>{if(t.includes(w)) s++;}); N.forEach(w=>{if(t.includes(w)) s--;});
-    if(s>0) pos++; else if(s<0) neg++;
-  }
-  return {rate:count/72,pos,neg,n:posts.length};
-}
-
-/* =========================
-   Technical + scoring
-========================= */
-function computeTech(ohlc){
-  const closes=ohlc.map(o=>o.Close), vols=ohlc.map(o=>o.Volume||0);
-  const sma20=SMA(closes,20), sma50=SMA(closes,50), sma150=SMA(closes,150), sma200=SMA(closes,200);
-  const atr14=ATR(ohlc,14), std20=stdev(closes,20);
-  const bbw=closes.map((c,i)=>{const m=sma20[i],s=std20[i]; if(m==null||s==null) return null; return ( (m+2*s)-(m-2*s) )/m;});
-  const volRatio20=vols.map((v,i)=>{const win=vols.slice(Math.max(0,i-19),i+1); const avg=win.reduce((a,b)=>a+b,0)/(win.length||1); return avg? v/avg:null;});
-  return {sma20,sma50,sma150,sma200,atr14,bbw,volRatio20,closes};
-}
-function scoreBlocks(sym, tech, rs60_now, newsStats, filingStats){
-  const i=tech.closes.length-1, c=tech.closes[i];
-  const s20=tech.sma20[i], s50=tech.sma50[i], s150=tech.sma150[i], s200=tech.sma200[i];
-  const trendStack=(c>s200?12.5:0)+(s200&&s150&&s150>s200?12.5:0)+(s150&&s50&&s50>s150?12.5:0)+(s50&&s20&&s20>s50?12.5:0);
-  const rsPct = percentileRank([rs60_now], rs60_now); // single-point rank → 100 or 50; acceptable as placeholder
-  const bbwNow=tech.bbw[i], bbwPct=percentileRank(tech.bbw.filter(Boolean), bbwNow);
-  const squeezeBreakout = (bbwNow!=null && bbwPct<35 && c>s20) ? 15 : 0;
-  const avwap = s200 ? (c>s200?10:0) : 0;
-  const parabolic = ((c - tech.closes[Math.max(0,i-5)]) / tech.closes[Math.max(0,i-5)])>0.25 ? -10 : 0;
-  let T = trendStack + (rsPct*0.25) + squeezeBreakout + avwap + parabolic;
-
-  let F=0; const recent=(filingStats.events||[]).slice(0,5).map(x=>x.form.toUpperCase());
-  if(recent.some(f=>/8-K/.test(f))) F+=25;
-  if(recent.some(f=>/10-Q/.test(f))) F+=5;
-  if(recent.some(f=>/13D|SC 13D/.test(f))) F+=10;
-  if(recent.some(f=>/13G|SC 13G/.test(f))) F+=5;
-  if(recent.some(f=>/NT 10-Q|NT 10-K/.test(f))) F-=10;
-
-  const toneMed=newsStats.toneMedPct||50, tailInv=newsStats.toneTailInvPct||50;
-  const density=Math.min(100, newsStats.docDensity*10);
-  const reddit=Math.min(100, newsStats.redditVelocity*50);
-  const dupPenalty=Math.min(10, (newsStats.dupDomains||0)*2);
-  let S=(toneMed*0.4)+(tailInv*0.2)+density+(reddit*0.3)-dupPenalty;
-
-  const volPct=percentileRank(tech.volRatio20.filter(Boolean), tech.volRatio20[i]);
-  const atrPct=percentileRank(tech.atr14.filter(Boolean), tech.atr14[i]);
-  const rev5=(tech.closes[i]-tech.closes[Math.max(0,i-5)])/tech.closes[Math.max(0,i-5)];
-  const rev10=(tech.closes[i]-tech.closes[Math.max(0,i-10)])/tech.closes[Math.max(0,i-10)];
-  const reversalFreq=(rev5*rev10<0)?15:0;
-  const crowdingPenalty=(newsStats.dupDomains>3)?20:0;
-  let P=(volPct*0.3)+(atrPct*0.25)+reversalFreq-crowdingPenalty;
-
-  return {T,F,S,P};
-}
-function compositeAlpha(blocks, regime){
-  const {T,F,S,P}=blocks, m=regime.mult;
-  const base=(0.35*T*m.T + 0.20*F*m.F + 0.30*S*m.S + 0.15*P*m.P);
-  const triggers=[T>60,S>60,F>20].filter(Boolean).length;
-  return Math.max(0, base - (triggers>=2?0:15));
-}
-function horizonAlpha(blocks, regime){
-  const {T,F,S,P}=blocks, m=regime.mult;
-  return {
-    week:  (0.45*T*m.T + 0.35*S*m.S + 0.15*P*m.P + 0.05*F*m.F),
-    next:  (0.40*T*m.T + 0.30*S*m.S + 0.15*P*m.P + 0.15*F*m.F),
-    month: (0.35*T*m.T + 0.30*S*m.S + 0.15*P*m.P + 0.20*F*m.F),
-    long:  (0.25*T*m.T + 0.20*S*m.S + 0.15*P*m.P + 0.40*F*m.F),
-  };
-}
-
-/* =========================
-   News aggregation → stats
-========================= */
-function newsStatsFrom(gdelt, reddit){
-  const tones=gdelt.map(x=>x.tone).filter(isFinite).sort((a,b)=>a-b);
-  const med=tones.length?tones[Math.floor(tones.length/2)]:0;
-  const tail=tones.length? (tones.filter(x=>x<0).length/tones.length) : 0;
-  const uniq=new Set(gdelt.map(x=>x.domain)).size;
-  const dup=Math.max(0, gdelt.length-uniq);
-  const now=Date.now();
-  const last48=gdelt.filter(x=>{
-    const m=x.date && /^\d{8}/.test(x.date) ? x.date.replace(/^(\d{4})(\d{2})(\d{2}).*/,'$1-$2-$3') : null;
-    const d=m?new Date(m):new Date(); return now-d.getTime()<48*3600*1000;
-  }).length;
-  return {toneMedPct:percentileRank(tones,med), toneTailInvPct:Math.round(100*(1-tail)), docDensity:last48, dupDomains:dup, redditVelocity:reddit.rate||0};
-}
-
-/* =========================
-   Pipeline
-========================= */
-async function buildUniverseAndScore(){
-  document.getElementById('tableWrap').innerHTML=''; setStamp();
-
-  const macro=await fetchMacro(); const regime=detectRegime(macro);
-  const uni=await fetchUniverse(); document.getElementById('uCount').textContent=uni.length;
-
-  const spyOHLC = await fetchStooqDaily('SPY'); const spyClose = spyOHLC? spyOHLC.map(x=>x.Close):[];
-
-  const results=[]; const limit=Math.min(uni.length, 120); const pool=6; let idx=0;
-  const workers = Array.from({length:pool}, async ()=>{
-    while(idx<limit){
-      const me=idx++; const u=uni[me];
-      const px = await fetchStooqDaily(u.ticker); if(!px || px.length<60) continue;
-
-      const vols=px.map(o=>o.Volume||0); const vmed=[...vols.slice(-20)].sort((a,b)=>a-b)[10]||0;
-      const lastC=px.at(-1).Close; if(vmed<200000 || lastC<1 || lastC>1000) continue;
-
-      const tech=computeTech(px);
-
-      // RS vs SPY (unaligned fallback)
-      let rs60_now = 0;
-      if(spyClose.length>=60){ rs60_now = rollingRS_unaligned(px.map(x=>x.Close), spyClose, 60).at(-1)||0; }
-
-      const [gdelt, red, sec] = await Promise.all([
-        fetchGDELT(`${u.ticker} OR ${u.name}`),
-        fetchReddit(u.ticker),
-        fetchSEC(u.ticker)
-      ]);
-      const nstat=newsStatsFrom(gdelt, red);
-      const blocks=scoreBlocks(u.ticker, tech, rs60_now, nstat, sec);
-      const alpha=compositeAlpha(blocks, regime);
-      const h=horizonAlpha(blocks, regime);
-
-      results.push({
-        sym:u.ticker, name:u.name, sector:u.sector,
-        price:lastC,
-        RS: Math.round( (rs60_now*100) + 50 ), // centered ~50
-        volSpike: tech.volRatio20.at(-1),
-        tone: nstat.toneMedPct,
-        mentions: Math.round((nstat.redditVelocity||0)*100)/100,
-        catalysts: (sec.events||[]).slice(0,3),
-        alpha, blocks, h,
-        tech, px, gdelt
-      });
-    }
-  });
-  await Promise.all(workers);
-
-  const filtered = results
-    .filter(x=>isFinite(x.alpha))
-    .map(x=>{ const last=x.px.length-1; const g5=(x.px[last].Close-x.px[Math.max(0,last-5)].Close)/x.px[Math.max(0,last-5)].Close;
-      if(g5>0.25 && (x.volSpike||0)<1.2) x.alpha*=0.85; return x; });
-
-  const ranks={
-    week:  [...filtered].sort((a,b)=>b.h.week-a.h.week).slice(0,50),
-    next:  [...filtered].sort((a,b)=>b.h.next-a.h.next).slice(0,50),
-    month: [...filtered].sort((a,b)=>b.h.month-a.h.month).slice(0,50),
-    long:  [...filtered].sort((a,b)=>b.h.long-a.h.long).slice(0,50),
-  };
-
-  setCache('lastResults',{at:Date.now(),ranks});
-  document.getElementById('lastUpd').textContent=new Date().toLocaleTimeString();
-  renderTable('week', ranks.week, regime);
-  ['universe','prices','gdelt','sec','reddit','macro'].forEach(k=>{ if(!state.pillsMeta[k]) setPill(k,'warn'); });
-  startAutoRefresh();
-}
-
-/* =========================
-   Render
-========================= */
-function renderTable(horizon, list, regime){
-  const wrap=document.getElementById('tableWrap');
-  wrap.innerHTML=`<table>
-    <thead><tr>
-      <th>#</th><th>Ticker</th><th>Price</th><th>α-Score</th>
-      <th>RS</th><th>Vol Spike</th><th>Tone</th><th>Mentions</th><th>Catalysts</th><th></th>
-    </tr></thead>
-    <tbody>${list.map((x,i)=>rowHTML(horizon,x,i,regime)).join('')}</tbody>
-  </table>`;
-  wrap.querySelectorAll('[data-exp]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const k=btn.getAttribute('data-exp'); const more=document.getElementById(`exp-${k}`);
-      more.style.display=more.style.display==='block'?'none':'block'; if(more.style.display==='block') drawSpark(k);
-    });
-  });
-}
-function rowHTML(h, x, i, regime){
-  const key=({week:'week',next:'next',month:'month',long:'long'}[h]||'week');
-  const a = x.h[key]; const kval=(v)=>isFinite(v)?fmt(v,2):'—';
-  const cats = x.catalysts.map(c=>`<span class="tag">${c.form} • ${c.date}</span>`).join(' ') || '<span class="small">—</span>';
-  const id=`${h}-${i}`; const toneBadge=x.tone>=60?'ok':x.tone>=40?'warn':'bad';
-  const volBadge=(x.volSpike||0)>=1.3?'ok':(x.volSpike||0)>=1.05?'warn':'bad';
-  return `
-  <tr>
-    <td class="k nowrap">${i+1}</td>
-    <td class="nowrap"><strong>${x.sym}</strong> <span class="small">• ${x.name}</span></td>
-    <td class="k">$${kval(x.price)}</td>
-    <td class="k"><span class="badge ${a>=70?'ok':a>=50?'warn':'bad'}">${kval(a)}</span></td>
-    <td class="k">${kval(x.RS)}</td>
-    <td class="k"><span class="badge ${volBadge}">${kval(x.volSpike)}</span></td>
-    <td class="k"><span class="badge ${toneBadge}">${kval(x.tone)}</span></td>
-    <td class="k">${kval(x.mentions)}</td>
-    <td>${cats}</td>
-    <td class="nowrap"><a class="link" href="javascript:void(0)" data-exp="${id}">Details</a></td>
-  </tr>
-  <tr id="exp-${id}" style="display:none"><td colspan="10">
-    <div class="rowexp">
-      <div class="flex">
-        <div class="card" style="min-width:320px">
-          <canvas id="spark-${id}" class="spark"></canvas>
-          <div class="small">Price 120d</div>
+```
+<div class="container">
+    <section class="hero">
+        <div class="logo-container">
+            <img src="Logo.svg" alt="Praeco Logo">
         </div>
-        <div class="card">
-          <div class="kv">
-            <div>Regime</div><div>${regime.tag}</div>
-            <div>T</div><div>${fmt(x.blocks.T,1)}</div>
-            <div>F</div><div>${fmt(x.blocks.F,1)}</div>
-            <div>S</div><div>${fmt(x.blocks.S,1)}</div>
-            <div>P</div><div>${fmt(x.blocks.P,1)}</div>
-            <div>α</div><div>${fmt(x.alpha,1)}</div>
-          </div>
+        
+        <div class="hero-content">
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                Coming Soon
+            </div>
+            
+            <h1>Enterprise Midstream Solutions Built Right</h1>
+            
+            <p class="tagline">
+                Advanced crude oil transportation and logistics engineered for the <span class="accent-text">modern energy supply chain</span>
+            </p>
+
+            <div class="services">
+                <div class="service-card">
+                    <div class="service-icon">🚛</div>
+                    <h3>Crude Oil Trucking</h3>
+                    <p>Heavy-duty transportation solutions moving 75,000+ barrels per day with precision dispatch and real-time tracking</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">📊</div>
+                    <h3>Business Intelligence</h3>
+                    <p>Custom reporting platforms and automated systems that eliminate waste and drive operational excellence</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">⚙️</div>
+                    <h3>Process Automation</h3>
+                    <p>Enterprise automation solutions reducing manual overhead by 35+ hours weekly while improving accuracy</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🗺️</div>
+                    <h3>Route Optimization</h3>
+                    <p>GIS-powered logistics planning and pipeline visualization improving efficiency across terminal networks</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">📡</div>
+                    <h3>Fleet Tracking Integration</h3>
+                    <p>Premier-level third-party platform integration delivering superior real-time visibility and compliance</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">✓</div>
+                    <h3>Quality Control</h3>
+                    <p>Advanced error detection and volume reconciliation systems ensuring measurement accuracy and regulatory compliance</p>
+                </div>
+            </div>
+
+            <div class="contact-section">
+                <h2>Ready to Optimize Your Operations?</h2>
+                <p>Get in touch to discuss how Praeco can streamline your midstream logistics</p>
+                <a href="mailto:haydenf809@gmail.com" class="cta-button">Contact Us</a>
+            </div>
         </div>
-        <div class="card" style="flex:2">
-          <div class="small" style="margin-bottom:6px">Catalyst Timeline</div>
-          <div>${x.catalysts.map(c=>`<span class="tag">${c.date} · ${c.form}</span>`).join(' ') || '<span class="small">No recent 8-K/10-Q/13D/13G detected</span>'}</div>
-          <hr/>
-          <div class="small" style="margin-bottom:6px">News (GDELT) — latest 6</div>
-          <div>${x.gdelt.slice(0,6).map(g=>`<div class="small">• ${g.date} — ${g.domain} — tone ${fmt(g.tone,1)}</div>`).join('')}</div>
-        </div>
-      </div>
-      <hr/>
-      <div class="small">Provenance: Prices — Stooq (${state.pillsMeta.prices?.mode||'—'}), News — GDELT (${state.pillsMeta.gdelt?.mode||'—'}), Filings — SEC (${state.pillsMeta.sec?.mode||'—'}), Reddit (${state.pillsMeta.reddit?.mode||'—'}), Universe — Wikipedia (${state.pillsMeta.universe?.mode||'—'})</div>
-    </div>
-  </td></tr>`;
-}
-function drawSpark(id){
-  const [h, idx]=id.split('-'); const cache=getCache('lastResults', 4*3600*1000); if(!cache) return;
-  const list=cache.ranks[h]||[]; const x=list[+idx]; if(!x) return;
-  const data=x.px.slice(-120).map(o=>o.Close); const c=document.getElementById(`spark-${id}`); const ctx=c.getContext('2d');
-  const w=c.width=c.clientWidth, hgt=c.height=c.clientHeight; ctx.clearRect(0,0,w,hgt);
-  const min=Math.min(...data), max=Math.max(...data), pad=6; ctx.lineWidth=1.5; ctx.strokeStyle='#9ad8ff'; ctx.beginPath();
-  data.forEach((v,i)=>{ const X=pad+i*((w-2*pad)/Math.max(1,data.length-1)); const Y=hgt-pad-((v-min)/(max-min||1))*(hgt-2*pad); i?ctx.lineTo(X,Y):ctx.moveTo(X,Y); }); ctx.stroke();
-}
+    </section>
 
-/* =========================
-   UI hooks
-========================= */
-document.getElementById('tabs').addEventListener('click', (e)=>{
-  const t=e.target.closest('.tab'); if(!t) return;
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active');
-  const h=t.getAttribute('data-h'); const cache=getCache('lastResults',4*3600*1000);
-  if(cache){ const key=(h==='week'?'week':h==='next'?'next':h==='month'?'month':'long'); renderTable(key, cache.ranks[key], {tag:'—', mult:{T:1,S:1,F:1,P:1}}); }
-});
-document.getElementById('btnRefresh').addEventListener('click', ()=>buildUniverseAndScore());
-const drawer=document.getElementById('drawer'); const settingsBtn=document.getElementById('btnSettings'); const closeBtn=document.getElementById('btnClose');
-settingsBtn.addEventListener('click', ()=>drawer.classList.add('open')); closeBtn.addEventListener('click', ()=>drawer.classList.remove('open'));
-document.getElementById('swProxy').addEventListener('change', e=>state.forceProxy=e.target.checked);
-document.getElementById('swCache').addEventListener('change', e=>state.useCache=e.target.checked);
-document.getElementById('btnClear').addEventListener('click', ()=>{
-  Object.keys(localStorage).forEach(k=>{ if(k.startsWith(`alphaGem:${VER}:`)) localStorage.removeItem(k); });
-  document.getElementById('lastUpd').textContent='—';
-});
+    <footer>
+        <p>&copy; 2025 Praeco. Enterprise midstream solutions.</p>
+    </footer>
+</div>
+```
 
-/* =========================
-   Service Worker (optional)
-========================= */
-async function setupSW(){
-  try{
-    if(!('serviceWorker' in navigator)) return;
-    if(!document.getElementById('swSW').checked) return;
-    const swCode=`
-      const SHELL=['./'];
-      self.addEventListener('install',e=>{e.waitUntil(caches.open('alphaGem-shell-v2').then(c=>c.addAll(SHELL))); self.skipWaiting();});
-      self.addEventListener('activate',e=>self.clients.claim());
-      self.addEventListener('fetch',e=>{
-        const u=new URL(e.request.url);
-        if(u.origin===location.origin){
-          e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
-        }
-      });
-    `;
-    const blob=new Blob([swCode],{type:'text/javascript'}); const url=URL.createObjectURL(blob);
-    await navigator.serviceWorker.register(url);
-  }catch{}
-}
-
-/* =========================
-   Auto-refresh every 4h
-========================= */
-let autoTimer=null; function startAutoRefresh(){
-  if(autoTimer) clearInterval(autoTimer);
-  autoTimer=setInterval(()=>{ if(!document.hidden) buildUniverseAndScore(); }, 4*3600*1000);
-}
-
-/* =========================
-   Boot
-========================= */
-(async function boot(){
-  await setupSW();
-  const saved=getCache('lastResults', 4*3600*1000);
-  if(saved){ renderTable('week', saved.ranks.week, {tag:'—', mult:{T:1,S:1,F:1,P:1}}); }
-  buildUniverseAndScore();
-})();
-</script>
 </body>
 </html>
