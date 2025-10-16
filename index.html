@@ -867,7 +867,7 @@
                     for (let i = 0; i < timestamps.length; i++) {
                         if (prices[i] !== null) {
                             const date = new Date(timestamps[i] * 1000);
-                            date.setHours(0, 0, 0, 0); // Normalize to midnight
+                            date.setHours(0, 0, 0, 0);
                             
                             historicalPrices.push({
                                 date: date,
@@ -885,7 +885,7 @@
                             minute: '2-digit'
                         });
                         
-                        console.log(`WTI Price Updated: $${currentLivePrice.toFixed(2)} (${historicalPrices.length} days of data)`);
+                        console.log(`✓ WTI Price Updated: $${currentLivePrice.toFixed(2)} (${historicalPrices.length} days loaded)`);
                         
                         if (isExpanded && chart) {
                             updateChart();
@@ -893,17 +893,17 @@
                     }
                 }
             } catch (error) {
-                console.error('Error fetching WTI price:', error);
+                console.error('⚠ Error fetching WTI price:', error);
                 if (currentLivePrice === null) {
-                    // Fallback: generate realistic year of data
                     generateFallbackData();
                 }
             }
         }
 
         function generateFallbackData() {
+            console.log('⚠ Using fallback data');
             historicalPrices = [];
-            let price = 58.31;
+            let price = 71.50;
             const daysBack = 365;
             
             for (let i = daysBack; i >= 0; i--) {
@@ -911,13 +911,12 @@
                 date.setDate(date.getDate() - i);
                 date.setHours(0, 0, 0, 0);
                 
-                // Realistic oil price movement
-                const trend = Math.sin(i / 60) * 0.05;
-                const volatility = (Math.random() - 0.5) * 1.2;
-                const meanReversion = (60 - price) * 0.02;
+                const trend = Math.sin(i / 60) * 0.08;
+                const volatility = (Math.random() - 0.5) * 1.5;
+                const meanReversion = (72 - price) * 0.03;
                 
                 price += trend + volatility + meanReversion;
-                price = Math.max(50, Math.min(85, price));
+                price = Math.max(60, Math.min(85, price));
                 
                 historicalPrices.push({
                     date: date,
@@ -927,6 +926,7 @@
             
             currentLivePrice = price;
             document.getElementById('currentPrice').textContent = `$${currentLivePrice.toFixed(2)}`;
+            console.log(`✓ Fallback data generated: ${historicalPrices.length} days`);
         }
 
         function getDateRangeStart(range) {
@@ -984,33 +984,30 @@
         }
 
         function generateAdvancedForecast() {
-            if (historicalPrices.length < 30) return [];
+            if (historicalPrices.length < 30) {
+                console.error('Not enough data for forecast');
+                return { forecastData: [], confidenceBands: [] };
+            }
             
-            const forecastDays = 30; // Extended to 30 days
+            const forecastDays = 30;
             const forecastData = [];
             const confidenceBands = [];
             
-            // Extract price series
             const prices = historicalPrices.map(d => d.price);
             
-            // Calculate technical indicators from full year
             const ema12 = calculateEMA(prices, 12);
             const ema26 = calculateEMA(prices, 26);
             const ema50 = calculateEMA(prices, 50);
             const ema200 = calculateEMA(prices, 200);
             
-            // Calculate momentum and trend strength
             const momentum = ema12 - ema26;
             const longTermTrend = (ema50 - ema200) / ema200;
             
-            // Historical volatility
             const volatility = calculateVolatility(prices, 60);
             const recentVolatility = calculateVolatility(prices, 20);
             
-            // Mean reversion level (yearly average)
             const yearlyMean = prices.reduce((a, b) => a + b, 0) / prices.length;
             
-            // Start forecast from current price
             let forecastPrice = currentLivePrice;
             const lastDate = historicalPrices[historicalPrices.length - 1].date;
             
@@ -1018,22 +1015,12 @@
                 const forecastDate = new Date(lastDate);
                 forecastDate.setDate(forecastDate.getDate() + i);
                 
-                // Trend component (weighted by momentum)
                 const trendComponent = (momentum * 0.12) + (longTermTrend * currentLivePrice * 0.08);
-                
-                // Mean reversion force (stronger as we move from mean)
                 const meanReversionForce = (yearlyMean - forecastPrice) * 0.05;
-                
-                // Decay factor - confidence decreases with forecast horizon
-                const decayFactor = Math.exp(-i / 15); // Adjusted for 30-day horizon
-                
-                // Stochastic component (reduced as confidence decreases)
+                const decayFactor = Math.exp(-i / 15);
                 const randomWalk = (Math.random() - 0.5) * recentVolatility * 0.8 * decayFactor;
                 
-                // Daily forecast
                 forecastPrice += trendComponent * decayFactor + meanReversionForce + randomWalk;
-                
-                // Reasonable bounds (slightly wider for longer horizon)
                 forecastPrice = Math.max(currentLivePrice * 0.88, Math.min(currentLivePrice * 1.12, forecastPrice));
                 
                 forecastData.push({
@@ -1041,7 +1028,6 @@
                     y: parseFloat(forecastPrice.toFixed(2))
                 });
                 
-                // Confidence band (widens with time)
                 const bandWidth = volatility * Math.sqrt(i) * 0.5;
                 confidenceBands.push({
                     x: forecastDate,
@@ -1050,11 +1036,11 @@
                 });
             }
             
-            // Update UI
             const finalForecast = forecastData[forecastData.length - 1].y;
             document.getElementById('forecastPrice').textContent = `$${finalForecast.toFixed(2)}`;
             document.getElementById('trendDirection').textContent = finalForecast > currentLivePrice ? '↑ Upward' : '↓ Downward';
             
+            console.log(`✓ Forecast generated: ${forecastDays} days`);
             return { forecastData, confidenceBands };
         }
 
@@ -1062,22 +1048,20 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            // Get the start date based on selected range
             const rangeStart = getDateRangeStart(selectedRange);
             
-            // Filter historical data by selected range
-            const filteredHistorical = historicalPrices.filter(d => d.date >= rangeStart && d.date < today);
-            
-            // Historical: all closing prices before today within range
-            const historicalData = filteredHistorical.map(d => ({ x: d.date, y: d.price }));
-            
-            // Current: today's price (last closing price in dataset)
-            const currentData = historicalPrices
-                .filter(d => d.date >= today)
+            // Get ALL historical data up to but not including today
+            const historicalData = historicalPrices
+                .filter(d => d.date >= rangeStart && d.date < today)
                 .map(d => ({ x: d.date, y: d.price }));
             
-            // Forecast: always show next 30 days regardless of range
+            // Get today's price as a separate point (if it exists)
+            const todayPrice = historicalPrices.find(d => d.date.getTime() === today.getTime());
+            const currentData = todayPrice ? [{ x: today, y: todayPrice.price }] : [];
+            
             const { forecastData, confidenceBands } = generateAdvancedForecast();
+            
+            console.log(`✓ Data prepared: ${historicalData.length} historical, ${currentData.length} current, ${forecastData.length} forecast`);
             
             return { historicalData, currentData, forecastData, confidenceBands };
         }
@@ -1091,9 +1075,9 @@
         }
 
         function setActiveRange(range) {
+            console.log(`→ Setting range to: ${range}`);
             selectedRange = range;
             
-            // Update button states
             document.querySelectorAll('.range-btn').forEach(btn => {
                 if (btn.dataset.range === range) {
                     btn.classList.add('active');
@@ -1102,7 +1086,6 @@
                 }
             });
             
-            // Update chart
             if (chart) {
                 updateChart();
             }
@@ -1115,6 +1098,7 @@
             isExpanded = !isExpanded;
             
             if (isExpanded) {
+                console.log('→ Expanding chart...');
                 section.classList.add('expanded');
                 btn.classList.add('active');
                 btn.textContent = 'Hide Predictive Model';
@@ -1126,6 +1110,7 @@
                     }
                 }, 300);
             } else {
+                console.log('→ Hiding chart...');
                 section.classList.remove('expanded');
                 btn.classList.remove('active');
                 btn.textContent = 'Preview Praeco\'s Predictive Model';
@@ -1134,11 +1119,25 @@
 
         function initChart() {
             const ctx = document.getElementById('priceChart');
-            if (!ctx) return;
+            if (!ctx) {
+                console.error('✗ Canvas element not found');
+                return;
+            }
+            
+            console.log('→ Initializing chart...');
+            
+            if (historicalPrices.length === 0) {
+                console.error('✗ No historical data available');
+                return;
+            }
             
             const { historicalData, currentData, forecastData, confidenceBands } = prepareChartData();
             
-            // Confidence band dataset
+            if (historicalData.length === 0 && currentData.length === 0) {
+                console.error('✗ No data to display');
+                return;
+            }
+            
             const confidenceUpper = confidenceBands.map(d => ({ x: d.x, y: d.upper }));
             const confidenceLower = confidenceBands.map(d => ({ x: d.x, y: d.lower }));
             
@@ -1315,10 +1314,17 @@
                     }
                 }
             });
+            
+            console.log('✓ Chart initialized successfully');
         }
 
         function updateChart() {
-            if (!chart) return;
+            if (!chart) {
+                console.error('✗ Chart not initialized');
+                return;
+            }
+            
+            console.log('→ Updating chart...');
             
             const { historicalData, currentData, forecastData, confidenceBands } = prepareChartData();
             
@@ -1331,22 +1337,37 @@
             chart.data.datasets[3].data = forecastData;
             
             chart.update('active');
+            console.log('✓ Chart updated');
         }
 
-        // Initialize range buttons
-        document.addEventListener('DOMContentLoaded', () => {
+        // Wait for DOM to be ready before setting up event listeners
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+
+        function initializeApp() {
+            console.log('→ Initializing app...');
+            
+            // Set up range buttons
             document.querySelectorAll('.range-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     setActiveRange(btn.dataset.range);
                 });
             });
-        });
-
-        document.getElementById('toggleChart').addEventListener('click', toggleChartView);
-        
-        window.addEventListener('load', () => {
+            
+            // Set up toggle button
+            const toggleBtn = document.getElementById('toggleChart');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', toggleChartView);
+            }
+            
+            // Fetch initial data
             fetchLiveWTIPrice();
-        });
+            
+            console.log('✓ App initialized');
+        }
     </script>
 </body>
 </html>
