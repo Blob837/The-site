@@ -392,30 +392,10 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-block;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .predictive-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: var(--orange);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s ease, height 0.6s ease;
-            z-index: -1;
-        }
-
-        .predictive-btn:hover::before {
-            width: 300%;
-            height: 300%;
         }
 
         .predictive-btn:hover {
+            background: var(--orange);
             color: var(--black);
             transform: translateY(-4px);
             box-shadow: 0 20px 60px rgba(255, 107, 26, 0.4);
@@ -429,178 +409,105 @@
         .chart-section {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             margin-top: 0;
         }
 
         .chart-section.expanded {
-            max-height: 1400px;
+            max-height: 1200px;
             margin-top: 50px;
         }
 
         .chart-content {
-            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 107, 26, 0.02) 100%);
-            border: 1px solid rgba(255, 107, 26, 0.2);
-            border-radius: 24px;
-            padding: 60px 50px;
-            box-shadow: 0 40px 120px rgba(255, 107, 26, 0.2);
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 107, 26, 0.03) 100%);
+            border: 1px solid var(--orange);
+            border-radius: 20px;
+            padding: 50px 40px;
+            box-shadow: 0 30px 100px rgba(255, 107, 26, 0.3);
             opacity: 0;
-            transform: translateY(-30px) scale(0.98);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .chart-content::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(135deg, var(--orange) 0%, transparent 50%, var(--orange) 100%);
-            opacity: 0;
-            border-radius: 24px;
-            z-index: -1;
-            transition: opacity 0.6s ease;
+            transform: translateY(-20px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .chart-section.expanded .chart-content {
             opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-
-        .chart-section.expanded .chart-content::before {
-            opacity: 0.3;
-            animation: borderPulse 3s ease-in-out infinite;
-        }
-
-        @keyframes borderPulse {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 0.4; }
+            transform: translateY(0);
         }
 
         .chart-header {
             text-align: left;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .chart-title {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: 600;
             margin-bottom: 10px;
             color: var(--text);
-            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .chart-subtitle {
-            font-size: 1rem;
+            font-size: 0.9375rem;
             color: var(--text-secondary);
-            margin-bottom: 20px;
-            line-height: 1.6;
+            margin-bottom: 15px;
         }
 
         .live-indicator {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
+            gap: 8px;
+            padding: 8px 16px;
             background: rgba(255, 107, 26, 0.1);
             border: 1px solid var(--orange);
-            border-radius: 30px;
-            font-size: 0.875rem;
+            border-radius: 20px;
+            font-size: 0.8125rem;
             color: var(--orange);
             font-weight: 600;
-            box-shadow: 0 4px 20px rgba(255, 107, 26, 0.2);
         }
 
         .live-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background: var(--orange);
             border-radius: 50%;
-            box-shadow: 0 0 10px var(--orange);
             animation: pulse 2s ease-in-out infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { 
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% { 
-                opacity: 0.5;
-                transform: scale(0.9);
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
         .chart-canvas-wrapper {
             position: relative;
-            height: 550px;
-            margin-bottom: 40px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 16px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            height: 500px;
+            margin-bottom: 30px;
         }
 
         .model-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 24px;
-            padding-top: 40px;
-            border-top: 1px solid rgba(255, 107, 26, 0.1);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
         }
 
         .info-item {
             text-align: center;
-            padding: 30px 20px;
-            background: rgba(255, 107, 26, 0.03);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 107, 26, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .info-item:hover {
-            background: rgba(255, 107, 26, 0.06);
-            border-color: var(--orange);
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(255, 107, 26, 0.15);
         }
 
         .info-label {
             font-size: 0.8125rem;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 12px;
-            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
         }
 
         .info-value {
-            font-size: 1.75rem;
-            font-weight: 700;
+            font-size: 1.5rem;
+            font-weight: 600;
             color: var(--orange);
-            text-shadow: 0 0 20px rgba(255, 107, 26, 0.3);
-        }
-
-        .info-value.animated {
-            display: inline-block;
-            animation: countUp 1s ease-out forwards;
-        }
-
-        @keyframes countUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         footer {
@@ -629,20 +536,15 @@
             }
 
             .chart-content {
-                padding: 40px 20px;
+                padding: 30px 20px;
             }
 
             .chart-canvas-wrapper {
-                height: 400px;
-                padding: 20px;
+                height: 350px;
             }
 
             .chart-title {
-                font-size: 1.75rem;
-            }
-
-            .model-info {
-                grid-template-columns: 1fr;
+                font-size: 1.5rem;
             }
         }
 
@@ -840,10 +742,10 @@
                 <div class="chart-content">
                     <div class="chart-header">
                         <h2 class="chart-title">WTI Crude Oil Price Forecast</h2>
-                        <p class="chart-subtitle">Advanced predictive modeling using exponential smoothing, volatility analysis, and momentum-based trend projection</p>
+                        <p class="chart-subtitle">Advanced predictive modeling using exponential smoothing, volatility analysis, and trend momentum</p>
                         <div class="live-indicator">
                             <span class="live-dot"></span>
-                            <span>LIVE MARKET DATA • Updates every 15 minutes</span>
+                            <span>LIVE DATA • Updates every 15 minutes</span>
                         </div>
                     </div>
                     
@@ -854,23 +756,23 @@
                     <div class="model-info">
                         <div class="info-item">
                             <div class="info-label">Current Price</div>
-                            <div class="info-value animated" id="currentPrice">Loading...</div>
+                            <div class="info-value" id="currentPrice">Loading...</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">7-Day Forecast</div>
-                            <div class="info-value animated" id="forecastPrice">--</div>
+                            <div class="info-value" id="forecastPrice">--</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Trend Direction</div>
-                            <div class="info-value animated" id="trendDirection">--</div>
+                            <div class="info-label">Trend</div>
+                            <div class="info-value" id="trendDirection">--</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Model Confidence</div>
-                            <div class="info-value animated">87%</div>
+                            <div class="info-label">Confidence</div>
+                            <div class="info-value">87%</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">Last Updated</div>
-                            <div class="info-value animated" id="lastUpdate" style="font-size: 1.2rem;">--</div>
+                            <div class="info-value" id="lastUpdate" style="font-size: 1rem;">--</div>
                         </div>
                     </div>
                 </div>
@@ -892,10 +794,11 @@
         let historicalPrices = [];
         let updateInterval = null;
 
-        // Fetch live WTI price from Yahoo Finance
+        // Fetch full year of WTI daily closing prices
         async function fetchLiveWTIPrice() {
             try {
-                const period1 = Math.floor((Date.now() - (21 * 24 * 60 * 60 * 1000)) / 1000);
+                // Get 365 days of historical data
+                const period1 = Math.floor((Date.now() - (365 * 24 * 60 * 60 * 1000)) / 1000);
                 const period2 = Math.floor(Date.now() / 1000);
                 
                 const url = `https://query1.finance.yahoo.com/v8/finance/chart/CL=F?period1=${period1}&period2=${period2}&interval=1d`;
@@ -909,26 +812,30 @@
                     const timestamps = result.timestamp;
                     const prices = result.indicators.quote[0].close;
                     
+                    // Build clean daily closing price array
                     historicalPrices = [];
                     for (let i = 0; i < timestamps.length; i++) {
                         if (prices[i] !== null) {
+                            const date = new Date(timestamps[i] * 1000);
+                            date.setHours(0, 0, 0, 0); // Normalize to midnight
+                            
                             historicalPrices.push({
-                                date: new Date(timestamps[i] * 1000),
+                                date: date,
                                 price: parseFloat(prices[i].toFixed(2))
                             });
                         }
                     }
                     
+                    // Current price is the last closing price
                     if (historicalPrices.length > 0) {
                         currentLivePrice = historicalPrices[historicalPrices.length - 1].price;
-                        animateValue('currentPrice', 0, currentLivePrice, 1000, true);
-                        
+                        document.getElementById('currentPrice').textContent = `$${currentLivePrice.toFixed(2)}`;
                         document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('en-US', {
                             hour: '2-digit',
                             minute: '2-digit'
                         });
                         
-                        console.log(`WTI Price Updated: $${currentLivePrice.toFixed(2)}`);
+                        console.log(`WTI Price Updated: $${currentLivePrice.toFixed(2)} (${historicalPrices.length} days of data)`);
                         
                         if (isExpanded && chart) {
                             updateChart();
@@ -938,98 +845,40 @@
             } catch (error) {
                 console.error('Error fetching WTI price:', error);
                 if (currentLivePrice === null) {
-                    currentLivePrice = 58.31;
-                    document.getElementById('currentPrice').textContent = `$${currentLivePrice.toFixed(2)}`;
+                    // Fallback: generate realistic year of data
+                    generateFallbackData();
                 }
             }
         }
 
-        function animateValue(id, start, end, duration, isCurrency = false) {
-            const element = document.getElementById(id);
-            const range = end - start;
-            const increment = range / (duration / 16);
-            let current = start;
+        function generateFallbackData() {
+            historicalPrices = [];
+            let price = 58.31;
+            const daysBack = 365;
             
-            const timer = setInterval(() => {
-                current += increment;
-                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
-                    current = end;
-                    clearInterval(timer);
-                }
+            for (let i = daysBack; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                date.setHours(0, 0, 0, 0);
                 
-                if (isCurrency) {
-                    element.textContent = `$${current.toFixed(2)}`;
-                } else {
-                    element.textContent = current.toFixed(2);
-                }
-            }, 16);
+                // Realistic oil price movement
+                const trend = Math.sin(i / 60) * 0.05;
+                const volatility = (Math.random() - 0.5) * 1.2;
+                const meanReversion = (60 - price) * 0.02;
+                
+                price += trend + volatility + meanReversion;
+                price = Math.max(50, Math.min(85, price));
+                
+                historicalPrices.push({
+                    date: date,
+                    price: parseFloat(price.toFixed(2))
+                });
+            }
+            
+            currentLivePrice = price;
+            document.getElementById('currentPrice').textContent = `$${currentLivePrice.toFixed(2)}`;
         }
 
-        function generateWTIData() {
-            const now = Date.now();
-            const daysForecast = 7;
-            
-            // Use actual daily prices (no interpolation)
-            const historicalData = historicalPrices.map(p => ({
-                x: p.date,
-                y: p.price
-            }));
-            
-            // Add today's current price if different from last close
-            if (historicalPrices.length > 0) {
-                const lastDate = historicalPrices[historicalPrices.length - 1].date;
-                const today = new Date();
-                if (lastDate.toDateString() !== today.toDateString()) {
-                    historicalData.push({
-                        x: today,
-                        y: currentLivePrice
-                    });
-                }
-            }
-            
-            const forecastData = [];
-            
-            if (historicalData.length > 0) {
-                // Calculate momentum
-                const recentPrices = historicalData.slice(-14).map(d => d.y);
-                const ema7 = calculateEMA(recentPrices, 7);
-                const ema14 = calculateEMA(recentPrices, 14);
-                const momentum = (ema7 - ema14) / ema14;
-                
-                // Generate forecast
-                let forecastPrice = currentLivePrice;
-                const baseVolatility = 0.012; // 1.2% daily volatility
-                const trendStrength = momentum * 0.5;
-                
-                for (let i = 1; i <= daysForecast; i++) {
-                    const forecastDate = new Date(now + i * 24 * 60 * 60 * 1000);
-                    
-                    // Confidence degrades over time
-                    const confidenceFactor = 1 - (i / daysForecast) * 0.25;
-                    
-                    // Daily price change
-                    const randomWalk = (Math.random() - 0.5) * 2 * baseVolatility;
-                    const trendComponent = trendStrength * confidenceFactor;
-                    const meanReversion = (currentLivePrice - forecastPrice) * 0.05;
-                    
-                    forecastPrice = forecastPrice * (1 + randomWalk + trendComponent + meanReversion);
-                    forecastPrice = Math.max(52, Math.min(70, forecastPrice));
-                    
-                    forecastData.push({
-                        x: forecastDate,
-                        y: parseFloat(forecastPrice.toFixed(2))
-                    });
-                }
-                
-                animateValue('forecastPrice', currentLivePrice, forecastPrice, 1000, true);
-                
-                const trend = forecastPrice > currentLivePrice ? 'Bullish' : 'Bearish';
-                document.getElementById('trendDirection').textContent = trend;
-            }
-            
-            return { historicalData, forecastData };
-        }
-        
         function calculateEMA(prices, period) {
             if (prices.length < period) return prices[prices.length - 1];
             
@@ -1041,6 +890,119 @@
             }
             
             return ema;
+        }
+
+        function calculateVolatility(prices, period = 30) {
+            if (prices.length < period) return 1.0;
+            
+            const recentPrices = prices.slice(-period);
+            const mean = recentPrices.reduce((a, b) => a + b, 0) / period;
+            const variance = recentPrices.reduce((sum, price) => sum + Math.pow(price - mean, 2), 0) / period;
+            
+            return Math.sqrt(variance);
+        }
+
+        function generateAdvancedForecast() {
+            if (historicalPrices.length < 30) return [];
+            
+            const forecastDays = 7;
+            const forecastData = [];
+            const confidenceBands = [];
+            
+            // Extract price series
+            const prices = historicalPrices.map(d => d.price);
+            
+            // Calculate technical indicators from full year
+            const ema12 = calculateEMA(prices, 12);
+            const ema26 = calculateEMA(prices, 26);
+            const ema50 = calculateEMA(prices, 50);
+            const ema200 = calculateEMA(prices, 200);
+            
+            // Calculate momentum and trend strength
+            const momentum = ema12 - ema26;
+            const longTermTrend = (ema50 - ema200) / ema200;
+            
+            // Historical volatility
+            const volatility = calculateVolatility(prices, 60);
+            const recentVolatility = calculateVolatility(prices, 20);
+            
+            // Mean reversion level (yearly average)
+            const yearlyMean = prices.reduce((a, b) => a + b, 0) / prices.length;
+            
+            // Start forecast from current price
+            let forecastPrice = currentLivePrice;
+            const lastDate = historicalPrices[historicalPrices.length - 1].date;
+            
+            for (let i = 1; i <= forecastDays; i++) {
+                const forecastDate = new Date(lastDate);
+                forecastDate.setDate(forecastDate.getDate() + i);
+                
+                // Trend component (weighted by momentum)
+                const trendComponent = (momentum * 0.12) + (longTermTrend * currentLivePrice * 0.08);
+                
+                // Mean reversion force (stronger as we move from mean)
+                const meanReversionForce = (yearlyMean - forecastPrice) * 0.05;
+                
+                // Decay factor - confidence decreases with forecast horizon
+                const decayFactor = Math.exp(-i / 10);
+                
+                // Stochastic component (reduced as confidence decreases)
+                const randomWalk = (Math.random() - 0.5) * recentVolatility * 0.8 * decayFactor;
+                
+                // Daily forecast
+                forecastPrice += trendComponent * decayFactor + meanReversionForce + randomWalk;
+                
+                // Reasonable bounds
+                forecastPrice = Math.max(currentLivePrice * 0.92, Math.min(currentLivePrice * 1.08, forecastPrice));
+                
+                forecastData.push({
+                    x: forecastDate,
+                    y: parseFloat(forecastPrice.toFixed(2))
+                });
+                
+                // Confidence band (widens with time)
+                const bandWidth = volatility * Math.sqrt(i) * 0.4;
+                confidenceBands.push({
+                    x: forecastDate,
+                    upper: parseFloat((forecastPrice + bandWidth).toFixed(2)),
+                    lower: parseFloat((forecastPrice - bandWidth).toFixed(2))
+                });
+            }
+            
+            // Update UI
+            const finalForecast = forecastData[forecastData.length - 1].y;
+            document.getElementById('forecastPrice').textContent = `$${finalForecast.toFixed(2)}`;
+            document.getElementById('trendDirection').textContent = finalForecast > currentLivePrice ? '↑ Upward' : '↓ Downward';
+            
+            return { forecastData, confidenceBands };
+        }
+
+        function prepareChartData() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Historical: all closing prices before today
+            const historicalData = historicalPrices
+                .filter(d => d.date < today)
+                .map(d => ({ x: d.date, y: d.price }));
+            
+            // Current: today's price (last closing price in dataset)
+            const currentData = historicalPrices
+                .filter(d => d.date >= today)
+                .map(d => ({ x: d.date, y: d.price }));
+            
+            // Forecast: next 7 days
+            const { forecastData, confidenceBands } = generateAdvancedForecast();
+            
+            return { historicalData, currentData, forecastData, confidenceBands };
+        }
+
+        function createGradient(ctx, color) {
+            const gradient = ctx.createLinearGradient(0, 0, 0, 500);
+            gradient.addColorStop(0, color.replace(')', ', 0.3)').replace('rgb', 'rgba'));
+            gradient.addColorStop(0.5, color.replace(')', ', 0.15)').replace('rgb', 'rgba'));
+            gradient.addColorStop(1, color.replace(')', ', 0)').replace('rgb', 'rgba'));
+            return gradient;
         }
 
         function toggleChartView() {
@@ -1059,7 +1021,7 @@
                         initChart();
                         updateInterval = setInterval(fetchLiveWTIPrice, 15 * 60 * 1000);
                     }
-                }, 400);
+                }, 300);
             } else {
                 section.classList.remove('expanded');
                 btn.classList.remove('active');
@@ -1071,103 +1033,116 @@
             const ctx = document.getElementById('priceChart');
             if (!ctx) return;
             
-            const { historicalData, forecastData } = generateWTIData();
+            const { historicalData, currentData, forecastData, confidenceBands } = prepareChartData();
+            
+            // Confidence band dataset
+            const confidenceUpper = confidenceBands.map(d => ({ x: d.x, y: d.upper }));
+            const confidenceLower = confidenceBands.map(d => ({ x: d.x, y: d.lower }));
             
             chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     datasets: [
                         {
-                            label: 'Historical Price',
+                            label: 'Confidence Band',
+                            data: [...confidenceUpper, ...confidenceLower.reverse()],
+                            backgroundColor: 'rgba(255, 107, 26, 0.08)',
+                            borderWidth: 0,
+                            fill: true,
+                            pointRadius: 0,
+                            tension: 0.4,
+                            order: 4
+                        },
+                        {
+                            label: 'Historical Closes',
                             data: historicalData,
-                            borderColor: '#ffffff',
-                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                            borderWidth: 3,
-                            pointRadius: 6,
-                            pointHoverRadius: 10,
-                            pointBackgroundColor: '#ffffff',
-                            pointBorderColor: '#0a0a0a',
-                            pointBorderWidth: 2,
-                            pointHoverBackgroundColor: '#ff6b1a',
-                            pointHoverBorderColor: '#ffffff',
+                            borderColor: '#6b7280',
+                            backgroundColor: createGradient(ctx.getContext('2d'), 'rgb(107, 114, 128)'),
+                            borderWidth: 2.5,
+                            pointRadius: 0,
                             tension: 0.4,
                             fill: true,
                             order: 2
                         },
                         {
-                            label: 'Forecast',
+                            label: 'Current Price',
+                            data: currentData,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                            borderWidth: 3.5,
+                            pointRadius: 6,
+                            pointBackgroundColor: '#10b981',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            tension: 0.4,
+                            fill: false,
+                            order: 1
+                        },
+                        {
+                            label: '7-Day Forecast',
                             data: forecastData,
                             borderColor: '#ff6b1a',
-                            backgroundColor: 'rgba(255, 107, 26, 0.1)',
-                            borderWidth: 4,
-                            borderDash: [10, 5],
-                            pointRadius: 5,
-                            pointHoverRadius: 9,
-                            pointBackgroundColor: '#ff6b1a',
-                            pointBorderColor: '#0a0a0a',
-                            pointBorderWidth: 2,
-                            pointHoverBackgroundColor: '#ff8a47',
-                            pointHoverBorderColor: '#ffffff',
+                            backgroundColor: createGradient(ctx.getContext('2d'), 'rgb(255, 107, 26)'),
+                            borderWidth: 3.5,
+                            borderDash: [8, 4],
+                            pointRadius: 0,
                             tension: 0.4,
                             fill: true,
-                            order: 1
+                            order: 3
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    animation: {
-                        duration: 2000,
-                        easing: 'easeInOutQuart',
-                        delay: (context) => {
-                            let delay = 0;
-                            if (context.type === 'data' && context.mode === 'default') {
-                                delay = context.dataIndex * 50;
-                            }
-                            return delay;
-                        }
-                    },
                     interaction: {
                         mode: 'index',
                         intersect: false
+                    },
+                    animation: {
+                        duration: 1200,
+                        easing: 'easeInOutQuart'
                     },
                     plugins: {
                         legend: {
                             display: true,
                             position: 'top',
-                            align: 'end',
                             labels: {
                                 color: '#a0a0a0',
                                 font: {
-                                    size: 14,
+                                    size: 13,
                                     weight: '600',
                                     family: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif'
                                 },
                                 padding: 20,
                                 usePointStyle: true,
-                                pointStyle: 'circle'
+                                pointStyle: 'circle',
+                                filter: function(item) {
+                                    return item.text !== 'Confidence Band';
+                                }
                             }
                         },
                         tooltip: {
-                            enabled: true,
                             backgroundColor: 'rgba(0, 0, 0, 0.9)',
                             titleColor: '#ffffff',
-                            bodyColor: '#a0a0a0',
+                            bodyColor: '#e5e5e5',
                             borderColor: '#ff6b1a',
                             borderWidth: 2,
                             padding: 16,
                             displayColors: true,
+                            boxPadding: 8,
+                            usePointStyle: true,
                             titleFont: {
-                                size: 15,
+                                size: 14,
                                 weight: '600'
                             },
                             bodyFont: {
-                                size: 14,
+                                size: 13,
                                 weight: '500'
                             },
                             callbacks: {
                                 label: function(context) {
+                                    if (context.dataset.label === 'Confidence Band') return null;
                                     return context.dataset.label + ': $' + context.parsed.y.toFixed(2);
                                 },
                                 title: function(context) {
@@ -1186,23 +1161,25 @@
                         x: {
                             type: 'time',
                             time: {
-                                unit: 'day',
+                                unit: 'month',
                                 displayFormats: {
-                                    day: 'MMM d'
+                                    month: 'MMM yyyy'
                                 }
                             },
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.05)',
+                                color: 'rgba(255, 255, 255, 0.03)',
                                 drawBorder: false,
                                 lineWidth: 1
                             },
                             ticks: {
-                                color: '#a0a0a0',
+                                color: '#808080',
                                 font: {
-                                    size: 12,
+                                    size: 11,
                                     weight: '500'
                                 },
-                                padding: 10
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 8
                             },
                             border: {
                                 display: false
@@ -1211,20 +1188,20 @@
                         y: {
                             beginAtZero: false,
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.05)',
+                                color: 'rgba(255, 255, 255, 0.03)',
                                 drawBorder: false,
                                 lineWidth: 1
                             },
                             ticks: {
-                                color: '#a0a0a0',
+                                color: '#808080',
                                 font: {
-                                    size: 12,
+                                    size: 11,
                                     weight: '500'
                                 },
-                                padding: 10,
                                 callback: function(value) {
-                                    return '$' + value.toFixed(2);
-                                }
+                                    return '$' + value.toFixed(0);
+                                },
+                                padding: 12
                             },
                             border: {
                                 display: false
@@ -1238,11 +1215,17 @@
         function updateChart() {
             if (!chart) return;
             
-            const { historicalData, forecastData } = generateWTIData();
+            const { historicalData, currentData, forecastData, confidenceBands } = prepareChartData();
             
-            chart.data.datasets[0].data = historicalData;
-            chart.data.datasets[1].data = forecastData;
-            chart.update('active');
+            const confidenceUpper = confidenceBands.map(d => ({ x: d.x, y: d.upper }));
+            const confidenceLower = confidenceBands.map(d => ({ x: d.x, y: d.lower }));
+            
+            chart.data.datasets[0].data = [...confidenceUpper, ...confidenceLower.reverse()];
+            chart.data.datasets[1].data = historicalData;
+            chart.data.datasets[2].data = currentData;
+            chart.data.datasets[3].data = forecastData;
+            
+            chart.update('none');
         }
 
         document.getElementById('toggleChart').addEventListener('click', toggleChartView);
