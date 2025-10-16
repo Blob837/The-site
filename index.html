@@ -452,6 +452,46 @@
             margin-bottom: 15px;
         }
 
+        .chart-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .time-range-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .range-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .range-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--orange);
+            color: var(--text);
+        }
+
+        .range-btn.active {
+            background: var(--orange);
+            color: var(--black);
+            border-color: var(--orange);
+        }
+
         .live-indicator {
             display: inline-flex;
             align-items: center;
@@ -743,9 +783,18 @@
                     <div class="chart-header">
                         <h2 class="chart-title">WTI Crude Oil Price Forecast</h2>
                         <p class="chart-subtitle">Advanced predictive modeling using exponential smoothing, volatility analysis, and trend momentum</p>
-                        <div class="live-indicator">
-                            <span class="live-dot"></span>
-                            <span>LIVE DATA • Updates every 15 minutes</span>
+                        <div class="chart-controls">
+                            <div class="live-indicator">
+                                <span class="live-dot"></span>
+                                <span>LIVE DATA • Updates every 15 minutes</span>
+                            </div>
+                            <div class="time-range-buttons">
+                                <button class="range-btn" data-range="week">Week</button>
+                                <button class="range-btn active" data-range="mtd">MTD</button>
+                                <button class="range-btn" data-range="3months">3 Months</button>
+                                <button class="range-btn" data-range="6months">6 Months</button>
+                                <button class="range-btn" data-range="ytd">YTD</button>
+                            </div>
                         </div>
                     </div>
                     
@@ -759,7 +808,7 @@
                             <div class="info-value" id="currentPrice">Loading...</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">7-Day Forecast</div>
+                            <div class="info-label">30-Day Forecast</div>
                             <div class="info-value" id="forecastPrice">--</div>
                         </div>
                         <div class="info-item">
@@ -793,6 +842,7 @@
         let currentLivePrice = null;
         let historicalPrices = [];
         let updateInterval = null;
+        let selectedRange = 'mtd'; // Default to MTD
 
         // Fetch full year of WTI daily closing prices
         async function fetchLiveWTIPrice() {
@@ -879,6 +929,37 @@
             document.getElementById('currentPrice').textContent = `$${currentLivePrice.toFixed(2)}`;
         }
 
+        function getDateRangeStart(range) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            switch(range) {
+                case 'week':
+                    const weekStart = new Date(today);
+                    weekStart.setDate(today.getDate() - 7);
+                    return weekStart;
+                    
+                case 'mtd':
+                    return new Date(today.getFullYear(), today.getMonth(), 1);
+                    
+                case '3months':
+                    const threeMonths = new Date(today);
+                    threeMonths.setMonth(today.getMonth() - 3);
+                    return threeMonths;
+                    
+                case '6months':
+                    const sixMonths = new Date(today);
+                    sixMonths.setMonth(today.getMonth() - 6);
+                    return sixMonths;
+                    
+                case 'ytd':
+                    return new Date(today.getFullYear(), 0, 1);
+                    
+                default:
+                    return new Date(today.getFullYear(), today.getMonth(), 1);
+            }
+        }
+
         function calculateEMA(prices, period) {
             if (prices.length < period) return prices[prices.length - 1];
             
@@ -905,7 +986,7 @@
         function generateAdvancedForecast() {
             if (historicalPrices.length < 30) return [];
             
-            const forecastDays = 7;
+            const forecastDays = 30; // Extended to 30 days
             const forecastData = [];
             const confidenceBands = [];
             
@@ -944,7 +1025,7 @@
                 const meanReversionForce = (yearlyMean - forecastPrice) * 0.05;
                 
                 // Decay factor - confidence decreases with forecast horizon
-                const decayFactor = Math.exp(-i / 10);
+                const decayFactor = Math.exp(-i / 15); // Adjusted for 30-day horizon
                 
                 // Stochastic component (reduced as confidence decreases)
                 const randomWalk = (Math.random() - 0.5) * recentVolatility * 0.8 * decayFactor;
@@ -952,8 +1033,8 @@
                 // Daily forecast
                 forecastPrice += trendComponent * decayFactor + meanReversionForce + randomWalk;
                 
-                // Reasonable bounds
-                forecastPrice = Math.max(currentLivePrice * 0.92, Math.min(currentLivePrice * 1.08, forecastPrice));
+                // Reasonable bounds (slightly wider for longer horizon)
+                forecastPrice = Math.max(currentLivePrice * 0.88, Math.min(currentLivePrice * 1.12, forecastPrice));
                 
                 forecastData.push({
                     x: forecastDate,
@@ -961,7 +1042,7 @@
                 });
                 
                 // Confidence band (widens with time)
-                const bandWidth = volatility * Math.sqrt(i) * 0.4;
+                const bandWidth = volatility * Math.sqrt(i) * 0.5;
                 confidenceBands.push({
                     x: forecastDate,
                     upper: parseFloat((forecastPrice + bandWidth).toFixed(2)),
@@ -981,17 +1062,21 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            // Historical: all closing prices before today
-            const historicalData = historicalPrices
-                .filter(d => d.date < today)
-                .map(d => ({ x: d.date, y: d.price }));
+            // Get the start date based on selected range
+            const rangeStart = getDateRangeStart(selectedRange);
+            
+            // Filter historical data by selected range
+            const filteredHistorical = historicalPrices.filter(d => d.date >= rangeStart && d.date < today);
+            
+            // Historical: all closing prices before today within range
+            const historicalData = filteredHistorical.map(d => ({ x: d.date, y: d.price }));
             
             // Current: today's price (last closing price in dataset)
             const currentData = historicalPrices
                 .filter(d => d.date >= today)
                 .map(d => ({ x: d.date, y: d.price }));
             
-            // Forecast: next 7 days
+            // Forecast: always show next 30 days regardless of range
             const { forecastData, confidenceBands } = generateAdvancedForecast();
             
             return { historicalData, currentData, forecastData, confidenceBands };
@@ -1003,6 +1088,24 @@
             gradient.addColorStop(0.5, color.replace(')', ', 0.15)').replace('rgb', 'rgba'));
             gradient.addColorStop(1, color.replace(')', ', 0)').replace('rgb', 'rgba'));
             return gradient;
+        }
+
+        function setActiveRange(range) {
+            selectedRange = range;
+            
+            // Update button states
+            document.querySelectorAll('.range-btn').forEach(btn => {
+                if (btn.dataset.range === range) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Update chart
+            if (chart) {
+                updateChart();
+            }
         }
 
         function toggleChartView() {
@@ -1079,7 +1182,7 @@
                             order: 1
                         },
                         {
-                            label: '7-Day Forecast',
+                            label: '30-Day Forecast',
                             data: forecastData,
                             borderColor: '#ff6b1a',
                             backgroundColor: createGradient(ctx.getContext('2d'), 'rgb(255, 107, 26)'),
@@ -1161,8 +1264,10 @@
                         x: {
                             type: 'time',
                             time: {
-                                unit: 'month',
+                                unit: 'day',
                                 displayFormats: {
+                                    day: 'MMM d',
+                                    week: 'MMM d',
                                     month: 'MMM yyyy'
                                 }
                             },
@@ -1179,7 +1284,7 @@
                                 },
                                 maxRotation: 0,
                                 autoSkip: true,
-                                maxTicksLimit: 8
+                                maxTicksLimit: 10
                             },
                             border: {
                                 display: false
@@ -1225,8 +1330,17 @@
             chart.data.datasets[2].data = currentData;
             chart.data.datasets[3].data = forecastData;
             
-            chart.update('none');
+            chart.update('active');
         }
+
+        // Initialize range buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.range-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    setActiveRange(btn.dataset.range);
+                });
+            });
+        });
 
         document.getElementById('toggleChart').addEventListener('click', toggleChartView);
         
