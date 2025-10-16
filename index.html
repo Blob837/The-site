@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Praeco - Stop bleeding money on manual processes. Enterprise automation and BI for midstream crude operations.">
+    <meta name="description" content="Praeco - Enterprise automation and business intelligence for midstream operations">
     <title>Praeco | Midstream Operations Intelligence</title>
     <style>
         * {
@@ -13,27 +13,27 @@
         }
 
         :root {
-            --oil-black: #0d0d0d;
-            --steel-gray: #1a1a1a;
-            --pipeline-orange: #ff6b1a;
-            --terminal-blue: #0ea5e9;
-            --text-primary: #e8e8e8;
-            --text-secondary: #a8a8a8;
+            --primary: #ffffff;
+            --secondary: #0a0a0a;
+            --accent: #ff6b1a;
+            --accent-blue: #0ea5e9;
+            --text: #e8e8e8;
+            --text-light: #a8a8a8;
             --text-muted: #757575;
-            --border-dark: #2a2a2a;
-            --error-red: #ef4444;
-            --success-green: #10b981;
+            --border: #2a2a2a;
+            --bg-card: #141414;
+            --bg-section: #0d0d0d;
         }
 
         body {
-            font-family: 'SF Mono', 'Roboto Mono', 'Consolas', monospace;
-            background: var(--oil-black);
-            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            background: var(--secondary);
+            color: var(--text);
             line-height: 1.6;
-            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Industrial Grid Background */
+        /* Grid Background */
         .grid-overlay {
             position: fixed;
             top: 0;
@@ -41,376 +41,276 @@
             width: 100%;
             height: 100%;
             background-image: 
-                repeating-linear-gradient(0deg, transparent, transparent 49px, var(--border-dark) 49px, var(--border-dark) 50px),
-                repeating-linear-gradient(90deg, transparent, transparent 49px, var(--border-dark) 49px, var(--border-dark) 50px);
+                repeating-linear-gradient(0deg, transparent, transparent 49px, var(--border) 49px, var(--border) 50px),
+                repeating-linear-gradient(90deg, transparent, transparent 49px, var(--border) 49px, var(--border) 50px);
             opacity: 0.3;
             pointer-events: none;
             z-index: 0;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 40px;
             position: relative;
             z-index: 1;
         }
 
-        /* Hero Section - Problem First */
-        .hero {
-            padding: 60px 0 40px;
-            text-align: left;
+        /* Navigation */
+        nav {
+            padding: 30px 0;
+            border-bottom: 1px solid var(--border);
+            background: var(--secondary);
+            position: relative;
+            z-index: 10;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .logo {
-            width: 180px;
-            margin-bottom: 60px;
+            width: 140px;
             filter: brightness(1.2);
         }
 
-        .problem-statement {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 900;
+        .nav-cta {
+            background: var(--accent);
+            color: var(--secondary);
+            padding: 12px 28px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-cta:hover {
+            background: #ff8a47;
+            transform: translateY(-1px);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 100px 0 120px;
+            text-align: center;
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 700;
             line-height: 1.1;
             margin-bottom: 24px;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.03em;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .problem-statement .highlight {
-            color: var(--pipeline-orange);
-            position: relative;
-            display: inline-block;
-        }
-
-        .subheading {
-            font-size: clamp(1rem, 2vw, 1.3rem);
-            color: var(--text-secondary);
-            margin-bottom: 48px;
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto 48px;
             font-weight: 400;
-            max-width: 800px;
         }
 
-        /* Cost Calculator Section */
-        .cost-panel {
-            background: linear-gradient(135deg, rgba(255, 107, 26, 0.1) 0%, rgba(239, 68, 68, 0.1) 100%);
-            border: 2px solid var(--pipeline-orange);
-            border-radius: 4px;
-            padding: 40px;
-            margin: 60px 0;
-            position: relative;
-            overflow: hidden;
+        .highlight {
+            color: var(--accent);
         }
 
-        .cost-panel::before {
-            content: 'OVERHEAD ANALYSIS';
-            position: absolute;
-            top: -10px;
-            left: 20px;
-            background: var(--oil-black);
-            padding: 0 12px;
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            color: var(--pipeline-orange);
-            font-weight: 700;
-        }
-
-        .cost-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 32px;
-            margin-top: 20px;
-        }
-
-        .cost-item h3 {
-            font-size: 2.5rem;
-            color: var(--error-red);
-            margin-bottom: 8px;
-            font-weight: 900;
-        }
-
-        .cost-item p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .cost-item .metric {
-            color: var(--text-secondary);
-            font-weight: 600;
-            display: block;
-            margin-top: 4px;
-        }
-
-        /* Solutions Grid - Pipeline Flow Design */
-        .solutions-section {
-            margin: 100px 0;
-        }
-
-        .section-label {
-            font-size: 0.75rem;
-            letter-spacing: 3px;
-            color: var(--pipeline-orange);
-            margin-bottom: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .section-title {
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
-            margin-bottom: 60px;
-            font-weight: 700;
-        }
-
-        .pipeline-flow {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            margin: 40px 0;
-        }
-
-        .flow-stage {
-            background: var(--steel-gray);
-            border-left: 4px solid var(--pipeline-orange);
-            padding: 32px;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .flow-stage:hover {
-            background: rgba(255, 107, 26, 0.05);
-            border-left-width: 8px;
-            transform: translateX(8px);
-        }
-
-        .flow-stage::before {
-            content: attr(data-stage);
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            color: var(--pipeline-orange);
-            font-weight: 700;
-        }
-
-        .flow-stage h3 {
-            font-size: 1.4rem;
-            margin: 32px 0 12px;
-            font-weight: 700;
-        }
-
-        .flow-stage p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.7;
-        }
-
-        .flow-metrics {
-            display: flex;
-            gap: 24px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .metric-badge {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid var(--success-green);
-            padding: 8px 16px;
-            border-radius: 3px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--success-green);
-            letter-spacing: 1px;
-        }
-
-        /* Stats Dashboard */
-        .stats-dashboard {
-            background: var(--steel-gray);
-            border: 2px solid var(--border-dark);
-            border-radius: 4px;
-            padding: 50px 40px;
-            margin: 80px 0;
-            position: relative;
-        }
-
-        .stats-dashboard::before {
-            content: 'OPERATIONAL METRICS';
-            position: absolute;
-            top: -10px;
-            left: 40px;
-            background: var(--oil-black);
-            padding: 0 12px;
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            color: var(--terminal-blue);
-            font-weight: 700;
-        }
-
-        .stats-grid {
+        /* Stats Bar */
+        .stats-bar {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
+            gap: 60px;
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
         }
 
-        .stat-block {
+        .stat {
             text-align: center;
-            padding: 20px;
-            border: 1px solid var(--border-dark);
-            background: rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .stat-block:hover {
-            border-color: var(--pipeline-orange);
-            background: rgba(255, 107, 26, 0.05);
         }
 
         .stat-number {
             font-size: 3rem;
-            font-weight: 900;
-            color: var(--pipeline-orange);
+            font-weight: 700;
+            color: var(--accent);
             line-height: 1;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Services Section */
+        .services {
+            padding: 120px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 80px;
+        }
+
+        .section-label {
             font-size: 0.8rem;
-            color: var(--text-muted);
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .section-description {
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+        }
+
+        .service-card {
+            padding: 48px 36px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-card);
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 12px 40px rgba(255, 107, 26, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .service-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 24px;
+        }
+
+        .service-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .service-card h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .service-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.7;
         }
 
         /* Case Studies */
-        .case-studies {
-            margin: 100px 0;
+        .cases {
+            padding: 120px 0;
+            background: var(--bg-section);
         }
 
-        .case-card {
-            background: var(--steel-gray);
-            border-left: 4px solid var(--terminal-blue);
-            padding: 40px;
-            margin-bottom: 24px;
-            position: relative;
-        }
-
-        .case-card::before {
-            content: 'DEPLOYMENT';
-            position: absolute;
-            top: 16px;
-            right: 20px;
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            color: var(--terminal-blue);
-            font-weight: 700;
-        }
-
-        .case-card h3 {
-            font-size: 1.6rem;
-            margin-bottom: 16px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .case-card .description {
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-            line-height: 1.7;
-            font-size: 0.95rem;
-        }
-
-        .case-results {
-            display: flex;
-            gap: 32px;
-            flex-wrap: wrap;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-dark);
-        }
-
-        .result-item {
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .result-value {
-            font-size: 1.8rem;
-            color: var(--success-green);
-            font-weight: 900;
-            margin-bottom: 4px;
-        }
-
-        .result-desc {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Tech Stack */
-        .tech-section {
-            margin: 100px 0;
-            padding: 60px 0;
-            border-top: 1px solid var(--border-dark);
-            border-bottom: 1px solid var(--border-dark);
-        }
-
-        .tech-grid {
+        .case-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 32px;
-            margin-top: 40px;
         }
 
-        .tech-category h4 {
-            font-size: 0.75rem;
-            color: var(--pipeline-orange);
-            letter-spacing: 2px;
+        .case {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 48px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .case-content h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
             margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        .case-content p {
+            color: var(--text-light);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .case-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 24px;
+            background: var(--bg-section);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
             font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .tech-category ul {
-            list-style: none;
-        }
-
-        .tech-category li {
-            color: var(--text-muted);
+            color: var(--accent);
+            line-height: 1;
             margin-bottom: 8px;
-            font-size: 0.9rem;
-            padding-left: 16px;
-            position: relative;
         }
 
-        .tech-category li::before {
-            content: '▸';
-            position: absolute;
-            left: 0;
-            color: var(--pipeline-orange);
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
         }
 
         /* CTA Section */
-        .cta-section {
-            background: linear-gradient(135deg, var(--steel-gray) 0%, rgba(255, 107, 26, 0.05) 100%);
-            border: 2px solid var(--pipeline-orange);
-            border-radius: 4px;
-            padding: 60px 40px;
-            margin: 100px 0 60px;
+        .cta {
+            padding: 120px 0;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
             text-align: center;
         }
 
-        .cta-section h2 {
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
-            margin-bottom: 20px;
-            font-weight: 900;
+        .cta h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 24px;
+            line-height: 1.2;
         }
 
-        .cta-section p {
-            color: var(--text-secondary);
-            margin-bottom: 40px;
-            font-size: 1rem;
+        .cta p {
+            font-size: 1.2rem;
+            color: var(--text-light);
             max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto 48px;
         }
 
         .cta-buttons {
@@ -421,383 +321,336 @@
         }
 
         .btn-primary {
-            background: var(--pipeline-orange);
-            color: white;
-            padding: 18px 36px;
+            background: var(--accent);
+            color: var(--secondary);
+            padding: 16px 40px;
             text-decoration: none;
-            font-weight: 700;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 2px solid var(--pipeline-orange);
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 8px;
             transition: all 0.2s ease;
             display: inline-block;
         }
 
         .btn-primary:hover {
-            background: transparent;
-            color: var(--pipeline-orange);
+            background: #ff8a47;
             transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 107, 26, 0.4);
         }
 
         .btn-secondary {
             background: transparent;
-            color: var(--text-primary);
-            padding: 18px 36px;
+            color: var(--text);
+            padding: 16px 40px;
             text-decoration: none;
-            font-weight: 700;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 2px solid var(--border-dark);
+            font-weight: 600;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
             transition: all 0.2s ease;
             display: inline-block;
         }
 
         .btn-secondary:hover {
-            border-color: var(--text-primary);
+            border-color: var(--accent);
+            background: rgba(255, 107, 26, 0.1);
             transform: translateY(-2px);
         }
 
         /* Footer */
         footer {
-            padding: 40px 0;
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
             text-align: center;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            border-top: 1px solid var(--border-dark);
         }
 
         footer p {
-            margin-bottom: 8px;
+            color: var(--text-light);
+            font-size: 0.9rem;
         }
 
         .footer-location {
-            color: var(--pipeline-orange);
+            color: var(--accent);
             font-weight: 600;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+
             .hero {
-                padding: 40px 0 20px;
+                padding: 60px 0;
+                min-height: 100vh;
             }
 
-            .cost-panel {
-                padding: 30px 20px;
+            .stats-bar {
+                gap: 40px;
             }
 
-            .cost-grid {
-                gap: 24px;
+            .services, .cases, .cta {
+                padding: 80px 0;
             }
 
-            .flow-stage {
-                padding: 24px 16px;
+            .case {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 36px 24px;
             }
 
-            .stats-dashboard {
-                padding: 40px 20px;
+            .case-metrics {
+                grid-template-columns: 1fr;
             }
 
-            .case-card {
-                padding: 30px 20px;
-            }
-
-            .cta-section {
-                padding: 40px 20px;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .btn-primary, .btn-secondary {
-                width: 100%;
-                text-align: center;
+            .services-grid {
+                grid-template-columns: 1fr;
             }
         }
 
         /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .hero, .cost-panel, .flow-stage, .case-card, .cta-section {
-            animation: fadeInUp 0.6s ease-out;
+        .hero, .stats-bar, .service-card, .case {
+            animation: fadeIn 0.6s ease-out;
         }
-
-        .flow-stage:nth-child(2) { animation-delay: 0.1s; }
-        .flow-stage:nth-child(3) { animation-delay: 0.2s; }
-        .flow-stage:nth-child(4) { animation-delay: 0.3s; }
-        .flow-stage:nth-child(5) { animation-delay: 0.4s; }
     </style>
 </head>
 <body>
+    <!-- Grid Overlay -->
     <div class="grid-overlay"></div>
 
-    <div class="container">
-        <!-- Hero -->
-        <section class="hero">
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
             <img src="Logo.svg" alt="Praeco" class="logo">
-            
-            <h1 class="problem-statement">
-                Your midstream operation is <span class="highlight">bleeding $40K/month</span> on Excel spreadsheets and manual processes.
-            </h1>
-            
-            <p class="subheading">
-                Three years building automation systems for crude oil operations moving 75,000 bbl/day. 
-                I've eliminated 1,820+ hours of manual work annually and recovered millions in leakage. 
-                Time to stop the bleeding.
+            <a href="mailto:haydenf809@gmail.com" class="nav-cta">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <h1>Enterprise Automation for <span class="highlight">Midstream Operations</span></h1>
+            <p class="hero-subtitle">
+                Production-grade business intelligence and process automation delivering measurable ROI for crude oil transportation and terminal operations.
             </p>
-        </section>
+        </div>
+    </section>
 
-        <!-- Cost Analysis Panel -->
-        <section class="cost-panel">
-            <div class="cost-grid">
-                <div class="cost-item">
-                    <h3>35+ hrs</h3>
-                    <p>Wasted every week on manual ticket processing, reconciliation, and reporting.</p>
-                    <span class="metric">$48K annual labor cost</span>
-                </div>
-                <div class="cost-item">
-                    <h3>2-4%</h3>
-                    <p>Revenue leakage from volume discrepancies, billing errors, and measurement gaps.</p>
-                    <span class="metric">$10-20M exposure on $500M operation</span>
-                </div>
-                <div class="cost-item">
-                    <h3>18-24 hrs</h3>
-                    <p>Delayed decision-making waiting for consolidated reports and actionable data.</p>
-                    <span class="metric">Lost efficiency = lost money</span>
-                </div>
-            </div>
-        </section>
+    <!-- Stats Bar -->
+    <section class="stats-bar container">
+        <div class="stat">
+            <div class="stat-number">75K+</div>
+            <div class="stat-label">Barrels Per Day</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">$500M+</div>
+            <div class="stat-label">Revenue Supported</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">1,820+</div>
+            <div class="stat-label">Hours Automated</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">20%</div>
+            <div class="stat-label">Accuracy Improvement</div>
+        </div>
+    </section>
 
-        <!-- Solutions Pipeline -->
-        <section class="solutions-section">
-            <div class="section-label">PRODUCTION SYSTEMS</div>
-            <h2 class="section-title">Built to Stop Leaks, Not Create Them</h2>
-
-            <div class="pipeline-flow">
-                <div class="flow-stage" data-stage="01">
-                    <h3>Executive Intelligence Platforms</h3>
-                    <p>Real-time dashboards giving you eyes on 75,000+ bbl/day operations. Volume analytics, dispatch optimization, driver performance, terminal throughput — all in one place. Built for operators who need answers now, not next Tuesday.</p>
-                    <div class="flow-metrics">
-                        <span class="metric-badge">REAL-TIME VISIBILITY</span>
-                        <span class="metric-badge">KPI TRACKING</span>
-                        <span class="metric-badge">EXECUTIVE REPORTING</span>
-                    </div>
-                </div>
-
-                <div class="flow-stage" data-stage="02">
-                    <h3>Enterprise Process Automation</h3>
-                    <p>Custom PowerShell and Python scripts that do the grunt work while your team focuses on actual operations. Billing automation, ticket processing, driver comp, electronic DVIRs — 1,820+ hours recovered annually. Already running on $500M+ operations.</p>
-                    <div class="flow-metrics">
-                        <span class="metric-badge">35+ HRS/WEEK ELIMINATED</span>
-                        <span class="metric-badge">ZERO-TOUCH PROCESSING</span>
-                    </div>
-                </div>
-
-                <div class="flow-stage" data-stage="03">
-                    <h3>Volume Reconciliation Systems</h3>
-                    <p>Proactive error detection catching measurement discrepancies before they hit the P&L. Automated validation across terminal meters, truck meters, and custody transfer. 20% accuracy improvement, full audit trail, regulatory compliance baked in.</p>
-                    <div class="flow-metrics">
-                        <span class="metric-badge">20% ACCURACY GAIN</span>
-                        <span class="metric-badge">REVENUE PROTECTION</span>
-                    </div>
-                </div>
-
-                <div class="flow-stage" data-stage="04">
-                    <h3>API Integration Architecture</h3>
-                    <p>Seamless connections to FourKites, Project 44, MacroPoint, and your ERP. Premier Carrier designation achieved through superior tracking. Your systems talk to each other so your people don't have to translate.</p>
-                    <div class="flow-metrics">
-                        <span class="metric-badge">PREMIER CARRIER STATUS</span>
-                        <span class="metric-badge">REAL-TIME TRACKING</span>
-                    </div>
-                </div>
-
-                <div class="flow-stage" data-stage="05">
-                    <h3>GIS Route Optimization</h3>
-                    <p>Mapbox-powered pipeline and terminal visualization. Route planning that actually considers field conditions, not just Google Maps distances. 12% logistics efficiency improvement through better planning and real-world data.</p>
-                    <div class="flow-metrics">
-                        <span class="metric-badge">12% EFFICIENCY GAIN</span>
-                        <span class="metric-badge">FIELD-TESTED ROUTES</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Stats Dashboard -->
-        <section class="stats-dashboard">
-            <div class="stats-grid">
-                <div class="stat-block">
-                    <div class="stat-number">75K+</div>
-                    <div class="stat-label">Barrels/Day Managed</div>
-                </div>
-                <div class="stat-block">
-                    <div class="stat-number">$500M+</div>
-                    <div class="stat-label">Annual Revenue Supported</div>
-                </div>
-                <div class="stat-block">
-                    <div class="stat-number">1,820+</div>
-                    <div class="stat-label">Hours Automated Annually</div>
-                </div>
-                <div class="stat-block">
-                    <div class="stat-number">20%</div>
-                    <div class="stat-label">Volume Accuracy Improvement</div>
-                </div>
-                <div class="stat-block">
-                    <div class="stat-number">12%</div>
-                    <div class="stat-label">Logistics Efficiency Gain</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Case Studies -->
-        <section class="case-studies">
-            <div class="section-label">FIELD DEPLOYMENTS</div>
-            <h2 class="section-title">Problems Solved, Money Saved</h2>
-
-            <div class="case-card">
-                <h3>Terminal Volume Reconciliation</h3>
-                <p class="description">Manual spreadsheet reconciliation was missing 2-3% of discrepancies, burning 12 hours/week in staff time with no audit trail for regulatory compliance. Built an automated validation system that cross-references terminal meters, truck tickets, and custody transfer documents in real-time. Catches anomalies before they hit the books, maintains complete audit logs, and proactively flags measurement errors.</p>
-                <div class="case-results">
-                    <div class="result-item">
-                        <div class="result-value">20%</div>
-                        <div class="result-desc">Accuracy Improvement</div>
-                    </div>
-                    <div class="result-item">
-                        <div class="result-value">12 hrs/wk</div>
-                        <div class="result-desc">Time Recovered</div>
-                    </div>
-                    <div class="result-item">
-                        <div class="result-value">$480K</div>
-                        <div class="result-desc">Annual Loss Prevention</div>
-                    </div>
-                </div>
+    <!-- Services -->
+    <section class="services">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-label">Capabilities</div>
+                <h2 class="section-title">Complete Operational Intelligence</h2>
+                <p class="section-description">Integrated systems delivering visibility, automation, and control across your midstream operations.</p>
             </div>
 
-            <div class="case-card">
-                <h3>Driver Compensation Automation</h3>
-                <p class="description">Operations were burning 18-22 hours weekly processing 300+ driver tickets manually. Errors were causing payment disputes, delayed settlements, and driver turnover. Deployed automated ticket ingestion with rate calculation and direct payroll integration. Validation rules catch errors before payment, enabling same-day settlement and keeping drivers happy.</p>
-                <div class="case-results">
-                    <div class="result-item">
-                        <div class="result-value">20 hrs/wk</div>
-                        <div class="result-desc">Processing Time Eliminated</div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
                     </div>
-                    <div class="result-item">
-                        <div class="result-value">95%</div>
-                        <div class="result-desc">Error Reduction</div>
+                    <h3>Business Intelligence</h3>
+                    <p>Real-time dashboards and analytics providing comprehensive visibility across operations, volumes, and KPIs.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6m0 6v6m8.66-15.66l-4.24 4.24m-4.24 4.24l-4.24 4.24M23 12h-6m-6 0H1m20.66 8.66l-4.24-4.24m-4.24-4.24l-4.24-4.24"/>
+                        </svg>
                     </div>
-                    <div class="result-item">
-                        <div class="result-value">$52K</div>
-                        <div class="result-desc">Annual Labor Savings</div>
+                    <h3>Process Automation</h3>
+                    <p>Custom automation eliminating manual processing for billing, ticketing, compensation, and reporting workflows.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <polyline points="9 12 11 14 15 10"/>
+                        </svg>
+                    </div>
+                    <h3>Volume Reconciliation</h3>
+                    <p>Automated validation and error detection across terminal operations ensuring accuracy and compliance.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"/>
+                            <circle cx="6" cy="12" r="3"/>
+                            <circle cx="18" cy="19" r="3"/>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                        </svg>
+                    </div>
+                    <h3>API Integration</h3>
+                    <p>Seamless connectivity with logistics platforms, ERPs, and third-party systems for unified operations.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                    </div>
+                    <h3>Route Intelligence</h3>
+                    <p>GIS-powered visualization and optimization for pipeline networks and logistics planning.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <h3>Technical Partnership</h3>
+                    <p>Embedded development, team training, and ongoing operational support for sustained success.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Case Studies -->
+    <section class="cases">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-label">Proven Results</div>
+                <h2 class="section-title">Deployed Solutions</h2>
+            </div>
+
+            <div class="case-grid">
+                <div class="case">
+                    <div class="case-content">
+                        <h3>Terminal Volume Reconciliation</h3>
+                        <p>Automated validation system cross-referencing terminal meters, truck tickets, and custody transfer documents. Real-time anomaly detection with complete audit trails.</p>
+                    </div>
+                    <div class="case-metrics">
+                        <div class="metric">
+                            <div class="metric-value">20%</div>
+                            <div class="metric-label">Accuracy Gain</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">12 hrs</div>
+                            <div class="metric-label">Weekly Savings</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$480K</div>
+                            <div class="metric-label">Annual Value</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">100%</div>
+                            <div class="metric-label">Audit Ready</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="case">
+                    <div class="case-content">
+                        <h3>Driver Compensation Automation</h3>
+                        <p>End-to-end automation from ticket ingestion through payroll integration. Validation rules and same-day settlement capabilities.</p>
+                    </div>
+                    <div class="case-metrics">
+                        <div class="metric">
+                            <div class="metric-value">20 hrs</div>
+                            <div class="metric-label">Weekly Savings</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">95%</div>
+                            <div class="metric-label">Error Reduction</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$52K</div>
+                            <div class="metric-label">Annual Savings</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">300+</div>
+                            <div class="metric-label">Tickets/Week</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="case">
+                    <div class="case-content">
+                        <h3>Executive Operations Dashboard</h3>
+                        <p>Integrated BI platform with real-time KPI tracking, automated alerts, and executive drill-down capabilities across all operations.</p>
+                    </div>
+                    <div class="case-metrics">
+                        <div class="metric">
+                            <div class="metric-value">24-48 hrs</div>
+                            <div class="metric-label">Time Eliminated</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">15%</div>
+                            <div class="metric-label">Efficiency Gain</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">75K</div>
+                            <div class="metric-label">Barrels/Day</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">Live</div>
+                            <div class="metric-label">Data Visibility</div>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="case-card">
-                <h3>Executive Operations Dashboard</h3>
-                <p class="description">Management was flying blind, waiting 24-48 hours for consolidated reports with no real-time visibility into 75K bbl/day operations. Decision-making was reactive instead of proactive. Built an integrated BI platform pulling live data from dispatch, terminals, and field systems. Real-time KPI tracking with automated alerts and executive-level drill-down capabilities puts operations data at their fingertips.</p>
-                <div class="case-results">
-                    <div class="result-item">
-                        <div class="result-value">Real-Time</div>
-                        <div class="result-desc">Data Visibility</div>
-                    </div>
-                    <div class="result-item">
-                        <div class="result-value">24-48 hrs</div>
-                        <div class="result-desc">Decision Time Reduced</div>
-                    </div>
-                    <div class="result-item">
-                        <div class="result-value">15%</div>
-                        <div class="result-desc">Operational Efficiency Gain</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Tech Stack -->
-        <section class="tech-section">
-            <div class="section-label">TECHNICAL CAPABILITIES</div>
-            <h2 class="section-title">Production-Grade Tools</h2>
-            <div class="tech-grid">
-                <div class="tech-category">
-                    <h4>Automation & Scripting</h4>
-                    <ul>
-                        <li>PowerShell (Advanced)</li>
-                        <li>Python (Automation/Data)</li>
-                        <li>Bash/Shell Scripting</li>
-                        <li>Windows Task Scheduler</li>
-                        <li>Cron Jobs</li>
-                    </ul>
-                </div>
-                <div class="tech-category">
-                    <h4>Data & Analytics</h4>
-                    <ul>
-                        <li>Power BI (Enterprise)</li>
-                        <li>SQL Server / PostgreSQL</li>
-                        <li>Excel VBA (Legacy Integration)</li>
-                        <li>Data Warehousing</li>
-                        <li>ETL Pipelines</li>
-                    </ul>
-                </div>
-                <div class="tech-category">
-                    <h4>Integration & APIs</h4>
-                    <ul>
-                        <li>FourKites Integration</li>
-                        <li>Project 44 / MacroPoint</li>
-                        <li>RESTful APIs</li>
-                        <li>Webhook Systems</li>
-                        <li>ERP Connectors</li>
-                    </ul>
-                </div>
-                <div class="tech-category">
-                    <h4>Mapping & GIS</h4>
-                    <ul>
-                        <li>Mapbox GL JS</li>
-                        <li>GeoJSON / Spatial Data</li>
-                        <li>Route Optimization</li>
-                        <li>Pipeline Visualization</li>
-                    </ul>
-                </div>
-                <div class="tech-category">
-                    <h4>Development</h4>
-                    <ul>
-                        <li>C# / .NET</li>
-                        <li>JavaScript / Node.js</li>
-                        <li>Git Version Control</li>
-                        <li>CI/CD Pipelines</li>
-                        <li>Testing & Validation</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- CTA -->
-        <section class="cta-section">
-            <h2>Stop Bleeding Money. Start Running Tight.</h2>
-            <p>
-                I know what breaks, what works, and what it costs when things go sideways. Let's talk about fixing your operation.
-            </p>
+    <!-- CTA -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Transform Your Operations?</h2>
+            <p>Partner with proven expertise in midstream automation and business intelligence.</p>
             <div class="cta-buttons">
                 <a href="mailto:haydenf809@gmail.com" class="btn-primary">Schedule Consultation</a>
-                <a href="mailto:haydenf809@gmail.com" class="btn-secondary">Request Case Studies</a>
+                <a href="mailto:haydenf809@gmail.com" class="btn-secondary">View Case Studies</a>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Footer -->
-        <footer>
+    <!-- Footer -->
+    <footer>
+        <div class="container">
             <p>&copy; 2025 Praeco LLC</p>
             <p class="footer-location">Houston, Texas</p>
-            <p style="margin-top: 20px; opacity: 0.6;">Built for operators who measure in barrels, not vanity metrics.</p>
-        </footer>
-    </div>
+        </div>
+    </footer>
 </body>
 </html>
