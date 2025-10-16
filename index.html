@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="description" content="Praeco - Enterprise automation and business intelligence for midstream operations">
-    <title>Praeco | Midstream Operations Intelligence</title>
+    <meta name="description" content="Praeco - Operational intelligence for midstream operations">
+    <title>Praeco</title>
     <style>
         * {
             margin: 0;
@@ -15,16 +15,11 @@
         }
 
         :root {
-            --primary: #ffffff;
-            --secondary: #0a0a0a;
-            --accent: #ff6b1a;
-            --accent-blue: #0ea5e9;
+            --black: #0a0a0a;
+            --orange: #ff6b1a;
             --text: #e8e8e8;
-            --text-light: #a8a8a8;
-            --text-muted: #757575;
+            --text-dim: #666;
             --border: #2a2a2a;
-            --bg-card: #141414;
-            --bg-section: #0d0d0d;
         }
 
         html {
@@ -35,7 +30,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
-            background: var(--secondary);
+            background: var(--black);
             color: var(--text);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
@@ -45,7 +40,6 @@
             min-height: -webkit-fill-available;
         }
 
-        /* Grid Background */
         .grid-overlay {
             position: fixed;
             top: 0;
@@ -61,7 +55,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 0 40px;
             position: relative;
@@ -75,6 +69,7 @@
             height: 100vh;
             height: 100dvh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
@@ -83,304 +78,187 @@
             z-index: 10;
         }
 
-        .hero-content {
-            width: 100%;
-        }
-
         .logo {
             width: 240px;
             max-width: 80vw;
-            margin: 0 auto 60px;
+            margin-bottom: 80px;
             filter: brightness(1.2);
-            display: block;
         }
 
         h1 {
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-size: clamp(3rem, 8vw, 6rem);
             font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            letter-spacing: -0.03em;
-            max-width: 900px;
-            margin-left: auto;
-            margin-right: auto;
+            line-height: 1;
+            letter-spacing: -0.04em;
+            margin-bottom: 32px;
         }
 
-        .hero-subtitle {
-            font-size: clamp(1.1rem, 2vw, 1.4rem);
-            color: var(--text-light);
-            max-width: 700px;
-            margin: 0 auto 48px;
+        .accent {
+            color: var(--orange);
+        }
+
+        .hero-sub {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto 60px;
             font-weight: 400;
         }
 
-        .highlight {
-            color: var(--accent);
-        }
-
-        .cta-primary {
-            background: var(--accent);
-            color: var(--secondary);
-            padding: 18px 48px;
+        .cta {
+            background: var(--orange);
+            color: var(--black);
+            padding: 20px 50px;
             text-decoration: none;
-            font-weight: 600;
-            font-size: 1.05rem;
+            font-weight: 700;
+            font-size: 1.1rem;
             border-radius: 8px;
             transition: all 0.2s ease;
             display: inline-block;
         }
 
-        .cta-primary:hover {
+        .cta:hover {
             background: #ff8a47;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 32px rgba(255, 107, 26, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(255, 107, 26, 0.6);
         }
 
-        /* Stats Bar */
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 60px;
-            padding: 80px 0;
+        /* Stats */
+        .stats {
+            padding: 100px 0;
             border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
             position: relative;
             z-index: 10;
         }
 
-        .stat {
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 60px;
             text-align: center;
         }
 
-        .stat-number {
-            font-size: 3rem;
+        .stat-num {
+            font-size: 4rem;
             font-weight: 700;
-            color: var(--accent);
+            color: var(--orange);
             line-height: 1;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .stat-label {
-            font-size: 0.9rem;
-            color: var(--text-light);
+            font-size: 1rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        /* Services Section */
-        .services {
+        /* Capabilities */
+        .capabilities {
             padding: 120px 0;
             position: relative;
             z-index: 10;
         }
 
-        .section-header {
-            text-align: center;
-            max-width: 700px;
-            margin: 0 auto 80px;
-        }
-
-        .section-label {
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--accent);
-            margin-bottom: 16px;
-        }
-
         .section-title {
-            font-size: clamp(2rem, 4vw, 3rem);
+            font-size: clamp(2.5rem, 5vw, 4rem);
             font-weight: 700;
-            margin-bottom: 20px;
-            line-height: 1.2;
+            text-align: center;
+            margin-bottom: 80px;
+            letter-spacing: -0.02em;
         }
 
-        .section-description {
-            font-size: 1.1rem;
-            color: var(--text-light);
-        }
-
-        .services-grid {
+        .cap-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
         }
 
-        .service-card {
-            padding: 40px 32px;
+        .cap-card {
+            padding: 40px;
             border: 1px solid var(--border);
-            border-radius: 12px;
-            background: var(--bg-card);
+            border-radius: 16px;
+            background: rgba(20, 20, 20, 0.5);
+            backdrop-filter: blur(10px);
             transition: all 0.3s ease;
         }
 
-        .service-card:hover {
-            border-color: var(--accent);
-            box-shadow: 0 12px 40px rgba(255, 107, 26, 0.15);
-            transform: translateY(-4px);
+        .cap-card:hover {
+            border-color: var(--orange);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(255, 107, 26, 0.2);
         }
 
-        .service-icon {
-            width: 44px;
-            height: 44px;
+        .cap-icon {
+            width: 50px;
+            height: 50px;
             margin-bottom: 24px;
         }
 
-        .service-icon svg {
+        .cap-icon svg {
             width: 100%;
             height: 100%;
         }
 
-        .service-card h3 {
-            font-size: 1.3rem;
+        .cap-card h3 {
+            font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 12px;
-            color: var(--text);
         }
 
-        .service-card p {
-            color: var(--text-light);
-            font-size: 0.95rem;
-            line-height: 1.7;
+        .cap-card p {
+            color: var(--text-dim);
+            line-height: 1.6;
         }
 
-        /* Case Studies */
-        .cases {
+        /* Results */
+        .results {
             padding: 120px 0;
-            background: var(--bg-section);
-            position: relative;
-            z-index: 10;
-        }
-
-        .case-grid {
-            display: grid;
-            gap: 32px;
-        }
-
-        .case {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 48px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-        }
-
-        .case-content h3 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--text);
-        }
-
-        .case-content p {
-            color: var(--text-light);
-            font-size: 1rem;
-            line-height: 1.7;
-        }
-
-        .case-metrics {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-        }
-
-        .metric {
-            text-align: center;
-            padding: 24px;
-            background: var(--bg-section);
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        .metric-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--accent);
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-
-        .metric-label {
-            font-size: 0.85rem;
-            color: var(--text-light);
-        }
-
-        /* CTA Section */
-        .cta {
-            padding: 120px 0;
-            background: var(--bg-card);
             border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            color: var(--text);
+            position: relative;
+            z-index: 10;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 50px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .result-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--orange);
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .result-desc {
+            font-size: 1rem;
+            color: var(--text-dim);
+        }
+
+        /* Contact */
+        .contact {
+            padding: 140px 0;
             text-align: center;
             position: relative;
             z-index: 10;
         }
 
-        .cta h2 {
-            font-size: clamp(2rem, 4vw, 3rem);
+        .contact h2 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
             font-weight: 700;
-            margin-bottom: 24px;
-            line-height: 1.2;
-        }
-
-        .cta p {
-            font-size: 1.2rem;
-            color: var(--text-light);
-            max-width: 600px;
-            margin: 0 auto 48px;
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: var(--secondary);
-            padding: 16px 40px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            display: inline-block;
-        }
-
-        .btn-primary:hover {
-            background: #ff8a47;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(255, 107, 26, 0.4);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--text);
-            padding: 16px 40px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1rem;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            display: inline-block;
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--accent);
-            background: rgba(255, 107, 26, 0.1);
-            transform: translateY(-2px);
+            margin-bottom: 60px;
+            letter-spacing: -0.02em;
         }
 
         /* Footer */
         footer {
-            padding: 60px 0;
-            padding-bottom: max(60px, env(safe-area-inset-bottom));
+            padding: 50px 0;
+            padding-bottom: max(50px, env(safe-area-inset-bottom));
             border-top: 1px solid var(--border);
             text-align: center;
             position: relative;
@@ -388,16 +266,16 @@
         }
 
         footer p {
-            color: var(--text-light);
+            color: var(--text-dim);
             font-size: 0.9rem;
         }
 
-        .footer-location {
-            color: var(--accent);
+        .location {
+            color: var(--orange);
             font-weight: 600;
         }
 
-        /* Responsive */
+        /* Mobile */
         @media (max-width: 768px) {
             html {
                 height: -webkit-fill-available;
@@ -421,139 +299,118 @@
 
             .logo {
                 width: 180px;
-                margin-bottom: 40px;
+                margin-bottom: 60px;
             }
 
-            .stats-bar {
-                gap: 40px;
-                padding: 60px 0;
-            }
-
-            .services, .cases, .cta {
+            .stats {
                 padding: 80px 0;
             }
 
-            .case {
+            .stats-grid {
+                gap: 50px;
+            }
+
+            .capabilities, .results, .contact {
+                padding: 100px 0;
+            }
+
+            .cap-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .results-grid {
                 gap: 40px;
-                padding: 36px 24px;
-            }
-
-            .case-metrics {
-                grid-template-columns: 1fr;
-            }
-
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .btn-primary, .btn-secondary {
-                width: 100%;
-                text-align: center;
             }
         }
 
         /* Animations */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .hero-content, .stats-bar, .service-card, .case {
-            animation: fadeIn 0.6s ease-out;
+        .hero, .stats, .cap-card, .results {
+            animation: fadeIn 0.8s ease-out;
         }
     </style>
 </head>
 <body>
-    <!-- Grid Overlay -->
     <div class="grid-overlay"></div>
 
     <!-- Hero -->
     <section class="hero">
-        <div class="hero-content">
-            <img src="Logo.svg" alt="Praeco" class="logo">
-            
-            <h1>Stop Burning <span class="highlight">$40K/Month</span> on Manual Processes</h1>
-            
-            <p class="hero-subtitle">
-                Turn operational chaos into competitive advantage. Production-grade automation and intelligence for midstream crude operations.
-            </p>
-
-            <a href="mailto:info@praeco.com" class="cta-primary">Let's Talk Solutions</a>
-        </div>
+        <img src="Logo.svg" alt="Praeco" class="logo">
+        <h1>Midstream.<br><span class="accent">Automated.</span></h1>
+        <p class="hero-sub">Stop burning cash on broken processes. Operational intelligence and automation for crude operations.</p>
+        <a href="mailto:info@praeco.com" class="cta">Let's Talk</a>
     </section>
 
-    <!-- Stats Bar -->
-    <section class="stats-bar container">
-        <div class="stat">
-            <div class="stat-number">75K+</div>
-            <div class="stat-label">Barrels Per Day</div>
-        </div>
-        <div class="stat">
-            <div class="stat-number">$500M+</div>
-            <div class="stat-label">Revenue Supported</div>
-        </div>
-        <div class="stat">
-            <div class="stat-number">1,820+</div>
-            <div class="stat-label">Hours Automated</div>
-        </div>
-        <div class="stat">
-            <div class="stat-number">20%</div>
-            <div class="stat-label">Accuracy Improvement</div>
-        </div>
-    </section>
-
-    <!-- Services -->
-    <section class="services">
+    <!-- Stats -->
+    <section class="stats">
         <div class="container">
-            <div class="section-header">
-                <div class="section-label">What I Build</div>
-                <h2 class="section-title">Systems That Work Under Pressure</h2>
-                <p class="section-description">Three years solving real problems for midstream operations moving 75,000+ barrels daily.</p>
+            <div class="stats-grid">
+                <div>
+                    <div class="stat-num">75K+</div>
+                    <div class="stat-label">Barrels Daily</div>
+                </div>
+                <div>
+                    <div class="stat-num">$500M+</div>
+                    <div class="stat-label">Revenue Supported</div>
+                </div>
+                <div>
+                    <div class="stat-num">1,820</div>
+                    <div class="stat-label">Hours Saved Annually</div>
+                </div>
+                <div>
+                    <div class="stat-num">20%</div>
+                    <div class="stat-label">Accuracy Gain</div>
+                </div>
             </div>
+        </div>
+    </section>
 
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-icon">
+    <!-- Capabilities -->
+    <section class="capabilities">
+        <div class="container">
+            <h2 class="section-title">Built for <span class="accent">Production</span></h2>
+            
+            <div class="cap-grid">
+                <div class="cap-card">
+                    <div class="cap-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="20" x2="18" y2="10"/>
                             <line x1="12" y1="20" x2="12" y2="4"/>
                             <line x1="6" y1="20" x2="6" y2="14"/>
                         </svg>
                     </div>
-                    <h3>Business Intelligence</h3>
-                    <p>Real-time dashboards and analytics providing visibility across operations, volumes, and KPIs when you need it.</p>
+                    <h3>Real-Time Intelligence</h3>
+                    <p>Executive dashboards with live operational visibility across volumes, dispatch, and performance.</p>
                 </div>
 
-                <div class="service-card">
-                    <div class="service-icon">
+                <div class="cap-card">
+                    <div class="cap-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="3"/>
                             <path d="M12 1v6m0 6v6m8.66-15.66l-4.24 4.24m-4.24 4.24l-4.24 4.24M23 12h-6m-6 0H1m20.66 8.66l-4.24-4.24m-4.24-4.24l-4.24-4.24"/>
                         </svg>
                     </div>
-                    <h3>Process Automation</h3>
-                    <p>Custom automation eliminating manual work from billing, ticketing, compensation, and reporting workflows.</p>
+                    <h3>Full Automation</h3>
+                    <p>End-to-end workflow automation for billing, ticketing, compensation, and reconciliation.</p>
                 </div>
 
-                <div class="service-card">
-                    <div class="service-icon">
+                <div class="cap-card">
+                    <div class="cap-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                             <polyline points="9 12 11 14 15 10"/>
                         </svg>
                     </div>
-                    <h3>Volume Reconciliation</h3>
-                    <p>Automated validation and error detection ensuring accuracy and compliance across terminal operations.</p>
+                    <h3>Volume Validation</h3>
+                    <p>Automated reconciliation with real-time error detection and complete audit trails.</p>
                 </div>
 
-                <div class="service-card">
-                    <div class="service-icon">
+                <div class="cap-card">
+                    <div class="cap-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="18" cy="5" r="3"/>
                             <circle cx="6" cy="12" r="3"/>
@@ -562,23 +419,23 @@
                             <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
                         </svg>
                     </div>
-                    <h3>API Integration</h3>
-                    <p>Seamless connectivity with FourKites, Project 44, ERPs, and third-party systems for unified operations.</p>
+                    <h3>System Integration</h3>
+                    <p>Seamless connectivity with FourKites, Project 44, ERPs, and logistics platforms.</p>
                 </div>
 
-                <div class="service-card">
-                    <div class="service-icon">
+                <div class="cap-card">
+                    <div class="cap-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                             <circle cx="12" cy="10" r="3"/>
                         </svg>
                     </div>
-                    <h3>Route Intelligence</h3>
-                    <p>GIS-powered visualization and optimization for pipeline networks and logistics planning.</p>
+                    <h3>Route Optimization</h3>
+                    <p>GIS-powered logistics planning for pipeline networks and terminal operations.</p>
                 </div>
 
-                <div class="service-card">
-                    <div class="service-icon">
+                <div class="cap-card">
+                    <div class="cap-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
                             <polyline points="7.5 4.21 12 6.81 16.5 4.21"/>
@@ -589,108 +446,42 @@
                         </svg>
                     </div>
                     <h3>AI Forecasting</h3>
-                    <p>Predictive models for volume forecasting, demand patterns, and operational optimization using machine learning.</p>
+                    <p>Machine learning models for volume prediction and demand pattern analysis.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Case Studies -->
-    <section class="cases">
+    <!-- Results -->
+    <section class="results">
         <div class="container">
-            <div class="section-header">
-                <div class="section-label">Proven Results</div>
-                <h2 class="section-title">Problems Solved, Money Saved</h2>
-            </div>
-
-            <div class="case-grid">
-                <div class="case">
-                    <div class="case-content">
-                        <h3>Terminal Volume Reconciliation</h3>
-                        <p>Automated validation system cross-referencing terminal meters, truck tickets, and custody transfer documents. Real-time anomaly detection with complete audit trails.</p>
-                    </div>
-                    <div class="case-metrics">
-                        <div class="metric">
-                            <div class="metric-value">20%</div>
-                            <div class="metric-label">Accuracy Gain</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">12 hrs</div>
-                            <div class="metric-label">Weekly Savings</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">$480K</div>
-                            <div class="metric-label">Annual Value</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">100%</div>
-                            <div class="metric-label">Audit Ready</div>
-                        </div>
-                    </div>
+            <h2 class="section-title">Proven <span class="accent">Impact</span></h2>
+            <div class="results-grid">
+                <div>
+                    <div class="result-value">$480K</div>
+                    <div class="result-desc">Annual Loss Prevention</div>
                 </div>
-
-                <div class="case">
-                    <div class="case-content">
-                        <h3>Driver Compensation Automation</h3>
-                        <p>End-to-end automation from ticket ingestion through payroll integration. Validation rules and same-day settlement capabilities.</p>
-                    </div>
-                    <div class="case-metrics">
-                        <div class="metric">
-                            <div class="metric-value">20 hrs</div>
-                            <div class="metric-label">Weekly Savings</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">95%</div>
-                            <div class="metric-label">Error Reduction</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">$52K</div>
-                            <div class="metric-label">Annual Savings</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">300+</div>
-                            <div class="metric-label">Tickets/Week</div>
-                        </div>
-                    </div>
+                <div>
+                    <div class="result-value">95%</div>
+                    <div class="result-desc">Error Reduction</div>
                 </div>
-
-                <div class="case">
-                    <div class="case-content">
-                        <h3>Executive Operations Dashboard</h3>
-                        <p>Integrated BI platform with real-time KPI tracking, automated alerts, and executive drill-down capabilities across all operations.</p>
-                    </div>
-                    <div class="case-metrics">
-                        <div class="metric">
-                            <div class="metric-value">24-48 hrs</div>
-                            <div class="metric-label">Time Eliminated</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">15%</div>
-                            <div class="metric-label">Efficiency Gain</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">75K</div>
-                            <div class="metric-label">Barrels/Day</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">Live</div>
-                            <div class="metric-label">Data Visibility</div>
-                        </div>
-                    </div>
+                <div>
+                    <div class="result-value">35 hrs</div>
+                    <div class="result-desc">Weekly Time Savings</div>
+                </div>
+                <div>
+                    <div class="result-value">24-48 hrs</div>
+                    <div class="result-desc">Decision Time Cut</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA -->
-    <section class="cta">
+    <!-- Contact -->
+    <section class="contact">
         <div class="container">
-            <h2>Ready to Stop the Bleeding?</h2>
-            <p>Three decades building systems that work. Let's talk about fixing yours.</p>
-            <div class="cta-buttons">
-                <a href="mailto:info@praeco.com" class="btn-primary">Schedule Consultation</a>
-                <a href="mailto:info@praeco.com" class="btn-secondary">View Case Studies</a>
-            </div>
+            <h2>Ready to <span class="accent">Ship?</span></h2>
+            <a href="mailto:info@praeco.com" class="cta">info@praeco.com</a>
         </div>
     </section>
 
@@ -698,7 +489,7 @@
     <footer>
         <div class="container">
             <p>&copy; 2025 Praeco LLC</p>
-            <p class="footer-location">Houston, Texas</p>
+            <p class="location">Houston, Texas</p>
         </div>
     </footer>
 </body>
