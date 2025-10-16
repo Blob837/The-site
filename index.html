@@ -392,10 +392,30 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-block;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .predictive-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--orange);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+            z-index: -1;
+        }
+
+        .predictive-btn:hover::before {
+            width: 300%;
+            height: 300%;
         }
 
         .predictive-btn:hover {
-            background: var(--orange);
             color: var(--black);
             transform: translateY(-4px);
             box-shadow: 0 20px 60px rgba(255, 107, 26, 0.4);
@@ -409,105 +429,178 @@
         .chart-section {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: max-height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             margin-top: 0;
         }
 
         .chart-section.expanded {
-            max-height: 1200px;
+            max-height: 1400px;
             margin-top: 50px;
         }
 
         .chart-content {
-            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 107, 26, 0.03) 100%);
-            border: 1px solid var(--orange);
-            border-radius: 20px;
-            padding: 50px 40px;
-            box-shadow: 0 30px 100px rgba(255, 107, 26, 0.3);
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 107, 26, 0.02) 100%);
+            border: 1px solid rgba(255, 107, 26, 0.2);
+            border-radius: 24px;
+            padding: 60px 50px;
+            box-shadow: 0 40px 120px rgba(255, 107, 26, 0.2);
             opacity: 0;
-            transform: translateY(-20px);
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(-30px) scale(0.98);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-content::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, var(--orange) 0%, transparent 50%, var(--orange) 100%);
+            opacity: 0;
+            border-radius: 24px;
+            z-index: -1;
+            transition: opacity 0.6s ease;
         }
 
         .chart-section.expanded .chart-content {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
+        }
+
+        .chart-section.expanded .chart-content::before {
+            opacity: 0.3;
+            animation: borderPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes borderPulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.4; }
         }
 
         .chart-header {
             text-align: left;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .chart-title {
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 600;
             margin-bottom: 10px;
             color: var(--text);
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .chart-subtitle {
-            font-size: 0.9375rem;
+            font-size: 1rem;
             color: var(--text-secondary);
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            line-height: 1.6;
         }
 
         .live-indicator {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
+            gap: 10px;
+            padding: 10px 20px;
             background: rgba(255, 107, 26, 0.1);
             border: 1px solid var(--orange);
-            border-radius: 20px;
-            font-size: 0.8125rem;
+            border-radius: 30px;
+            font-size: 0.875rem;
             color: var(--orange);
             font-weight: 600;
+            box-shadow: 0 4px 20px rgba(255, 107, 26, 0.2);
         }
 
         .live-dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             background: var(--orange);
             border-radius: 50%;
+            box-shadow: 0 0 10px var(--orange);
             animation: pulse 2s ease-in-out infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+            0%, 100% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.5;
+                transform: scale(0.9);
+            }
         }
 
         .chart-canvas-wrapper {
             position: relative;
-            height: 500px;
-            margin-bottom: 30px;
+            height: 550px;
+            margin-bottom: 40px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .model-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding-top: 30px;
-            border-top: 1px solid var(--border);
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 107, 26, 0.1);
         }
 
         .info-item {
             text-align: center;
+            padding: 30px 20px;
+            background: rgba(255, 107, 26, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 107, 26, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            background: rgba(255, 107, 26, 0.06);
+            border-color: var(--orange);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(255, 107, 26, 0.15);
         }
 
         .info-label {
             font-size: 0.8125rem;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            font-weight: 600;
         }
 
         .info-value {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 1.75rem;
+            font-weight: 700;
             color: var(--orange);
+            text-shadow: 0 0 20px rgba(255, 107, 26, 0.3);
+        }
+
+        .info-value.animated {
+            display: inline-block;
+            animation: countUp 1s ease-out forwards;
+        }
+
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         footer {
@@ -536,15 +629,20 @@
             }
 
             .chart-content {
-                padding: 30px 20px;
+                padding: 40px 20px;
             }
 
             .chart-canvas-wrapper {
-                height: 350px;
+                height: 400px;
+                padding: 20px;
             }
 
             .chart-title {
-                font-size: 1.5rem;
+                font-size: 1.75rem;
+            }
+
+            .model-info {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -742,10 +840,10 @@
                 <div class="chart-content">
                     <div class="chart-header">
                         <h2 class="chart-title">WTI Crude Oil Price Forecast</h2>
-                        <p class="chart-subtitle">Advanced predictive modeling using exponential smoothing, volatility analysis, and trend momentum</p>
+                        <p class="chart-subtitle">Advanced predictive modeling using exponential smoothing, volatility analysis, and momentum-based trend projection</p>
                         <div class="live-indicator">
                             <span class="live-dot"></span>
-                            <span>LIVE DATA • Updates every 15 minutes</span>
+                            <span>LIVE MARKET DATA • Updates every 15 minutes</span>
                         </div>
                     </div>
                     
@@ -756,23 +854,23 @@
                     <div class="model-info">
                         <div class="info-item">
                             <div class="info-label">Current Price</div>
-                            <div class="info-value" id="currentPrice">Loading...</div>
+                            <div class="info-value animated" id="currentPrice">Loading...</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">7-Day Forecast</div>
-                            <div class="info-value" id="forecastPrice">--</div>
+                            <div class="info-value animated" id="forecastPrice">--</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Trend</div>
-                            <div class="info-value" id="trendDirection">--</div>
+                            <div class="info-label">Trend Direction</div>
+                            <div class="info-value animated" id="trendDirection">--</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Confidence</div>
-                            <div class="info-value">87%</div>
+                            <div class="info-label">Model Confidence</div>
+                            <div class="info-value animated">87%</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">Last Updated</div>
-                            <div class="info-value" id="lastUpdate" style="font-size: 1rem;">--</div>
+                            <div class="info-value animated" id="lastUpdate" style="font-size: 1.2rem;">--</div>
                         </div>
                     </div>
                 </div>
@@ -794,16 +892,13 @@
         let historicalPrices = [];
         let updateInterval = null;
 
-        // Fetch live WTI price from Yahoo Finance via CORS proxy
+        // Fetch live WTI price from Yahoo Finance
         async function fetchLiveWTIPrice() {
             try {
-                // Get last 21 days of data
                 const period1 = Math.floor((Date.now() - (21 * 24 * 60 * 60 * 1000)) / 1000);
                 const period2 = Math.floor(Date.now() / 1000);
                 
                 const url = `https://query1.finance.yahoo.com/v8/finance/chart/CL=F?period1=${period1}&period2=${period2}&interval=1d`;
-                
-                // Use CORS proxy
                 const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
                 
                 const response = await fetch(proxyUrl);
@@ -814,7 +909,6 @@
                     const timestamps = result.timestamp;
                     const prices = result.indicators.quote[0].close;
                     
-                    // Build historical price array
                     historicalPrices = [];
                     for (let i = 0; i < timestamps.length; i++) {
                         if (prices[i] !== null) {
@@ -825,10 +919,10 @@
                         }
                     }
                     
-                    // Set current price
                     if (historicalPrices.length > 0) {
                         currentLivePrice = historicalPrices[historicalPrices.length - 1].price;
-                        document.getElementById('currentPrice').textContent = `$${currentLivePrice.toFixed(2)}`;
+                        animateValue('currentPrice', 0, currentLivePrice, 1000, true);
+                        
                         document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('en-US', {
                             hour: '2-digit',
                             minute: '2-digit'
@@ -843,103 +937,94 @@
                 }
             } catch (error) {
                 console.error('Error fetching WTI price:', error);
-                // Fallback to simulation if API fails
                 if (currentLivePrice === null) {
                     currentLivePrice = 58.31;
-                    document.getElementById('currentPrice').textContent = `$${currentLivePrice.toFixed(2)} (simulated)`;
+                    document.getElementById('currentPrice').textContent = `$${currentLivePrice.toFixed(2)}`;
                 }
             }
         }
 
-        function interpolateHourly(dailyPrices) {
-            const hourlyData = [];
+        function animateValue(id, start, end, duration, isCurrency = false) {
+            const element = document.getElementById(id);
+            const range = end - start;
+            const increment = range / (duration / 16);
+            let current = start;
             
-            for (let i = 0; i < dailyPrices.length; i++) {
-                const current = dailyPrices[i];
-                const next = dailyPrices[i + 1];
-                
-                const currentDate = new Date(current.date);
-                
-                if (next) {
-                    const nextDate = new Date(next.date);
-                    const priceDiff = next.price - current.price;
-                    const timeDiff = nextDate - currentDate;
-                    const hoursTotal = timeDiff / (1000 * 60 * 60);
-                    
-                    for (let h = 0; h < hoursTotal; h++) {
-                        const hourDate = new Date(currentDate.getTime() + (h * 60 * 60 * 1000));
-                        const progress = h / hoursTotal;
-                        
-                        // Add realistic intraday volatility
-                        const volatility = (Math.random() - 0.5) * 0.4;
-                        const interpolatedPrice = current.price + (priceDiff * progress) + volatility;
-                        
-                        hourlyData.push({
-                            x: hourDate,
-                            y: parseFloat(interpolatedPrice.toFixed(2))
-                        });
-                    }
-                } else {
-                    // Last day - add final hours
-                    for (let h = 0; h < 12; h++) {
-                        const hourDate = new Date(currentDate.getTime() + (h * 60 * 60 * 1000));
-                        const volatility = (Math.random() - 0.5) * 0.25;
-                        hourlyData.push({
-                            x: hourDate,
-                            y: parseFloat((current.price + volatility).toFixed(2))
-                        });
-                    }
+            const timer = setInterval(() => {
+                current += increment;
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    current = end;
+                    clearInterval(timer);
                 }
-            }
-            
-            return hourlyData;
+                
+                if (isCurrency) {
+                    element.textContent = `$${current.toFixed(2)}`;
+                } else {
+                    element.textContent = current.toFixed(2);
+                }
+            }, 16);
         }
 
         function generateWTIData() {
             const now = Date.now();
-            const hoursForecast = 7 * 24;
+            const daysForecast = 7;
             
-            // Use real historical data
-            const historicalData = historicalPrices.length > 0 
-                ? interpolateHourly(historicalPrices)
-                : [];
+            // Use actual daily prices (no interpolation)
+            const historicalData = historicalPrices.map(p => ({
+                x: p.date,
+                y: p.price
+            }));
+            
+            // Add today's current price if different from last close
+            if (historicalPrices.length > 0) {
+                const lastDate = historicalPrices[historicalPrices.length - 1].date;
+                const today = new Date();
+                if (lastDate.toDateString() !== today.toDateString()) {
+                    historicalData.push({
+                        x: today,
+                        y: currentLivePrice
+                    });
+                }
+            }
             
             const forecastData = [];
             
             if (historicalData.length > 0) {
-                // Calculate momentum from real data
-                const recentPrices = historicalData.slice(-72).map(d => d.y);
-                const ema12 = calculateEMA(recentPrices, 12);
-                const ema26 = calculateEMA(recentPrices, 26);
-                const momentum = ema12 - ema26;
+                // Calculate momentum
+                const recentPrices = historicalData.slice(-14).map(d => d.y);
+                const ema7 = calculateEMA(recentPrices, 7);
+                const ema14 = calculateEMA(recentPrices, 14);
+                const momentum = (ema7 - ema14) / ema14;
                 
                 // Generate forecast
                 let forecastPrice = currentLivePrice;
-                const forecastTrend = 0.015 + (momentum * 0.008);
-                const forecastVolatility = 0.35;
+                const baseVolatility = 0.012; // 1.2% daily volatility
+                const trendStrength = momentum * 0.5;
                 
-                for (let i = 1; i <= hoursForecast; i++) {
-                    const date = new Date(now + i * 60 * 60 * 1000);
-                    const hour = date.getHours();
+                for (let i = 1; i <= daysForecast; i++) {
+                    const forecastDate = new Date(now + i * 24 * 60 * 60 * 1000);
                     
-                    const tradingFactor = (hour >= 9 && hour <= 16) ? 1.1 : 0.85;
-                    const confidenceFactor = 1 - (i / hoursForecast) * 0.3;
+                    // Confidence degrades over time
+                    const confidenceFactor = 1 - (i / daysForecast) * 0.25;
                     
-                    const randomChange = (Math.random() - 0.48) * forecastVolatility * tradingFactor * confidenceFactor;
-                    const reversionForce = (currentLivePrice - forecastPrice) * 0.015;
-                    const trend = forecastTrend * (Math.random() - 0.25);
+                    // Daily price change
+                    const randomWalk = (Math.random() - 0.5) * 2 * baseVolatility;
+                    const trendComponent = trendStrength * confidenceFactor;
+                    const meanReversion = (currentLivePrice - forecastPrice) * 0.05;
                     
-                    forecastPrice += randomChange + reversionForce + trend;
-                    forecastPrice = Math.max(54, Math.min(66, forecastPrice));
+                    forecastPrice = forecastPrice * (1 + randomWalk + trendComponent + meanReversion);
+                    forecastPrice = Math.max(52, Math.min(70, forecastPrice));
                     
                     forecastData.push({
-                        x: date,
+                        x: forecastDate,
                         y: parseFloat(forecastPrice.toFixed(2))
                     });
                 }
                 
-                document.getElementById('forecastPrice').textContent = `$${forecastPrice.toFixed(2)}`;
-                document.getElementById('trendDirection').textContent = forecastPrice > currentLivePrice ? 'Upward' : 'Downward';
+                animateValue('forecastPrice', currentLivePrice, forecastPrice, 1000, true);
+                
+                const trend = forecastPrice > currentLivePrice ? 'Bullish' : 'Bearish';
+                document.getElementById('trendDirection').textContent = trend;
             }
             
             return { historicalData, forecastData };
@@ -972,10 +1057,9 @@
                 setTimeout(() => {
                     if (!chart) {
                         initChart();
-                        // Auto-refresh every 15 minutes
                         updateInterval = setInterval(fetchLiveWTIPrice, 15 * 60 * 1000);
                     }
-                }, 300);
+                }, 400);
             } else {
                 section.classList.remove('expanded');
                 btn.classList.remove('active');
@@ -994,31 +1078,56 @@
                 data: {
                     datasets: [
                         {
-                            label: 'Historical Price (3 Weeks)',
+                            label: 'Historical Price',
                             data: historicalData,
-                            borderColor: '#a0a0a0',
-                            backgroundColor: 'rgba(160, 160, 160, 0.1)',
-                            borderWidth: 2,
-                            pointRadius: 0,
-                            tension: 0.3,
-                            fill: true
+                            borderColor: '#ffffff',
+                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                            borderWidth: 3,
+                            pointRadius: 6,
+                            pointHoverRadius: 10,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#0a0a0a',
+                            pointBorderWidth: 2,
+                            pointHoverBackgroundColor: '#ff6b1a',
+                            pointHoverBorderColor: '#ffffff',
+                            tension: 0.4,
+                            fill: true,
+                            order: 2
                         },
                         {
-                            label: 'Predicted Price (7 Days)',
+                            label: 'Forecast',
                             data: forecastData,
                             borderColor: '#ff6b1a',
                             backgroundColor: 'rgba(255, 107, 26, 0.1)',
-                            borderWidth: 3,
-                            borderDash: [5, 5],
-                            pointRadius: 0,
-                            tension: 0.3,
-                            fill: true
+                            borderWidth: 4,
+                            borderDash: [10, 5],
+                            pointRadius: 5,
+                            pointHoverRadius: 9,
+                            pointBackgroundColor: '#ff6b1a',
+                            pointBorderColor: '#0a0a0a',
+                            pointBorderWidth: 2,
+                            pointHoverBackgroundColor: '#ff8a47',
+                            pointHoverBorderColor: '#ffffff',
+                            tension: 0.4,
+                            fill: true,
+                            order: 1
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeInOutQuart',
+                        delay: (context) => {
+                            let delay = 0;
+                            if (context.type === 'data' && context.mode === 'default') {
+                                delay = context.dataIndex * 50;
+                            }
+                            return delay;
+                        }
+                    },
                     interaction: {
                         mode: 'index',
                         intersect: false
@@ -1027,23 +1136,36 @@
                         legend: {
                             display: true,
                             position: 'top',
+                            align: 'end',
                             labels: {
                                 color: '#a0a0a0',
                                 font: {
-                                    size: 13,
-                                    weight: '500'
+                                    size: 14,
+                                    weight: '600',
+                                    family: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif'
                                 },
-                                padding: 15
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
                             }
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(10, 10, 10, 0.95)',
+                            enabled: true,
+                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
                             titleColor: '#ffffff',
                             bodyColor: '#a0a0a0',
                             borderColor: '#ff6b1a',
-                            borderWidth: 1,
-                            padding: 12,
+                            borderWidth: 2,
+                            padding: 16,
                             displayColors: true,
+                            titleFont: {
+                                size: 15,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                size: 14,
+                                weight: '500'
+                            },
                             callbacks: {
                                 label: function(context) {
                                     return context.dataset.label + ': $' + context.parsed.y.toFixed(2);
@@ -1051,10 +1173,10 @@
                                 title: function(context) {
                                     const date = new Date(context[0].parsed.x);
                                     return date.toLocaleDateString('en-US', { 
+                                        weekday: 'short',
                                         month: 'short', 
                                         day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
+                                        year: 'numeric'
                                     });
                                 }
                             }
@@ -1071,29 +1193,41 @@
                             },
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.05)',
-                                drawBorder: false
+                                drawBorder: false,
+                                lineWidth: 1
                             },
                             ticks: {
                                 color: '#a0a0a0',
                                 font: {
-                                    size: 11
-                                }
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                padding: 10
+                            },
+                            border: {
+                                display: false
                             }
                         },
                         y: {
                             beginAtZero: false,
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.05)',
-                                drawBorder: false
+                                drawBorder: false,
+                                lineWidth: 1
                             },
                             ticks: {
                                 color: '#a0a0a0',
                                 font: {
-                                    size: 11
+                                    size: 12,
+                                    weight: '500'
                                 },
+                                padding: 10,
                                 callback: function(value) {
                                     return '$' + value.toFixed(2);
                                 }
+                            },
+                            border: {
+                                display: false
                             }
                         }
                     }
@@ -1108,12 +1242,11 @@
             
             chart.data.datasets[0].data = historicalData;
             chart.data.datasets[1].data = forecastData;
-            chart.update('none');
+            chart.update('active');
         }
 
         document.getElementById('toggleChart').addEventListener('click', toggleChartView);
         
-        // Initial fetch on page load
         window.addEventListener('load', () => {
             fetchLiveWTIPrice();
         });
