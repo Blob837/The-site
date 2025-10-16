@@ -462,34 +462,46 @@
 
         .time-range-buttons {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .range-btn {
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-secondary);
             border: 1px solid var(--border);
-            padding: 8px 16px;
+            padding: 10px 20px;
             font-size: 0.8125rem;
             font-weight: 600;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            min-width: 70px;
+            line-height: 1.2;
         }
 
         .range-btn:hover {
             background: rgba(255, 255, 255, 0.08);
             border-color: var(--orange);
             color: var(--text);
+            transform: translateY(-1px);
         }
 
         .range-btn.active {
             background: var(--orange);
             color: var(--black);
             border-color: var(--orange);
+            box-shadow: 0 4px 12px rgba(255, 107, 26, 0.3);
+        }
+
+        .range-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(255, 107, 26, 0.2);
         }
 
         .live-indicator {
@@ -626,13 +638,20 @@
 
             .time-range-buttons {
                 width: 100%;
+                gap: 6px;
             }
 
             .range-btn {
                 flex: 1;
                 min-width: 0;
-                padding: 8px 12px;
-                font-size: 0.75rem;
+                padding: 10px 12px;
+                font-size: 0.7rem;
+                letter-spacing: 0.5px;
+            }
+            
+            .data-source-badge {
+                font-size: 0.7rem;
+                padding: 5px 12px;
             }
         }
 
@@ -1235,6 +1254,7 @@
                 setTimeout(() => {
                     if (!chart) {
                         initChart();
+                        setupChartClickOutsideHandler();
                         updateInterval = setInterval(fetchLiveWTIPrice, 15 * 60 * 1000);
                     }
                 }, 300);
@@ -1328,7 +1348,12 @@
                     maintainAspectRatio: false,
                     interaction: {
                         mode: 'index',
-                        intersect: false
+                        intersect: false,
+                        axis: 'x'
+                    },
+                    onClick: function(event, activeElements) {
+                        // Click handler is now managed in the external onclick function
+                        // This ensures tooltip shows date when user clicks
                     },
                     animation: {
                         duration: 1200,
@@ -1354,6 +1379,7 @@
                             }
                         },
                         tooltip: {
+                            enabled: true,
                             backgroundColor: 'rgba(0, 0, 0, 0.9)',
                             titleColor: '#ffffff',
                             bodyColor: '#e5e5e5',
@@ -1445,6 +1471,54 @@
             });
             
             console.log('✓ Chart initialized successfully');
+            
+            // Add click handler to show tooltip on chart click
+            ctx.onclick = function(evt) {
+                const points = chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+                
+                if (points.length > 0) {
+                    const firstPoint = points[0];
+                    
+                    // Show tooltip at clicked point
+                    chart.tooltip.setActiveElements([{
+                        datasetIndex: firstPoint.datasetIndex,
+                        index: firstPoint.index
+                    }]);
+                    chart.update();
+                }
+            };
+        }
+
+        // Global click handler to hide tooltip when clicking outside chart
+        // Set up once when app initializes
+        let chartClickOutsideHandler = null;
+        
+        function setupChartClickOutsideHandler() {
+            if (chartClickOutsideHandler) {
+                document.removeEventListener('click', chartClickOutsideHandler);
+            }
+            
+            chartClickOutsideHandler = function(event) {
+                if (!chart) return;
+                
+                const canvas = document.getElementById('priceChart');
+                if (!canvas) return;
+                
+                const chartArea = canvas.getBoundingClientRect();
+                const clickX = event.clientX;
+                const clickY = event.clientY;
+                
+                // Check if click is outside the chart canvas
+                if (clickX < chartArea.left || clickX > chartArea.right ||
+                    clickY < chartArea.top || clickY > chartArea.bottom) {
+                    if (chart.tooltip) {
+                        chart.tooltip.setActiveElements([]);
+                        chart.update();
+                    }
+                }
+            };
+            
+            document.addEventListener('click', chartClickOutsideHandler);
         }
 
         function updateChart() {
