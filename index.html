@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="Praeco - Enterprise automation and business intelligence for midstream operations">
     <title>Praeco | Midstream Operations Intelligence</title>
     <style>
@@ -25,12 +25,17 @@
             --bg-section: #0d0d0d;
         }
 
+        html {
+            overflow-x: hidden;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
             background: var(--secondary);
             color: var(--text);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
         /* Grid Background */
@@ -56,49 +61,26 @@
             z-index: 1;
         }
 
-        /* Navigation */
-        nav {
-            padding: 30px 0;
-            border-bottom: 1px solid var(--border);
-            background: var(--secondary);
-            position: relative;
-            z-index: 10;
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: max(env(safe-area-inset-top), 60px) 20px max(env(safe-area-inset-bottom), 60px);
         }
 
-        nav .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .hero-content {
+            width: 100%;
         }
 
         .logo {
-            width: 140px;
+            width: 160px;
+            margin: 0 auto 60px;
             filter: brightness(1.2);
-        }
-
-        .nav-cta {
-            background: var(--accent);
-            color: var(--secondary);
-            padding: 12px 28px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .nav-cta:hover {
-            background: #ff8a47;
-            transform: translateY(-1px);
-        }
-
-        /* Hero */
-        .hero {
-            padding: 100px 0 120px;
-            text-align: center;
-            min-height: 80vh;
-            display: flex;
-            align-items: center;
+            display: block;
         }
 
         h1 {
@@ -124,12 +106,30 @@
             color: var(--accent);
         }
 
+        .cta-primary {
+            background: var(--accent);
+            color: var(--secondary);
+            padding: 18px 48px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.05rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .cta-primary:hover {
+            background: #ff8a47;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(255, 107, 26, 0.5);
+        }
+
         /* Stats Bar */
         .stats-bar {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 60px;
-            padding: 60px 0;
+            padding: 80px 0;
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
         }
@@ -185,12 +185,12 @@
 
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
         }
 
         .service-card {
-            padding: 48px 36px;
+            padding: 40px 32px;
             border: 1px solid var(--border);
             border-radius: 12px;
             background: var(--bg-card);
@@ -204,8 +204,8 @@
         }
 
         .service-icon {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             margin-bottom: 24px;
         }
 
@@ -215,7 +215,7 @@
         }
 
         .service-card h3 {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 600;
             margin-bottom: 12px;
             color: var(--text);
@@ -265,7 +265,7 @@
         .case-metrics {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 32px;
+            gap: 24px;
         }
 
         .metric {
@@ -360,6 +360,7 @@
         /* Footer */
         footer {
             padding: 60px 0;
+            padding-bottom: max(60px, env(safe-area-inset-bottom));
             border-top: 1px solid var(--border);
             text-align: center;
         }
@@ -381,12 +382,17 @@
             }
 
             .hero {
-                padding: 60px 0;
-                min-height: 100vh;
+                padding: max(env(safe-area-inset-top), 40px) 20px max(env(safe-area-inset-bottom), 40px);
+            }
+
+            .logo {
+                width: 140px;
+                margin-bottom: 40px;
             }
 
             .stats-bar {
                 gap: 40px;
+                padding: 60px 0;
             }
 
             .services, .cases, .cta {
@@ -406,6 +412,16 @@
             .services-grid {
                 grid-template-columns: 1fr;
             }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                text-align: center;
+            }
         }
 
         /* Animations */
@@ -414,7 +430,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .hero, .stats-bar, .service-card, .case {
+        .hero-content, .stats-bar, .service-card, .case {
             animation: fadeIn 0.6s ease-out;
         }
     </style>
@@ -423,21 +439,18 @@
     <!-- Grid Overlay -->
     <div class="grid-overlay"></div>
 
-    <!-- Navigation -->
-    <nav>
-        <div class="container">
-            <img src="Logo.svg" alt="Praeco" class="logo">
-            <a href="mailto:haydenf809@gmail.com" class="nav-cta">Get Started</a>
-        </div>
-    </nav>
-
     <!-- Hero -->
     <section class="hero">
-        <div class="container">
-            <h1>Enterprise Automation for <span class="highlight">Midstream Operations</span></h1>
+        <div class="hero-content">
+            <img src="Logo.svg" alt="Praeco" class="logo">
+            
+            <h1>Stop Burning <span class="highlight">$40K/Month</span> on Manual Processes</h1>
+            
             <p class="hero-subtitle">
-                Production-grade business intelligence and process automation delivering measurable ROI for crude oil transportation and terminal operations.
+                Turn operational chaos into competitive advantage. Production-grade automation and intelligence for midstream crude operations.
             </p>
+
+            <a href="mailto:info@praeco.com" class="cta-primary">Let's Talk Solutions</a>
         </div>
     </section>
 
@@ -465,9 +478,9 @@
     <section class="services">
         <div class="container">
             <div class="section-header">
-                <div class="section-label">Capabilities</div>
-                <h2 class="section-title">Complete Operational Intelligence</h2>
-                <p class="section-description">Integrated systems delivering visibility, automation, and control across your midstream operations.</p>
+                <div class="section-label">What I Build</div>
+                <h2 class="section-title">Systems That Work Under Pressure</h2>
+                <p class="section-description">Three years solving real problems for midstream operations moving 75,000+ barrels daily.</p>
             </div>
 
             <div class="services-grid">
@@ -480,7 +493,7 @@
                         </svg>
                     </div>
                     <h3>Business Intelligence</h3>
-                    <p>Real-time dashboards and analytics providing comprehensive visibility across operations, volumes, and KPIs.</p>
+                    <p>Real-time dashboards and analytics providing visibility across operations, volumes, and KPIs when you need it.</p>
                 </div>
 
                 <div class="service-card">
@@ -491,7 +504,7 @@
                         </svg>
                     </div>
                     <h3>Process Automation</h3>
-                    <p>Custom automation eliminating manual processing for billing, ticketing, compensation, and reporting workflows.</p>
+                    <p>Custom automation eliminating manual work from billing, ticketing, compensation, and reporting workflows.</p>
                 </div>
 
                 <div class="service-card">
@@ -502,7 +515,7 @@
                         </svg>
                     </div>
                     <h3>Volume Reconciliation</h3>
-                    <p>Automated validation and error detection across terminal operations ensuring accuracy and compliance.</p>
+                    <p>Automated validation and error detection ensuring accuracy and compliance across terminal operations.</p>
                 </div>
 
                 <div class="service-card">
@@ -516,7 +529,7 @@
                         </svg>
                     </div>
                     <h3>API Integration</h3>
-                    <p>Seamless connectivity with logistics platforms, ERPs, and third-party systems for unified operations.</p>
+                    <p>Seamless connectivity with FourKites, Project 44, ERPs, and third-party systems for unified operations.</p>
                 </div>
 
                 <div class="service-card">
@@ -533,14 +546,16 @@
                 <div class="service-card">
                     <div class="service-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            <polyline points="7.5 4.21 12 6.81 16.5 4.21"/>
+                            <polyline points="7.5 19.79 7.5 14.6 3 12"/>
+                            <polyline points="21 12 16.5 14.6 16.5 19.79"/>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                            <line x1="12" y1="22.08" x2="12" y2="12"/>
                         </svg>
                     </div>
-                    <h3>Technical Partnership</h3>
-                    <p>Embedded development, team training, and ongoing operational support for sustained success.</p>
+                    <h3>AI Forecasting</h3>
+                    <p>Predictive models for volume forecasting, demand patterns, and operational optimization using machine learning.</p>
                 </div>
             </div>
         </div>
@@ -551,7 +566,7 @@
         <div class="container">
             <div class="section-header">
                 <div class="section-label">Proven Results</div>
-                <h2 class="section-title">Deployed Solutions</h2>
+                <h2 class="section-title">Problems Solved, Money Saved</h2>
             </div>
 
             <div class="case-grid">
@@ -636,11 +651,11 @@
     <!-- CTA -->
     <section class="cta">
         <div class="container">
-            <h2>Ready to Transform Your Operations?</h2>
-            <p>Partner with proven expertise in midstream automation and business intelligence.</p>
+            <h2>Ready to Stop the Bleeding?</h2>
+            <p>Three decades building systems that work. Let's talk about fixing yours.</p>
             <div class="cta-buttons">
-                <a href="mailto:haydenf809@gmail.com" class="btn-primary">Schedule Consultation</a>
-                <a href="mailto:haydenf809@gmail.com" class="btn-secondary">View Case Studies</a>
+                <a href="mailto:info@praeco.com" class="btn-primary">Schedule Consultation</a>
+                <a href="mailto:info@praeco.com" class="btn-secondary">View Case Studies</a>
             </div>
         </div>
     </section>
