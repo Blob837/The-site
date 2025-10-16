@@ -15,11 +15,14 @@
         }
 
         :root {
-            --black: #0a0a0a;
+            --black: #000000;
+            --dark: #0a0a0a;
             --orange: #ff6b1a;
-            --text: #e8e8e8;
-            --text-dim: #666;
-            --border: #2a2a2a;
+            --orange-glow: rgba(255, 107, 26, 0.15);
+            --text: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border: #1a1a1a;
+            --card-bg: #0d0d0d;
         }
 
         html {
@@ -29,17 +32,19 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
             background: var(--black);
             color: var(--text);
-            line-height: 1.6;
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
             width: 100%;
             min-height: 100vh;
             min-height: -webkit-fill-available;
         }
 
+        /* Subtle Grid */
         .grid-overlay {
             position: fixed;
             top: 0;
@@ -47,17 +52,37 @@
             width: 100%;
             height: 100%;
             background-image: 
-                repeating-linear-gradient(0deg, transparent, transparent 49px, var(--border) 49px, var(--border) 50px),
-                repeating-linear-gradient(90deg, transparent, transparent 49px, var(--border) 49px, var(--border) 50px);
-            opacity: 0.3;
+                repeating-linear-gradient(0deg, transparent, transparent 99px, var(--border) 99px, var(--border) 100px),
+                repeating-linear-gradient(90deg, transparent, transparent 99px, var(--border) 99px, var(--border) 100px);
+            opacity: 0.2;
             pointer-events: none;
             z-index: -1;
         }
 
+        /* Ambient Gradient */
+        .ambient-gradient {
+            position: fixed;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, var(--orange-glow) 0%, transparent 70%);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: -1;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-20px); }
+        }
+
         .container {
-            max-width: 1100px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 40px;
+            padding: 0 60px;
             position: relative;
             z-index: 10;
         }
@@ -73,59 +98,75 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: max(env(safe-area-inset-top), 60px) 20px max(env(safe-area-inset-bottom), 60px);
+            padding: max(env(safe-area-inset-top), 80px) 20px max(env(safe-area-inset-bottom), 80px);
             position: relative;
             z-index: 10;
         }
 
         .logo {
-            width: 240px;
-            max-width: 80vw;
-            margin-bottom: 80px;
-            filter: brightness(1.2);
+            width: 380px;
+            max-width: 90vw;
+            margin-bottom: 100px;
+            filter: brightness(1.1) drop-shadow(0 0 60px rgba(255, 107, 26, 0.3));
+            animation: logoFade 1.2s ease-out;
+        }
+
+        @keyframes logoFade {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
-            font-size: clamp(3rem, 8vw, 6rem);
-            font-weight: 700;
-            line-height: 1;
-            letter-spacing: -0.04em;
-            margin-bottom: 32px;
+            font-size: clamp(3.5rem, 10vw, 7.5rem);
+            font-weight: 600;
+            line-height: 1.05;
+            letter-spacing: -0.05em;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .accent {
-            color: var(--orange);
+        .hero-accent {
+            display: block;
+            background: linear-gradient(135deg, var(--orange) 0%, #ff8a47 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .hero-sub {
-            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
-            color: var(--text-dim);
-            max-width: 600px;
-            margin: 0 auto 60px;
+        .hero-subtitle {
+            font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 70px;
             font-weight: 400;
+            line-height: 1.6;
         }
 
-        .cta {
+        .hero-cta {
             background: var(--orange);
             color: var(--black);
-            padding: 20px 50px;
+            padding: 22px 60px;
             text-decoration: none;
-            font-weight: 700;
-            font-size: 1.1rem;
-            border-radius: 8px;
-            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 1.125rem;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-block;
+            box-shadow: 0 10px 40px var(--orange-glow);
         }
 
-        .cta:hover {
+        .hero-cta:hover {
             background: #ff8a47;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 40px rgba(255, 107, 26, 0.6);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(255, 107, 26, 0.4);
         }
 
         /* Stats */
         .stats {
-            padding: 100px 0;
+            padding: 140px 0;
             border-top: 1px solid var(--border);
             position: relative;
             z-index: 10;
@@ -133,66 +174,109 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 60px;
-            text-align: center;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 80px;
         }
 
-        .stat-num {
-            font-size: 4rem;
+        .stat {
+            text-align: center;
+            padding: 40px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 107, 26, 0.02) 100%);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .stat:hover {
+            border-color: var(--orange);
+            transform: translateY(-6px);
+        }
+
+        .stat-number {
+            font-size: 4.5rem;
             font-weight: 700;
-            color: var(--orange);
             line-height: 1;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--orange) 0%, #ff8a47 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .stat-label {
             font-size: 1rem;
-            color: var(--text-dim);
+            color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            font-weight: 500;
         }
 
         /* Capabilities */
         .capabilities {
-            padding: 120px 0;
+            padding: 160px 0;
             position: relative;
             z-index: 10;
         }
 
         .section-title {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 700;
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 600;
             text-align: center;
-            margin-bottom: 80px;
-            letter-spacing: -0.02em;
+            margin-bottom: 120px;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--orange) 0%, #ff8a47 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .cap-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 32px;
         }
 
         .cap-card {
-            padding: 40px;
+            padding: 50px 40px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 107, 26, 0.03) 100%);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            background: rgba(20, 20, 20, 0.5);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cap-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--orange), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
         }
 
         .cap-card:hover {
             border-color: var(--orange);
-            transform: translateY(-8px);
-            box-shadow: 0 20px 60px rgba(255, 107, 26, 0.2);
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px rgba(255, 107, 26, 0.15);
+        }
+
+        .cap-card:hover::before {
+            opacity: 1;
         }
 
         .cap-icon {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 24px;
+            width: 56px;
+            height: 56px;
+            margin-bottom: 32px;
+            opacity: 0.9;
         }
 
         .cap-icon svg {
@@ -201,19 +285,21 @@
         }
 
         .cap-card h3 {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
+            letter-spacing: -0.01em;
         }
 
         .cap-card p {
-            color: var(--text-dim);
-            line-height: 1.6;
+            color: var(--text-secondary);
+            font-size: 1.0625rem;
+            line-height: 1.7;
         }
 
         /* Results */
         .results {
-            padding: 120px 0;
+            padding: 160px 0;
             border-top: 1px solid var(--border);
             position: relative;
             z-index: 10;
@@ -221,44 +307,81 @@
 
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 50px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 60px;
+            margin-top: 80px;
+        }
+
+        .result-card {
             text-align: center;
-            margin-top: 60px;
+            padding: 50px 30px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(255, 107, 26, 0.02) 100%);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            border-color: var(--orange);
+            transform: translateY(-8px);
         }
 
         .result-value {
-            font-size: 3.5rem;
+            font-size: 4rem;
             font-weight: 700;
-            color: var(--orange);
             line-height: 1;
-            margin-bottom: 12px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--orange) 0%, #ff8a47 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .result-desc {
-            font-size: 1rem;
-            color: var(--text-dim);
+        .result-label {
+            font-size: 1.0625rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
         }
 
         /* Contact */
         .contact {
-            padding: 140px 0;
+            padding: 180px 0;
             text-align: center;
             position: relative;
             z-index: 10;
         }
 
-        .contact h2 {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 700;
-            margin-bottom: 60px;
-            letter-spacing: -0.02em;
+        .contact-title {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 600;
+            margin-bottom: 80px;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .contact-cta {
+            background: var(--orange);
+            color: var(--black);
+            padding: 22px 60px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.125rem;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
+            box-shadow: 0 10px 40px var(--orange-glow);
+        }
+
+        .contact-cta:hover {
+            background: #ff8a47;
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(255, 107, 26, 0.4);
         }
 
         /* Footer */
         footer {
-            padding: 50px 0;
-            padding-bottom: max(50px, env(safe-area-inset-bottom));
+            padding: 80px 0;
+            padding-bottom: max(80px, env(safe-area-inset-bottom));
             border-top: 1px solid var(--border);
             text-align: center;
             position: relative;
@@ -266,8 +389,9 @@
         }
 
         footer p {
-            color: var(--text-dim);
-            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            margin-bottom: 8px;
         }
 
         .location {
@@ -287,31 +411,35 @@
             }
 
             .container {
-                padding: 0 20px;
+                padding: 0 24px;
             }
 
             .hero {
                 min-height: 100vh;
                 min-height: -webkit-fill-available;
                 height: auto;
-                padding: max(env(safe-area-inset-top, 20px), 40px) 20px max(env(safe-area-inset-bottom, 20px), 40px);
+                padding: max(env(safe-area-inset-top, 20px), 60px) 24px max(env(safe-area-inset-bottom, 20px), 60px);
             }
 
             .logo {
-                width: 180px;
-                margin-bottom: 60px;
+                width: 280px;
+                margin-bottom: 80px;
             }
 
             .stats {
-                padding: 80px 0;
+                padding: 100px 0;
             }
 
             .stats-grid {
                 gap: 50px;
             }
 
-            .capabilities, .results, .contact {
-                padding: 100px 0;
+            .capabilities, .results {
+                padding: 120px 0;
+            }
+
+            .contact {
+                padding: 140px 0;
             }
 
             .cap-grid {
@@ -323,46 +451,70 @@
             }
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Smooth Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .hero, .stats, .cap-card, .results {
-            animation: fadeIn 0.8s ease-out;
+        .hero, .stat, .cap-card, .result-card {
+            animation: fadeInUp 0.8s ease-out backwards;
         }
+
+        .stat:nth-child(1) { animation-delay: 0.1s; }
+        .stat:nth-child(2) { animation-delay: 0.2s; }
+        .stat:nth-child(3) { animation-delay: 0.3s; }
+        .stat:nth-child(4) { animation-delay: 0.4s; }
+
+        .cap-card:nth-child(1) { animation-delay: 0.1s; }
+        .cap-card:nth-child(2) { animation-delay: 0.15s; }
+        .cap-card:nth-child(3) { animation-delay: 0.2s; }
+        .cap-card:nth-child(4) { animation-delay: 0.25s; }
+        .cap-card:nth-child(5) { animation-delay: 0.3s; }
+        .cap-card:nth-child(6) { animation-delay: 0.35s; }
     </style>
 </head>
 <body>
     <div class="grid-overlay"></div>
+    <div class="ambient-gradient"></div>
 
     <!-- Hero -->
     <section class="hero">
         <img src="Logo.svg" alt="Praeco" class="logo">
-        <h1>Midstream.<br><span class="accent">Automated.</span></h1>
-        <p class="hero-sub">Stop burning cash on broken processes. Operational intelligence and automation for crude operations.</p>
-        <a href="mailto:info@praeco.com" class="cta">Let's Talk</a>
+        <h1>
+            Midstream Operations.
+            <span class="hero-accent">Intelligent.</span>
+        </h1>
+        <p class="hero-subtitle">
+            Operational intelligence and automation built for crude oil transportation. Real-time visibility, automated workflows, proven results.
+        </p>
+        <a href="mailto:info@praeco.com" class="hero-cta">Get Started</a>
     </section>
 
     <!-- Stats -->
     <section class="stats">
         <div class="container">
             <div class="stats-grid">
-                <div>
-                    <div class="stat-num">75K+</div>
+                <div class="stat">
+                    <div class="stat-number">75K+</div>
                     <div class="stat-label">Barrels Daily</div>
                 </div>
-                <div>
-                    <div class="stat-num">$500M+</div>
+                <div class="stat">
+                    <div class="stat-number">$500M</div>
                     <div class="stat-label">Revenue Supported</div>
                 </div>
-                <div>
-                    <div class="stat-num">1,820</div>
-                    <div class="stat-label">Hours Saved Annually</div>
+                <div class="stat">
+                    <div class="stat-number">1,820</div>
+                    <div class="stat-label">Hours Saved</div>
                 </div>
-                <div>
-                    <div class="stat-num">20%</div>
+                <div class="stat">
+                    <div class="stat-number">20%</div>
                     <div class="stat-label">Accuracy Gain</div>
                 </div>
             </div>
@@ -372,46 +524,48 @@
     <!-- Capabilities -->
     <section class="capabilities">
         <div class="container">
-            <h2 class="section-title">Built for <span class="accent">Production</span></h2>
+            <h2 class="section-title">
+                Built for <span class="gradient-text">Production</span>
+            </h2>
             
             <div class="cap-grid">
                 <div class="cap-card">
                     <div class="cap-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="20" x2="18" y2="10"/>
                             <line x1="12" y1="20" x2="12" y2="4"/>
                             <line x1="6" y1="20" x2="6" y2="14"/>
                         </svg>
                     </div>
                     <h3>Real-Time Intelligence</h3>
-                    <p>Executive dashboards with live operational visibility across volumes, dispatch, and performance.</p>
+                    <p>Executive dashboards delivering live visibility across volumes, dispatch, and operational performance.</p>
                 </div>
 
                 <div class="cap-card">
                     <div class="cap-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="3"/>
                             <path d="M12 1v6m0 6v6m8.66-15.66l-4.24 4.24m-4.24 4.24l-4.24 4.24M23 12h-6m-6 0H1m20.66 8.66l-4.24-4.24m-4.24-4.24l-4.24-4.24"/>
                         </svg>
                     </div>
-                    <h3>Full Automation</h3>
-                    <p>End-to-end workflow automation for billing, ticketing, compensation, and reconciliation.</p>
+                    <h3>Process Automation</h3>
+                    <p>End-to-end workflow automation for billing, ticketing, driver compensation, and reconciliation systems.</p>
                 </div>
 
                 <div class="cap-card">
                     <div class="cap-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                             <polyline points="9 12 11 14 15 10"/>
                         </svg>
                     </div>
                     <h3>Volume Validation</h3>
-                    <p>Automated reconciliation with real-time error detection and complete audit trails.</p>
+                    <p>Automated reconciliation with real-time error detection, complete audit trails, and compliance reporting.</p>
                 </div>
 
                 <div class="cap-card">
                     <div class="cap-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="18" cy="5" r="3"/>
                             <circle cx="6" cy="12" r="3"/>
                             <circle cx="18" cy="19" r="3"/>
@@ -419,24 +573,24 @@
                             <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
                         </svg>
                     </div>
-                    <h3>System Integration</h3>
-                    <p>Seamless connectivity with FourKites, Project 44, ERPs, and logistics platforms.</p>
+                    <h3>Platform Integration</h3>
+                    <p>Seamless connectivity with FourKites, Project 44, MacroPoint, ERPs, and logistics platforms.</p>
                 </div>
 
                 <div class="cap-card">
                     <div class="cap-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                             <circle cx="12" cy="10" r="3"/>
                         </svg>
                     </div>
                     <h3>Route Optimization</h3>
-                    <p>GIS-powered logistics planning for pipeline networks and terminal operations.</p>
+                    <p>GIS-powered logistics planning and visualization for pipeline networks and terminal operations.</p>
                 </div>
 
                 <div class="cap-card">
                     <div class="cap-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#ff6b1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
                             <polyline points="7.5 4.21 12 6.81 16.5 4.21"/>
                             <polyline points="7.5 19.79 7.5 14.6 3 12"/>
@@ -446,7 +600,7 @@
                         </svg>
                     </div>
                     <h3>AI Forecasting</h3>
-                    <p>Machine learning models for volume prediction and demand pattern analysis.</p>
+                    <p>Machine learning models for volume prediction, demand patterns, and operational optimization.</p>
                 </div>
             </div>
         </div>
@@ -455,23 +609,25 @@
     <!-- Results -->
     <section class="results">
         <div class="container">
-            <h2 class="section-title">Proven <span class="accent">Impact</span></h2>
+            <h2 class="section-title">
+                Proven <span class="gradient-text">Impact</span>
+            </h2>
             <div class="results-grid">
-                <div>
+                <div class="result-card">
                     <div class="result-value">$480K</div>
-                    <div class="result-desc">Annual Loss Prevention</div>
+                    <div class="result-label">Annual Loss Prevention</div>
                 </div>
-                <div>
+                <div class="result-card">
                     <div class="result-value">95%</div>
-                    <div class="result-desc">Error Reduction</div>
+                    <div class="result-label">Error Reduction</div>
                 </div>
-                <div>
+                <div class="result-card">
                     <div class="result-value">35 hrs</div>
-                    <div class="result-desc">Weekly Time Savings</div>
+                    <div class="result-label">Weekly Time Savings</div>
                 </div>
-                <div>
-                    <div class="result-value">24-48 hrs</div>
-                    <div class="result-desc">Decision Time Cut</div>
+                <div class="result-card">
+                    <div class="result-value">48 hrs</div>
+                    <div class="result-label">Decision Time Cut</div>
                 </div>
             </div>
         </div>
@@ -480,8 +636,10 @@
     <!-- Contact -->
     <section class="contact">
         <div class="container">
-            <h2>Ready to <span class="accent">Ship?</span></h2>
-            <a href="mailto:info@praeco.com" class="cta">info@praeco.com</a>
+            <h2 class="contact-title">
+                Ready to <span class="gradient-text">Ship?</span>
+            </h2>
+            <a href="mailto:info@praeco.com" class="contact-cta">info@praeco.com</a>
         </div>
     </section>
 
