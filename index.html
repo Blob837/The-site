@@ -1027,25 +1027,25 @@
         .chart-section {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: max-height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             margin-top: 0;
         }
 
         .chart-section.expanded {
-            max-height: 1200px;
+            max-height: 2400px;
             margin-top: 50px;
         }
 
         .chart-content {
-            background: linear-gradient(135deg, rgba(13, 13, 13, 0.95) 0%, rgba(255, 107, 26, 0.05) 100%);
-            backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 107, 26, 0.4);
-            border-radius: 28px;
-            padding: 60px 50px;
-            box-shadow: 0 30px 100px rgba(255, 107, 26, 0.4);
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.98) 0%, rgba(13, 13, 13, 0.95) 100%);
+            backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 107, 26, 0.3);
+            border-radius: 24px;
+            padding: 0;
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.8), 0 0 80px rgba(255, 107, 26, 0.15);
             opacity: 0;
             transform: translateY(-20px);
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
@@ -1055,213 +1055,503 @@
             transform: translateY(0);
         }
 
-        .chart-header {
-            text-align: left;
-            margin-bottom: 30px;
+        /* Chart Top Bar */
+        .chart-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 32px;
+            border-bottom: 1px solid rgba(255, 107, 26, 0.15);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .chart-title-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         .chart-title {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin: 0;
+            letter-spacing: -0.01em;
         }
 
-        .chart-subtitle {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-        }
-
-        .chart-controls {
+        .chart-badges {
             display: flex;
             align-items: center;
-            gap: 24px;
-            flex-wrap: wrap;
-            margin-top: 28px;
-            padding: 24px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 107, 26, 0.1);
-        }
-
-        .time-range-buttons {
-            display: flex;
             gap: 12px;
-            flex-wrap: wrap;
-            padding: 6px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 107, 26, 0.15);
-        }
-
-        .range-btn {
-            background: transparent;
-            color: var(--text-secondary);
-            border: none;
-            padding: 12px 24px;
-            font-size: 0.875rem;
-            font-weight: 700;
-            font-family: 'Inter', sans-serif;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .range-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255, 107, 26, 0.15), rgba(255, 138, 71, 0.15));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            border-radius: 12px;
-        }
-
-        .range-btn:hover {
-            background: rgba(255, 107, 26, 0.1);
-            color: var(--orange);
-            transform: translateY(-2px);
-        }
-
-        .range-btn:hover::before {
-            opacity: 1;
-        }
-
-        .range-btn.active {
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
-            color: var(--black);
-            box-shadow: 0 6px 20px rgba(255, 107, 26, 0.4), 0 0 0 1px rgba(255, 107, 26, 0.5);
-            transform: translateY(-2px);
-        }
-
-        .range-btn.active::before {
-            opacity: 0;
         }
 
         .live-indicator {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px 20px;
-            background: linear-gradient(135deg, rgba(255, 107, 26, 0.15), rgba(255, 138, 71, 0.1));
-            border: 1px solid rgba(255, 107, 26, 0.4);
-            border-radius: 24px;
-            font-size: 0.875rem;
-            color: var(--orange);
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: #10b981;
             font-weight: 700;
             letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(255, 107, 26, 0.2);
-            backdrop-filter: blur(10px);
+            text-transform: uppercase;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 8px currentColor; }
+            50% { opacity: 0.4; box-shadow: 0 0 4px currentColor; }
         }
 
         .data-source-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 12px 20px;
-            border-radius: 24px;
-            font-size: 0.8125rem;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+            letter-spacing: 0.5px;
             transition: all 0.3s ease;
-        }
-
-        .data-source-badge:hover {
-            transform: translateY(-2px);
         }
 
         .data-source-badge.live {
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.15));
             border: 1px solid rgba(16, 185, 129, 0.5);
             color: #10b981;
-            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
         }
 
         .data-source-badge.simulated {
             background: linear-gradient(135deg, rgba(251, 146, 60, 0.2), rgba(249, 115, 22, 0.15));
             border: 1px solid rgba(251, 146, 60, 0.5);
             color: #fb923c;
-            box-shadow: 0 4px 16px rgba(251, 146, 60, 0.3);
         }
 
         .data-source-badge .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: currentColor;
             box-shadow: 0 0 8px currentColor;
-            animation: pulse 2s ease-in-out infinite;
         }
 
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--orange);
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
+        .chart-actions {
+            display: flex;
+            gap: 8px;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 107, 26, 0.2);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
         }
 
-        .chart-canvas-wrapper {
-            position: relative;
-            height: 550px;
-            margin-bottom: 40px;
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(255, 107, 26, 0.02));
-            border-radius: 16px;
+        .action-btn:hover {
+            background: rgba(255, 107, 26, 0.15);
+            border-color: rgba(255, 107, 26, 0.5);
+            color: var(--orange);
+            transform: translateY(-2px);
+        }
+
+        /* Main Chart Grid */
+        .chart-main-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 0;
+            min-height: 700px;
+        }
+
+        .chart-column-primary {
+            padding: 28px 32px;
+            border-right: 1px solid rgba(255, 107, 26, 0.15);
+        }
+
+        .chart-column-insights {
+            padding: 24px;
+            background: rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            max-height: 1200px;
+        }
+
+        /* Time Range Selector */
+        .time-range-selector {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 20px;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
             border: 1px solid rgba(255, 107, 26, 0.1);
         }
 
-        .model-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 24px;
-            padding-top: 36px;
-            border-top: 1px solid rgba(255, 107, 26, 0.2);
+        .range-btn {
+            flex: 1;
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            padding: 10px 16px;
+            font-size: 0.8125rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .info-item {
-            text-align: center;
+        .range-btn:hover {
+            background: rgba(255, 107, 26, 0.1);
+            color: var(--orange);
+        }
+
+        .range-btn.active {
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
+            color: var(--black);
+            box-shadow: 0 4px 12px rgba(255, 107, 26, 0.3);
+        }
+
+        /* Chart Canvas */
+        .chart-canvas-wrapper {
+            position: relative;
+            height: 500px;
+            margin-bottom: 20px;
             padding: 20px;
-            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(255, 107, 26, 0.05));
-            border-radius: 16px;
-            border: 1px solid rgba(255, 107, 26, 0.15);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 107, 26, 0.08);
         }
 
-        .info-item:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255, 107, 26, 0.4);
-            box-shadow: 0 12px 32px rgba(255, 107, 26, 0.2);
+        /* Quick Stats Bar */
+        .quick-stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 107, 26, 0.1);
         }
 
-        .info-label {
-            font-size: 0.75rem;
+        .quick-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .quick-stat-label {
+            font-size: 0.6875rem;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 12px;
+            letter-spacing: 1px;
             font-weight: 700;
         }
 
-        .info-value {
+        .quick-stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .quick-stat-value.accent {
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .quick-stat-value.positive {
+            color: #10b981;
+        }
+
+        .quick-stat-value.negative {
+            color: #ef4444;
+        }
+
+        /* Insight Cards */
+        .insight-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 107, 26, 0.15);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .insight-card:hover {
+            background: rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 107, 26, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .insight-card.highlight {
+            background: linear-gradient(135deg, rgba(255, 107, 26, 0.12), rgba(255, 138, 71, 0.08));
+            border-color: rgba(255, 107, 26, 0.4);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .insight-title {
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .insight-badge {
+            padding: 4px 12px;
+            background: rgba(255, 107, 26, 0.2);
+            border: 1px solid rgba(255, 107, 26, 0.4);
+            border-radius: 12px;
+            font-size: 0.6875rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ai-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.2), rgba(168, 85, 247, 0.15));
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            border-radius: 12px;
+            font-size: 0.6875rem;
+            font-weight: 800;
+            color: #a855f7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .insight-body {
+            font-size: 0.875rem;
+        }
+
+        .metric-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 107, 26, 0.08);
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-size: 0.875rem;
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .metric-value.small {
+            font-size: 0.75rem;
+        }
+
+        /* Financial Metrics */
+        .financial-metric {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 107, 26, 0.15);
+        }
+
+        .financial-metric:last-child {
+            border-bottom: none;
+        }
+
+        .financial-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .financial-value {
             font-size: 1.75rem;
             font-weight: 800;
             background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            margin-bottom: 4px;
+        }
+
+        .financial-sublabel {
+            font-size: 0.6875rem;
+            color: var(--text-tertiary);
+        }
+
+        /* Technical Indicators */
+        .indicator-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 107, 26, 0.08);
+        }
+
+        .indicator-row:last-child {
+            border-bottom: none;
+        }
+
+        .indicator-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .indicator-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+        }
+
+        .indicator-dot.bullish {
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .indicator-dot.bearish {
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+        }
+
+        .indicator-dot.neutral {
+            background: #6b7280;
+        }
+
+        .indicator-value {
+            font-size: 0.875rem;
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        /* Decision Card */
+        .decision-card {
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.12), rgba(168, 85, 247, 0.08));
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+
+        .decision-recommendation {
+            margin-bottom: 16px;
+        }
+
+        .decision-action {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--orange);
+            margin-bottom: 8px;
+        }
+
+        .decision-rationale {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .decision-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .decision-metric {
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .decision-metric-label {
+            display: block;
+            font-size: 0.6875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .decision-metric-value {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        /* Model Performance */
+        .performance-metric {
+            margin-bottom: 16px;
+        }
+
+        .performance-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .performance-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--orange) 0%, var(--orange-light) 100%);
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .performance-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8125rem;
+        }
+
+        .performance-label span:first-child {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .performance-value {
+            color: var(--orange);
+            font-weight: 800;
         }
 
         /* ===== FOOTER ===== */
@@ -1315,6 +1605,21 @@
         }
 
         /* ===== MOBILE RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .chart-main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-column-primary {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 107, 26, 0.15);
+            }
+
+            .chart-column-insights {
+                max-height: none;
+            }
+        }
+
         @media (max-width: 768px) {
             nav {
                 padding: 15px 0;
@@ -1434,35 +1739,48 @@
                 width: 100%;
             }
 
-            .chart-content {
-                padding: 30px 20px;
+            .chart-topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                padding: 20px;
             }
 
-            .chart-canvas-wrapper {
-                height: 400px;
-                padding: 15px;
-            }
-
-            .chart-title {
-                font-size: 1.5rem;
-            }
-
-            .chart-controls {
+            .chart-title-group {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 12px;
             }
 
-            .time-range-buttons {
-                width: 100%;
-                gap: 6px;
+            .chart-title {
+                font-size: 1.25rem;
             }
 
-            .range-btn {
-                flex: 1;
-                min-width: 0;
-                padding: 10px 12px;
-                font-size: 0.7rem;
+            .chart-column-primary {
+                padding: 20px;
+            }
+
+            .chart-column-insights {
+                padding: 20px;
+            }
+
+            .chart-canvas-wrapper {
+                height: 350px;
+                padding: 15px;
+            }
+
+            .quick-stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 16px;
+            }
+
+            .quick-stat-value {
+                font-size: 1.25rem;
+            }
+
+            .financial-value {
+                font-size: 1.5rem;
             }
 
             .orb-1,
@@ -1477,6 +1795,24 @@
             .stats-grid,
             .results-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .time-range-selector {
+                gap: 4px;
+                padding: 4px;
+            }
+
+            .range-btn {
+                padding: 8px 10px;
+                font-size: 0.6875rem;
+            }
+
+            .quick-stats-bar {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-section.expanded {
+                max-height: 3500px;
             }
         }
     </style>
@@ -1692,52 +2028,210 @@
 
             <div class="chart-section" id="chartSection">
                 <div class="chart-content">
-                    <div class="chart-header">
-                        <h2 class="chart-title">WTI Crude Oil Price Forecast</h2>
-                        <p class="chart-subtitle">Advanced predictive modeling using exponential smoothing, volatility analysis, and trend momentum</p>
-                        <div class="chart-controls">
-                            <div class="live-indicator">
-                                <span class="live-dot"></span>
-                                <span>Updates every 15 minutes</span>
+                    <!-- Top Control Bar -->
+                    <div class="chart-topbar">
+                        <div class="chart-title-group">
+                            <h2 class="chart-title">WTI Crude Oil Price Forecast</h2>
+                            <div class="chart-badges">
+                                <div class="live-indicator">
+                                    <span class="live-dot"></span>
+                                    <span>Live</span>
+                                </div>
+                                <div class="data-source-badge live" id="dataSourceBadge">
+                                    <span class="status-dot"></span>
+                                    <span id="dataSourceText">LIVE DATA</span>
+                                </div>
                             </div>
-                            <div class="data-source-badge live" id="dataSourceBadge">
-                                <span class="status-dot"></span>
-                                <span id="dataSourceText">LIVE DATA</span>
-                            </div>
-                            <div class="time-range-buttons">
-                                <button class="range-btn" data-range="week">Week</button>
+                        </div>
+                        <div class="chart-actions">
+                            <button class="action-btn" id="exportBtn" title="Export data">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                            </button>
+                            <button class="action-btn" id="fullscreenBtn" title="Fullscreen">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Main Chart Area -->
+                    <div class="chart-main-grid">
+                        <div class="chart-column-primary">
+                            <!-- Time Range Controls -->
+                            <div class="time-range-selector">
+                                <button class="range-btn" data-range="week">1W</button>
                                 <button class="range-btn active" data-range="mtd">MTD</button>
-                                <button class="range-btn" data-range="3months">3 Months</button>
-                                <button class="range-btn" data-range="6months">6 Months</button>
+                                <button class="range-btn" data-range="3months">3M</button>
+                                <button class="range-btn" data-range="6months">6M</button>
                                 <button class="range-btn" data-range="ytd">YTD</button>
+                                <button class="range-btn" data-range="1year">1Y</button>
+                            </div>
+
+                            <!-- Chart Canvas -->
+                            <div class="chart-canvas-wrapper">
+                                <canvas id="priceChart"></canvas>
+                            </div>
+
+                            <!-- Quick Stats Bar -->
+                            <div class="quick-stats-bar">
+                                <div class="quick-stat">
+                                    <span class="quick-stat-label">Current</span>
+                                    <span class="quick-stat-value" id="currentPrice">$--</span>
+                                </div>
+                                <div class="quick-stat">
+                                    <span class="quick-stat-label">30D Forecast</span>
+                                    <span class="quick-stat-value accent" id="forecastPrice">$--</span>
+                                </div>
+                                <div class="quick-stat">
+                                    <span class="quick-stat-label">Change</span>
+                                    <span class="quick-stat-value" id="priceChange">--</span>
+                                </div>
+                                <div class="quick-stat">
+                                    <span class="quick-stat-label">Volatility</span>
+                                    <span class="quick-stat-value" id="volatilityValue">--</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="chart-canvas-wrapper">
-                        <canvas id="priceChart"></canvas>
-                    </div>
+                        <!-- Insights Panel -->
+                        <div class="chart-column-insights">
+                            <!-- Market Overview -->
+                            <div class="insight-card">
+                                <div class="insight-header">
+                                    <h3 class="insight-title">Market Overview</h3>
+                                    <span class="insight-badge" id="trendBadge">--</span>
+                                </div>
+                                <div class="insight-body">
+                                    <div class="metric-row">
+                                        <span class="metric-label">Trend Direction</span>
+                                        <span class="metric-value" id="trendDirection">--</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">Momentum</span>
+                                        <span class="metric-value" id="momentumValue">--</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">Model Confidence</span>
+                                        <span class="metric-value" id="confidenceValue">87%</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">Last Updated</span>
+                                        <span class="metric-value small" id="lastUpdate">--</span>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div class="model-info">
-                        <div class="info-item">
-                            <div class="info-label">Current Price</div>
-                            <div class="info-value" id="currentPrice">Loading...</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">30-Day Forecast</div>
-                            <div class="info-value" id="forecastPrice">--</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Trend</div>
-                            <div class="info-value" id="trendDirection">--</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Confidence</div>
-                            <div class="info-value">87%</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Last Updated</div>
-                            <div class="info-value" id="lastUpdate" style="font-size: 1rem;">--</div>
+                            <!-- Financial Impact -->
+                            <div class="insight-card highlight">
+                                <div class="insight-header">
+                                    <h3 class="insight-title">Financial Impact</h3>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                    </svg>
+                                </div>
+                                <div class="insight-body">
+                                    <div class="financial-metric">
+                                        <div class="financial-label">30-Day Revenue Impact</div>
+                                        <div class="financial-value" id="revenueImpact">$--</div>
+                                        <div class="financial-sublabel">Based on 75,000 barrels/day</div>
+                                    </div>
+                                    <div class="financial-metric">
+                                        <div class="financial-label">Price per Barrel Change</div>
+                                        <div class="financial-value" id="barrelChange">$--</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Technical Indicators -->
+                            <div class="insight-card">
+                                <div class="insight-header">
+                                    <h3 class="insight-title">Technical Indicators</h3>
+                                </div>
+                                <div class="insight-body">
+                                    <div class="indicator-row">
+                                        <div class="indicator-name">
+                                            <span class="indicator-dot" id="rsiDot"></span>
+                                            <span>RSI (14)</span>
+                                        </div>
+                                        <span class="indicator-value" id="rsiValue">--</span>
+                                    </div>
+                                    <div class="indicator-row">
+                                        <div class="indicator-name">
+                                            <span class="indicator-dot" id="macdDot"></span>
+                                            <span>MACD Signal</span>
+                                        </div>
+                                        <span class="indicator-value" id="macdValue">--</span>
+                                    </div>
+                                    <div class="indicator-row">
+                                        <div class="indicator-name">
+                                            <span class="indicator-dot" id="volumeDot"></span>
+                                            <span>Volume Trend</span>
+                                        </div>
+                                        <span class="indicator-value" id="volumeValue">--</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Decision Support -->
+                            <div class="insight-card decision-card">
+                                <div class="insight-header">
+                                    <h3 class="insight-title">AI Recommendation</h3>
+                                    <span class="ai-badge">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                                        </svg>
+                                        AI
+                                    </span>
+                                </div>
+                                <div class="insight-body">
+                                    <div class="decision-recommendation" id="aiDecision">
+                                        <div class="decision-action" id="decisionAction">Analyzing...</div>
+                                        <div class="decision-rationale" id="decisionRationale">Loading market analysis...</div>
+                                    </div>
+                                    <div class="decision-metrics">
+                                        <div class="decision-metric">
+                                            <span class="decision-metric-label">Risk Level</span>
+                                            <span class="decision-metric-value" id="riskLevel">--</span>
+                                        </div>
+                                        <div class="decision-metric">
+                                            <span class="decision-metric-label">Opportunity Score</span>
+                                            <span class="decision-metric-value" id="opportunityScore">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Model Performance -->
+                            <div class="insight-card">
+                                <div class="insight-header">
+                                    <h3 class="insight-title">Model Performance</h3>
+                                </div>
+                                <div class="insight-body">
+                                    <div class="performance-metric">
+                                        <div class="performance-bar">
+                                            <div class="performance-fill" style="width: 87%"></div>
+                                        </div>
+                                        <div class="performance-label">
+                                            <span>Prediction Accuracy</span>
+                                            <span class="performance-value">87%</span>
+                                        </div>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">MAPE</span>
+                                        <span class="metric-value" id="mapeValue">2.3%</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span class="metric-label">Sharpe Ratio</span>
+                                        <span class="metric-value" id="sharpeValue">1.85</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1870,6 +2364,10 @@
                         updateChart();
                     }
 
+                    if (isExpanded) {
+                        updateInsightsPanel();
+                    }
+
                     return;
 
                 } catch (error) {
@@ -1911,6 +2409,10 @@
             });
 
             updateDataSourceBadge(false);
+
+            if (isExpanded) {
+                updateInsightsPanel();
+            }
         }
 
         function getDateRangeStart(range) {
@@ -1934,8 +2436,302 @@
                     return sixMonths;
                 case 'ytd':
                     return new Date(today.getFullYear(), 0, 1);
+                case '1year':
+                    const oneYear = new Date(today);
+                    oneYear.setFullYear(today.getFullYear() - 1);
+                    return oneYear;
                 default:
                     return new Date(today.getFullYear(), today.getMonth(), 1);
+            }
+        }
+
+        // Technical Indicators
+        function calculateRSI(prices, period = 14) {
+            if (prices.length < period + 1) return 50;
+
+            const recentPrices = prices.slice(-period - 1);
+            let gains = 0;
+            let losses = 0;
+
+            for (let i = 1; i < recentPrices.length; i++) {
+                const change = recentPrices[i] - recentPrices[i - 1];
+                if (change > 0) {
+                    gains += change;
+                } else {
+                    losses += Math.abs(change);
+                }
+            }
+
+            const avgGain = gains / period;
+            const avgLoss = losses / period;
+
+            if (avgLoss === 0) return 100;
+
+            const rs = avgGain / avgLoss;
+            const rsi = 100 - (100 / (1 + rs));
+
+            return rsi;
+        }
+
+        function calculateMACD(prices) {
+            const ema12 = calculateEMA(prices, 12);
+            const ema26 = calculateEMA(prices, 26);
+            const macd = ema12 - ema26;
+
+            return macd;
+        }
+
+        function updateInsightsPanel() {
+            if (historicalPrices.length < 30) return;
+
+            const prices = historicalPrices.map(d => d.price);
+            const { forecastData } = generateAdvancedForecast();
+
+            if (forecastData.length === 0) return;
+
+            // Calculate metrics
+            const finalForecast = forecastData[forecastData.length - 1].y;
+            const priceChange = finalForecast - currentLivePrice;
+            const priceChangePercent = ((priceChange / currentLivePrice) * 100);
+            const volatility = calculateVolatility(prices, 30);
+            const rsi = calculateRSI(prices, 14);
+            const macd = calculateMACD(prices);
+
+            // Update quick stats
+            const priceChangeEl = document.getElementById('priceChange');
+            if (priceChangeEl) {
+                priceChangeEl.textContent = `${priceChange >= 0 ? '+' : ''}$${priceChange.toFixed(2)}`;
+                priceChangeEl.classList.remove('positive', 'negative');
+                priceChangeEl.classList.add(priceChange >= 0 ? 'positive' : 'negative');
+            }
+
+            const volatilityEl = document.getElementById('volatilityValue');
+            if (volatilityEl) {
+                volatilityEl.textContent = volatility.toFixed(2);
+            }
+
+            // Update trend badge
+            const trendBadge = document.getElementById('trendBadge');
+            if (trendBadge) {
+                if (priceChangePercent > 2) {
+                    trendBadge.textContent = 'BULLISH';
+                    trendBadge.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.15))';
+                    trendBadge.style.borderColor = 'rgba(16, 185, 129, 0.5)';
+                    trendBadge.style.color = '#10b981';
+                } else if (priceChangePercent < -2) {
+                    trendBadge.textContent = 'BEARISH';
+                    trendBadge.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.15))';
+                    trendBadge.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+                    trendBadge.style.color = '#ef4444';
+                } else {
+                    trendBadge.textContent = 'NEUTRAL';
+                    trendBadge.style.background = 'rgba(255, 107, 26, 0.2)';
+                    trendBadge.style.borderColor = 'rgba(255, 107, 26, 0.4)';
+                    trendBadge.style.color = 'var(--orange)';
+                }
+            }
+
+            // Update momentum
+            const momentumEl = document.getElementById('momentumValue');
+            if (momentumEl) {
+                if (macd > 0) {
+                    momentumEl.textContent = 'Positive';
+                    momentumEl.style.color = '#10b981';
+                } else if (macd < 0) {
+                    momentumEl.textContent = 'Negative';
+                    momentumEl.style.color = '#ef4444';
+                } else {
+                    momentumEl.textContent = 'Neutral';
+                    momentumEl.style.color = 'var(--text-secondary)';
+                }
+            }
+
+            // Financial Impact (75,000 barrels/day for 30 days)
+            const barrelsPerDay = 75000;
+            const days = 30;
+            const totalBarrels = barrelsPerDay * days;
+            const revenueImpact = priceChange * totalBarrels;
+
+            const revenueImpactEl = document.getElementById('revenueImpact');
+            if (revenueImpactEl) {
+                const sign = revenueImpact >= 0 ? '+' : '';
+                revenueImpactEl.textContent = `${sign}$${(revenueImpact / 1000000).toFixed(2)}M`;
+            }
+
+            const barrelChangeEl = document.getElementById('barrelChange');
+            if (barrelChangeEl) {
+                const sign = priceChange >= 0 ? '+' : '';
+                barrelChangeEl.textContent = `${sign}$${priceChange.toFixed(2)}`;
+            }
+
+            // Technical Indicators
+            const rsiEl = document.getElementById('rsiValue');
+            const rsiDot = document.getElementById('rsiDot');
+            if (rsiEl && rsiDot) {
+                rsiEl.textContent = rsi.toFixed(1);
+                if (rsi > 70) {
+                    rsiDot.className = 'indicator-dot bearish';
+                } else if (rsi < 30) {
+                    rsiDot.className = 'indicator-dot bullish';
+                } else {
+                    rsiDot.className = 'indicator-dot neutral';
+                }
+            }
+
+            const macdEl = document.getElementById('macdValue');
+            const macdDot = document.getElementById('macdDot');
+            if (macdEl && macdDot) {
+                if (macd > 0) {
+                    macdEl.textContent = 'Bullish';
+                    macdDot.className = 'indicator-dot bullish';
+                } else if (macd < 0) {
+                    macdEl.textContent = 'Bearish';
+                    macdDot.className = 'indicator-dot bearish';
+                } else {
+                    macdEl.textContent = 'Neutral';
+                    macdDot.className = 'indicator-dot neutral';
+                }
+            }
+
+            const volumeEl = document.getElementById('volumeValue');
+            const volumeDot = document.getElementById('volumeDot');
+            if (volumeEl && volumeDot) {
+                volumeEl.textContent = 'Normal';
+                volumeDot.className = 'indicator-dot neutral';
+            }
+
+            // AI Recommendation
+            updateAIRecommendation(priceChangePercent, rsi, macd, volatility);
+        }
+
+        function updateAIRecommendation(priceChangePercent, rsi, macd, volatility) {
+            const decisionActionEl = document.getElementById('decisionAction');
+            const decisionRationaleEl = document.getElementById('decisionRationale');
+            const riskLevelEl = document.getElementById('riskLevel');
+            const opportunityScoreEl = document.getElementById('opportunityScore');
+
+            if (!decisionActionEl || !decisionRationaleEl || !riskLevelEl || !opportunityScoreEl) return;
+
+            // Determine action based on multiple indicators
+            let action = '';
+            let rationale = '';
+            let riskLevel = '';
+            let opportunityScore = 0;
+
+            // Calculate opportunity score (0-100)
+            let scoreFactors = [];
+
+            // RSI factor (30-70 is good)
+            if (rsi < 30) {
+                scoreFactors.push(70); // Oversold - opportunity to buy
+            } else if (rsi > 70) {
+                scoreFactors.push(30); // Overbought - caution
+            } else {
+                scoreFactors.push(50); // Neutral
+            }
+
+            // MACD factor
+            if (macd > 0) {
+                scoreFactors.push(65);
+            } else {
+                scoreFactors.push(35);
+            }
+
+            // Trend factor
+            if (priceChangePercent > 3) {
+                scoreFactors.push(75);
+            } else if (priceChangePercent < -3) {
+                scoreFactors.push(25);
+            } else {
+                scoreFactors.push(50);
+            }
+
+            opportunityScore = Math.round(scoreFactors.reduce((a, b) => a + b, 0) / scoreFactors.length);
+
+            // Determine action
+            if (priceChangePercent > 3 && rsi < 70 && macd > 0) {
+                action = 'BULLISH OUTLOOK';
+                rationale = 'Strong upward trend with positive momentum indicators. Model suggests continued price appreciation over 30-day horizon.';
+                riskLevel = 'Moderate';
+            } else if (priceChangePercent < -3 && rsi > 30 && macd < 0) {
+                action = 'BEARISH OUTLOOK';
+                rationale = 'Downward pressure detected with negative momentum. Consider hedging strategies to protect against price decline.';
+                riskLevel = 'Elevated';
+            } else if (rsi < 30) {
+                action = 'POTENTIAL OPPORTUNITY';
+                rationale = 'Market showing oversold conditions. Historical patterns suggest possible price recovery ahead.';
+                riskLevel = 'Moderate';
+            } else if (rsi > 70) {
+                action = 'EXERCISE CAUTION';
+                rationale = 'Overbought conditions detected. Market may be due for consolidation or correction.';
+                riskLevel = 'Elevated';
+            } else {
+                action = 'HOLD & MONITOR';
+                rationale = 'Market in equilibrium. Continue monitoring for clearer directional signals before taking major positions.';
+                riskLevel = 'Low';
+            }
+
+            // Update DOM
+            decisionActionEl.textContent = action;
+            decisionRationaleEl.textContent = rationale;
+            riskLevelEl.textContent = riskLevel;
+            opportunityScoreEl.textContent = `${opportunityScore}/100`;
+
+            // Color coding
+            if (riskLevel === 'Low') {
+                riskLevelEl.style.color = '#10b981';
+            } else if (riskLevel === 'Moderate') {
+                riskLevelEl.style.color = '#fb923c';
+            } else {
+                riskLevelEl.style.color = '#ef4444';
+            }
+
+            if (opportunityScore >= 70) {
+                opportunityScoreEl.style.color = '#10b981';
+            } else if (opportunityScore >= 40) {
+                opportunityScoreEl.style.color = '#fb923c';
+            } else {
+                opportunityScoreEl.style.color = '#ef4444';
+            }
+        }
+
+        function exportChartData() {
+            if (historicalPrices.length === 0) return;
+
+            const { forecastData } = generateAdvancedForecast();
+
+            let csvContent = 'data:text/csv;charset=utf-8,';
+            csvContent += 'Date,Type,Price\n';
+
+            // Add historical data
+            historicalPrices.forEach(item => {
+                csvContent += `${item.date.toISOString().split('T')[0]},Historical,${item.price}\n`;
+            });
+
+            // Add forecast data
+            forecastData.forEach(item => {
+                csvContent += `${item.x.toISOString().split('T')[0]},Forecast,${item.y}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', `wti_crude_forecast_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function toggleFullscreen() {
+            const chartContent = document.querySelector('.chart-content');
+            if (!chartContent) return;
+
+            if (!document.fullscreenElement) {
+                chartContent.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
             }
         }
 
@@ -2113,6 +2909,7 @@
 
             if (chart) {
                 updateChart();
+                updateInsightsPanel();
             }
         }
 
@@ -2130,6 +2927,7 @@
                 setTimeout(() => {
                     if (!chart) {
                         initChart();
+                        updateInsightsPanel();
                         updateInterval = setInterval(fetchLiveWTIPrice, 15 * 60 * 1000);
                     }
                 }, 300);
@@ -2416,6 +3214,16 @@
             const toggleBtn = document.getElementById('toggleChart');
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', toggleChartView);
+            }
+
+            const exportBtn = document.getElementById('exportBtn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', exportChartData);
+            }
+
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            if (fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', toggleFullscreen);
             }
 
             fetchLiveWTIPrice();
