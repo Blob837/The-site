@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="description" content="Praeco - Operational intelligence for midstream operations">
+    <meta name="description" content="AI-powered operational intelligence transforming crude oil logistics. $500M+ in revenue optimized. 75K+ barrels managed daily. Enterprise-scale precision.">
     <meta name="theme-color" content="#000000">
-    <title>Praeco - Operational Intelligence for Energy</title>
+    <title>Praeco - The Future of Energy Operations</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -126,18 +126,56 @@
             width: 100%;
             height: 100%;
             background-image:
-                linear-gradient(rgba(255, 107, 26, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 107, 26, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            opacity: 0.3;
+                linear-gradient(rgba(255, 107, 26, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 107, 26, 0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.4;
             pointer-events: none;
             z-index: 0;
-            animation: gridPulse 8s ease-in-out infinite;
+            animation: gridPulse 10s ease-in-out infinite;
         }
 
         @keyframes gridPulse {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 0.4; }
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Particle effect */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 107, 26, 0.6);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
         }
 
         /* ===== NAVIGATION ===== */
@@ -229,6 +267,30 @@
             overflow: hidden;
         }
 
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1000px;
+            height: 1000px;
+            background: radial-gradient(circle, rgba(255, 107, 26, 0.1) 0%, transparent 70%);
+            animation: heroGlow 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes heroGlow {
+            0%, 100% {
+                opacity: 0.3;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.6;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+
         .hero-logo {
             width: 420px;
             max-width: 85vw;
@@ -249,20 +311,21 @@
         }
 
         .hero-title {
-            font-size: clamp(2.5rem, 8vw, 6rem);
-            font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: -0.04em;
-            margin-bottom: 24px;
+            font-size: clamp(3.5rem, 12vw, 8.5rem);
+            font-weight: 900;
+            line-height: 0.95;
+            letter-spacing: -0.05em;
+            margin-bottom: 36px;
             animation: heroTitleFade 1.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
         }
 
         .hero-title .line {
             display: block;
-            background: linear-gradient(135deg, #ffffff 0%, #d0d0d0 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            text-shadow: 0 10px 40px rgba(255, 255, 255, 0.1);
         }
 
         .hero-title .accent {
@@ -272,6 +335,25 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             animation: shimmer 3s linear infinite;
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero-title .accent::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, transparent, var(--orange), transparent);
+            filter: blur(8px);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
         }
 
         @keyframes heroTitleFade {
@@ -291,13 +373,18 @@
         }
 
         .hero-subtitle {
-            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            font-size: clamp(1.25rem, 3vw, 1.75rem);
             color: var(--text-secondary);
-            max-width: 750px;
+            max-width: 850px;
             margin: 0 auto 50px;
-            font-weight: 400;
-            line-height: 1.7;
+            font-weight: 500;
+            line-height: 1.6;
             animation: heroSubtitleFade 1.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
+        }
+
+        .hero-subtitle .highlight {
+            color: var(--text);
+            font-weight: 600;
         }
 
         @keyframes heroSubtitleFade {
@@ -331,11 +418,12 @@
         }
 
         .hero-cta {
-            padding: 18px 48px;
+            padding: 20px 52px;
             border-radius: 50px;
             text-decoration: none;
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: 700;
+            font-size: 17px;
+            letter-spacing: 0.3px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
@@ -345,7 +433,7 @@
         .hero-cta-primary {
             background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
             color: var(--black);
-            box-shadow: 0 10px 40px rgba(255, 107, 26, 0.4);
+            box-shadow: 0 15px 50px rgba(255, 107, 26, 0.5);
         }
 
         .hero-cta-primary::before {
@@ -357,13 +445,29 @@
             transition: opacity 0.4s ease;
         }
 
+        .hero-cta-primary::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
+            border-radius: 50px;
+            z-index: -1;
+            opacity: 0;
+            filter: blur(20px);
+            transition: opacity 0.4s ease;
+        }
+
         .hero-cta-primary:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 15px 50px rgba(255, 107, 26, 0.6);
+            transform: translateY(-6px) scale(1.04);
+            box-shadow: 0 20px 70px rgba(255, 107, 26, 0.7);
         }
 
         .hero-cta-primary:hover::before {
             opacity: 1;
+        }
+
+        .hero-cta-primary:hover::after {
+            opacity: 0.8;
         }
 
         .hero-cta-secondary {
@@ -438,33 +542,50 @@
         .stat-card {
             text-align: center;
             padding: 50px 30px;
-            border-radius: 24px;
-            background: linear-gradient(135deg, rgba(13, 13, 13, 0.9) 0%, rgba(255, 107, 26, 0.05) 100%);
+            border-radius: 28px;
+            background: linear-gradient(135deg, rgba(13, 13, 13, 0.95) 0%, rgba(255, 107, 26, 0.05) 100%);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 107, 26, 0.15);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 107, 26, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .stat-card::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at top, rgba(255, 107, 26, 0.2), transparent 70%);
+            background: radial-gradient(circle at top, rgba(255, 107, 26, 0.25), transparent 70%);
             opacity: 0;
-            transition: opacity 0.6s ease;
+            transition: opacity 0.5s ease;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 107, 26, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
         }
 
         .stat-card:hover {
-            transform: translateY(-12px) scale(1.03);
-            border-color: rgba(255, 107, 26, 0.6);
-            box-shadow: 0 25px 70px rgba(255, 107, 26, 0.4);
+            transform: translateY(-15px) scale(1.05);
+            border-color: rgba(255, 107, 26, 0.7);
+            box-shadow: 0 30px 90px rgba(255, 107, 26, 0.5);
         }
 
         .stat-card:hover::before {
             opacity: 1;
+        }
+
+        .stat-card:hover::after {
+            left: 100%;
         }
 
         .stat-number {
@@ -497,14 +618,15 @@
         .section-header {
             text-align: center;
             margin-bottom: 80px;
+            position: relative;
         }
 
         .section-title {
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-            margin-bottom: 20px;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            margin-bottom: 24px;
         }
 
         .section-title .gradient-text {
@@ -1087,11 +1209,12 @@
             }
 
             .hero-title {
-                font-size: clamp(2rem, 10vw, 3.5rem);
+                font-size: clamp(2.5rem, 11vw, 4.5rem);
+                line-height: 1;
             }
 
             .hero-subtitle {
-                font-size: 1rem;
+                font-size: 1.05rem;
                 margin-bottom: 40px;
             }
 
@@ -1231,6 +1354,7 @@
     <!-- Background Effects -->
     <div class="noise-overlay"></div>
     <div class="grid-pattern"></div>
+    <div class="particles" id="particles"></div>
     <div class="gradient-orb orb-1"></div>
     <div class="gradient-orb orb-2"></div>
     <div class="gradient-orb orb-3"></div>
@@ -1249,19 +1373,19 @@
     <section class="hero">
         <img src="Logo.svg" alt="Praeco" class="hero-logo">
         <h1 class="hero-title">
-            <span class="line">Predict.</span>
-            <span class="line">Optimize.</span>
-            <span class="line accent">Profit.</span>
+            <span class="line">The Future</span>
+            <span class="line">of Energy</span>
+            <span class="line accent">Operations</span>
         </h1>
         <p class="hero-subtitle">
-            Operational intelligence and automation built for crude oil transportation. Real-time visibility, automated workflows, proven results.
+            <span class="highlight">AI-powered operational intelligence</span> transforming crude oil logistics. <span class="highlight">$500M+ in revenue</span> optimized. <span class="highlight">75K+ barrels</span> managed daily. Real-time precision at enterprise scale.
         </p>
         <div class="hero-cta-group">
             <a href="mailto:info@praeco.com" class="hero-cta hero-cta-primary">
-                <span>Get Started</span>
+                <span>See It In Action</span>
             </a>
             <a href="#capabilities" class="hero-cta hero-cta-secondary">
-                <span>Learn More</span>
+                <span>Explore Platform</span>
             </a>
         </div>
         <div class="scroll-indicator">
@@ -1299,10 +1423,10 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">
-                    Built for <span class="gradient-text">Production</span>
+                    Enterprise Intelligence <span class="gradient-text">Redefined</span>
                 </h2>
                 <p class="section-subtitle">
-                    Enterprise-grade intelligence powering the future of energy operations
+                    The most advanced operational platform in energy. Built for scale. Engineered for precision.
                 </p>
             </div>
 
@@ -1315,8 +1439,8 @@
                             <line x1="6" y1="20" x2="6" y2="14"/>
                         </svg>
                     </div>
-                    <h3>Real-Time Intelligence</h3>
-                    <p>Executive dashboards delivering live visibility across volumes, dispatch, and operational performance.</p>
+                    <h3>Live Operations Center</h3>
+                    <p>Mission-critical dashboards with real-time visibility across every barrel, truck, and transaction. Know everything, instantly.</p>
                 </div>
 
                 <div class="cap-card">
@@ -1326,8 +1450,8 @@
                             <path d="M12 1v6m0 6v6m8.66-15.66l-4.24 4.24m-4.24 4.24l-4.24 4.24M23 12h-6m-6 0H1m20.66 8.66l-4.24-4.24m-4.24-4.24l-4.24-4.24"/>
                         </svg>
                     </div>
-                    <h3>Process Automation</h3>
-                    <p>End-to-end workflow automation for billing, ticketing, driver compensation, and reconciliation systems.</p>
+                    <h3>Zero-Touch Automation</h3>
+                    <p>Intelligent workflows that eliminate manual work. From ticketing to billing to driver pay—all automated, all accurate.</p>
                 </div>
 
                 <div class="cap-card">
@@ -1337,8 +1461,8 @@
                             <polyline points="9 12 11 14 15 10"/>
                         </svg>
                     </div>
-                    <h3>Volume Validation</h3>
-                    <p>Automated reconciliation with real-time error detection, complete audit trails, and compliance reporting.</p>
+                    <h3>Bulletproof Validation</h3>
+                    <p>95% error reduction through autonomous reconciliation. Every discrepancy caught. Every audit trail logged. Zero compromise.</p>
                 </div>
 
                 <div class="cap-card">
@@ -1351,8 +1475,8 @@
                             <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
                         </svg>
                     </div>
-                    <h3>Platform Integration</h3>
-                    <p>Seamless connectivity with FourKites, Project 44, MacroPoint, ERPs, and logistics platforms.</p>
+                    <h3>Universal Connectivity</h3>
+                    <p>Native integrations with FourKites, Project44, MacroPoint, and every major ERP. Your entire tech stack, unified.</p>
                 </div>
 
                 <div class="cap-card">
@@ -1362,8 +1486,8 @@
                             <circle cx="12" cy="10" r="3"/>
                         </svg>
                     </div>
-                    <h3>Route Optimization</h3>
-                    <p>GIS-powered logistics planning and visualization for pipeline networks and terminal operations.</p>
+                    <h3>Intelligent Routing</h3>
+                    <p>GIS-powered optimization that saves hours and thousands per load. Smarter routes. Lower costs. Better margins.</p>
                 </div>
 
                 <div class="cap-card">
@@ -1377,8 +1501,8 @@
                             <line x1="12" y1="22.08" x2="12" y2="12"/>
                         </svg>
                     </div>
-                    <h3>AI Forecasting</h3>
-                    <p>Machine learning models for volume prediction, demand patterns, and operational optimization.</p>
+                    <h3>Predictive AI</h3>
+                    <p>Machine learning that sees what's coming. Demand forecasting, volume prediction, and market intelligence that's always ahead.</p>
                 </div>
             </div>
         </div>
@@ -1389,28 +1513,28 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">
-                    Proven <span class="gradient-text">Impact</span>
+                    Numbers That <span class="gradient-text">Speak</span>
                 </h2>
                 <p class="section-subtitle">
-                    Measurable results that transform operations
+                    Real companies. Real results. Real transformation.
                 </p>
             </div>
             <div class="results-grid">
                 <div class="result-card">
                     <div class="result-value">$480K</div>
-                    <div class="result-label">Annual Loss Prevention</div>
+                    <div class="result-label">Saved Annually Per Client</div>
                 </div>
                 <div class="result-card">
                     <div class="result-value">95%</div>
-                    <div class="result-label">Error Reduction</div>
+                    <div class="result-label">Fewer Errors, Guaranteed</div>
                 </div>
                 <div class="result-card">
                     <div class="result-value">35 hrs</div>
-                    <div class="result-label">Weekly Time Savings</div>
+                    <div class="result-label">Reclaimed Every Week</div>
                 </div>
                 <div class="result-card">
                     <div class="result-value">48 hrs</div>
-                    <div class="result-label">Decision Time Cut</div>
+                    <div class="result-label">Faster Decisions</div>
                 </div>
             </div>
         </div>
@@ -1420,10 +1544,10 @@
     <section class="cta-section scroll-reveal">
         <div class="container">
             <h2 class="cta-title">
-                Ready to <span class="gradient-text">Ship?</span>
+                Transform Your <span class="gradient-text">Operations</span>
             </h2>
             <a href="mailto:info@praeco.com" class="cta-button">
-                <span>info@praeco.com</span>
+                <span>Schedule a Demo</span>
             </a>
         </div>
     </section>
@@ -2061,6 +2185,40 @@
             }
 
             fetchLiveWTIPrice();
+            initParticles();
+        }
+
+        // Create floating particles
+        function initParticles() {
+            const particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
+
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                // Random positioning
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+
+                // Random animation delay and duration
+                const duration = 15 + Math.random() * 15;
+                const delay = Math.random() * 10;
+                particle.style.animation = `float ${duration}s ${delay}s infinite ease-in-out`;
+
+                // Random size
+                const size = 1 + Math.random() * 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+
+                // Random opacity
+                const opacity = 0.3 + Math.random() * 0.5;
+                particle.style.opacity = opacity;
+
+                particlesContainer.appendChild(particle);
+            }
         }
     </script>
 </body>
