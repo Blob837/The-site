@@ -6,7 +6,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="Praeco - Operational intelligence for midstream operations">
-    <title>Praeco</title>
+    <meta name="theme-color" content="#000000">
+    <title>Praeco - Operational Intelligence for Energy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <style>
@@ -19,10 +23,13 @@
         :root {
             --black: #000000;
             --dark: #0a0a0a;
+            --darker: #050505;
             --orange: #ff6b1a;
+            --orange-light: #ff8a47;
             --orange-glow: rgba(255, 107, 26, 0.15);
             --text: #ffffff;
             --text-secondary: #a0a0a0;
+            --text-tertiary: #707070;
             --border: #1a1a1a;
             --card-bg: #0d0d0d;
         }
@@ -31,377 +38,513 @@
             overflow-x: hidden;
             width: 100%;
             height: 100%;
+            scroll-behavior: smooth;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
             background: var(--black);
             color: var(--text);
-            line-height: 1.5;
+            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
             width: 100%;
             min-height: 100vh;
-            min-height: -webkit-fill-available;
+            position: relative;
         }
 
-        .grid-overlay {
+        /* ===== BACKGROUND EFFECTS ===== */
+        .noise-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
-                repeating-linear-gradient(0deg, transparent, transparent 99px, var(--border) 99px, var(--border) 100px),
-                repeating-linear-gradient(90deg, transparent, transparent 99px, var(--border) 99px, var(--border) 100px);
-            opacity: 0.2;
+            opacity: 0.03;
             pointer-events: none;
-            z-index: -1;
+            z-index: 1;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
-        .ambient-gradient {
+        .gradient-orb {
             position: fixed;
-            top: -50%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, var(--orange-glow) 0%, transparent 70%);
-            opacity: 0.5;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0;
             pointer-events: none;
-            z-index: -1;
-            animation: float 20s ease-in-out infinite;
+            z-index: 0;
+            animation: orbFloat 20s ease-in-out infinite;
         }
 
-        .gradient-orb-1 {
-            position: fixed;
-            top: 20%;
-            right: 10%;
+        .orb-1 {
+            top: -10%;
+            right: -5%;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(255, 107, 26, 0.15) 0%, transparent 70%);
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
-            pointer-events: none;
-            z-index: -1;
-            animation: floatOrb1 25s ease-in-out infinite;
+            background: radial-gradient(circle, rgba(255, 107, 26, 0.2) 0%, transparent 70%);
+            animation-delay: 0s;
         }
 
-        .gradient-orb-2 {
-            position: fixed;
+        .orb-2 {
             bottom: 10%;
-            left: 5%;
+            left: -10%;
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, rgba(255, 138, 71, 0.12) 0%, transparent 70%);
-            border-radius: 50%;
-            filter: blur(90px);
-            opacity: 0.5;
-            pointer-events: none;
-            z-index: -1;
-            animation: floatOrb2 30s ease-in-out infinite;
+            background: radial-gradient(circle, rgba(255, 138, 71, 0.15) 0%, transparent 70%);
+            animation-delay: 5s;
         }
 
-        .gradient-orb-3 {
-            position: fixed;
-            top: 50%;
+        .orb-3 {
+            top: 40%;
             left: 50%;
             width: 700px;
             height: 700px;
-            background: radial-gradient(circle, rgba(255, 107, 26, 0.08) 0%, transparent 70%);
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.4;
+            background: radial-gradient(circle, rgba(255, 107, 26, 0.1) 0%, transparent 70%);
+            animation-delay: 10s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% {
+                opacity: 0.4;
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                opacity: 0.6;
+                transform: translate(-30px, 50px) scale(1.1);
+            }
+            66% {
+                opacity: 0.5;
+                transform: translate(40px, -30px) scale(0.9);
+            }
+        }
+
+        .grid-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(255, 107, 26, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 107, 26, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
             pointer-events: none;
-            z-index: -1;
-            animation: floatOrb3 35s ease-in-out infinite;
+            z-index: 0;
+            animation: gridPulse 8s ease-in-out infinite;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-20px); }
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.4; }
         }
 
-        @keyframes floatOrb1 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(-50px, 80px) scale(1.1); }
-            66% { transform: translate(60px, -40px) scale(0.9); }
+        /* ===== NAVIGATION ===== */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 20px 0;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid rgba(255, 107, 26, 0.1);
+            transition: all 0.3s ease;
         }
 
-        @keyframes floatOrb2 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(70px, -60px) scale(1.15); }
-            66% { transform: translate(-40px, 50px) scale(0.95); }
+        nav.scrolled {
+            padding: 15px 0;
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom-color: rgba(255, 107, 26, 0.2);
         }
 
-        @keyframes floatOrb3 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(calc(-50% + 30px), calc(-50% - 30px)) scale(1.1); }
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 60px;
+        .nav-logo {
+            height: 32px;
+            filter: brightness(1.1) drop-shadow(0 0 20px rgba(255, 107, 26, 0.3));
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo:hover {
+            filter: brightness(1.3) drop-shadow(0 0 30px rgba(255, 107, 26, 0.5));
+            transform: scale(1.05);
+        }
+
+        .nav-cta {
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
+            color: var(--black);
+            padding: 12px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(255, 107, 26, 0.3);
             position: relative;
-            z-index: 10;
+            overflow: hidden;
         }
 
+        .nav-cta::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--orange-light) 0%, #ffb347 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 107, 26, 0.5);
+        }
+
+        .nav-cta:hover::before {
+            opacity: 1;
+        }
+
+        .nav-cta span {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== HERO SECTION ===== */
         .hero {
             min-height: 100vh;
-            min-height: -webkit-fill-available;
-            height: 100vh;
-            height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: max(env(safe-area-inset-top), 40px) 20px max(env(safe-area-inset-bottom), 40px);
+            padding: 120px 20px 80px;
             position: relative;
             z-index: 10;
-        }
-
-        .logo {
-            width: 380px;
-            max-width: 90vw;
-            margin-bottom: 50px;
-            filter: brightness(1.1) drop-shadow(0 0 60px rgba(255, 107, 26, 0.3));
-            animation: logoFade 1.2s ease-out;
-        }
-
-        @keyframes logoFade {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h1 {
-            font-size: clamp(3.5rem, 10vw, 7.5rem);
-            font-weight: 600;
-            line-height: 1.05;
-            letter-spacing: -0.05em;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-accent {
-            display: block;
-            background: linear-gradient(135deg, var(--orange) 0%, #ff8a47 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-subtitle {
-            font-size: clamp(1.25rem, 2.5vw, 1.75rem);
-            color: var(--text-secondary);
-            max-width: 700px;
-            margin: 0 auto 40px;
-            font-weight: 400;
-            line-height: 1.6;
-        }
-
-        .hero-cta {
-            background: var(--orange);
-            color: var(--black);
-            padding: 22px 60px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.125rem;
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: inline-block;
-            box-shadow: 0 10px 40px var(--orange-glow);
-        }
-
-        .hero-cta:hover {
-            background: #ff8a47;
-            transform: translateY(-4px);
-            box-shadow: 0 20px 60px rgba(255, 107, 26, 0.4);
-        }
-
-        .stats {
-            padding: 80px 0;
-            border-top: 1px solid rgba(255, 107, 26, 0.15);
-            position: relative;
-            z-index: 10;
-        }
-
-        .stats::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 300px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--orange), transparent);
-            box-shadow: 0 0 20px rgba(255, 107, 26, 0.5);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-        }
-
-        .stat {
-            text-align: center;
-            padding: 40px 30px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, rgba(13, 13, 13, 0.8) 0%, rgba(255, 107, 26, 0.05) 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 107, 26, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
-                        0 0 0 1px rgba(255, 255, 255, 0.03) inset,
-                        0 20px 60px rgba(255, 107, 26, 0.05);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
             overflow: hidden;
         }
 
-        .stat::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 107, 26, 0.1), transparent);
-            transition: left 0.6s ease;
+        .hero-logo {
+            width: 420px;
+            max-width: 85vw;
+            margin-bottom: 60px;
+            filter: brightness(1.2) drop-shadow(0 0 80px rgba(255, 107, 26, 0.4));
+            animation: heroLogoFade 1.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
         }
 
-        .stat:hover::before {
-            left: 100%;
+        @keyframes heroLogoFade {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
-        .stat:hover {
-            border-color: rgba(255, 107, 26, 0.5);
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 60px rgba(255, 107, 26, 0.25),
-                        0 0 80px rgba(255, 107, 26, 0.15),
-                        0 0 0 1px rgba(255, 107, 26, 0.3) inset;
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+            margin-bottom: 24px;
+            animation: heroTitleFade 1.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
         }
 
-        .stat-number {
-            font-size: 4rem;
-            font-weight: 700;
-            line-height: 1;
-            margin-bottom: 14px;
-            background: linear-gradient(135deg, var(--orange) 0%, #ff8a47 50%, var(--orange) 100%);
+        .hero-title .line {
+            display: block;
+            background: linear-gradient(135deg, #ffffff 0%, #d0d0d0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-title .accent {
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 50%, #ffb347 100%);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            filter: drop-shadow(0 4px 12px rgba(255, 107, 26, 0.4));
-            animation: shimmer 4s linear infinite;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes heroTitleFade {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            color: var(--text-secondary);
+            max-width: 750px;
+            margin: 0 auto 50px;
+            font-weight: 400;
+            line-height: 1.7;
+            animation: heroSubtitleFade 1.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
+        }
+
+        @keyframes heroSubtitleFade {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-cta-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: heroCtaFade 1.5s cubic-bezier(0.4, 0, 0.2, 1) 0.6s backwards;
+        }
+
+        @keyframes heroCtaFade {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-cta {
+            padding: 18px 48px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-cta-primary {
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
+            color: var(--black);
+            box-shadow: 0 10px 40px rgba(255, 107, 26, 0.4);
+        }
+
+        .hero-cta-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--orange-light) 0%, #ffb347 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .hero-cta-primary:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 15px 50px rgba(255, 107, 26, 0.6);
+        }
+
+        .hero-cta-primary:hover::before {
+            opacity: 1;
+        }
+
+        .hero-cta-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border: 2px solid rgba(255, 107, 26, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-cta-secondary:hover {
+            background: rgba(255, 107, 26, 0.1);
+            border-color: rgba(255, 107, 26, 0.6);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 15px 50px rgba(255, 107, 26, 0.3);
+        }
+
+        .hero-cta span {
             position: relative;
             z-index: 1;
         }
 
-        .stat:hover .stat-number {
-            animation: shimmer 2s linear infinite;
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
             color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 2px;
-            font-weight: 500;
+            animation: scrollFloat 3s ease-in-out infinite;
         }
 
-        .capabilities {
+        .scroll-indicator-line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, transparent, var(--orange), transparent);
+        }
+
+        @keyframes scrollFloat {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* ===== STATS SECTION ===== */
+        .stats {
             padding: 100px 0;
             position: relative;
             z-index: 10;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 50px 30px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(13, 13, 13, 0.9) 0%, rgba(255, 107, 26, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 107, 26, 0.15);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
             overflow: hidden;
         }
 
-        .capabilities::before {
+        .stat-card::before {
             content: '';
             position: absolute;
-            top: 20%;
-            right: -100px;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(255, 107, 26, 0.06) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
+            inset: 0;
+            background: radial-gradient(circle at top, rgba(255, 107, 26, 0.2), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.6s ease;
         }
 
-        .capabilities::after {
-            content: '';
-            position: absolute;
-            bottom: 20%;
-            left: -100px;
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(255, 138, 71, 0.05) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
+        .stat-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            border-color: rgba(255, 107, 26, 0.6);
+            box-shadow: 0 25px 70px rgba(255, 107, 26, 0.4);
         }
 
-        .section-title {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 70px;
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-            position: relative;
-            padding-bottom: 30px;
+        .stat-card:hover::before {
+            opacity: 1;
         }
 
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--orange), transparent);
-            border-radius: 2px;
-            box-shadow: 0 0 20px rgba(255, 107, 26, 0.5);
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, var(--orange) 0%, #ff8a47 50%, var(--orange) 100%);
+        .stat-number {
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 50%, #ffb347 100%);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            animation: shimmer 4s linear infinite;
             filter: drop-shadow(0 4px 20px rgba(255, 107, 26, 0.5));
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== SECTION TITLES ===== */
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-title {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .section-title .gradient-text {
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 50%, #ffb347 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             animation: shimmer 5s linear infinite;
         }
 
-        html {
-            scroll-behavior: smooth;
+        .section-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ===== CAPABILITIES SECTION ===== */
+        .capabilities {
+            padding: 100px 0;
+            position: relative;
+            z-index: 10;
         }
 
         .cap-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 28px;
         }
 
         .cap-card {
-            padding: 40px 35px;
-            border-radius: 24px;
-            background: linear-gradient(135deg, rgba(13, 13, 13, 0.9) 0%, rgba(255, 107, 26, 0.04) 100%);
+            padding: 45px 40px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, rgba(13, 13, 13, 0.95) 0%, rgba(255, 107, 26, 0.04) 100%);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 107, 26, 0.08);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4),
-                        0 0 0 1px rgba(255, 255, 255, 0.02) inset;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 107, 26, 0.1);
+            box-shadow: 0 12px 50px rgba(0, 0, 0, 0.5);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
@@ -412,137 +555,97 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 2px;
+            height: 3px;
             background: linear-gradient(90deg, transparent, var(--orange), transparent);
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.6s ease;
         }
 
         .cap-card::after {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: radial-gradient(circle, rgba(255, 107, 26, 0.15) 0%, transparent 70%);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s ease, height 0.6s ease;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255, 107, 26, 0.15), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.6s ease;
         }
 
         .cap-card:hover {
-            border-color: rgba(255, 107, 26, 0.4);
             transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 30px 90px rgba(255, 107, 26, 0.3),
-                        0 0 100px rgba(255, 107, 26, 0.15),
-                        0 0 0 1px rgba(255, 107, 26, 0.2) inset;
+            border-color: rgba(255, 107, 26, 0.5);
+            box-shadow: 0 30px 100px rgba(255, 107, 26, 0.4);
         }
 
-        .cap-card:hover::before {
-            opacity: 1;
-        }
-
+        .cap-card:hover::before,
         .cap-card:hover::after {
-            width: 300px;
-            height: 300px;
+            opacity: 1;
         }
 
         .cap-icon {
-            width: 56px;
-            height: 56px;
-            margin-bottom: 24px;
-            opacity: 0.9;
-            padding: 12px;
-            background: rgba(255, 107, 26, 0.08);
-            border-radius: 14px;
-            border: 1px solid rgba(255, 107, 26, 0.15);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 64px;
+            height: 64px;
+            margin-bottom: 28px;
+            padding: 16px;
+            background: rgba(255, 107, 26, 0.1);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 107, 26, 0.2);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-        }
-
-        .cap-icon::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 14px;
-            background: linear-gradient(135deg, rgba(255, 107, 26, 0.2), transparent);
-            opacity: 0;
-            transition: opacity 0.4s ease;
+            z-index: 1;
         }
 
         .cap-card:hover .cap-icon {
-            transform: scale(1.1) translateY(-4px);
-            background: rgba(255, 107, 26, 0.15);
-            border-color: rgba(255, 107, 26, 0.4);
-            box-shadow: 0 10px 30px rgba(255, 107, 26, 0.3);
-        }
-
-        .cap-card:hover .cap-icon::before {
-            opacity: 1;
+            transform: scale(1.15) translateY(-6px) rotate(5deg);
+            background: rgba(255, 107, 26, 0.2);
+            border-color: rgba(255, 107, 26, 0.5);
+            box-shadow: 0 12px 40px rgba(255, 107, 26, 0.4);
         }
 
         .cap-icon svg {
             width: 100%;
             height: 100%;
-            filter: drop-shadow(0 2px 8px rgba(255, 107, 26, 0.3));
-            transition: transform 0.4s ease;
-        }
-
-        .cap-card:hover .cap-icon svg {
-            transform: scale(1.05);
+            filter: drop-shadow(0 2px 8px rgba(255, 107, 26, 0.5));
         }
 
         .cap-card h3 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 14px;
             letter-spacing: -0.01em;
+            position: relative;
+            z-index: 1;
         }
 
         .cap-card p {
             color: var(--text-secondary);
-            font-size: 0.9375rem;
-            line-height: 1.6;
+            font-size: 1rem;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
         }
 
+        /* ===== RESULTS SECTION ===== */
         .results {
             padding: 100px 0;
-            border-top: 1px solid rgba(255, 107, 26, 0.15);
             position: relative;
             z-index: 10;
         }
 
-        .results::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 300px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--orange), transparent);
-            box-shadow: 0 0 20px rgba(255, 107, 26, 0.5);
-        }
-
         .results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 32px;
-            margin-top: 40px;
         }
 
         .result-card {
             text-align: center;
-            padding: 50px 35px;
-            border-radius: 24px;
-            background: linear-gradient(135deg, rgba(13, 13, 13, 0.85) 0%, rgba(255, 107, 26, 0.06) 100%);
+            padding: 60px 40px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, rgba(13, 13, 13, 0.95) 0%, rgba(255, 107, 26, 0.06) 100%);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 107, 26, 0.12);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4),
-                        0 0 0 1px rgba(255, 255, 255, 0.02) inset;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 107, 26, 0.15);
+            box-shadow: 0 12px 50px rgba(0, 0, 0, 0.5);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
@@ -551,17 +654,15 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at top, rgba(255, 107, 26, 0.15), transparent 60%);
+            background: radial-gradient(circle at top, rgba(255, 107, 26, 0.2), transparent 70%);
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.6s ease;
         }
 
         .result-card:hover {
-            border-color: rgba(255, 107, 26, 0.5);
             transform: translateY(-12px) scale(1.03);
-            box-shadow: 0 25px 70px rgba(255, 107, 26, 0.3),
-                        0 0 100px rgba(255, 107, 26, 0.2),
-                        0 0 0 1px rgba(255, 107, 26, 0.3) inset;
+            border-color: rgba(255, 107, 26, 0.6);
+            box-shadow: 0 30px 100px rgba(255, 107, 26, 0.5);
         }
 
         .result-card:hover::before {
@@ -569,11 +670,11 @@
         }
 
         .result-value {
-            font-size: 3.75rem;
-            font-weight: 700;
+            font-size: 4.5rem;
+            font-weight: 800;
             line-height: 1;
-            margin-bottom: 18px;
-            background: linear-gradient(135deg, var(--orange) 0%, #ff8a47 50%, var(--orange) 100%);
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 50%, #ffb347 100%);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -583,140 +684,119 @@
             z-index: 1;
         }
 
-        @keyframes shimmer {
-            0% { background-position: 0% center; }
-            100% { background-position: 200% center; }
-        }
-
-        .result-card:hover .result-value {
-            animation: shimmer 1.5s linear infinite;
-        }
-
         .result-label {
-            font-size: 0.9375rem;
+            font-size: 1rem;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.6;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
         }
 
-        .contact {
-            padding: 100px 0;
+        /* ===== CTA SECTION ===== */
+        .cta-section {
+            padding: 120px 0;
             text-align: center;
             position: relative;
             z-index: 10;
         }
 
-        .contact::before {
+        .cta-section::before {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255, 107, 26, 0.1) 0%, transparent 70%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(255, 107, 26, 0.15) 0%, transparent 70%);
             border-radius: 50%;
             pointer-events: none;
-            animation: pulse-glow 4s ease-in-out infinite;
+            animation: pulse-glow 5s ease-in-out infinite;
         }
 
         @keyframes pulse-glow {
-            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1); }
+            0%, 100% {
+                opacity: 0.3;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.6;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
         }
 
-        .contact-title {
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 600;
-            margin-bottom: 50px;
+        .cta-title {
+            font-size: clamp(2.5rem, 5vw, 5rem);
+            font-weight: 800;
+            margin-bottom: 60px;
             letter-spacing: -0.03em;
             line-height: 1.1;
             position: relative;
             z-index: 1;
         }
 
-        .contact-cta {
-            background: linear-gradient(135deg, var(--orange) 0%, #ff8a47 100%);
+        .cta-button {
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
             color: var(--black);
-            padding: 24px 70px;
+            padding: 24px 72px;
             text-decoration: none;
-            font-weight: 600;
-            font-size: 1.25rem;
-            border-radius: 14px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 700;
+            font-size: 1.35rem;
+            border-radius: 50px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-block;
-            box-shadow: 0 15px 50px rgba(255, 107, 26, 0.4),
-                        0 0 0 1px rgba(255, 107, 26, 0.5) inset;
+            box-shadow: 0 15px 60px rgba(255, 107, 26, 0.5);
             position: relative;
             z-index: 1;
             overflow: hidden;
         }
 
-        .contact-cta::before {
+        .cta-button::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, #ff8a47 0%, #ffb347 100%);
+            background: linear-gradient(135deg, var(--orange-light) 0%, #ffb347 100%);
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.5s ease;
         }
 
-        .contact-cta::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s ease, height 0.6s ease;
+        .cta-button:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 25px 90px rgba(255, 107, 26, 0.7);
         }
 
-        .contact-cta:hover::before {
+        .cta-button:hover::before {
             opacity: 1;
         }
 
-        .contact-cta:hover::after {
-            width: 300px;
-            height: 300px;
-        }
-
-        .contact-cta:hover {
-            transform: translateY(-6px) scale(1.05);
-            box-shadow: 0 25px 80px rgba(255, 107, 26, 0.6),
-                        0 0 100px rgba(255, 107, 26, 0.3),
-                        0 0 0 2px rgba(255, 255, 255, 0.2) inset;
-        }
-
-        .contact-cta > * {
+        .cta-button span {
             position: relative;
             z-index: 1;
         }
 
+        /* ===== PREDICTIVE SECTION ===== */
         .predictive-section {
-            padding: 60px 0;
+            padding: 80px 0;
             text-align: center;
             position: relative;
             z-index: 10;
         }
 
         .predictive-btn {
-            background: linear-gradient(135deg, rgba(13, 13, 13, 0.9) 0%, rgba(255, 107, 26, 0.08) 100%);
+            background: linear-gradient(135deg, rgba(13, 13, 13, 0.95) 0%, rgba(255, 107, 26, 0.08) 100%);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             color: var(--orange);
             padding: 22px 55px;
             border: 2px solid rgba(255, 107, 26, 0.6);
             text-decoration: none;
             font-weight: 600;
             font-size: 1.125rem;
-            border-radius: 14px;
+            border-radius: 50px;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-block;
             cursor: pointer;
-            box-shadow: 0 10px 40px rgba(255, 107, 26, 0.2),
-                        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+            box-shadow: 0 10px 40px rgba(255, 107, 26, 0.2);
             position: relative;
             overflow: hidden;
         }
@@ -725,46 +805,30 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, var(--orange) 0%, #ff8a47 100%);
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
             opacity: 0;
             transition: opacity 0.4s ease;
         }
 
-        .predictive-btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.6s ease;
+        .predictive-btn:hover {
+            color: var(--black);
+            transform: translateY(-6px) scale(1.05);
+            box-shadow: 0 20px 60px rgba(255, 107, 26, 0.5);
+            border-color: var(--orange);
         }
 
         .predictive-btn:hover::before {
             opacity: 1;
         }
 
-        .predictive-btn:hover::after {
-            left: 100%;
-        }
-
-        .predictive-btn:hover {
-            color: var(--black);
-            transform: translateY(-6px) scale(1.05);
-            box-shadow: 0 20px 60px rgba(255, 107, 26, 0.5),
-                        0 0 80px rgba(255, 107, 26, 0.3);
-            border-color: var(--orange);
-        }
-
         .predictive-btn.active {
-            background: linear-gradient(135deg, var(--orange) 0%, #ff8a47 100%);
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
             color: var(--black);
             border-color: var(--orange);
             box-shadow: 0 15px 50px rgba(255, 107, 26, 0.5);
         }
 
-        .predictive-btn > * {
+        .predictive-btn span {
             position: relative;
             z-index: 1;
         }
@@ -784,37 +848,15 @@
         .chart-content {
             background: linear-gradient(135deg, rgba(13, 13, 13, 0.95) 0%, rgba(255, 107, 26, 0.05) 100%);
             backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
             border: 1px solid rgba(255, 107, 26, 0.4);
-            border-radius: 24px;
+            border-radius: 28px;
             padding: 60px 50px;
-            box-shadow: 0 30px 100px rgba(255, 107, 26, 0.4),
-                        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-                        0 0 120px rgba(255, 107, 26, 0.2);
+            box-shadow: 0 30px 100px rgba(255, 107, 26, 0.4);
             opacity: 0;
             transform: translateY(-20px);
             transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-        }
-
-        .chart-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--orange), transparent);
-            opacity: 0.8;
-        }
-
-        .chart-content::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 50% 0%, rgba(255, 107, 26, 0.08), transparent 60%);
-            pointer-events: none;
         }
 
         .chart-section.expanded .chart-content {
@@ -829,13 +871,12 @@
 
         .chart-title {
             font-size: 2rem;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 10px;
-            color: var(--text);
         }
 
         .chart-subtitle {
-            font-size: 0.9375rem;
+            font-size: 0.95rem;
             color: var(--text-secondary);
             margin-bottom: 15px;
         }
@@ -852,7 +893,6 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-            align-items: center;
         }
 
         .range-btn {
@@ -862,22 +902,18 @@
             padding: 10px 20px;
             font-size: 0.8125rem;
             font-weight: 600;
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            border-radius: 20px;
             cursor: pointer;
             transition: all 0.2s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
-            white-space: nowrap;
-            min-width: 70px;
-            line-height: 1.2;
         }
 
         .range-btn:hover {
             background: rgba(255, 255, 255, 0.08);
             border-color: var(--orange);
             color: var(--text);
-            transform: translateY(-1px);
         }
 
         .range-btn.active {
@@ -885,11 +921,6 @@
             color: var(--black);
             border-color: var(--orange);
             box-shadow: 0 4px 12px rgba(255, 107, 26, 0.3);
-        }
-
-        .range-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 6px rgba(255, 107, 26, 0.2);
         }
 
         .live-indicator {
@@ -981,9 +1012,9 @@
             color: var(--orange);
         }
 
+        /* ===== FOOTER ===== */
         footer {
-            padding: 60px 0;
-            padding-bottom: max(60px, env(safe-area-inset-bottom));
+            padding: 80px 0;
             border-top: 1px solid rgba(255, 107, 26, 0.15);
             text-align: center;
             position: relative;
@@ -1012,16 +1043,142 @@
 
         .location {
             color: var(--orange);
-            font-weight: 600;
-            background: linear-gradient(135deg, var(--orange) 0%, #ff8a47 100%);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
+        /* ===== SCROLL ANIMATIONS ===== */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== MOBILE RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .container {
-                padding: 0 24px;
+            nav {
+                padding: 15px 0;
+            }
+
+            .nav-logo {
+                height: 28px;
+            }
+
+            .nav-cta {
+                padding: 10px 24px;
+                font-size: 13px;
+            }
+
+            .hero {
+                padding: 100px 20px 60px;
+            }
+
+            .hero-logo {
+                width: 280px;
+                margin-bottom: 40px;
+            }
+
+            .hero-title {
+                font-size: clamp(2rem, 10vw, 3.5rem);
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+                margin-bottom: 40px;
+            }
+
+            .hero-cta-group {
+                flex-direction: column;
+                gap: 16px;
+                width: 100%;
+            }
+
+            .hero-cta {
+                padding: 16px 40px;
+                font-size: 15px;
+                width: 100%;
+            }
+
+            .scroll-indicator {
+                display: none;
+            }
+
+            .stats,
+            .capabilities,
+            .results,
+            .cta-section,
+            .predictive-section {
+                padding: 60px 0;
+            }
+
+            .section-header {
+                margin-bottom: 50px;
+            }
+
+            .section-title {
+                font-size: clamp(2rem, 8vw, 3rem);
+            }
+
+            .section-subtitle {
+                font-size: 0.95rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .stat-card {
+                padding: 35px 20px;
+            }
+
+            .stat-number {
+                font-size: 3rem;
+            }
+
+            .stat-label {
+                font-size: 0.75rem;
+            }
+
+            .cap-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .cap-card {
+                padding: 35px 28px;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .result-card {
+                padding: 40px 24px;
+            }
+
+            .result-value {
+                font-size: 3rem;
+            }
+
+            .cta-title {
+                font-size: clamp(2rem, 8vw, 3rem);
+                margin-bottom: 40px;
+            }
+
+            .cta-button {
+                padding: 20px 48px;
+                font-size: 1.1rem;
+                width: 100%;
             }
 
             .chart-content {
@@ -1052,142 +1209,84 @@
                 min-width: 0;
                 padding: 10px 12px;
                 font-size: 0.7rem;
-                letter-spacing: 0.5px;
             }
-            
-            .data-source-badge {
-                font-size: 0.7rem;
-                padding: 5px 12px;
-            }
-        }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .orb-1,
+            .orb-2,
+            .orb-3 {
+                width: 300px;
+                height: 300px;
             }
         }
 
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-60px);
+        @media (max-width: 480px) {
+            .stats-grid,
+            .results-grid {
+                grid-template-columns: 1fr;
             }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(60px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes scaleIn {
-            from {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .scroll-reveal {
-            opacity: 0;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .scroll-reveal.revealed {
-            opacity: 1;
-        }
-
-        .hero {
-            animation: fadeInUp 0.8s ease-out backwards;
-        }
-
-        .stat {
-            animation: scaleIn 0.7s ease-out backwards;
-        }
-
-        .stat:nth-child(1) { animation-delay: 0.1s; }
-        .stat:nth-child(2) { animation-delay: 0.2s; }
-        .stat:nth-child(3) { animation-delay: 0.3s; }
-        .stat:nth-child(4) { animation-delay: 0.4s; }
-
-        .cap-card {
-            animation: fadeInUp 0.7s ease-out backwards;
-        }
-
-        .cap-card:nth-child(1) { animation-delay: 0.1s; }
-        .cap-card:nth-child(2) { animation-delay: 0.15s; }
-        .cap-card:nth-child(3) { animation-delay: 0.2s; }
-        .cap-card:nth-child(4) { animation-delay: 0.25s; }
-        .cap-card:nth-child(5) { animation-delay: 0.3s; }
-        .cap-card:nth-child(6) { animation-delay: 0.35s; }
-
-        .result-card {
-            animation: scaleIn 0.7s ease-out backwards;
-        }
-
-        .result-card:nth-child(1) { animation-delay: 0.1s; }
-        .result-card:nth-child(2) { animation-delay: 0.2s; }
-        .result-card:nth-child(3) { animation-delay: 0.3s; }
-        .result-card:nth-child(4) { animation-delay: 0.4s; }
-
-        .section-title {
-            animation: fadeInUp 0.8s ease-out backwards;
         }
     </style>
 </head>
 <body>
-    <div class="grid-overlay"></div>
-    <div class="ambient-gradient"></div>
-    <div class="gradient-orb-1"></div>
-    <div class="gradient-orb-2"></div>
-    <div class="gradient-orb-3"></div>
+    <!-- Background Effects -->
+    <div class="noise-overlay"></div>
+    <div class="grid-pattern"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
 
+    <!-- Navigation -->
+    <nav id="nav">
+        <div class="container">
+            <img src="Logo.svg" alt="Praeco" class="nav-logo">
+            <a href="mailto:info@praeco.com" class="nav-cta">
+                <span>Contact Us</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
     <section class="hero">
-    <img src="Logo.svg" alt="Praeco" class="logo">
-    <h1>
-        Predict.<br>
-        Optimize.<br>
-        <span class="hero-accent">Profit.</span>
-    </h1>
-    <p class="hero-subtitle">
-        Operational intelligence and automation built for crude oil transportation. Real-time visibility, automated workflows, proven results.
-    </p>
-    <a href="mailto:info@praeco.com" class="hero-cta">Get Started</a>
-</section>
+        <img src="Logo.svg" alt="Praeco" class="hero-logo">
+        <h1 class="hero-title">
+            <span class="line">Predict.</span>
+            <span class="line">Optimize.</span>
+            <span class="line accent">Profit.</span>
+        </h1>
+        <p class="hero-subtitle">
+            Operational intelligence and automation built for crude oil transportation. Real-time visibility, automated workflows, proven results.
+        </p>
+        <div class="hero-cta-group">
+            <a href="mailto:info@praeco.com" class="hero-cta hero-cta-primary">
+                <span>Get Started</span>
+            </a>
+            <a href="#capabilities" class="hero-cta hero-cta-secondary">
+                <span>Learn More</span>
+            </a>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <div class="scroll-indicator-line"></div>
+        </div>
+    </section>
 
-    <section class="stats">
+    <!-- Stats Section -->
+    <section class="stats scroll-reveal">
         <div class="container">
             <div class="stats-grid">
-                <div class="stat">
+                <div class="stat-card">
                     <div class="stat-number">75K+</div>
                     <div class="stat-label">Barrels Daily</div>
                 </div>
-                <div class="stat">
+                <div class="stat-card">
                     <div class="stat-number">$500M</div>
                     <div class="stat-label">Revenue Supported</div>
                 </div>
-                <div class="stat">
+                <div class="stat-card">
                     <div class="stat-number">1,820</div>
                     <div class="stat-label">Hours Saved</div>
                 </div>
-                <div class="stat">
+                <div class="stat-card">
                     <div class="stat-number">20%</div>
                     <div class="stat-label">Accuracy Gain</div>
                 </div>
@@ -1195,12 +1294,18 @@
         </div>
     </section>
 
-    <section class="capabilities">
+    <!-- Capabilities Section -->
+    <section class="capabilities scroll-reveal" id="capabilities">
         <div class="container">
-            <h2 class="section-title">
-                Built for <span class="gradient-text">Production</span>
-            </h2>
-            
+            <div class="section-header">
+                <h2 class="section-title">
+                    Built for <span class="gradient-text">Production</span>
+                </h2>
+                <p class="section-subtitle">
+                    Enterprise-grade intelligence powering the future of energy operations
+                </p>
+            </div>
+
             <div class="cap-grid">
                 <div class="cap-card">
                     <div class="cap-icon">
@@ -1279,11 +1384,17 @@
         </div>
     </section>
 
-    <section class="results">
+    <!-- Results Section -->
+    <section class="results scroll-reveal">
         <div class="container">
-            <h2 class="section-title">
-                Proven <span class="gradient-text">Impact</span>
-            </h2>
+            <div class="section-header">
+                <h2 class="section-title">
+                    Proven <span class="gradient-text">Impact</span>
+                </h2>
+                <p class="section-subtitle">
+                    Measurable results that transform operations
+                </p>
+            </div>
             <div class="results-grid">
                 <div class="result-card">
                     <div class="result-value">$480K</div>
@@ -1305,19 +1416,25 @@
         </div>
     </section>
 
-    <section class="contact">
+    <!-- CTA Section -->
+    <section class="cta-section scroll-reveal">
         <div class="container">
-            <h2 class="contact-title">
+            <h2 class="cta-title">
                 Ready to <span class="gradient-text">Ship?</span>
             </h2>
-            <a href="mailto:info@praeco.com" class="contact-cta">info@praeco.com</a>
+            <a href="mailto:info@praeco.com" class="cta-button">
+                <span>info@praeco.com</span>
+            </a>
         </div>
     </section>
 
-    <section class="predictive-section">
+    <!-- Predictive Section -->
+    <section class="predictive-section scroll-reveal">
         <div class="container">
-            <button class="predictive-btn" id="toggleChart">Preview Praeco's Predictive Model</button>
-            
+            <button class="predictive-btn" id="toggleChart">
+                <span>Preview Praeco's Predictive Model</span>
+            </button>
+
             <div class="chart-section" id="chartSection">
                 <div class="chart-content">
                     <div class="chart-header">
@@ -1341,7 +1458,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="chart-canvas-wrapper">
                         <canvas id="priceChart"></canvas>
                     </div>
@@ -1373,6 +1490,7 @@
         </div>
     </section>
 
+    <!-- Footer -->
     <footer>
         <div class="container">
             <p>&copy; 2025 Praeco LLC</p>
@@ -1381,21 +1499,50 @@
     </footer>
 
     <script>
+        // Navigation scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Scroll reveal animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Chart functionality (keeping original chart code)
         let chart = null;
         let isExpanded = false;
         let currentLivePrice = null;
         let historicalPrices = [];
         let updateInterval = null;
-        let selectedRange = 'mtd'; // Default to MTD
-        let isLiveData = false; // Track if data is live or simulated
+        let selectedRange = 'mtd';
+        let isLiveData = false;
 
         function updateDataSourceBadge(isLive) {
             isLiveData = isLive;
             const badge = document.getElementById('dataSourceBadge');
             const text = document.getElementById('dataSourceText');
-            
+
             if (!badge || !text) return;
-            
+
             if (isLive) {
                 badge.className = 'data-source-badge live';
                 text.textContent = 'LIVE DATA';
@@ -1405,27 +1552,20 @@
             }
         }
 
-        // Fetch WTI data from local JSON file (generated by backend script)
         async function fetchLiveWTIPrice() {
-            console.log('→ Fetching live WTI data from Yahoo Finance...');
-            
-            // Get 365 days of historical data
             const period1 = Math.floor((Date.now() - (365 * 24 * 60 * 60 * 1000)) / 1000);
             const period2 = Math.floor(Date.now() / 1000);
-            
+
             const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/CL=F?period1=${period1}&period2=${period2}&interval=1d`;
-            
-            // Try multiple CORS proxies in order
+
             const proxies = [
                 `https://corsproxy.io/?${encodeURIComponent(yahooUrl)}`,
                 `https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`,
-                yahooUrl // Try direct as last resort (will fail in most browsers due to CORS)
+                yahooUrl
             ];
-            
+
             for (let i = 0; i < proxies.length; i++) {
                 try {
-                    console.log(`  Attempting proxy ${i + 1}/${proxies.length}...`);
-                    
                     const response = await fetch(proxies[i], {
                         method: 'GET',
                         headers: {
@@ -1433,149 +1573,112 @@
                             'User-Agent': 'Mozilla/5.0'
                         }
                     });
-                    
-                    if (!response.ok) {
-                        console.warn(`  ✗ Proxy ${i + 1} HTTP ${response.status}: ${response.statusText}`);
-                        continue;
-                    }
-                    
+
+                    if (!response.ok) continue;
+
                     const data = await response.json();
-                    
-                    // Validate response structure
-                    if (!data || !data.chart || !data.chart.result || !data.chart.result[0]) {
-                        console.warn(`  ✗ Proxy ${i + 1}: Invalid response structure`);
-                        continue;
-                    }
-                    
+
+                    if (!data || !data.chart || !data.chart.result || !data.chart.result[0]) continue;
+
                     const result = data.chart.result[0];
                     const timestamps = result.timestamp;
                     const prices = result.indicators.quote[0].close;
-                    
-                    if (!timestamps || !prices || timestamps.length === 0) {
-                        console.warn(`  ✗ Proxy ${i + 1}: No price data in response`);
-                        continue;
-                    }
-                    
-                    // Build clean daily closing price array
+
+                    if (!timestamps || !prices || timestamps.length === 0) continue;
+
                     historicalPrices = [];
-                    let validPrices = 0;
-                    
+
                     for (let j = 0; j < timestamps.length; j++) {
                         if (prices[j] !== null && prices[j] !== undefined) {
                             const date = new Date(timestamps[j] * 1000);
                             date.setHours(0, 0, 0, 0);
-                            
+
                             historicalPrices.push({
                                 date: date,
                                 price: parseFloat(prices[j].toFixed(2))
                             });
-                            validPrices++;
                         }
                     }
-                    
-                    if (validPrices === 0) {
-                        console.warn(`  ✗ Proxy ${i + 1}: No valid price data parsed`);
-                        continue;
-                    }
-                    
-                    // Current price is the last closing price
+
+                    if (historicalPrices.length === 0) continue;
+
                     currentLivePrice = historicalPrices[historicalPrices.length - 1].price;
                     document.getElementById('currentPrice').textContent = `$${currentLivePrice.toFixed(2)}`;
                     document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('en-US', {
                         hour: '2-digit',
                         minute: '2-digit'
                     });
-                    
-                    console.log(`✓ LIVE DATA LOADED: $${currentLivePrice.toFixed(2)}`);
-                    console.log(`  Source: Yahoo Finance via proxy ${i + 1}`);
-                    console.log(`  Data points: ${historicalPrices.length} days`);
-                    console.log(`  Date range: ${historicalPrices[0].date.toLocaleDateString()} to ${historicalPrices[historicalPrices.length - 1].date.toLocaleDateString()}`);
-                    
+
                     updateDataSourceBadge(true);
-                    
+
                     if (isExpanded && chart) {
                         updateChart();
                     }
-                    
-                    return; // Success! Exit function
-                    
+
+                    return;
+
                 } catch (error) {
-                    console.warn(`  ✗ Proxy ${i + 1} error: ${error.message}`);
                     continue;
                 }
             }
-            
-            // All proxies failed
-            console.error('✗ ALL PROXIES FAILED');
-            console.error('  Unable to fetch live data from Yahoo Finance');
-            console.error('  Falling back to simulated data');
+
             generateFallbackData();
         }
 
         function generateFallbackData() {
-            console.log('⚠ Generating simulated WTI data...');
             historicalPrices = [];
             let price = 71.50;
             const daysBack = 365;
-            
+
             for (let i = daysBack; i >= 0; i--) {
                 const date = new Date();
                 date.setDate(date.getDate() - i);
                 date.setHours(0, 0, 0, 0);
-                
+
                 const trend = Math.sin(i / 60) * 0.08;
                 const volatility = (Math.random() - 0.5) * 1.5;
                 const meanReversion = (72 - price) * 0.03;
-                
+
                 price += trend + volatility + meanReversion;
                 price = Math.max(60, Math.min(85, price));
-                
+
                 historicalPrices.push({
                     date: date,
                     price: parseFloat(price.toFixed(2))
                 });
             }
-            
+
             currentLivePrice = price;
             document.getElementById('currentPrice').textContent = `$${currentLivePrice.toFixed(2)}`;
             document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('en-US', {
                 hour: '2-digit',
                 minute: '2-digit'
             });
-            
+
             updateDataSourceBadge(false);
-            
-            console.log(`✓ SIMULATED DATA: ${historicalPrices.length} days generated`);
-            console.log(`  Price: $${currentLivePrice.toFixed(2)}`);
-            console.log(`  Note: This is not real market data`);
         }
 
         function getDateRangeStart(range) {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            
+
             switch(range) {
                 case 'week':
                     const weekStart = new Date(today);
                     weekStart.setDate(today.getDate() - 7);
                     return weekStart;
-                    
                 case 'mtd':
                     return new Date(today.getFullYear(), today.getMonth(), 1);
-                    
                 case '3months':
                     const threeMonths = new Date(today);
                     threeMonths.setMonth(today.getMonth() - 3);
                     return threeMonths;
-                    
                 case '6months':
                     const sixMonths = new Date(today);
                     sixMonths.setMonth(today.getMonth() - 6);
                     return sixMonths;
-                    
                 case 'ytd':
                     return new Date(today.getFullYear(), 0, 1);
-                    
                 default:
                     return new Date(today.getFullYear(), today.getMonth(), 1);
             }
@@ -1583,72 +1686,71 @@
 
         function calculateEMA(prices, period) {
             if (prices.length < period) return prices[prices.length - 1];
-            
+
             const multiplier = 2 / (period + 1);
             let ema = prices.slice(0, period).reduce((a, b) => a + b, 0) / period;
-            
+
             for (let i = period; i < prices.length; i++) {
                 ema = (prices[i] - ema) * multiplier + ema;
             }
-            
+
             return ema;
         }
 
         function calculateVolatility(prices, period = 30) {
             if (prices.length < period) return 1.0;
-            
+
             const recentPrices = prices.slice(-period);
             const mean = recentPrices.reduce((a, b) => a + b, 0) / period;
             const variance = recentPrices.reduce((sum, price) => sum + Math.pow(price - mean, 2), 0) / period;
-            
+
             return Math.sqrt(variance);
         }
 
         function generateAdvancedForecast() {
             if (historicalPrices.length < 30) {
-                console.error('Not enough data for forecast');
                 return { forecastData: [], confidenceBands: [] };
             }
-            
+
             const forecastDays = 30;
             const forecastData = [];
             const confidenceBands = [];
-            
+
             const prices = historicalPrices.map(d => d.price);
-            
+
             const ema12 = calculateEMA(prices, 12);
             const ema26 = calculateEMA(prices, 26);
             const ema50 = calculateEMA(prices, 50);
             const ema200 = calculateEMA(prices, 200);
-            
+
             const momentum = ema12 - ema26;
             const longTermTrend = (ema50 - ema200) / ema200;
-            
+
             const volatility = calculateVolatility(prices, 60);
             const recentVolatility = calculateVolatility(prices, 20);
-            
+
             const yearlyMean = prices.reduce((a, b) => a + b, 0) / prices.length;
-            
+
             let forecastPrice = currentLivePrice;
             const lastDate = historicalPrices[historicalPrices.length - 1].date;
-            
+
             for (let i = 1; i <= forecastDays; i++) {
                 const forecastDate = new Date(lastDate);
                 forecastDate.setDate(forecastDate.getDate() + i);
-                
+
                 const trendComponent = (momentum * 0.12) + (longTermTrend * currentLivePrice * 0.08);
                 const meanReversionForce = (yearlyMean - forecastPrice) * 0.05;
                 const decayFactor = Math.exp(-i / 15);
                 const randomWalk = (Math.random() - 0.5) * recentVolatility * 0.8 * decayFactor;
-                
+
                 forecastPrice += trendComponent * decayFactor + meanReversionForce + randomWalk;
                 forecastPrice = Math.max(currentLivePrice * 0.88, Math.min(currentLivePrice * 1.12, forecastPrice));
-                
+
                 forecastData.push({
                     x: forecastDate,
                     y: parseFloat(forecastPrice.toFixed(2))
                 });
-                
+
                 const bandWidth = volatility * Math.sqrt(i) * 0.5;
                 confidenceBands.push({
                     x: forecastDate,
@@ -1656,34 +1758,29 @@
                     lower: parseFloat((forecastPrice - bandWidth).toFixed(2))
                 });
             }
-            
+
             const finalForecast = forecastData[forecastData.length - 1].y;
             document.getElementById('forecastPrice').textContent = `$${finalForecast.toFixed(2)}`;
             document.getElementById('trendDirection').textContent = finalForecast > currentLivePrice ? '↑ Upward' : '↓ Downward';
-            
-            console.log(`✓ Forecast generated: ${forecastDays} days`);
+
             return { forecastData, confidenceBands };
         }
 
         function prepareChartData() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            
+
             const rangeStart = getDateRangeStart(selectedRange);
-            
-            // Get ALL historical data up to but not including today
+
             const historicalData = historicalPrices
                 .filter(d => d.date >= rangeStart && d.date < today)
                 .map(d => ({ x: d.date, y: d.price }));
-            
-            // Get today's price as a separate point (if it exists)
+
             const todayPrice = historicalPrices.find(d => d.date.getTime() === today.getTime());
             const currentData = todayPrice ? [{ x: today, y: todayPrice.price }] : [];
-            
+
             const { forecastData, confidenceBands } = generateAdvancedForecast();
-            
-            console.log(`✓ Data prepared: ${historicalData.length} historical, ${currentData.length} current, ${forecastData.length} forecast`);
-            
+
             return { historicalData, currentData, forecastData, confidenceBands };
         }
 
@@ -1696,9 +1793,8 @@
         }
 
         function setActiveRange(range) {
-            console.log(`→ Setting range to: ${range}`);
             selectedRange = range;
-            
+
             document.querySelectorAll('.range-btn').forEach(btn => {
                 if (btn.dataset.range === range) {
                     btn.classList.add('active');
@@ -1706,7 +1802,7 @@
                     btn.classList.remove('active');
                 }
             });
-            
+
             if (chart) {
                 updateChart();
             }
@@ -1715,54 +1811,38 @@
         function toggleChartView() {
             const section = document.getElementById('chartSection');
             const btn = document.getElementById('toggleChart');
-            
+
             isExpanded = !isExpanded;
-            
+
             if (isExpanded) {
-                console.log('→ Expanding chart...');
                 section.classList.add('expanded');
                 btn.classList.add('active');
-                btn.textContent = 'Hide Predictive Model';
-                
+                btn.querySelector('span').textContent = 'Hide Predictive Model';
+
                 setTimeout(() => {
                     if (!chart) {
                         initChart();
-                        setupChartClickOutsideHandler();
                         updateInterval = setInterval(fetchLiveWTIPrice, 15 * 60 * 1000);
                     }
                 }, 300);
             } else {
-                console.log('→ Hiding chart...');
                 section.classList.remove('expanded');
                 btn.classList.remove('active');
-                btn.textContent = 'Preview Praeco\'s Predictive Model';
+                btn.querySelector('span').textContent = 'Preview Praeco\'s Predictive Model';
             }
         }
 
         function initChart() {
             const ctx = document.getElementById('priceChart');
-            if (!ctx) {
-                console.error('✗ Canvas element not found');
-                return;
-            }
-            
-            console.log('→ Initializing chart...');
-            
-            if (historicalPrices.length === 0) {
-                console.error('✗ No historical data available');
-                return;
-            }
-            
+            if (!ctx || historicalPrices.length === 0) return;
+
             const { historicalData, currentData, forecastData, confidenceBands } = prepareChartData();
-            
-            if (historicalData.length === 0 && currentData.length === 0) {
-                console.error('✗ No data to display');
-                return;
-            }
-            
+
+            if (historicalData.length === 0 && currentData.length === 0) return;
+
             const confidenceUpper = confidenceBands.map(d => ({ x: d.x, y: d.upper }));
             const confidenceLower = [...confidenceBands].reverse().map(d => ({ x: d.x, y: d.lower }));
-            
+
             chart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -1824,10 +1904,6 @@
                         intersect: false,
                         axis: 'x'
                     },
-                    onClick: function(event, activeElements) {
-                        // Click handler is now managed in the external onclick function
-                        // This ensures tooltip shows date when user clicks
-                    },
                     animation: {
                         duration: 1200,
                         easing: 'easeInOutQuart'
@@ -1841,7 +1917,7 @@
                                 font: {
                                     size: 13,
                                     weight: '600',
-                                    family: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif'
+                                    family: 'Inter, sans-serif'
                                 },
                                 padding: 20,
                                 usePointStyle: true,
@@ -1877,9 +1953,9 @@
                                 },
                                 title: function(context) {
                                     const date = new Date(context[0].parsed.x);
-                                    return date.toLocaleDateString('en-US', { 
+                                    return date.toLocaleDateString('en-US', {
                                         weekday: 'short',
-                                        month: 'short', 
+                                        month: 'short',
                                         day: 'numeric',
                                         year: 'numeric'
                                     });
@@ -1942,94 +2018,30 @@
                     }
                 }
             });
-            
-            console.log('✓ Chart initialized successfully');
-            
-            // Add click handler to show tooltip on chart click
-            ctx.onclick = function(evt) {
-                const points = chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-                
-                if (points.length > 0) {
-                    const firstPoint = points[0];
-                    
-                    // Show tooltip at clicked point
-                    chart.tooltip.setActiveElements([{
-                        datasetIndex: firstPoint.datasetIndex,
-                        index: firstPoint.index
-                    }]);
-                    chart.update();
-                }
-            };
-        }
-
-        // Global click handler to hide tooltip when clicking outside chart
-        // Set up once when app initializes
-        let chartClickOutsideHandler = null;
-        
-        function setupChartClickOutsideHandler() {
-            if (chartClickOutsideHandler) {
-                document.removeEventListener('click', chartClickOutsideHandler);
-            }
-            
-            chartClickOutsideHandler = function(event) {
-                if (!chart) return;
-                
-                const canvas = document.getElementById('priceChart');
-                if (!canvas) return;
-                
-                const chartArea = canvas.getBoundingClientRect();
-                const clickX = event.clientX;
-                const clickY = event.clientY;
-                
-                // Check if click is outside the chart canvas
-                if (clickX < chartArea.left || clickX > chartArea.right ||
-                    clickY < chartArea.top || clickY > chartArea.bottom) {
-                    if (chart.tooltip) {
-                        chart.tooltip.setActiveElements([]);
-                        chart.update();
-                    }
-                }
-            };
-            
-            document.addEventListener('click', chartClickOutsideHandler);
         }
 
         function updateChart() {
-            if (!chart) {
-                console.error('✗ Chart not initialized');
-                return;
-            }
-            
-            console.log('→ Updating chart for range: ' + selectedRange);
-            
+            if (!chart) return;
+
             const { historicalData, currentData, forecastData, confidenceBands } = prepareChartData();
-            
-            // Create fresh arrays for confidence bands - don't mutate originals
+
             const confidenceUpper = confidenceBands.map(d => ({ x: d.x, y: d.upper }));
             const confidenceLower = [...confidenceBands].reverse().map(d => ({ x: d.x, y: d.lower }));
-            
-            // Completely replace dataset data (not append)
+
             chart.data.datasets[0].data = [...confidenceUpper, ...confidenceLower];
             chart.data.datasets[1].data = [...historicalData];
             chart.data.datasets[2].data = [...currentData];
             chart.data.datasets[3].data = [...forecastData];
-            
-            // Reset chart scales to prevent overlay artifacts
+
             chart.options.scales.x.min = undefined;
             chart.options.scales.x.max = undefined;
             chart.options.scales.y.min = undefined;
             chart.options.scales.y.max = undefined;
-            
-            // Force complete redraw without animation to prevent overlay
+
             chart.update('none');
-            
-            console.log('✓ Chart updated');
-            console.log(`  Historical points: ${historicalData.length}`);
-            console.log(`  Current points: ${currentData.length}`);
-            console.log(`  Forecast points: ${forecastData.length}`);
         }
 
-        // Wait for DOM to be ready before setting up event listeners
+        // Initialize app
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initializeApp);
         } else {
@@ -2037,25 +2049,18 @@
         }
 
         function initializeApp() {
-            console.log('→ Initializing app...');
-            
-            // Set up range buttons
             document.querySelectorAll('.range-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     setActiveRange(btn.dataset.range);
                 });
             });
-            
-            // Set up toggle button
+
             const toggleBtn = document.getElementById('toggleChart');
             if (toggleBtn) {
                 toggleBtn.addEventListener('click', toggleChartView);
             }
-            
-            // Fetch initial data
+
             fetchLiveWTIPrice();
-            
-            console.log('✓ App initialized');
         }
     </script>
 </body>
