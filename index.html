@@ -331,21 +331,30 @@
 
         .hero-title .accent {
             background: linear-gradient(135deg,
-                var(--orange) 0%,
-                #ff7a2e 15%,
-                var(--orange-light) 35%,
-                #ffa05c 50%,
-                #ffb06f 65%,
-                #ffb347 85%,
-                #ffc066 100%
+                #ff6b1a 0%,
+                #ff7524 8%,
+                #ff7f2e 16%,
+                #ff8938 24%,
+                #ff9342 32%,
+                #ff9d4c 40%,
+                #ffa756 48%,
+                #ffb160 56%,
+                #ffbb6a 64%,
+                #ffc574 72%,
+                #ffcf7e 80%,
+                #ffd988 88%,
+                #ffe392 96%,
+                #ffed9c 100%
             );
-            background-size: 300% auto;
+            background-size: 400% 100%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shimmer 4s ease-in-out infinite;
+            animation: shimmer 6s ease-in-out infinite;
             position: relative;
             display: inline-block;
+            filter: contrast(1.05) brightness(1.1);
+            will-change: background-position;
         }
 
         .hero-title .accent::after {
@@ -377,9 +386,9 @@
         }
 
         @keyframes shimmer {
-            0% { background-position: 0% center; }
-            50% { background-position: 100% center; }
-            100% { background-position: 200% center; }
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .hero-subtitle {
@@ -604,22 +613,30 @@
             line-height: 1;
             margin-bottom: 16px;
             background: linear-gradient(135deg,
-                var(--orange) 0%,
-                #ff7a2e 15%,
-                var(--orange-light) 35%,
-                #ffa05c 50%,
-                #ffb06f 65%,
-                #ffb347 85%,
-                #ffc066 100%
+                #ff6b1a 0%,
+                #ff7524 8%,
+                #ff7f2e 16%,
+                #ff8938 24%,
+                #ff9342 32%,
+                #ff9d4c 40%,
+                #ffa756 48%,
+                #ffb160 56%,
+                #ffbb6a 64%,
+                #ffc574 72%,
+                #ffcf7e 80%,
+                #ffd988 88%,
+                #ffe392 96%,
+                #ffed9c 100%
             );
-            background-size: 300% auto;
+            background-size: 400% 100%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shimmer 4s ease-in-out infinite;
-            filter: drop-shadow(0 4px 20px rgba(255, 107, 26, 0.5));
+            animation: shimmer 5s ease-in-out infinite;
+            filter: drop-shadow(0 4px 20px rgba(255, 107, 26, 0.5)) contrast(1.05) brightness(1.1);
             position: relative;
             z-index: 1;
+            will-change: background-position;
         }
 
         .stat-label {
@@ -649,19 +666,28 @@
 
         .section-title .gradient-text {
             background: linear-gradient(135deg,
-                var(--orange) 0%,
-                #ff7a2e 15%,
-                var(--orange-light) 35%,
-                #ffa05c 50%,
-                #ffb06f 65%,
-                #ffb347 85%,
-                #ffc066 100%
+                #ff6b1a 0%,
+                #ff7524 8%,
+                #ff7f2e 16%,
+                #ff8938 24%,
+                #ff9342 32%,
+                #ff9d4c 40%,
+                #ffa756 48%,
+                #ffb160 56%,
+                #ffbb6a 64%,
+                #ffc574 72%,
+                #ffcf7e 80%,
+                #ffd988 88%,
+                #ffe392 96%,
+                #ffed9c 100%
             );
-            background-size: 300% auto;
+            background-size: 400% 100%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shimmer 5s ease-in-out infinite;
+            animation: shimmer 5.5s ease-in-out infinite;
+            filter: contrast(1.05) brightness(1.1);
+            will-change: background-position;
         }
 
         .section-subtitle {
@@ -823,21 +849,30 @@
             line-height: 1;
             margin-bottom: 20px;
             background: linear-gradient(135deg,
-                var(--orange) 0%,
-                #ff7a2e 15%,
-                var(--orange-light) 35%,
-                #ffa05c 50%,
-                #ffb06f 65%,
-                #ffb347 85%,
-                #ffc066 100%
+                #ff6b1a 0%,
+                #ff7524 8%,
+                #ff7f2e 16%,
+                #ff8938 24%,
+                #ff9342 32%,
+                #ff9d4c 40%,
+                #ffa756 48%,
+                #ffb160 56%,
+                #ffbb6a 64%,
+                #ffc574 72%,
+                #ffcf7e 80%,
+                #ffd988 88%,
+                #ffe392 96%,
+                #ffed9c 100%
             );
-            background-size: 300% auto;
+            background-size: 400% 100%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shimmer 3s ease-in-out infinite;
+            animation: shimmer 4.5s ease-in-out infinite;
+            filter: contrast(1.05) brightness(1.1);
             position: relative;
             z-index: 1;
+            will-change: background-position;
         }
 
         .result-label {
@@ -1040,87 +1075,129 @@
         .chart-controls {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 24px;
             flex-wrap: wrap;
-            margin-top: 20px;
+            margin-top: 28px;
+            padding: 24px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 107, 26, 0.1);
         }
 
         .time-range-buttons {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 107, 26, 0.15);
         }
 
         .range-btn {
-            background: rgba(255, 255, 255, 0.05);
+            background: transparent;
             color: var(--text-secondary);
-            border: 1px solid var(--border);
-            padding: 10px 20px;
-            font-size: 0.8125rem;
-            font-weight: 600;
+            border: none;
+            padding: 12px 24px;
+            font-size: 0.875rem;
+            font-weight: 700;
             font-family: 'Inter', sans-serif;
-            border-radius: 20px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .range-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 107, 26, 0.15), rgba(255, 138, 71, 0.15));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 12px;
         }
 
         .range-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--orange);
-            color: var(--text);
+            background: rgba(255, 107, 26, 0.1);
+            color: var(--orange);
+            transform: translateY(-2px);
+        }
+
+        .range-btn:hover::before {
+            opacity: 1;
         }
 
         .range-btn.active {
-            background: var(--orange);
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
             color: var(--black);
-            border-color: var(--orange);
-            box-shadow: 0 4px 12px rgba(255, 107, 26, 0.3);
+            box-shadow: 0 6px 20px rgba(255, 107, 26, 0.4), 0 0 0 1px rgba(255, 107, 26, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .range-btn.active::before {
+            opacity: 0;
         }
 
         .live-indicator {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: rgba(255, 107, 26, 0.1);
-            border: 1px solid var(--orange);
-            border-radius: 20px;
-            font-size: 0.8125rem;
+            gap: 10px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, rgba(255, 107, 26, 0.15), rgba(255, 138, 71, 0.1));
+            border: 1px solid rgba(255, 107, 26, 0.4);
+            border-radius: 24px;
+            font-size: 0.875rem;
             color: var(--orange);
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(255, 107, 26, 0.2);
+            backdrop-filter: blur(10px);
         }
 
         .data-source-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 24px;
+            font-size: 0.8125rem;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .data-source-badge:hover {
+            transform: translateY(-2px);
         }
 
         .data-source-badge.live {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.15));
+            border: 1px solid rgba(16, 185, 129, 0.5);
             color: #10b981;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
         }
 
         .data-source-badge.simulated {
-            background: rgba(251, 146, 60, 0.15);
-            border: 1px solid #fb923c;
+            background: linear-gradient(135deg, rgba(251, 146, 60, 0.2), rgba(249, 115, 22, 0.15));
+            border: 1px solid rgba(251, 146, 60, 0.5);
             color: #fb923c;
+            box-shadow: 0 4px 16px rgba(251, 146, 60, 0.3);
         }
 
         .data-source-badge .status-dot {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background: currentColor;
+            box-shadow: 0 0 8px currentColor;
+            animation: pulse 2s ease-in-out infinite;
         }
 
         .live-dot {
@@ -1138,34 +1215,53 @@
 
         .chart-canvas-wrapper {
             position: relative;
-            height: 500px;
-            margin-bottom: 30px;
+            height: 550px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(255, 107, 26, 0.02));
+            border-radius: 16px;
+            border: 1px solid rgba(255, 107, 26, 0.1);
         }
 
         .model-info {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding-top: 30px;
-            border-top: 1px solid var(--border);
+            gap: 24px;
+            padding-top: 36px;
+            border-top: 1px solid rgba(255, 107, 26, 0.2);
         }
 
         .info-item {
             text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(255, 107, 26, 0.05));
+            border-radius: 16px;
+            border: 1px solid rgba(255, 107, 26, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .info-item:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 107, 26, 0.4);
+            box-shadow: 0 12px 32px rgba(255, 107, 26, 0.2);
         }
 
         .info-label {
-            font-size: 0.8125rem;
+            font-size: 0.75rem;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            font-weight: 700;
         }
 
         .info-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--orange);
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         /* ===== FOOTER ===== */
@@ -1343,7 +1439,8 @@
             }
 
             .chart-canvas-wrapper {
-                height: 350px;
+                height: 400px;
+                padding: 15px;
             }
 
             .chart-title {
@@ -1995,9 +2092,10 @@
         }
 
         function createGradient(ctx, color) {
-            const gradient = ctx.createLinearGradient(0, 0, 0, 500);
-            gradient.addColorStop(0, color.replace(')', ', 0.3)').replace('rgb', 'rgba'));
-            gradient.addColorStop(0.5, color.replace(')', ', 0.15)').replace('rgb', 'rgba'));
+            const gradient = ctx.createLinearGradient(0, 0, 0, 550);
+            gradient.addColorStop(0, color.replace(')', ', 0.5)').replace('rgb', 'rgba'));
+            gradient.addColorStop(0.3, color.replace(')', ', 0.3)').replace('rgb', 'rgba'));
+            gradient.addColorStop(0.6, color.replace(')', ', 0.15)').replace('rgb', 'rgba'));
             gradient.addColorStop(1, color.replace(')', ', 0)').replace('rgb', 'rgba'));
             return gradient;
         }
@@ -2060,49 +2158,77 @@
                         {
                             label: 'Confidence Band',
                             data: [...confidenceUpper, ...confidenceLower],
-                            backgroundColor: 'rgba(255, 107, 26, 0.08)',
+                            backgroundColor: 'rgba(255, 107, 26, 0.12)',
                             borderWidth: 0,
                             fill: true,
                             pointRadius: 0,
-                            tension: 0.4,
+                            tension: 0.45,
                             order: 4
                         },
                         {
                             label: 'Historical Closes',
                             data: historicalData,
-                            borderColor: '#6b7280',
-                            backgroundColor: createGradient(ctx.getContext('2d'), 'rgb(107, 114, 128)'),
-                            borderWidth: 2.5,
+                            borderColor: '#8b92a0',
+                            backgroundColor: createGradient(ctx.getContext('2d'), 'rgb(139, 146, 160)'),
+                            borderWidth: 3,
                             pointRadius: 0,
-                            tension: 0.4,
+                            pointHoverRadius: 6,
+                            pointHoverBackgroundColor: '#8b92a0',
+                            pointHoverBorderColor: '#ffffff',
+                            pointHoverBorderWidth: 3,
+                            tension: 0.45,
                             fill: true,
-                            order: 2
+                            order: 2,
+                            segment: {
+                                borderColor: ctx => {
+                                    const gradient = ctx.chart.ctx.createLinearGradient(0, 0, ctx.chart.width, 0);
+                                    gradient.addColorStop(0, '#6b7280');
+                                    gradient.addColorStop(1, '#8b92a0');
+                                    return gradient;
+                                }
+                            }
                         },
                         {
                             label: 'Current Price',
                             data: currentData,
                             borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                            borderWidth: 3.5,
-                            pointRadius: 6,
+                            backgroundColor: 'rgba(16, 185, 129, 0.3)',
+                            borderWidth: 4,
+                            pointRadius: 8,
                             pointBackgroundColor: '#10b981',
                             pointBorderColor: '#ffffff',
-                            pointBorderWidth: 2,
-                            tension: 0.4,
+                            pointBorderWidth: 3,
+                            pointHoverRadius: 12,
+                            pointHoverBorderWidth: 4,
+                            tension: 0.45,
                             fill: false,
-                            order: 1
+                            order: 1,
+                            pointStyle: 'circle'
                         },
                         {
                             label: '30-Day Forecast',
                             data: forecastData,
                             borderColor: '#ff6b1a',
                             backgroundColor: createGradient(ctx.getContext('2d'), 'rgb(255, 107, 26)'),
-                            borderWidth: 3.5,
-                            borderDash: [8, 4],
+                            borderWidth: 4,
+                            borderDash: [12, 6],
                             pointRadius: 0,
-                            tension: 0.4,
+                            pointHoverRadius: 6,
+                            pointHoverBackgroundColor: '#ff6b1a',
+                            pointHoverBorderColor: '#ffffff',
+                            pointHoverBorderWidth: 3,
+                            tension: 0.45,
                             fill: true,
-                            order: 3
+                            order: 3,
+                            segment: {
+                                borderColor: ctx => {
+                                    const gradient = ctx.chart.ctx.createLinearGradient(0, 0, ctx.chart.width, 0);
+                                    gradient.addColorStop(0, '#ff6b1a');
+                                    gradient.addColorStop(0.5, '#ff8a47');
+                                    gradient.addColorStop(1, '#ffb347');
+                                    return gradient;
+                                }
+                            }
                         }
                     ]
                 },
@@ -2115,21 +2241,24 @@
                         axis: 'x'
                     },
                     animation: {
-                        duration: 1200,
-                        easing: 'easeInOutQuart'
+                        duration: 1500,
+                        easing: 'easeInOutCubic'
                     },
                     plugins: {
                         legend: {
                             display: true,
                             position: 'top',
+                            align: 'start',
                             labels: {
-                                color: '#a0a0a0',
+                                color: '#c0c0c0',
                                 font: {
-                                    size: 13,
-                                    weight: '600',
+                                    size: 14,
+                                    weight: '700',
                                     family: 'Inter, sans-serif'
                                 },
-                                padding: 20,
+                                padding: 24,
+                                boxWidth: 16,
+                                boxHeight: 16,
                                 usePointStyle: true,
                                 pointStyle: 'circle',
                                 filter: function(item) {
@@ -2139,23 +2268,29 @@
                         },
                         tooltip: {
                             enabled: true,
-                            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.95)',
                             titleColor: '#ffffff',
                             bodyColor: '#e5e5e5',
-                            borderColor: '#ff6b1a',
+                            borderColor: 'rgba(255, 107, 26, 0.8)',
                             borderWidth: 2,
-                            padding: 16,
+                            padding: 20,
                             displayColors: true,
-                            boxPadding: 8,
+                            boxPadding: 10,
                             usePointStyle: true,
+                            cornerRadius: 12,
                             titleFont: {
-                                size: 14,
-                                weight: '600'
+                                size: 15,
+                                weight: '700',
+                                family: 'Inter, sans-serif'
                             },
                             bodyFont: {
-                                size: 13,
-                                weight: '500'
+                                size: 14,
+                                weight: '600',
+                                family: 'Inter, sans-serif'
                             },
+                            bodySpacing: 8,
+                            titleSpacing: 8,
+                            titleMarginBottom: 12,
                             callbacks: {
                                 label: function(context) {
                                     if (context.dataset.label === 'Confidence Band') return null;
@@ -2169,6 +2304,14 @@
                                         day: 'numeric',
                                         year: 'numeric'
                                     });
+                                },
+                                labelColor: function(context) {
+                                    return {
+                                        borderColor: context.dataset.borderColor,
+                                        backgroundColor: context.dataset.borderColor,
+                                        borderWidth: 2,
+                                        borderRadius: 4
+                                    };
                                 }
                             }
                         }
@@ -2185,19 +2328,22 @@
                                 }
                             },
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.03)',
+                                color: 'rgba(255, 107, 26, 0.08)',
                                 drawBorder: false,
-                                lineWidth: 1
+                                lineWidth: 1.5,
+                                z: 1
                             },
                             ticks: {
-                                color: '#808080',
+                                color: '#a0a0a0',
                                 font: {
-                                    size: 11,
-                                    weight: '500'
+                                    size: 12,
+                                    weight: '600',
+                                    family: 'Inter, sans-serif'
                                 },
                                 maxRotation: 0,
                                 autoSkip: true,
-                                maxTicksLimit: 10
+                                maxTicksLimit: 12,
+                                padding: 12
                             },
                             border: {
                                 display: false
@@ -2206,20 +2352,22 @@
                         y: {
                             beginAtZero: false,
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.03)',
+                                color: 'rgba(255, 107, 26, 0.08)',
                                 drawBorder: false,
-                                lineWidth: 1
+                                lineWidth: 1.5,
+                                z: 1
                             },
                             ticks: {
-                                color: '#808080',
+                                color: '#a0a0a0',
                                 font: {
-                                    size: 11,
-                                    weight: '500'
+                                    size: 12,
+                                    weight: '600',
+                                    family: 'Inter, sans-serif'
                                 },
                                 callback: function(value) {
                                     return '$' + value.toFixed(0);
                                 },
-                                padding: 12
+                                padding: 16
                             },
                             border: {
                                 display: false
