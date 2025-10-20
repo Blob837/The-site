@@ -313,9 +313,10 @@
         .hero-title {
             font-size: clamp(3.5rem, 12vw, 8.5rem);
             font-weight: 900;
-            line-height: 0.95;
+            line-height: 1.1;
             letter-spacing: -0.05em;
             margin-bottom: 36px;
+            padding-bottom: 0.1em;
             animation: heroTitleFade 1.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
         }
 
@@ -329,12 +330,20 @@
         }
 
         .hero-title .accent {
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 50%, #ffb347 100%);
-            background-size: 200% auto;
+            background: linear-gradient(135deg,
+                var(--orange) 0%,
+                #ff7a2e 15%,
+                var(--orange-light) 35%,
+                #ffa05c 50%,
+                #ffb06f 65%,
+                #ffb347 85%,
+                #ffc066 100%
+            );
+            background-size: 300% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shimmer 3s linear infinite;
+            animation: shimmer 4s ease-in-out infinite;
             position: relative;
             display: inline-block;
         }
@@ -369,6 +378,7 @@
 
         @keyframes shimmer {
             0% { background-position: 0% center; }
+            50% { background-position: 100% center; }
             100% { background-position: 200% center; }
         }
 
@@ -593,12 +603,20 @@
             font-weight: 800;
             line-height: 1;
             margin-bottom: 16px;
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 50%, #ffb347 100%);
-            background-size: 200% auto;
+            background: linear-gradient(135deg,
+                var(--orange) 0%,
+                #ff7a2e 15%,
+                var(--orange-light) 35%,
+                #ffa05c 50%,
+                #ffb06f 65%,
+                #ffb347 85%,
+                #ffc066 100%
+            );
+            background-size: 300% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shimmer 4s linear infinite;
+            animation: shimmer 4s ease-in-out infinite;
             filter: drop-shadow(0 4px 20px rgba(255, 107, 26, 0.5));
             position: relative;
             z-index: 1;
@@ -630,12 +648,20 @@
         }
 
         .section-title .gradient-text {
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 50%, #ffb347 100%);
-            background-size: 200% auto;
+            background: linear-gradient(135deg,
+                var(--orange) 0%,
+                #ff7a2e 15%,
+                var(--orange-light) 35%,
+                #ffa05c 50%,
+                #ffb06f 65%,
+                #ffb347 85%,
+                #ffc066 100%
+            );
+            background-size: 300% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shimmer 5s linear infinite;
+            animation: shimmer 5s ease-in-out infinite;
         }
 
         .section-subtitle {
@@ -796,12 +822,20 @@
             font-weight: 800;
             line-height: 1;
             margin-bottom: 20px;
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 50%, #ffb347 100%);
-            background-size: 200% auto;
+            background: linear-gradient(135deg,
+                var(--orange) 0%,
+                #ff7a2e 15%,
+                var(--orange-light) 35%,
+                #ffa05c 50%,
+                #ffb06f 65%,
+                #ffb347 85%,
+                #ffc066 100%
+            );
+            background-size: 300% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shimmer 3s linear infinite;
+            animation: shimmer 3s ease-in-out infinite;
             position: relative;
             z-index: 1;
         }
@@ -1210,7 +1244,7 @@
 
             .hero-title {
                 font-size: clamp(2.5rem, 11vw, 4.5rem);
-                line-height: 1;
+                line-height: 1.15;
             }
 
             .hero-subtitle {
@@ -1842,18 +1876,36 @@
 
             const prices = historicalPrices.map(d => d.price);
 
+            // Calculate multiple EMAs for robust trend detection
+            const ema5 = calculateEMA(prices, 5);
             const ema12 = calculateEMA(prices, 12);
             const ema26 = calculateEMA(prices, 26);
             const ema50 = calculateEMA(prices, 50);
             const ema200 = calculateEMA(prices, 200);
 
-            const momentum = ema12 - ema26;
+            // Recent trend analysis (last 5-10 days)
+            const recentPrices = prices.slice(-10);
+            const recentTrend = (recentPrices[recentPrices.length - 1] - recentPrices[0]) / recentPrices[0];
+            const veryRecentTrend = (prices[prices.length - 1] - prices[prices.length - 5]) / prices[prices.length - 5];
+
+            // Short-term momentum (weighted heavily toward recent data)
+            const shortTermMomentum = ema5 - ema12;
+            const mediumTermMomentum = ema12 - ema26;
             const longTermTrend = (ema50 - ema200) / ema200;
 
+            // Weighted momentum that favors recent trends
+            const weightedMomentum = (shortTermMomentum * 0.5) + (mediumTermMomentum * 0.3) + (longTermTrend * currentLivePrice * 0.2);
+
+            // Volatility calculations
             const volatility = calculateVolatility(prices, 60);
             const recentVolatility = calculateVolatility(prices, 20);
 
+            // Mean reversion target (use recent mean instead of yearly)
+            const recentMean = recentPrices.reduce((a, b) => a + b, 0) / recentPrices.length;
             const yearlyMean = prices.reduce((a, b) => a + b, 0) / prices.length;
+
+            // Trend strength indicator
+            const trendStrength = Math.abs(recentTrend) > 0.05 ? 1.2 : 0.8;
 
             let forecastPrice = currentLivePrice;
             const lastDate = historicalPrices[historicalPrices.length - 1].date;
@@ -1862,20 +1914,37 @@
                 const forecastDate = new Date(lastDate);
                 forecastDate.setDate(forecastDate.getDate() + i);
 
-                const trendComponent = (momentum * 0.12) + (longTermTrend * currentLivePrice * 0.08);
-                const meanReversionForce = (yearlyMean - forecastPrice) * 0.05;
-                const decayFactor = Math.exp(-i / 15);
-                const randomWalk = (Math.random() - 0.5) * recentVolatility * 0.8 * decayFactor;
+                // Decay factor that reduces trend impact over time
+                const decayFactor = Math.exp(-i / 20);
+                const strongDecay = Math.exp(-i / 10);
 
-                forecastPrice += trendComponent * decayFactor + meanReversionForce + randomWalk;
-                forecastPrice = Math.max(currentLivePrice * 0.88, Math.min(currentLivePrice * 1.12, forecastPrice));
+                // Recent trend component (heavily weighted)
+                const recentTrendComponent = (veryRecentTrend * currentLivePrice * 0.25 * strongDecay);
+
+                // Weighted momentum component
+                const momentumComponent = weightedMomentum * 0.15 * decayFactor * trendStrength;
+
+                // Mean reversion (blend recent and yearly means)
+                const meanReversionTarget = (recentMean * 0.7) + (yearlyMean * 0.3);
+                const meanReversionForce = (meanReversionTarget - forecastPrice) * 0.06 * (1 - decayFactor);
+
+                // Controlled random walk
+                const randomWalk = (Math.random() - 0.5) * recentVolatility * 0.6 * Math.sqrt(decayFactor);
+
+                // Apply all components
+                forecastPrice += recentTrendComponent + momentumComponent + meanReversionForce + randomWalk;
+
+                // More conservative bounds
+                const maxChange = currentLivePrice * 0.10; // 10% max change
+                forecastPrice = Math.max(currentLivePrice - maxChange, Math.min(currentLivePrice + maxChange, forecastPrice));
 
                 forecastData.push({
                     x: forecastDate,
                     y: parseFloat(forecastPrice.toFixed(2))
                 });
 
-                const bandWidth = volatility * Math.sqrt(i) * 0.5;
+                // Dynamic confidence bands
+                const bandWidth = volatility * Math.sqrt(i / 30) * 0.6;
                 confidenceBands.push({
                     x: forecastDate,
                     upper: parseFloat((forecastPrice + bandWidth).toFixed(2)),
@@ -1884,8 +1953,25 @@
             }
 
             const finalForecast = forecastData[forecastData.length - 1].y;
+            const trendChange = ((finalForecast - currentLivePrice) / currentLivePrice * 100);
+
             document.getElementById('forecastPrice').textContent = `$${finalForecast.toFixed(2)}`;
-            document.getElementById('trendDirection').textContent = finalForecast > currentLivePrice ? '↑ Upward' : '↓ Downward';
+
+            // More detailed trend indication
+            let trendText = '';
+            if (Math.abs(trendChange) < 1) {
+                trendText = '→ Stable';
+            } else if (trendChange > 3) {
+                trendText = '↑↑ Strong Up';
+            } else if (trendChange > 0) {
+                trendText = '↑ Upward';
+            } else if (trendChange < -3) {
+                trendText = '↓↓ Strong Down';
+            } else {
+                trendText = '↓ Downward';
+            }
+
+            document.getElementById('trendDirection').textContent = trendText;
 
             return { forecastData, confidenceBands };
         }
