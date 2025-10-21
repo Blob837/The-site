@@ -1,259 +1,870 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Praeco: Specialized intelligence and automation for midstream oil operations. Eliminate manual drudgery, amplify precision, and propel efficiency.">
-    <meta property="og:title" content="Praeco - Elevate Your Midstream Efficiency">
-    <meta property="og:description" content="Custom AI and automation for crude oil trucking, pipelines, terminals, and volumetrics.">
-    <meta property="og:image" content="https://example.com/praeco-hero.jpg">
-    <meta property="og:url" content="https://praeco.com">
-    <title>Praeco: Zenith of Midstream Oil Intelligence</title>
-    <link rel="icon" href="https://example.com/favicon.ico">
-    <link rel="manifest" href="/manifest.json">
-    <!-- SEO Schema -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Praeco",
-      "url": "https://praeco.com",
-      "logo": "https://example.com/logo.png",
-      "description": "AI-driven automation for midstream oil operations."
-    }
-    </script>
-    <!-- Fonts: Using system stack with variable fonts for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS CDN for rapid prototyping with custom plugins -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'crude-indigo': '#001020',
-                        'flare-cyan': '#00FFCC',
-                        'sediment-light': '#F0F0F0',
-                        'sediment-dark': '#222222',
-                    },
-                    fontFamily: {
-                        'industrial': ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                    },
-                },
-            },
-            darkMode: 'media', // Auto dark mode based on prefers-color-scheme
-        }
-    </script>
-    <!-- Performance: Preload key assets -->
-    <link rel="preload" href="https://example.com/hero-video.mp4" as="video">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js" as="script">
-    <!-- Styles: Mobile-first, with media queries -->
+    <meta name="description" content="Praeco: AI-powered intelligence and automation for midstream oil operations, eliminating manual overhead and boosting efficiency.">
+    <title>Praeco - Midstream Intelligence & Automation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* Base mobile styles */
+        :root {
+            --primary: #0A2540;
+            --accent: #00D4FF;
+            --neutral-light: #f3f4f6;
+            --neutral-dark: #1a1a1a;
+            --text-dark: #ffffff;
+            --text-light: #0A2540;
+            --shadow: rgba(0, 0, 0, 0.2);
+            --bg-dark: #000000;
+            --bg-light: #ffffff;
+            --bg-secondary-dark: #0a0a0a;
+            --bg-secondary-light: #f3f4f6;
+            --transition: 0.3s ease;
+            --parallax-speed: 0.5;
+        }
+
         body {
-            font-family: 'industrial', sans-serif;
-            background-color: var(--bg-color, #F0F0F0);
-            color: var(--text-color, #001020);
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin: 0;
             overflow-x: hidden;
+            transition: background var(--transition), color var(--transition);
         }
-        @media (prefers-color-scheme: dark) {
-            body { --bg-color: #222222; --text-color: #F0F0F0; }
+
+        body[data-theme="light"] {
+            background: var(--bg-light);
+            color: var(--text-light);
         }
-        /* Parallax setup using CSS scroll-driven (experimental, fallback to JS) */
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            position: relative;
+            transition: color var(--transition);
+        }
+
+        a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width var(--transition);
+        }
+
+        a:hover::after {
+            width: 100%;
+        }
+
+        button {
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            background: rgba(var(--bg-dark), 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            transition: background var(--transition);
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+
+        body[data-theme="light"] header {
+            background: rgba(var(--bg-light), 0.95);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            transition: transform var(--transition);
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-links {
+            display: none;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links li a {
+            font-weight: 500;
+            transition: color var(--transition);
+        }
+
+        .nav-links li a:hover {
+            color: var(--accent);
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-dark);
+            transition: all var(--transition);
+        }
+
+        body[data-theme="light"] .hamburger span {
+            background: var(--text-light);
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-left: 1rem;
+            transition: transform var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(180deg);
+        }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--bg-secondary-dark) 100%);
+            transition: background var(--transition);
+        }
+
+        body[data-theme="light"] .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--bg-secondary-light) 100%);
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transform: translateY(0);
+            transition: transform 0.5s ease;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2.5rem;
+            font-weight: 300;
+            animation: fadeInUp 1s ease 0.2s;
+        }
+
+        .hero-cta {
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: var(--neutral-light);
+            padding: 1.2rem 3rem;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: 0 5px 15px var(--shadow);
+            transition: transform var(--transition), box-shadow var(--transition);
+            animation: fadeInUp 1s ease 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left var(--transition);
+        }
+
+        .hero-cta:hover::before {
+            left: 100%;
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px var(--shadow);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Features */
+        .features {
+            padding: 6rem 0;
+            background: var(--bg-secondary-dark);
+            transition: background var(--transition);
+        }
+
+        body[data-theme="light"] .features {
+            background: var(--bg-secondary-light);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--accent);
+            margin: 1rem auto 0;
+            transition: width var(--transition);
+        }
+
+        .section-title:hover::after {
+            width: 100px;
+        }
+
+        .feature-grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--neutral-dark);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: transform var(--transition), box-shadow var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body[data-theme="light"] .feature-card {
+            background: var(--neutral-light);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .feature-card img {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            transition: opacity var(--transition);
+            opacity: 0;
+        }
+
+        .feature-card img.loaded {
+            opacity: 1;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            font-weight: 300;
+        }
+
+        /* Advantages */
+        .advantages {
+            padding: 6rem 0;
+        }
+
+        .advantages ul {
+            list-style: none;
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .advantages li {
+            position: relative;
+            padding-left: 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 300;
+            transition: color var(--transition);
+        }
+
+        .advantages li:hover {
+            color: var(--accent);
+        }
+
+        .advantages li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        /* Resilience */
+        .resilience {
+            padding: 6rem 0;
+            background: var(--bg-secondary-dark);
+            transition: background var(--transition);
+        }
+
+        body[data-theme="light"] .resilience {
+            background: var(--bg-secondary-light);
+        }
+
+        .resilience-content {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .resilience img {
+            width: 100%;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: transform var(--transition);
+        }
+
+        .resilience img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 6rem 0;
+        }
+
+        .testimonial-carousel {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .testimonial-track {
+            display: flex;
+            transition: transform var(--transition-slow);
+        }
+
+        .testimonial {
+            min-width: 100%;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .testimonial p {
+            font-style: italic;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-author {
+            font-weight: 500;
+            color: var(--accent);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: var(--text-dark);
+            padding: 4rem 0;
+            text-align: center;
+            transition: background var(--transition);
+        }
+
+        body[data-theme="light"] footer {
+            background: var(--primary);
+            color: var(--text-light);
+        }
+
+        .newsletter {
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .newsletter input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 50px 0 0 50px;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .newsletter button {
+            padding: 1rem 2rem;
+            border-radius: 0 50px 50px 0;
+            background: var(--accent);
+            color: var(--primary);
+            font-weight: 600;
+            transition: background var(--transition);
+        }
+
+        .newsletter button:hover {
+            background: darken(var(--accent), 10%);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .footer-links a {
+            color: var(--text-dark);
+            transition: color var(--transition);
+        }
+
+        body[data-theme="light"] .footer-links a {
+            color: var(--text-light);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Mobile First Media Queries */
+        @media (min-width: 640px) {
+            .hero h1 {
+                font-size: 4rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .advantages ul {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .newsletter {
+                display: flex;
+            }
+
+            .newsletter input {
+                border-radius: 50px 0 0 50px;
+            }
+
+            .newsletter button {
+                border-radius: 0 50px 50px 0;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .nav-links {
+                display: flex;
+                gap: 2rem;
+            }
+
+            .hamburger {
+                display: none;
+            }
+
+            .feature-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .hero h1 {
+                font-size: 5rem;
+            }
+
+            .section-title {
+                font-size: 3rem;
+            }
+        }
+
+        /* Parallax Effect */
+        .parallax {
+            perspective: 1px;
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
         .parallax-layer {
-            will-change: transform;
-            transition: transform 0.5s ease-out;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            transform-style: preserve-3d;
         }
-        /* Media queries for progressive enhancement */
-        @media (min-width: 480px) { /* Micro-mobile */
-            .container { max-width: 480px; margin: 0 auto; }
+
+        .parallax-layer-back {
+            transform: translateZ(-1px) scale(2);
         }
-        @media (min-width: 768px) { /* Tablet */
-            .container { max-width: 768px; }
-            .hero { height: 80vh; }
+
+        /* Particle Background */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
         }
-        @media (min-width: 1024px) { /* Operational console */
-            .container { max-width: 1024px; }
+
+        /* Lottie Animation Placeholder */
+        .lottie-animation {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
         }
-        @media (min-width: 1440px) { /* Command center */
-            .container { max-width: 1440px; }
+
+        /* Draggable Slider Example */
+        .slider {
+            position: relative;
+            height: 10px;
+            background: var(--neutral-light);
+            border-radius: 5px;
+            margin: 2rem 0;
         }
-        @media (min-width: 3840px) { /* Ultra-vision */
-            .container { max-width: 3840px; font-size: 1.2rem; }
+
+        body[data-theme="light"] .slider {
+            background: var(--neutral-dark);
         }
-        /* Haptic-friendly buttons: Min 72x72px */
-        .cta { min-width: 72px; min-height: 72px; }
-        /* WCAG: High contrast, ARIA */
-        a:focus, button:focus { outline: 2px solid #00FFCC; }
-        img { alt: ''; } /* Ensure alts */
+
+        .slider-handle {
+            position: absolute;
+            top: -10px;
+            left: 0;
+            width: 30px;
+            height: 30px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: grab;
+            transition: left var(--transition);
+        }
+
+        /* More Bells and Whistles */
+        .icon-rotate {
+            transition: transform var(--transition);
+        }
+
+        .icon-rotate:hover {
+            transform: rotate(360deg);
+        }
+
+        .card-expansion {
+            transition: height var(--transition);
+            overflow: hidden;
+        }
+
+        .button-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Gradient Shift */
+        .gradient-shift {
+            background-size: 200% 200%;
+            animation: gradientShift 10s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
     </style>
 </head>
-<body class="bg-sediment-light dark:bg-sediment-dark text-crude-indigo dark:text-sediment-light">
-    <!-- Hero Abyss: Full-screen video with fallback image -->
-    <section class="hero relative h-screen overflow-hidden" aria-labelledby="hero-title">
-        <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover" poster="https://example.com/hero-fallback.jpg">
-            <source src="https://example.com/hero-video.av1.mp4" type="video/mp4; codecs=av01"> <!-- AV1 for efficiency -->
-            <source src="https://example.com/hero-video.hevc.mp4" type="video/mp4; codecs=hevc">
-            Your browser does not support the video tag.
-        </video>
-        <div class="absolute inset-0 bg-crude-indigo/50 mix-blend-multiply"></div> <!-- Overlay for contrast -->
-        <div class="container relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
-            <h1 id="hero-title" class="text-4xl md:text-6xl font-bold animate-fade-in">Elevate Your Midstream Efficiency</h1>
-            <p class="text-xl md:text-2xl mt-4">Custom intelligence and automation that eliminate manual overhead and drive accuracy</p>
-            <div class="mt-8 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
-                <button class="cta bg-flare-cyan text-crude-indigo px-6 py-3 rounded-full font-semibold hover:scale-105 transition-transform" onclick="openDemoModal()">Schedule Demo</button>
-                <button class="cta bg-transparent border-2 border-flare-cyan text-flare-cyan px-6 py-3 rounded-full font-semibold hover:bg-flare-cyan/20">Witness Resilience</button>
-                <button class="cta bg-transparent border-2 border-flare-cyan text-flare-cyan px-6 py-3 rounded-full font-semibold" onclick="connectWallet()">Integrate Now (Web3)</button>
-                <button class="cta bg-transparent border-2 border-flare-cyan text-flare-cyan px-6 py-3 rounded-full font-semibold">Explore ROI</button>
-            </div>
-            <!-- Trust reservoir -->
-            <div class="mt-8 flex space-x-4">
-                <img src="https://example.com/chevron-logo.svg" alt="Chevron" class="h-10">
-                <img src="https://example.com/shell-logo.svg" alt="Shell" class="h-10">
-                <!-- Add more -->
-            </div>
-        </div>
-    </section>
+<body>
+    <div id="particles-js"></div>
 
-    <!-- Solution Constellations: Fractal matrices -->
-    <section class="py-16 bg-sediment-light dark:bg-sediment-dark">
-        <div class="container px-4">
-            <h2 class="text-3xl font-bold text-center mb-8">Ascendant Solution Constellations</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="orb relative p-6 bg-white dark:bg-crude-indigo rounded-xl shadow-lg hover:shadow-2xl transition-shadow parallax-layer" data-speed="0.5">
-                    <h3 class="text-xl font-semibold">Executive BI Platforms</h3>
-                    <p>Real-time dashboards for volume analytics, dispatch optimization, and key KPIs.</p>
-                    <!-- SVG icon with animation -->
-                    <svg class="w-12 h-12 mt-4" viewBox="0 0 24 24" fill="none" stroke="#00FFCC" stroke-width="2">
-                        <path d="M12 2L2 7L12 12L22 7L12 2Z" />
-                        <!-- Add morph animation via JS -->
-                    </svg>
+    <header>
+        <div class="container flex-center">
+            <nav class="flex-center" style="width: 100%;">
+                <div class="logo">Praeco</div>
+                <ul class="nav-links flex-center" style="gap: 2rem;">
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#why-us">Why Us</a></li>
+                    <li><a href="#resilience">Resilience</a></li>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="#footer">Contact</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
-                <!-- Repeat for other orbs: Process Automation, GIS & Route Optimization -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Advantage Pantheon -->
-    <section class="py-16 bg-crude-indigo text-sediment-light">
-        <div class="container px-4">
-            <h2 class="text-3xl font-bold text-center mb-8">Celestial Advantage Pantheon</h2>
-            <ul class="space-y-4">
-                <li class="flex items-center">Deep domain expertise in crude oil trucking and midstream workflows.</li>
-                <li class="flex items-center">Proven ROI supporting $500M+ operations with 35+ hours/week savings.</li>
-                <!-- More with icons -->
-            </ul>
-            <!-- D3.js visualization placeholder -->
-            <div id="volatility-chart" class="mt-8 h-64"></div>
-        </div>
-    </section>
-
-    <!-- Testimonial Nebula -->
-    <section class="py-16">
-        <div class="container px-4">
-            <h2 class="text-3xl font-bold text-center mb-8">Testimonial Nebula</h2>
-            <div class="carousel flex overflow-x-auto space-x-4">
-                <div class="min-w-[300px] p-6 bg-white dark:bg-crude-indigo rounded-xl shadow-lg">
-                    <p>"Praeco transformed our operations, saving us countless hours"</p>
-                    <p class="mt-4 font-semibold">Oil Operator A</p>
-                </div>
-                <!-- More -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer Reservoir -->
-    <footer class="py-8 bg-crude-indigo text-sediment-light">
-        <div class="container px-4 flex flex-col md:flex-row justify-between items-center">
-            <div>© 2025 Praeco LLC</div>
-            <nav class="space-x-4">
-                <a href="/privacy" class="hover:underline">Privacy Policy</a>
-                <a href="/terms" class="hover:underline">Terms of Service</a>
+                <div class="theme-toggle">🌙</div>
             </nav>
-            <div class="social space-x-4">
-                <a href="https://linkedin.com" aria-label="LinkedIn"><svg>...</svg></a>
-                <!-- More -->
+        </div>
+    </header>
+
+    <section class="hero parallax gradient-shift" style="background: linear-gradient(135deg, var(--primary), var(--accent));">
+        <div class="hero-background" style="background-image: url('https://serpapi.com/searches/6716d9a3b7a1d4c5a5b8f4c9/images/10285e69267c094e3ff0824223aaf9a4.jpeg');"></div>
+        <div class="hero-content container">
+
+<grok-card data-id="1fd4c3" data-type="image_card"></grok-card>
+
+            <h1>Elevate Your Midstream Operations</h1>
+            <p>Specialized intelligence and automation solutions that eliminate manual overhead, improve accuracy, and drive efficiency for crude oil transportation.</p>
+            <a href="#contact" class="hero-cta button-pulse">Schedule a Demo</a>
+        </div>
+    </section>
+
+    <section id="services" class="features">
+        <div class="container">
+            <h2 class="section-title">Our Solutions</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+
+<grok-card data-id="cd21bd" data-type="image_card"></grok-card>
+
+                    <h3>Executive BI Platforms</h3>
+                    <p>Real-time dashboards for volume analytics, dispatch optimization, and operational KPIs.</p>
+                </div>
+                <div class="feature-card">
+
+<grok-card data-id="90ba1f" data-type="image_card"></grok-card>
+
+                    <h3>Process Automation</h3>
+                    <p>Custom PowerShell/Python solutions for billing, ticketing, driver compensation, and reporting.</p>
+                </div>
+                <div class="feature-card">
+
+<grok-card data-id="4cfa1e" data-type="image_card"></grok-card>
+
+                    <h3>GIS/Route Optimization</h3>
+                    <p>Mapbox-based visualization for pipelines, terminals, and route efficiency.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="why-us" class="advantages">
+        <div class="container">
+            <h2 class="section-title">Why Choose Praeco</h2>
+            <ul>
+                <li>Deep operational expertise in crude oil trucking, terminal operations, and midstream workflows.</li>
+                <li>Proven track record supporting $500M+ revenue operations with measurable improvements.</li>
+                <li>Full-stack technical depth from SQL/BI to automation and API integrations.</li>
+                <li>Embedded partnership approach with hands-on development, training, and support.</li>
+                <li>Resilient business model that becomes more valuable during oil price downturns.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="resilience" class="resilience features">
+        <div class="container">
+            <h2 class="section-title">Thriving Through Market Volatility</h2>
+            <div class="resilience-content">
+
+<grok-card data-id="ea2e3e" data-type="image_card"></grok-card>
+
+                <p>Our solutions help operators reduce costs and enhance efficiency, especially when commodity prices fall.</p>
+                <ul>
+                    <li>Eliminate 35+ hours/week of manual processing to cut overhead directly.</li>
+                    <li>Shift focus to operational efficiency over growth during downturns.</li>
+                    <li>Leverage stable, fee-based revenue models for continued tech investments.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="testimonials">
+        <div class="container">
+            <h2 class="section-title">What Our Clients Say</h2>
+            <div class="testimonial-carousel">
+                <div class="testimonial-track">
+                    <div class="testimonial">
+                        <p>"Praeco's BI platforms have revolutionized our dispatch optimization."</p>
+                        <div class="testimonial-author">- Permian Operator</div>
+                    </div>
+                    <div class="testimonial">
+                        <p>"The automation solutions saved us countless hours weekly."</p>
+                        <div class="testimonial-author">- Eagle Ford Terminal Manager</div>
+                    </div>
+                    <div class="testimonial">
+                        <p>"Resilient and reliable even in market downturns."</p>
+                        <div class="testimonial-author">- Houston Midstream Exec</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="footer">
+        <div class="container">
+            <div class="newsletter">
+                <input type="email" placeholder="Enter your email">
+                <button>Subscribe</button>
+            </div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="https://linkedin.com/company/praeco-llc">LinkedIn</a>
+                <a href="mailto:info@praeco.com">Contact Us</a>
             </div>
         </div>
     </footer>
 
-    <!-- Modals and Interactivity -->
-    <div id="demo-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center" role="dialog" aria-modal="true">
-        <div class="bg-white dark:bg-sediment-dark p-8 rounded-xl">
-            <h2>Schedule Demo</h2>
-            <form>
-                <!-- Fields with autofill, WCAG compliant -->
-                <input type="email" placeholder="Email" required aria-label="Email">
-                <button type="submit">Submit</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Scripts: Vanilla JS for interactivity, Three.js for animations -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script> <!-- For charts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
     <script>
-        // Parallax scrolling
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 50, density: { enable: true, value_area: 800 } },
+                color: { value: '#00D4FF' },
+                shape: { type: 'circle' },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: '#00D4FF', opacity: 0.4, width: 1 },
+                move: { enable: true, speed: 2, direction: 'none', random: true, straight: false, out_mode: 'out', bounce: false }
+            },
+            interactivity: {
+                detect_on: 'canvas',
+                events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' }, resize: true },
+                modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+            },
+            retina_detect: true
+        });
+
+        // Hamburger
+        document.querySelector('.hamburger').addEventListener('click', () => {
+            document.querySelector('.nav-links').classList.toggle('active');
+            document.querySelector('.hamburger').classList.toggle('active');
+        });
+
+        // Theme toggle
+        document.querySelector('.theme-toggle').addEventListener('click', () => {
+            document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        });
+
+        // Parallax scroll
         window.addEventListener('scroll', () => {
-            document.querySelectorAll('.parallax-layer').forEach(layer => {
-                const speed = layer.dataset.speed;
-                layer.style.transform = `translateY(${window.scrollY * speed}px)`;
+            document.querySelector('.hero-background').style.transform = `translateY(${window.scrollY * var(--parallax-speed)}px)`;
+        });
+
+        // Lazy load images
+        const images = document.querySelectorAll('img');
+        const imageObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.src = entry.target.dataset.src;
+                    entry.target.classList.add('loaded');
+                    imageObserver.unobserve(entry.target);
+                }
             });
         });
 
-        // Demo modal
-        function openDemoModal() {
-            document.getElementById('demo-modal').classList.remove('hidden');
-        }
+        images.forEach(img => {
+            img.dataset.src = img.src;
+            img.src = '';
+            imageObserver.observe(img);
+        });
 
-        // Web3 wallet connection (example with Ethereum)
-        async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    await ethereum.request({ method: 'eth_requestAccounts' });
-                    alert('Wallet connected!');
-                } catch (error) {
-                    console.error(error);
-                }
+        // Carousel
+        const track = document.querySelector('.testimonial-track');
+        let current = 0;
+        setInterval(() => {
+            current = (current + 1) % track.children.length;
+            track.style.transform = `translateX(-${current * 100}%)`;
+        }, 5000);
+
+        // Newsletter validation
+        const form = document.querySelector('.newsletter');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Simple validation and success animation
+            const input = form.querySelector('input');
+            if (input.value.includes('@')) {
+                input.style.border = '2px solid green';
+                setTimeout(() => input.style.border = '', 2000);
             } else {
-                alert('Install MetaMask!');
+                input.style.border = '2px solid red';
+                setTimeout(() => input.style.border = '', 2000);
             }
-        }
+        });
 
-        // Three.js fluid animation in hero (simplified)
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true });
-        renderer.setSize(window.innerWidth / 2, window.innerHeight / 2);
-        document.querySelector('.hero').appendChild(renderer.domElement);
-        const geometry = new THREE.SphereGeometry(1, 32, 32);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00FFCC, wireframe: true });
-        const sphere = new THREE.Mesh(geometry, material);
-        scene.add(sphere);
-        camera.position.z = 5;
-        function animate() {
-            requestAnimationFrame(animate);
-            sphere.rotation.x += 0.01;
-            sphere.rotation.y += 0.01;
-            renderer.render(scene, camera);
-        }
-        animate();
+        // Draggable slider example (for interactive element)
+        const slider = document.createElement('div');
+        slider.classList.add('slider');
+        const handle = document.createElement('div');
+        handle.classList.add('slider-handle');
+        slider.appendChild(handle);
+        document.querySelector('.resilience-content').appendChild(slider);
 
-        // D3 volatility chart (placeholder)
-        const svg = d3.select('#volatility-chart').append('svg').attr('width', 400).attr('height', 200);
-        // Add data viz here
+        let isDragging = false;
+        handle.addEventListener('mousedown', () => isDragging = true);
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const rect = slider.getBoundingClientRect();
+                let newLeft = e.clientX - rect.left;
+                if (newLeft < 0) newLeft = 0;
+                if (newLeft > rect.width - handle.offsetWidth) newLeft = rect.width - handle.offsetWidth;
+                handle.style.left = `${newLeft}px`;
+            }
+        });
+        document.addEventListener('mouseup', () => isDragging = false);
 
-        // WebXR AR for wellhead overlays (basic setup)
-        if (navigator.xr) {
-            // Request session for AR previews
-        }
-
-        // Performance: Service Worker for caching
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js');
-        }
+        // Lottie animation placeholder (assume Lottie script loaded)
+        // For example, add to hero or somewhere
+        // lottie.loadAnimation({ container: document.querySelector('.lottie-animation'), renderer: 'svg', loop: true, autoplay: true, path: 'animation.json' });
     </script>
 </body>
 </html>
