@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="description" content="AI-powered operational intelligence transforming crude oil logistics. $500M+ in revenue optimized. 75K+ barrels managed daily. Enterprise-scale precision.">
+    <meta name="description" content="Praeco LLC - Expert AI-powered solutions for crude oil logistics. $500M+ in revenue optimized. 75K+ barrels managed daily. Precision-built operational intelligence.">
     <meta name="theme-color" content="#000000">
-    <meta name="keywords" content="AI operations, crude oil logistics, energy technology, predictive analytics, operational intelligence">
-    <meta property="og:title" content="Praeco - The Future of Energy Operations">
-    <meta property="og:description" content="Transform your energy operations with AI-powered intelligence. $500M+ revenue optimized. 75K+ barrels daily.">
+    <meta name="keywords" content="AI operations, crude oil logistics, energy technology, predictive analytics, operational intelligence, consulting">
+    <meta property="og:title" content="Praeco - Expert Energy Operations Solutions">
+    <meta property="og:description" content="Expert AI-powered solutions for crude oil logistics. $500M+ revenue optimized. 75K+ barrels daily.">
     <meta property="og:type" content="website">
     <link rel="preload" href="Logo.svg" as="image">
-    <title>Praeco - The Future of Energy Operations | AI-Powered Operational Intelligence</title>
+    <title>Praeco - Expert Energy Operations Solutions | AI-Powered Intelligence</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -995,224 +995,52 @@
             z-index: 1;
         }
 
-        /* ===== TRUST INDICATORS SECTION ===== */
-        .trust-section {
-            padding: 80px 0;
-            position: relative;
-            z-index: 10;
-            border-top: 1px solid rgba(255, 107, 26, 0.1);
-            border-bottom: 1px solid rgba(255, 107, 26, 0.1);
-        }
-
-        .trust-label {
-            text-align: center;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: var(--text-tertiary);
-            font-weight: 600;
-            margin-bottom: 48px;
-        }
-
-        .client-logos {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 60px;
-            opacity: 0.6;
-            filter: grayscale(100%);
-            transition: all 0.4s ease;
-        }
-
-        .client-logos:hover {
-            opacity: 0.9;
-            filter: grayscale(0%);
-        }
-
-        .client-logo {
-            height: 40px;
-            transition: all 0.3s ease;
-        }
-
-        .client-logo:hover {
-            transform: scale(1.1);
-            opacity: 1;
-        }
-
-        /* ===== TESTIMONIALS SECTION ===== */
-        .testimonials {
+        /* ===== ABOUT SECTION ===== */
+        .about-section {
             padding: 120px 0;
             position: relative;
             z-index: 10;
         }
 
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-            gap: 32px;
-            margin-top: 60px;
+        .about-content {
+            max-width: 900px;
+            margin: 60px auto 0;
         }
 
-        .testimonial-card {
-            padding: 48px;
-            border-radius: 24px;
-            background: linear-gradient(135deg, rgba(13, 13, 13, 0.95) 0%, rgba(255, 107, 26, 0.04) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 107, 26, 0.1);
-            box-shadow: 0 12px 50px rgba(0, 0, 0, 0.5);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .testimonial-card::before {
-            content: '"';
-            position: absolute;
-            top: 20px;
-            left: 30px;
-            font-size: 120px;
-            color: rgba(255, 107, 26, 0.1);
-            font-family: Georgia, serif;
-            line-height: 1;
-        }
-
-        .testimonial-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(255, 107, 26, 0.4);
-            box-shadow: 0 20px 70px rgba(255, 107, 26, 0.3);
-        }
-
-        .testimonial-content {
-            font-size: 1.125rem;
+        .about-text {
+            font-size: 1.25rem;
             line-height: 1.8;
             color: var(--text-secondary);
             margin-bottom: 32px;
-            position: relative;
-            z-index: 1;
         }
 
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .author-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--black);
-        }
-
-        .author-info h4 {
-            font-size: 1.125rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .author-info p {
-            font-size: 0.9375rem;
-            color: var(--text-tertiary);
-        }
-
-        /* ===== ROI CALCULATOR ===== */
-        .roi-section {
-            padding: 100px 0;
-            position: relative;
-            z-index: 10;
-        }
-
-        .roi-calculator {
-            max-width: 800px;
-            margin: 60px auto 0;
-            padding: 60px;
-            border-radius: 32px;
-            background: linear-gradient(135deg, rgba(13, 13, 13, 0.98) 0%, rgba(255, 107, 26, 0.05) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 107, 26, 0.2);
-            box-shadow: 0 20px 80px rgba(255, 107, 26, 0.2);
-        }
-
-        .calculator-input-group {
-            margin-bottom: 32px;
-        }
-
-        .calculator-label {
-            display: block;
-            font-size: 1rem;
+        .about-text strong {
+            color: var(--text);
             font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--text);
         }
 
-        .calculator-input {
-            width: 100%;
-            padding: 18px 24px;
-            font-size: 1.125rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 107, 26, 0.2);
-            border-radius: 12px;
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        .calculator-input:focus {
-            outline: none;
-            border-color: var(--orange);
-            box-shadow: 0 0 0 3px rgba(255, 107, 26, 0.1);
-        }
-
-        .calculator-result {
-            text-align: center;
+        .about-highlight {
             padding: 40px;
             border-radius: 20px;
-            background: rgba(255, 107, 26, 0.1);
-            border: 2px solid rgba(255, 107, 26, 0.3);
+            background: linear-gradient(135deg, rgba(13, 13, 13, 0.95) 0%, rgba(255, 107, 26, 0.05) 100%);
+            border: 1px solid rgba(255, 107, 26, 0.2);
             margin-top: 40px;
         }
 
-        .calculator-result-label {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .calculator-result-value {
-            font-size: 4rem;
-            font-weight: 800;
-            background: linear-gradient(135deg,
-                #ff6b1a 0%,
-                #ff7524 8%,
-                #ff7f2e 16%,
-                #ff8938 24%,
-                #ff9342 32%,
-                #ff9d4c 40%,
-                #ffa756 48%,
-                #ffb160 56%,
-                #ffbb6a 64%,
-                #ffc574 72%,
-                #ffcf7e 80%,
-                #ffd988 88%,
-                #ffe392 96%,
-                #ffed9c 100%
-            );
-            background-size: 400% 100%;
+        .about-highlight h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--orange) 0%, var(--orange-light) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shimmer 5s ease-in-out infinite;
+        }
+
+        .about-highlight p {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
         }
 
         /* ===== FAQ SECTION ===== */
@@ -2261,24 +2089,6 @@
                 gap: 12px;
             }
 
-            /* Testimonials Mobile */
-            .testimonials-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .testimonial-card {
-                padding: 32px 24px;
-            }
-
-            /* ROI Calculator Mobile */
-            .roi-calculator {
-                padding: 32px 24px;
-            }
-
-            .calculator-result-value {
-                font-size: 3rem;
-            }
-
             /* FAQ Mobile */
             .faq-question {
                 font-size: 1.0625rem;
@@ -2287,15 +2097,6 @@
 
             .faq-answer-content {
                 padding: 0 24px 20px;
-            }
-
-            /* Trust Section Mobile */
-            .client-logos {
-                gap: 40px;
-            }
-
-            .client-logo {
-                height: 32px;
             }
 
             .hero {
@@ -2508,17 +2309,13 @@
     <!-- Mobile Navigation Menu -->
     <div class="mobile-nav-menu" id="mobileNavMenu">
         <nav class="mobile-nav-links">
-            <a href="#capabilities" class="mobile-nav-link">Platform</a>
-            <a href="#testimonials" class="mobile-nav-link">Testimonials</a>
-            <a href="#roi" class="mobile-nav-link">ROI Calculator</a>
-            <a href="#faq" class="mobile-nav-link">FAQ</a>
-            <a href="mailto:info@praeco.com" class="mobile-nav-link">Contact</a>
+            <a href="#about" class="mobile-nav-link">About</a>
         </nav>
     </div>
 
     <!-- Sticky Mobile CTA -->
     <div class="sticky-mobile-cta" id="stickyMobileCTA">
-        <a href="mailto:info@praeco.com">Schedule a Demo</a>
+        <a href="mailto:info@praeco.com">Get In Touch</a>
     </div>
 
     <!-- Hero Section -->
@@ -2530,14 +2327,14 @@
             <span class="line accent">Operations</span>
         </h1>
         <p class="hero-subtitle">
-            <span class="highlight">AI-powered operational intelligence</span> transforming crude oil logistics. <span class="highlight">$500M+ in revenue</span> optimized. <span class="highlight">75K+ barrels</span> managed daily. Real-time precision at enterprise scale.
+            <span class="highlight">Expert AI-powered solutions</span> for crude oil logistics. <span class="highlight">$500M+ in revenue</span> optimized. <span class="highlight">75K+ barrels</span> managed daily. Precision-built operational intelligence.
         </p>
         <div class="hero-cta-group">
             <a href="mailto:info@praeco.com" class="hero-cta hero-cta-primary">
-                <span>See It In Action</span>
+                <span>Get In Touch</span>
             </a>
-            <a href="#capabilities" class="hero-cta hero-cta-secondary">
-                <span>Explore Platform</span>
+            <a href="#about" class="hero-cta hero-cta-secondary">
+                <span>Learn More</span>
             </a>
         </div>
         <div class="scroll-indicator">
@@ -2566,32 +2363,6 @@
                     <div class="stat-number">20%</div>
                     <div class="stat-label">Accuracy Gain</div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Trust Indicators Section -->
-    <section class="trust-section scroll-reveal">
-        <div class="container">
-            <div class="trust-label">Trusted by Energy Leaders Worldwide</div>
-            <div class="client-logos">
-                <!-- Placeholder for actual client logos -->
-                <svg class="client-logo" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="10" y="10" width="100" height="20" rx="4" fill="var(--text-secondary)" opacity="0.3"/>
-                    <text x="60" y="26" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="var(--text-secondary)" text-anchor="middle">ENERGY CO</text>
-                </svg>
-                <svg class="client-logo" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="10" y="10" width="100" height="20" rx="4" fill="var(--text-secondary)" opacity="0.3"/>
-                    <text x="60" y="26" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="var(--text-secondary)" text-anchor="middle">OIL TECH</text>
-                </svg>
-                <svg class="client-logo" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="10" y="10" width="100" height="20" rx="4" fill="var(--text-secondary)" opacity="0.3"/>
-                    <text x="60" y="26" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="var(--text-secondary)" text-anchor="middle">LOGISTICS</text>
-                </svg>
-                <svg class="client-logo" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="10" y="10" width="100" height="20" rx="4" fill="var(--text-secondary)" opacity="0.3"/>
-                    <text x="60" y="26" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="var(--text-secondary)" text-anchor="middle">PETRO INC</text>
-                </svg>
             </div>
         </div>
     </section>
@@ -2694,7 +2465,7 @@
                     Numbers That <span class="gradient-text">Speak</span>
                 </h2>
                 <p class="section-subtitle">
-                    Real companies. Real results. Real transformation.
+                    Proven results from real-world implementations.
                 </p>
             </div>
             <div class="results-grid">
@@ -2718,82 +2489,33 @@
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="testimonials scroll-reveal" id="testimonials">
+    <!-- About Section -->
+    <section class="about-section scroll-reveal" id="about">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">
-                    Proven <span class="gradient-text">Success</span>
+                    About <span class="gradient-text">Praeco</span>
                 </h2>
-                <p class="section-subtitle">
-                    See how industry leaders transformed their operations with Praeco
+            </div>
+            <div class="about-content">
+                <p class="about-text">
+                    <strong>Praeco LLC</strong> was founded to solve a critical problem in the energy industry: the overwhelming complexity of crude oil logistics and the manual inefficiencies that cost companies millions in lost revenue and wasted time.
                 </p>
-            </div>
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        "Praeco eliminated 95% of our data errors and saved us 35 hours per week. The ROI was immediate—this is the future of energy operations."
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">JM</div>
-                        <div class="author-info">
-                            <h4>Jennifer Martinez</h4>
-                            <p>Director of Operations, Major Oil & Gas</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        "The predictive analytics are game-changing. We're making better decisions faster, and our margins have never been stronger."
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">RC</div>
-                        <div class="author-info">
-                            <h4>Robert Chen</h4>
-                            <p>VP Logistics, Energy Transport Corp</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        "From implementation to results—8 weeks. Praeco integrated seamlessly with our existing systems and delivered immediately."
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">SK</div>
-                        <div class="author-info">
-                            <h4>Sarah Kim</h4>
-                            <p>CTO, Petroleum Solutions Inc</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ROI Calculator Section -->
-    <section class="roi-section scroll-reveal" id="roi">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">
-                    Calculate Your <span class="gradient-text">ROI</span>
-                </h2>
-                <p class="section-subtitle">
-                    See how much you could save with Praeco
+                <p class="about-text">
+                    What started as a custom solution for a single client managing thousands of barrels daily evolved into a comprehensive platform that now supports over <strong>$500M in annual revenue</strong> and processes <strong>75,000+ barrels per day</strong>.
                 </p>
-            </div>
-            <div class="roi-calculator">
-                <div class="calculator-input-group">
-                    <label for="barrels" class="calculator-label">Daily Barrels Managed</label>
-                    <input type="number" id="barrels" class="calculator-input" placeholder="e.g., 50000" value="50000">
+                <div class="about-highlight">
+                    <h3>The Founder's Story</h3>
+                    <p>
+                        With deep expertise in AI, data engineering, and energy operations, I built Praeco from the ground up to bridge the gap between cutting-edge technology and real-world operational needs. Every feature, every algorithm, and every optimization was crafted through direct collaboration with operations teams on the front lines of crude oil logistics.
+                    </p>
                 </div>
-                <div class="calculator-input-group">
-                    <label for="hours" class="calculator-label">Hours Spent on Manual Operations (Weekly)</label>
-                    <input type="number" id="hours" class="calculator-input" placeholder="e.g., 40" value="40">
-                </div>
-                <div class="calculator-result" id="roiResult">
-                    <div class="calculator-result-label">Estimated Annual Savings</div>
-                    <div class="calculator-result-value" id="savingsAmount">$384,000</div>
-                </div>
+                <p class="about-text">
+                    Today, Praeco represents more than just software—it's a proven methodology for transforming operational chaos into predictable, optimized, and profitable business operations. From predictive analytics to automated reconciliation, every tool is purpose-built to deliver measurable results.
+                </p>
+                <p class="about-text">
+                    <strong>Praeco is more than a platform. It's a partnership built on expertise, precision, and results.</strong>
+                </p>
             </div>
         </div>
     </section>
@@ -2809,66 +2531,66 @@
             <div class="faq-container">
                 <div class="faq-item">
                     <button class="faq-question">
-                        <span>How quickly can Praeco be deployed?</span>
+                        <span>How do you work with clients?</span>
                         <svg class="faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            Most clients are fully operational within 6-8 weeks. Our dedicated implementation team works alongside your operations to ensure a seamless transition with zero downtime.
+                            I work directly with your team to understand your specific operational challenges and build custom solutions tailored to your needs. Each engagement is hands-on and collaborative.
                         </div>
                     </div>
                 </div>
                 <div class="faq-item">
                     <button class="faq-question">
-                        <span>What integrations does Praeco support?</span>
+                        <span>What makes Praeco different?</span>
                         <svg class="faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            Praeco integrates natively with FourKites, Project44, MacroPoint, SAP, Oracle, and all major ERPs. Our API-first architecture makes custom integrations straightforward.
+                            Unlike off-the-shelf software, Praeco solutions are purpose-built for crude oil logistics with deep domain expertise. You work directly with me—no sales teams, no support tiers, just expert implementation and results.
                         </div>
                     </div>
                 </div>
                 <div class="faq-item">
                     <button class="faq-question">
-                        <span>What level of accuracy can we expect?</span>
+                        <span>What kind of results can I expect?</span>
                         <svg class="faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            Our AI-powered validation system achieves 95%+ error reduction compared to manual processes. Every transaction is verified, reconciled, and logged with full audit trails.
+                            Clients typically see 95%+ reduction in data errors, hundreds of hours saved monthly, and significant improvements in operational visibility and decision-making speed.
                         </div>
                     </div>
                 </div>
                 <div class="faq-item">
                     <button class="faq-question">
-                        <span>Is my data secure with Praeco?</span>
+                        <span>Is my data secure?</span>
                         <svg class="faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            Absolutely. Praeco is SOC 2 Type II certified with enterprise-grade encryption, role-based access control, and full compliance with industry regulations. Your data stays yours.
+                            Absolutely. All solutions are built with enterprise-grade security, encryption, and full compliance with industry standards. Your data remains yours, always.
                         </div>
                     </div>
                 </div>
                 <div class="faq-item">
                     <button class="faq-question">
-                        <span>What kind of support do you provide?</span>
+                        <span>How do I get started?</span>
                         <svg class="faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            Every client gets a dedicated success manager, 24/7 technical support, and access to our energy operations specialists. We're invested in your success.
+                            Reach out via email to discuss your specific needs. We'll start with a consultation to understand your operations, identify opportunities, and map out a solution that delivers real results.
                         </div>
                     </div>
                 </div>
@@ -2880,10 +2602,13 @@
     <section class="cta-section scroll-reveal">
         <div class="container">
             <h2 class="cta-title">
-                Transform Your <span class="gradient-text">Operations</span>
+                Let's Build Something <span class="gradient-text">Exceptional</span>
             </h2>
+            <p style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 32px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Ready to transform your crude oil operations? Let's discuss how Praeco can deliver measurable results for your business.
+            </p>
             <a href="mailto:info@praeco.com" class="cta-button">
-                <span>Schedule a Demo</span>
+                <span>Get In Touch</span>
             </a>
         </div>
     </section>
@@ -4120,35 +3845,6 @@
                 }
             });
         });
-
-        // ROI Calculator
-        const barrelsInput = document.getElementById('barrels');
-        const hoursInput = document.getElementById('hours');
-        const savingsDisplay = document.getElementById('savingsAmount');
-
-        function calculateROI() {
-            const barrels = parseFloat(barrelsInput.value) || 0;
-            const hours = parseFloat(hoursInput.value) || 0;
-
-            // Calculate savings (simplified formula)
-            // $80/hour labor cost + $0.15/barrel efficiency gain
-            const laborSavings = hours * 52 * 80; // Weekly hours * 52 weeks * $80/hour
-            const efficiencySavings = barrels * 365 * 0.15; // Daily barrels * 365 days * $0.15/barrel
-            const totalSavings = laborSavings + efficiencySavings;
-
-            // Format and display
-            if (totalSavings > 0) {
-                savingsDisplay.textContent = '$' + Math.round(totalSavings).toLocaleString();
-            } else {
-                savingsDisplay.textContent = '$0';
-            }
-        }
-
-        if (barrelsInput && hoursInput) {
-            barrelsInput.addEventListener('input', calculateROI);
-            hoursInput.addEventListener('input', calculateROI);
-            calculateROI(); // Initial calculation
-        }
 
         // Animated Counter for Stats
         function animateCounter(element) {
