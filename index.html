@@ -8,11 +8,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0a2540;
+            --bg-primary: #000000;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
             --accent: #ff5e00;
-            --gray: #6b7280;
-            --light-gray: #f3f4f6;
-            --white: #ffffff;
+            --accent-hover: #e65100;
+            --border: #333333;
         }
 
         * {
@@ -23,8 +24,8 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            color: var(--primary);
-            background-color: var(--white);
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
             line-height: 1.6;
         }
 
@@ -41,7 +42,10 @@
             max-width: 100%;
             height: auto;
             display: block;
-            margin: 0 auto;
+        }
+
+        .logo {
+            height: 40px;
         }
 
         /* Mobile-first styles */
@@ -49,8 +53,8 @@
         header {
             position: sticky;
             top: 0;
-            background: var(--white);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: var(--bg-primary);
+            box-shadow: 0 2px 4px rgba(255,255,255,0.05);
             z-index: 1000;
         }
 
@@ -63,12 +67,6 @@
             padding: 1rem;
         }
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
         .nav-links {
             display: none;
             flex-direction: column;
@@ -76,13 +74,19 @@
             top: 60px;
             left: 0;
             width: 100%;
-            background: var(--white);
+            background: var(--bg-primary);
             padding: 1rem;
+            border-top: 1px solid var(--border);
         }
 
         .nav-links a {
             padding: 0.5rem 0;
             font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
         }
 
         #menu-toggle {
@@ -93,6 +97,7 @@
             display: block;
             font-size: 1.5rem;
             cursor: pointer;
+            color: var(--text-primary);
         }
 
         #menu-toggle:checked ~ .nav-links {
@@ -107,29 +112,27 @@
 
         .hero {
             text-align: center;
-            background-color: var(--primary);
-            color: var(--white);
-            padding: 4rem 1rem;
+            background: linear-gradient(to bottom, var(--bg-primary), #331100);
+            color: var(--text-primary);
+            padding: 6rem 1rem;
             position: relative;
         }
 
-        .hero img {
-            margin-bottom: 1rem;
-        }
-
         .hero h1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
             margin-bottom: 1rem;
+            font-weight: 700;
         }
 
         .hero p {
             font-size: 1.2rem;
             margin-bottom: 2rem;
+            color: var(--text-secondary);
         }
 
-        .cta {
+        .cta-primary {
             background: var(--accent);
-            color: var(--white);
+            color: var(--text-primary);
             border: none;
             padding: 1rem 2rem;
             font-size: 1rem;
@@ -138,36 +141,53 @@
             transition: background 0.3s;
         }
 
-        .cta:hover {
-            background: #e65100;
+        .cta-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .cta-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--text-primary);
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 4px;
+            margin-left: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .cta-secondary:hover {
+            border-color: var(--accent);
         }
 
         h2 {
-            font-size: 1.8rem;
+            font-size: 2rem;
             text-align: center;
             margin-bottom: 2rem;
+            font-weight: 700;
         }
 
         .features .grid {
             display: grid;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .feature-card {
-            background: var(--light-gray);
+            background: #111111;
             padding: 1.5rem;
             border-radius: 8px;
             text-align: center;
-        }
-
-        .feature-card img {
-            width: 150px;
-            margin-bottom: 1rem;
+            border: 1px solid var(--border);
         }
 
         .feature-card h3 {
             font-size: 1.2rem;
             margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
         }
 
         .advantages ul,
@@ -180,6 +200,7 @@
             margin-bottom: 1rem;
             padding-left: 1.5rem;
             position: relative;
+            color: var(--text-secondary);
         }
 
         .advantages li::before,
@@ -190,21 +211,17 @@
             color: var(--accent);
         }
 
-        .resilience img {
-            width: 150px;
-            margin-bottom: 1rem;
-        }
-
         .pricing .tiers {
             display: grid;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .tier {
-            background: var(--light-gray);
+            background: #111111;
             padding: 1.5rem;
             border-radius: 8px;
             text-align: center;
+            border: 1px solid var(--border);
         }
 
         .tier h3 {
@@ -218,15 +235,25 @@
             margin-bottom: 1rem;
         }
 
+        .tier p {
+            color: var(--text-secondary);
+        }
+
         footer {
-            background: var(--primary);
-            color: var(--white);
+            background: #111111;
+            color: var(--text-secondary);
             text-align: center;
             padding: 2rem 1rem;
+            border-top: 1px solid var(--border);
         }
 
         footer a {
             margin: 0 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        footer a:hover {
+            color: var(--text-primary);
         }
 
         /* Tablet and desktop media queries */
@@ -241,6 +268,7 @@
                 position: static;
                 width: auto;
                 padding: 0;
+                border: none;
             }
 
             .nav-links a {
@@ -256,12 +284,18 @@
                 padding: 4rem 2rem;
             }
 
+            .hero {
+                padding: 8rem 2rem;
+            }
+
             .hero h1 {
-                font-size: 3rem;
+                font-size: 4rem;
             }
 
             .hero p {
                 font-size: 1.5rem;
+                max-width: 800px;
+                margin: 0 auto 2rem;
             }
 
             h2 {
@@ -287,7 +321,7 @@
 <body>
     <header>
         <nav>
-            <div class="logo">Praeco LLC</div>
+            <img src="./Logo.svg" alt="Praeco LLC" class="logo">
             <label for="menu-toggle" class="hamburger">&#9776;</label>
             <input type="checkbox" id="menu-toggle">
             <div class="nav-links">
@@ -301,27 +335,24 @@
 
     <main>
         <section class="hero">
-            <img src="https://www.shutterstock.com/image-photo/outdoor-photo-highresolution-cinematic-photorealistic-260nw-2663009245.jpg" alt="Seamless Midstream Operations">
             <h1>Elevate Your Midstream Efficiency</h1>
-            <p>Custom intelligence and automation that eliminate manual overhead and drive accuracy.</p>
-            <button class="cta">Schedule Demo</button>
+            <p>Custom intelligence and automation that eliminate manual overhead and drive accuracy for crude oil operations.</p>
+            <button class="cta-primary">Schedule Demo</button>
+            <button class="cta-secondary">Learn More</button>
         </section>
 
         <section id="services" class="features">
             <h2>Our Solutions</h2>
             <div class="grid">
                 <div class="feature-card">
-                    <img src="https://www.slideteam.net/media/catalog/product/cache/1280x720/m/i/mining_oil_and_gas_extraction_kpi_dashboard_showing_total_produc_Slide01.jpg" alt="Real-Time Analytics Dashboard">
                     <h3>Executive BI Platforms</h3>
                     <p>Real-time dashboards for volume analytics, dispatch optimization, and key KPIs.</p>
                 </div>
                 <div class="feature-card">
-                    <img src="https://www.shutterstock.com/image-vector/making-trash-bins-robots-controlled-260nw-2538358159.jpg" alt="Process Automation Interface">
                     <h3>Process Automation</h3>
                     <p>Custom solutions for billing, ticketing, compensation, and reporting.</p>
                 </div>
                 <div class="feature-card">
-                    <img src="https://elements.visualcapitalist.com/wp-content/uploads/2022/03/CrudeOilPipelinesRefineries_shareable_1200px.jpg" alt="Pipeline Optimization Visualization">
                     <h3>GIS & Route Optimization</h3>
                     <p>Advanced mapping for pipelines, terminals, and efficient routing.</p>
                 </div>
@@ -341,7 +372,6 @@
 
         <section class="resilience">
             <h2>Thriving in Any Market</h2>
-            <img src="https://sp-ao.shortpixel.ai/client/to_auto,q_lossy,ret_img,w_1216,h_730/https://market.us/wp-content/uploads/2024/12/Midstream-Oil-Gas-Equipment-Market.jpg" alt="Midstream Market Growth Insights">
             <p>Our solutions become essential during downturns, helping operators cut costs and boost efficiency.</p>
             <ul>
                 <li>Eliminate manual processing to reduce labor costs.</li>
