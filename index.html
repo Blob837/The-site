@@ -62,6 +62,32 @@
             }
         }
 
+        @keyframes pump {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(-2deg); }
+        }
+
+        @keyframes slide-right {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(30px); }
+        }
+
+        @keyframes flow {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: 100; }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                opacity: 0.3;
+                filter: blur(40px);
+            }
+            50% {
+                opacity: 0.6;
+                filter: blur(60px);
+            }
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: var(--bg-primary);
@@ -190,11 +216,69 @@
             text-align: center;
             animation: fade-up 0.8s ease;
             position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.85) 50%, rgba(0,0,0,0.95) 100%),
+                url('https://images.unsplash.com/photo-1568495248636-6432b97bd949?w=1920&q=80') center/cover no-repeat;
+            z-index: 0;
+            animation: float 30s ease-in-out infinite;
         }
 
         .hero-container {
             position: relative;
             z-index: 1;
+        }
+
+        .floating-asset {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .pumpjack-1 {
+            top: 10%;
+            right: 5%;
+            width: 120px;
+            animation: pump 4s ease-in-out infinite;
+        }
+
+        .pumpjack-2 {
+            bottom: 15%;
+            left: 3%;
+            width: 100px;
+            animation: pump 5s ease-in-out infinite 1s;
+        }
+
+        .truck-asset {
+            top: 40%;
+            right: -50px;
+            width: 180px;
+            animation: slide-right 15s ease-in-out infinite;
+        }
+
+        .tank-asset {
+            bottom: 10%;
+            right: 8%;
+            width: 140px;
+            opacity: 0.1;
+        }
+
+        .pipeline-decoration {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--accent-green-dim), transparent);
+            opacity: 0.3;
         }
 
         h1 {
@@ -271,6 +355,18 @@
             border: 1px solid var(--border-secondary);
             border-radius: 16px;
             overflow: hidden;
+            position: relative;
+        }
+
+        .stats::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+            animation: slide-right 3s ease-in-out infinite;
         }
 
         .stat-item {
@@ -418,6 +514,107 @@
             background: linear-gradient(180deg, transparent 0%, rgba(0, 229, 153, 0.02) 50%, transparent 100%);
             border-top: 1px solid var(--border-secondary);
             border-bottom: 1px solid var(--border-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 80% 20%, rgba(0, 229, 153, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(0, 229, 153, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .industry-showcase {
+            padding: 120px 0;
+            position: relative;
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+        }
+
+        .industry-images {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 48px;
+            position: relative;
+        }
+
+        .industry-image {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-secondary);
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .industry-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.7) 100%);
+            z-index: 1;
+            transition: opacity 0.4s ease;
+        }
+
+        .industry-image:hover::before {
+            opacity: 0.5;
+        }
+
+        .industry-image:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-green);
+            box-shadow: 0 12px 40px rgba(0, 229, 153, 0.2);
+        }
+
+        .industry-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .industry-image:hover img {
+            transform: scale(1.1);
+        }
+
+        .section-divider {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-divider::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.9) 100%),
+                url('https://images.unsplash.com/photo-1611348524140-53c9a25263d6?w=1920&q=80') center/cover no-repeat;
+            opacity: 0.6;
+        }
+
+        .divider-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .divider-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 16px;
+            opacity: 0.8;
+            filter: drop-shadow(0 4px 12px var(--accent-green-glow));
         }
 
         .feature-grid {
@@ -461,6 +658,21 @@
         .cta-section {
             padding: 120px 0;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 229, 153, 0.08) 0%, transparent 70%);
+            animation: pulse-glow 8s ease-in-out infinite;
+            pointer-events: none;
         }
 
         .cta-section h2 {
@@ -634,6 +846,35 @@
                 width: 100%;
                 text-align: center;
             }
+
+            .industry-images {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .floating-asset {
+                opacity: 0.08;
+            }
+
+            .pumpjack-1, .pumpjack-2 {
+                width: 80px;
+            }
+
+            .truck-asset {
+                width: 120px;
+            }
+
+            .tank-asset {
+                width: 100px;
+            }
+
+            .section-divider {
+                height: 150px;
+            }
+
+            .divider-icon {
+                width: 60px;
+                height: 60px;
+            }
         }
 
         @media (max-width: 640px) {
@@ -672,11 +913,46 @@
 
     <main>
         <section class="hero">
+            <!-- Floating Industry Assets -->
+            <svg class="floating-asset pumpjack-1" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M30 85 L30 55 L45 40 L70 55 L70 85" stroke="#00e599" stroke-width="2" fill="rgba(0,229,153,0.1)"/>
+                <circle cx="45" cy="38" r="4" fill="#00e599"/>
+                <path d="M45 40 L45 55" stroke="#00e599" stroke-width="3"/>
+                <rect x="28" y="85" width="44" height="5" fill="#00e599" opacity="0.6"/>
+                <path d="M50 30 L65 20 L70 25" stroke="#00e599" stroke-width="2.5" stroke-linecap="round"/>
+                <rect x="40" y="55" width="10" height="10" fill="#00e599" opacity="0.4"/>
+            </svg>
+
+            <svg class="floating-asset pumpjack-2" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M25 80 L25 50 L40 35 L65 50 L65 80" stroke="#00e599" stroke-width="2" fill="rgba(0,229,153,0.1)"/>
+                <circle cx="40" cy="33" r="4" fill="#00e599"/>
+                <path d="M40 35 L40 50" stroke="#00e599" stroke-width="3"/>
+                <rect x="23" y="80" width="44" height="5" fill="#00e599" opacity="0.6"/>
+                <path d="M45 28 L60 18 L65 23" stroke="#00e599" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+
+            <svg class="floating-asset truck-asset" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="20" y="30" width="140" height="35" rx="4" fill="rgba(0,229,153,0.2)" stroke="#00e599" stroke-width="2"/>
+                <rect x="140" y="25" width="45" height="40" rx="4" fill="rgba(0,229,153,0.15)" stroke="#00e599" stroke-width="2"/>
+                <circle cx="50" cy="70" r="8" fill="#00e599" opacity="0.6"/>
+                <circle cx="150" cy="70" r="8" fill="#00e599" opacity="0.6"/>
+                <path d="M25 40 L155 40" stroke="#00e599" stroke-width="1" opacity="0.4"/>
+                <rect x="145" y="35" width="15" height="15" rx="2" fill="#00e599" opacity="0.3"/>
+            </svg>
+
+            <svg class="floating-asset tank-asset" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="50" cy="30" rx="35" ry="8" fill="#00e599" opacity="0.3"/>
+                <rect x="15" y="30" width="70" height="50" fill="rgba(0,229,153,0.15)" stroke="#00e599" stroke-width="2"/>
+                <ellipse cx="50" cy="80" rx="35" ry="8" fill="rgba(0,229,153,0.2)" stroke="#00e599" stroke-width="2"/>
+                <path d="M30 40 L70 40 M30 50 L70 50 M30 60 L70 60" stroke="#00e599" stroke-width="1" opacity="0.3"/>
+                <rect x="45" y="15" width="10" height="15" rx="2" fill="#00e599" opacity="0.4"/>
+            </svg>
+
             <div class="container">
                 <div class="hero-container">
                     <h1>Predict. Optimize. Profit.</h1>
                     <p class="hero-description">
-                        Specialized business intelligence and automation for crude oil transportation. 
+                        Specialized business intelligence and automation for crude oil transportation.
                         Three years supporting $500M+ operations with zero manual overhead.
                     </p>
                 <div class="cta-group">
@@ -708,6 +984,51 @@
             </div>
         </section>
 
+        <!-- Industry Showcase Section -->
+        <section class="industry-showcase">
+            <div class="container">
+                <div class="section-header scroll-reveal">
+                    <div class="section-label">Our Industry</div>
+                    <h2 class="section-title">Powering America's Energy Infrastructure</h2>
+                    <p class="section-description">
+                        From wellhead to refinery, we understand every aspect of crude oil transportation
+                        and midstream operations.
+                    </p>
+                </div>
+                <div class="industry-images">
+                    <div class="industry-image scroll-reveal">
+                        <img src="https://images.unsplash.com/photo-1568495248636-6432b97bd949?w=600&q=80" alt="Oil Pumpjacks">
+                    </div>
+                    <div class="industry-image scroll-reveal">
+                        <img src="https://images.unsplash.com/photo-1611348524140-53c9a25263d6?w=600&q=80" alt="Oil Storage Tanks">
+                    </div>
+                    <div class="industry-image scroll-reveal">
+                        <img src="https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?w=600&q=80" alt="Tanker Truck">
+                    </div>
+                    <div class="industry-image scroll-reveal">
+                        <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&q=80" alt="Industrial Pipeline">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pipeline Divider -->
+        <section class="section-divider">
+            <div class="divider-content">
+                <svg class="divider-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="10" y="35" width="80" height="12" rx="6" fill="rgba(0,229,153,0.2)" stroke="#00e599" stroke-width="2"/>
+                    <rect x="10" y="53" width="80" height="12" rx="6" fill="rgba(0,229,153,0.2)" stroke="#00e599" stroke-width="2"/>
+                    <circle cx="25" cy="41" r="4" fill="#00e599"/>
+                    <circle cx="50" cy="41" r="4" fill="#00e599"/>
+                    <circle cx="75" cy="41" r="4" fill="#00e599"/>
+                    <circle cx="25" cy="59" r="4" fill="#00e599"/>
+                    <circle cx="50" cy="59" r="4" fill="#00e599"/>
+                    <circle cx="75" cy="59" r="4" fill="#00e599"/>
+                    <path d="M5 41 L15 41 M85 41 L95 41 M5 59 L15 59 M85 59 L95 59" stroke="#00e599" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+        </section>
+
         <section class="section" id="capabilities">
             <div class="container">
                 <div class="section-header scroll-reveal">
@@ -724,11 +1045,14 @@
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00e599" stroke-width="2">
                                 <path d="M3 3v18h18" />
                                 <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+                                <circle cx="18.7" cy="8" r="1.5" fill="#00e599"/>
+                                <rect x="4" y="16" width="2" height="5" fill="#00e599" opacity="0.3"/>
+                                <rect x="10" y="13" width="2" height="8" fill="#00e599" opacity="0.3"/>
                             </svg>
                         </div>
                         <h3 class="card-title">Executive BI Platforms</h3>
                         <p class="card-description">
-                            Real-time dashboards for volume analytics, dispatch optimization, and operational KPIs. 
+                            Real-time dashboards for volume analytics, dispatch optimization, and operational KPIs.
                             Decision-ready intelligence when you need it.
                         </p>
                     </div>
@@ -776,11 +1100,12 @@
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00e599" stroke-width="2">
                                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
                                 <circle cx="12" cy="10" r="3"/>
+                                <path d="M6 18 L12 22 L18 18" stroke="#00e599" stroke-width="1.5" opacity="0.4" stroke-dasharray="2 2"/>
                             </svg>
                         </div>
                         <h3 class="card-title">GIS Route Optimization</h3>
                         <p class="card-description">
-                            Mapbox-based pipeline and terminal visualization with intelligent 
+                            Mapbox-based pipeline and terminal visualization with intelligent
                             routing. Maximum efficiency, minimum empty miles.
                         </p>
                     </div>
@@ -896,6 +1221,31 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- Operations Divider -->
+        <section class="section-divider">
+            <div class="divider-content">
+                <svg class="divider-icon" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Refinery Tank -->
+                    <ellipse cx="30" cy="40" rx="20" ry="5" fill="#00e599" opacity="0.3"/>
+                    <rect x="10" y="40" width="40" height="35" fill="rgba(0,229,153,0.15)" stroke="#00e599" stroke-width="2"/>
+                    <ellipse cx="30" cy="75" rx="20" ry="5" fill="rgba(0,229,153,0.2)" stroke="#00e599" stroke-width="2"/>
+                    <rect x="25" y="30" width="10" height="10" rx="2" fill="#00e599" opacity="0.4"/>
+
+                    <!-- Pumpjack -->
+                    <path d="M60 75 L60 55 L70 45 L85 55 L85 75" stroke="#00e599" stroke-width="2" fill="rgba(0,229,153,0.1)"/>
+                    <circle cx="70" cy="43" r="3" fill="#00e599"/>
+                    <path d="M70 45 L70 55" stroke="#00e599" stroke-width="2.5"/>
+                    <rect x="58" y="75" width="28" height="3" fill="#00e599" opacity="0.6"/>
+                    <path d="M73 40 L83 32 L86 35" stroke="#00e599" stroke-width="2" stroke-linecap="round"/>
+
+                    <!-- Truck -->
+                    <rect x="95" y="55" width="20" height="10" rx="2" fill="rgba(0,229,153,0.2)" stroke="#00e599" stroke-width="1.5"/>
+                    <circle cx="100" cy="68" r="3" fill="#00e599" opacity="0.6"/>
+                    <circle cx="110" cy="68" r="3" fill="#00e599" opacity="0.6"/>
+                </svg>
             </div>
         </section>
 
