@@ -84,14 +84,28 @@ Runs on `http://localhost:3000`
 
 ### Production Build
 ```bash
-npm run build
-npm run preview
+npm run build        # Build with GitHub Pages base path
+npm run preview      # Preview production build locally
+```
+
+### Deploy to GitHub Pages
+```bash
+npm run deploy       # Build and deploy to gh-pages branch
 ```
 
 ### Optimize Images
 ```bash
 npm run optimize-images
 ```
+
+### Commands Summary
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview production build |
+| `npm run deploy` | Deploy to GitHub Pages |
+| `npm run optimize-images` | Optimize images |
 
 ---
 
@@ -259,16 +273,45 @@ dist/
 
 ## 🏁 Deployment
 
-### Build for Production
-```bash
-npm run build
-```
+### GitHub Pages (Primary Method)
 
-### Deploy to Vercel/Netlify
+#### Automatic Deployment (Recommended)
+The site is configured with GitHub Actions for automatic deployment:
+
+1. **Enable GitHub Pages:**
+   - Go to repository Settings → Pages
+   - Source: "GitHub Actions"
+   - The workflow will automatically deploy on push to main or current branch
+
+2. **Your live URL will be:**
+   ```
+   https://Blob837.github.io/The-site/
+   ```
+
+3. **The workflow:**
+   - Automatically runs on push
+   - Optimizes images
+   - Builds production version
+   - Deploys to GitHub Pages
+
+#### Manual Deployment
+If you prefer manual deployment:
+```bash
+npm run deploy
+```
+This will build and push to the `gh-pages` branch.
+
+### Alternative: Vercel/Netlify
 Simply connect the repository and deploy the `dist` folder.
 
 ### Environment Variables
 None required - fully static site.
+
+### Configuration Notes
+- Base path is set to `/The-site/` in `vite.config.js`
+- `.nojekyll` file prevents Jekyll processing
+- Service Worker paths are configured for GitHub Pages
+- All asset paths are relative to the base path
 
 ---
 

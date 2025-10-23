@@ -1,10 +1,12 @@
 # Dependencies
 node_modules/
-package-lock.json
 
 # Build output
 dist/
 *.local
+
+# gh-pages branch (created by gh-pages package)
+.gh-pages/
 
 # Editor directories and files
 .vscode/

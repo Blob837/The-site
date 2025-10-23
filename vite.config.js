@@ -3,6 +3,9 @@ import { createHtmlPlugin } from 'vite-plugin-html';
 import viteCompression from 'vite-plugin-compression';
 
 export default defineConfig({
+  // GitHub Pages deployment configuration
+  base: '/The-site/',
+
   plugins: [
     createHtmlPlugin({
       minify: {
@@ -26,6 +29,8 @@ export default defineConfig({
   build: {
     target: 'es2015',
     minify: 'terser',
+    outDir: 'dist',
+    emptyOutDir: true,
     terserOptions: {
       compress: {
         drop_console: true,

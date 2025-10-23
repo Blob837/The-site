@@ -6,15 +6,14 @@
 const CACHE_NAME = 'praeco-v1';
 const RUNTIME_CACHE = 'praeco-runtime-v1';
 
+// GitHub Pages base path
+const BASE_PATH = '/The-site/';
+
 // Assets to cache on install
 const PRECACHE_ASSETS = [
-  '/',
-  '/index.html',
-  '/assets/images/logo.svg',
-  '/assets/images/background-lg.webp',
-  '/assets/images/background-md.webp',
-  '/assets/images/background-sm.webp',
-];
+  BASE_PATH,
+  `${BASE_PATH}index.html`,
+].filter(Boolean);
 
 // Install event - cache critical assets
 self.addEventListener('install', (event) => {
