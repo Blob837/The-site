@@ -23,6 +23,122 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
 /**
+ * RESPONSIVE BACKGROUND IMAGE LOADING
+ * Load appropriate image size based on viewport
+ */
+function loadHeroBackground() {
+  const heroSection = document.getElementById('hero-section');
+  if (!heroSection) return;
+
+  const bgLg = heroSection.dataset.bgLg;
+  const bgMd = heroSection.dataset.bgMd;
+  const bgSm = heroSection.dataset.bgSm;
+
+  let bgUrl;
+  const width = window.innerWidth;
+
+  if (width >= 1024) {
+    bgUrl = bgLg;
+  } else if (width >= 640) {
+    bgUrl = bgMd;
+  } else {
+    bgUrl = bgSm;
+  }
+
+  // Preload image for smooth appearance
+  const img = new Image();
+  img.onload = () => {
+    heroSection.style.backgroundImage = `url('${bgUrl}')`;
+    heroSection.style.backgroundSize = 'cover';
+    heroSection.style.backgroundPosition = 'center';
+  };
+  img.src = bgUrl;
+}
+
+// Load background on page load
+loadHeroBackground();
+
+// Reload on resize (debounced)
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(loadHeroBackground, 250);
+}, { passive: true });
+
+/**
+ * SOPHISTICATED OPENING SEQUENCE
+ * Competition-grade page load animation
+ */
+window.addEventListener('load', () => {
+  const loadingScreen = document.getElementById('loading-screen');
+  const heroTitle = document.querySelector('.hero-title');
+  const heroDescription = document.querySelector('.hero-description');
+  const ctaButtons = document.querySelectorAll('.cta-group .button');
+  const header = document.getElementById('header');
+
+  if (!prefersReducedMotion && loadingScreen) {
+    // Opening sequence timeline
+    const openingTL = gsap.timeline({
+      defaults: { ease: 'power3.out' }
+    });
+
+    openingTL
+      // Hide loading screen
+      .to(loadingScreen, {
+        opacity: 0,
+        duration: 0.6,
+        delay: 0.5,
+        onComplete: () => {
+          loadingScreen.classList.add('hidden');
+        }
+      })
+      // Fade in header
+      .from(header, {
+        y: -30,
+        opacity: 0,
+        duration: 0.8,
+      }, '-=0.3')
+      // Stagger hero title characters with shimmer
+      .from(heroTitle, {
+        y: 60,
+        opacity: 0,
+        scale: 0.9,
+        duration: 1.2,
+        ease: 'power4.out',
+      }, '-=0.5')
+      // Hero description
+      .from(heroDescription, {
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+      }, '-=0.7')
+      // CTA buttons with stagger
+      .from(ctaButtons, {
+        y: 30,
+        opacity: 0,
+        scale: 0.95,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: 'back.out(1.7)',
+      }, '-=0.5')
+      // Gradient orbs entrance
+      .from('.gradient-orb', {
+        scale: 0,
+        opacity: 0,
+        duration: 1.5,
+        stagger: 0.2,
+        ease: 'elastic.out(1, 0.5)',
+      }, '-=1');
+
+  } else {
+    // Instant show for reduced motion
+    if (loadingScreen) {
+      loadingScreen.classList.add('hidden');
+    }
+  }
+});
+
+/**
  * Initialize Lenis smooth scrolling (desktop only, respects reduced motion)
  */
 let lenis;
@@ -292,9 +408,49 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 /**
- * Animate stat values on scroll into view
+ * Animate stat values with counter effect on scroll into view
  */
 const statValues = document.querySelectorAll('.stat-value');
+
+// Counter animation function
+function animateCounter(element, duration = 2000) {
+  const text = element.textContent;
+  const numberMatch = text.match(/[\d,]+/);
+
+  if (numberMatch) {
+    const originalNumber = numberMatch[0];
+    const numericValue = parseInt(originalNumber.replace(/,/g, ''));
+    const suffix = text.replace(originalNumber, '').trim();
+
+    if (!isNaN(numericValue)) {
+      const startTime = Date.now();
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Easing function for smooth acceleration
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const currentValue = Math.floor(eased * numericValue);
+
+        // Format with commas if original had them
+        const formatted = originalNumber.includes(',')
+          ? currentValue.toLocaleString()
+          : currentValue.toString();
+
+        element.textContent = suffix ? `${formatted}${suffix}` : `${formatted}`;
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          element.textContent = text; // Set to original
+        }
+      };
+
+      animate();
+    }
+  }
+}
+
 const statObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
@@ -303,8 +459,16 @@ const statObserver = new IntersectionObserver((entries) => {
       if (!prefersReducedMotion) {
         gsap.fromTo(entry.target,
           { opacity: 0, scale: 0.8 },
-          { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.7)' }
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.6,
+            ease: 'back.out(1.7)',
+            onStart: () => animateCounter(entry.target, 1500)
+          }
         );
+      } else {
+        animateCounter(entry.target, 1000);
       }
     }
   });
