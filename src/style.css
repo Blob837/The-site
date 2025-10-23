@@ -1153,16 +1153,17 @@ footer {
    ========================================================================== */
 .cursor-glow {
   position: fixed;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(0, 229, 153, 0.15) 0%, transparent 70%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(0, 229, 153, 0.2) 0%, rgba(0, 229, 153, 0.1) 30%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
   transform: translate(-50%, -50%);
   transition: opacity 0.3s ease;
   z-index: 9999;
   opacity: 0;
-  filter: blur(40px);
+  filter: blur(60px);
+  mix-blend-mode: screen;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -1172,7 +1173,115 @@ footer {
 }
 
 /* ==========================================================================
-   RESPONSIVE ADJUSTMENTS
+   LOADING SCREEN
+   ========================================================================== */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--color-bg-base);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-content {
+  text-align: center;
+}
+
+.loading-logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 24px;
+  animation: pulse-logo 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px var(--color-accent-glow));
+}
+
+.loading-bar {
+  width: 200px;
+  height: 3px;
+  background: var(--color-bg-elevated-2);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  margin: 0 auto;
+}
+
+.loading-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  animation: loading-slide 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-logo {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes loading-slide {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
+  }
+}
+
+/* ==========================================================================
+   ENHANCED GLOW EFFECTS
+   ========================================================================== */
+.glow-text {
+  text-shadow:
+    0 0 10px var(--color-accent-dim),
+    0 0 20px var(--color-accent-dim),
+    0 0 40px var(--color-accent-dim);
+}
+
+/* Enhanced button glow states */
+.button-primary {
+  position: relative;
+  overflow: visible;
+}
+
+.button-primary::after {
+  filter: blur(15px);
+}
+
+/* Animated gradient border effect */
+@keyframes border-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px var(--color-accent-dim),
+                0 0 40px var(--color-accent-subtle),
+                inset 0 0 20px var(--color-accent-subtle);
+  }
+  50% {
+    box-shadow: 0 0 30px var(--color-accent-glow),
+                0 0 60px var(--color-accent-dim),
+                inset 0 0 30px var(--color-accent-dim);
+  }
+}
+
+/* ==========================================================================
+   MOBILE ENHANCEMENTS
    ========================================================================== */
 @media (max-width: 768px) {
   .hero {
@@ -1194,6 +1303,67 @@ footer {
   .button {
     width: 100%;
     text-align: center;
+  }
+
+  /* Enhanced mobile touch feedback */
+  .button:active,
+  .nav-button:active,
+  .card:active,
+  .stat-item:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease;
+  }
+
+  /* Optimize animations for mobile */
+  .gradient-orb {
+    filter: blur(60px);
+    opacity: 0.4;
+  }
+
+  /* Better mobile typography */
+  .hero-title {
+    font-size: clamp(2rem, 8vw, 3rem);
+    line-height: 1.15;
+  }
+
+  .hero-description {
+    font-size: clamp(0.95rem, 4vw, 1.1rem);
+  }
+
+  /* Mobile-optimized card spacing */
+  .card {
+    padding: var(--space-md);
+  }
+
+  /* Reduce parallax on mobile for performance */
+  .scroll-reveal {
+    transform: translateY(20px);
+  }
+}
+
+/* Touch-specific enhancements */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase touch targets */
+  .button,
+  .nav-button {
+    min-height: 44px;
+    padding: 16px 24px;
+  }
+
+  /* Disable hover effects that don't make sense on touch */
+  .card::after {
+    display: none;
+  }
+
+  /* Faster transitions for touch */
+  * {
+    transition-duration: 200ms;
+  }
+
+  /* Optimize scroll performance */
+  .hero,
+  .section {
+    will-change: auto;
   }
 }
 
